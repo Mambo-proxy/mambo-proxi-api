@@ -1,0 +1,11 @@
+extends:
+  - recommended
+apis:
+  main:
+    root: contracts/openapi.yaml
+rules:
+  operation-4xx-response: error
+  no-unused-components: error
+  no-server-example.com: off   # le serveur localhost est documenté volontairement pour le développement
+  security-defined: off        # endpoints publics sans authentification par conception
+  info-license-strict: off

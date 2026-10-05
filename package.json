@@ -1,0 +1,21 @@
+{
+  "name": "mambo-proxi-api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API du site MAMBO Proxi (NestJS, Prisma, PostgreSQL).",
+  "license": "UNLICENSED",
+  "packageManager": "pnpm@12.9.1",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "contract:lint": "redocly lint",
+    "contract:bundle": "redocly bundle contracts/openapi.yaml --output dist/openapi.json",
+    "contract:docs": "redocly build-docs contracts/openapi.yaml --output dist/openapi.html",
+    "services:up": "docker compose up -d",
+    "services:down": "docker compose down"
+  },
+  "devDependencies": {
+    "@redocly/cli": "2.58.1"
+  }
+}
