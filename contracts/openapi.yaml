@@ -4224,7 +4224,7 @@ components:
         kind: { $ref: '#/components/schemas/SurveyQuestionKind' }
         label: { type: string }
         helpText: { type: [string, 'null'] }
-        options: { type: array, items: { type: string }, description: Choix proposés (CHOICE) ou libellés des notes 1→5 (STARS). }
+        options: { type: array, items: { type: string }, description: 'Choix proposés (CHOICE), libellés des notes 1→5 (STARS) ou bornes de l''échelle 0–10 (NPS : [gauche, droite]).' }
         required: { type: boolean }
 
     PublicSurvey:
@@ -6426,10 +6426,10 @@ components:
         expiresAt: '2026-12-16T09:00:00.000Z'
         questions:
           - { id: q1, order: 1, kind: STARS, label: 'Quelle note donnez-vous à la prestation ?', helpText: null, options: [Très décevant, Décevant, Correct, Très bien, Excellent], required: true }
-          - { id: q2, order: 2, kind: CHOICE, label: 'Le prestataire était-il ponctuel ?', helpText: null, options: [Oui, Un léger retard, Non], required: true }
-          - { id: q3, order: 3, kind: CHOICE, label: 'Avez-vous été bien informé·e à chaque étape ?', helpText: null, options: ['Oui, tout à fait', En partie, Pas vraiment], required: true }
-          - { id: q4, order: 4, kind: NPS, label: 'Recommanderiez-vous Mambo Proxi à un proche ?', helpText: '0 = pas du tout, 10 = sans hésiter', options: [], required: true }
-          - { id: q5, order: 5, kind: TEXT, label: 'Un commentaire à partager ?', helpText: null, options: [], required: false }
+          - { id: q2, order: 2, kind: CHOICE, label: 'Le prestataire était-il ponctuel et professionnel ?', helpText: null, options: ['Oui, tout à fait', Plutôt oui, Plutôt non, Non], required: false }
+          - { id: q3, order: 3, kind: CHOICE, label: 'L’équipe Mambo vous a-t-elle bien informé ?', helpText: null, options: ['Oui, tout à fait', Plutôt oui, Plutôt non, Non], required: false }
+          - { id: q4, order: 4, kind: NPS, label: 'Recommanderiez-vous Mambo Proxi à un proche ?', helpText: null, options: [Peu probable, Très probable], required: false }
+          - { id: q5, order: 5, kind: TEXT, label: 'Un commentaire à partager ?', helpText: Votre commentaire, options: [], required: false }
 
     Dashboard:
       summary: Tableau de bord (30 jours)
@@ -6543,7 +6543,7 @@ components:
             publishConsent: true
             answers:
               - { question: 'Quelle note donnez-vous à la prestation ?', answer: 5/5 — Excellent }
-              - { question: 'Le prestataire était-il ponctuel ?', answer: Oui }
+              - { question: 'Le prestataire était-il ponctuel et professionnel ?', answer: 'Oui, tout à fait' }
             reply: null
             publishedAt: null
             createdAt: '2026-10-03T19:40:00.000Z'
