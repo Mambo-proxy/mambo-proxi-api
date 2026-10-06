@@ -5916,6 +5916,7 @@ components:
           properties:
             type: { const: ctaBand }
             text: { type: [string, 'null'], maxLength: 300 }
+            textMobile: { type: [string, 'null'], maxLength: 200, description: Texte raccourci en mobile ; null = texte principal. }
             primaryCta: { oneOf: [{ $ref: '#/components/schemas/Link' }, { type: 'null' }] }
             showWhatsapp: { type: boolean, default: true }
 
@@ -6280,6 +6281,7 @@ components:
             enabled: true
             title: "Un projet, une question ?\n==Parlons-en.=="
             text: Devis gratuit et sans engagement, réponse sous 24 h. Ou écrivez-nous directement sur WhatsApp.
+            textMobile: 'Devis gratuit, réponse sous 24 h.'
             primaryCta: { label: Demander un devis gratuit, href: /devis }
             showWhatsapp: true
 
