@@ -146,6 +146,7 @@ paths:
               schema: { $ref: '#/components/schemas/Page' }
               examples:
                 accueil: { $ref: '#/components/examples/PageAccueil' }
+                services: { $ref: '#/components/examples/PageServices' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   /v1/sitemap:
@@ -6212,7 +6213,7 @@ components:
             visualSecondary: { illustration: chef, image: null, alt: '' }
             floatingCards:
               - { icon: Check, title: Devis envoyé en 24 h, text: Chef privé · samedi 20h }
-              - { icon: KeyRound, title: Logement trouvé, text: 'Bastos, Yaoundé', progress: 0.83, footnote: Installation prévue le 12 nov. }
+              - { icon: Key, title: Logement trouvé, text: 'Bastos, Yaoundé', progress: 0.83, footnote: Installation prévue le 12 nov. }
             sticker: Pensé pour vous
           - id: bandeau-services
             type: marquee
@@ -6285,13 +6286,44 @@ components:
             primaryCta: { label: Demander un devis gratuit, href: /devis }
             showWhatsapp: true
 
+    PageServices:
+      summary: Page « Nos services » (sections de la maquette)
+      value:
+        key: services
+        title: Nos services
+        isPreview: false
+        updatedAt: '2026-10-05T08:00:00.000Z'
+        seo: { title: Nos services, description: 'Expérience, immobilier, services de proximité, culture et événementiel : 19 services coordonnés par MAMBO Proxi au Cameroun. Devis gratuit sous 24 h.', ogImageUrl: null, noindex: false }
+        sections:
+          - id: hero
+            type: hero
+            enabled: true
+            variant: page
+            tone: muted
+            eyebrow: Nos services
+            title: 19 services, ==un seul interlocuteur.==
+            lead: 'Expérience, immobilier, services de proximité, culture et événementiel : choisissez votre besoin, nous coordonnons tout avec des prestataires sélectionnés. Tarifs communiqués sur devis.'
+            primaryCta: { label: Demander un devis gratuit, href: /devis }
+            showWhatsapp: true
+            visual: { illustration: accueil, image: null, alt: '' }
+          - id: rubriques
+            type: dynamic
+            enabled: true
+            source: categories-list
+          - id: cta
+            type: ctaBand
+            enabled: true
+            title: "Vous ne trouvez pas\nvotre besoin ?"
+            text: 'Décrivez-nous votre projet : nous trouvons la bonne solution et vous répondons sous 24 h.'
+            primaryCta: { label: Demander un devis gratuit, href: /devis }
+            showWhatsapp: true
     Categories:
       summary: Les 4 rubriques
       value:
-        - { id: cat_experience, slug: experience, name: Expérience, tagline: Des moments sur mesure, description: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', icon: Sparkles, tint: orange-50, iconColor: orange-700, visual: { illustration: chef, image: null, alt: '' }, sortOrder: 1, serviceCount: 5, href: /services/experience, homeCard: { title: Des moments sur mesure, text: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', textMobile: 'Voiture, chef privé, massage, photographe, événementiel.', chips: [Location de voiture, Chef privé, Massage bien-être, Photographe, Prestataires événementiels] } }
-        - { id: cat_immobilier, slug: immobilier, name: Immobilier, tagline: Se loger en toute sérénité, description: "Trouver, s'installer, louer en toute sérénité, ou confier votre bien à une équipe sur place.", icon: Building, tint: neutral-100, iconColor: neutral-800, visual: { illustration: logement, image: null, alt: '' }, sortOrder: 2, serviceCount: 7, href: /services/immobilier, homeCard: { title: Immobilier, text: "Trouver, s'installer, louer en toute sérénité, ou confier votre bien à une équipe sur place.", textMobile: "Trouver, louer, s'installer ou confier votre bien.", chips: [Recherche de logement, Location & colocation, Logement temporaire, Gestion locative] } }
-        - { id: cat_proximite, slug: services-de-proximite, name: Services de proximité, tagline: Votre quotidien simplifié, description: "Repas, courses, colis : on s'en charge, vous gagnez du temps.", icon: ShoppingCart, tint: vert-50, iconColor: vert-700, visual: { illustration: livraison, image: null, alt: '' }, sortOrder: 3, serviceCount: 3, href: /services/services-de-proximite, homeCard: { title: Votre quotidien simplifié, text: "Repas, courses, colis : on s'en charge, vous gagnez du temps.", textMobile: 'Repas, courses et colis livrés pour vous.', chips: [Livraison de repas, Courses, Colis] } }
-        - { id: cat_culture, slug: culture-evenementiel, name: Culture & événementiel, tagline: Vivre le Cameroun, description: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", icon: Compass, tint: neutral-900, iconColor: orange-400, visual: { illustration: marche, image: null, alt: '' }, sortOrder: 4, serviceCount: 4, href: /services/culture-evenementiel, homeCard: { title: Vivre le Cameroun, text: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", textMobile: 'Découvertes, sorties, événements, intégration locale.', chips: [Découverte du Cameroun, Sorties & loisirs, Événements Mambo, Intégration locale] } }
+        - { id: cat_experience, slug: experience, name: Expérience, tagline: Des moments sur mesure, number: '01', description: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', icon: Sparkles, tint: orange-50, iconColor: orange-700, visual: { illustration: chef, image: null, alt: '' }, sortOrder: 1, serviceCount: 5, href: /services/experience, homeCard: { title: Des moments sur mesure, text: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', textMobile: 'Voiture, chef privé, massage, photographe, événementiel.', chips: [Location de voiture, Chef privé, Massage bien-être, Photographe, Prestataires événementiels] } }
+        - { id: cat_immobilier, slug: immobilier, name: Immobilier, tagline: Se loger en toute sérénité, number: '02', description: "Trouver, louer, s'installer, ou confier votre bien à une équipe présente sur place.", icon: Building, tint: neutral-100, iconColor: neutral-800, visual: { illustration: logement, image: null, alt: '' }, sortOrder: 2, serviceCount: 7, href: /services/immobilier, homeCard: { title: Immobilier, text: "Trouver, s'installer, louer en toute sérénité, ou confier votre bien à une équipe sur place.", textMobile: "Trouver, louer, s'installer ou confier votre bien.", chips: [Recherche de logement, Location & colocation, Logement temporaire, Gestion locative] } }
+        - { id: cat_proximite, slug: services-de-proximite, name: Services de proximité, tagline: Votre quotidien simplifié, number: '03', description: 'Repas, courses, colis : nous nous en chargeons pour vous et pour vos proches.', icon: ShoppingCart, tint: vert-50, iconColor: vert-700, visual: { illustration: livraison, image: null, alt: '' }, sortOrder: 3, serviceCount: 3, href: /services/services-de-proximite, homeCard: { title: Votre quotidien simplifié, text: "Repas, courses, colis : on s'en charge, vous gagnez du temps.", textMobile: 'Repas, courses et colis livrés pour vous.', chips: [Livraison de repas, Courses, Colis] } }
+        - { id: cat_culture, slug: culture-evenementiel, name: Culture & événementiel, tagline: Vivre le Cameroun, number: '04', description: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", icon: Compass, tint: neutral-900, iconColor: orange-400, visual: { illustration: marche, image: null, alt: '' }, sortOrder: 4, serviceCount: 4, href: /services/culture-evenementiel, homeCard: { title: Vivre le Cameroun, text: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", textMobile: 'Découvertes, sorties, événements, intégration locale.', chips: [Découverte du Cameroun, Sorties & loisirs, Événements Mambo, Intégration locale] } }
 
     CategoryExperience:
       summary: Rubrique Expérience
