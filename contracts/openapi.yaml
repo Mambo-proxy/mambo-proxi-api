@@ -6239,7 +6239,7 @@ components:
             items:
               - { number: '01', icon: FileText, title: Vous exprimez votre besoin, text: "Via le formulaire de devis, sur WhatsApp ou lors d'un rendez-vous, en France comme au Cameroun.", textMobile: 'Formulaire, WhatsApp ou rendez-vous.' }
               - { number: '02', icon: Mail, title: Vous recevez un devis sur mesure, text: 'Sous 24 h, une proposition claire et personnalisée, sans engagement de votre part.', textMobile: 'Sous 24 h, sans engagement.' }
-              - { number: '03', icon: Shield, title: Nous nous occupons de tout, text: Nos prestataires sélectionnés interviennent. Vous êtes tenu informé à chaque étape., textMobile: Vous êtes informé à chaque étape. }
+              - { number: '03', icon: ShieldCheck, title: Nous nous occupons de tout, text: Nos prestataires sélectionnés interviennent. Vous êtes tenu informé à chaque étape., textMobile: Vous êtes informé à chaque étape. }
             channelsLabel: 'Au choix :'
             channels:
               - { label: Formulaire en ligne, kind: form }
@@ -6255,7 +6255,7 @@ components:
             visual: { illustration: equipe, image: null, alt: '' }
             items:
               - { icon: Users, title: Une équipe à vos côtés, text: 'Un interlocuteur unique qui vous accompagne pas à pas, en France comme au Cameroun.' }
-              - { icon: Shield, title: Des solutions concrètes et durables, text: 'Des prestataires vérifiés, suivis et évalués après chaque mission.' }
+              - { icon: ShieldCheck, title: Des solutions concrètes et durables, text: 'Des prestataires vérifiés, suivis et évalués après chaque mission.' }
               - { icon: Globe, title: Un pont entre la France et le Cameroun, text: 'Préparez votre venue depuis la France, nous agissons sur place.' }
             figures: []
           - id: avis
