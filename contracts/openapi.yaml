@@ -3926,6 +3926,9 @@ components:
         tint: { $ref: '#/components/schemas/CategoryTint' }
         iconColor: { type: string, description: Token de couleur de l'icône, examples: [orange-700] }
         visual: { $ref: '#/components/schemas/Visual' }
+        thumbnail:
+          oneOf: [{ $ref: '#/components/schemas/Visual' }, { type: 'null' }]
+          description: Vignette des cartes « Nos autres rubriques » (pages rubrique) ; null = visuel principal.
         sortOrder: { type: integer }
         serviceCount: { type: integer }
         href: { type: string, examples: [/services/experience] }
@@ -3952,8 +3955,12 @@ components:
         eyebrow: { type: [string, 'null'] }
         title: { $ref: '#/components/schemas/AccentText' }
         text: { type: [string, 'null'] }
-        steps: { type: array, items: { $ref: '#/components/schemas/StepItem' } }
+        steps:
+          type: array
+          description: Étapes illustrées (réception de colis).
+          items: { $ref: '#/components/schemas/IconTextItem' }
         note: { type: [string, 'null'] }
+        link: { oneOf: [{ $ref: '#/components/schemas/Link' }, { type: 'null' }], description: "Lien complémentaire (ex. « Voir tout l'agenda »)." }
 
     CategoryDetail:
       allOf:
@@ -6320,10 +6327,10 @@ components:
     Categories:
       summary: Les 4 rubriques
       value:
-        - { id: cat_experience, slug: experience, name: Expérience, tagline: Des moments sur mesure, number: '01', description: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', icon: Sparkles, tint: orange-50, iconColor: orange-700, visual: { illustration: chef, image: null, alt: '' }, sortOrder: 1, serviceCount: 5, href: /services/experience, homeCard: { title: Des moments sur mesure, text: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', textMobile: 'Voiture, chef privé, massage, photographe, événementiel.', chips: [Location de voiture, Chef privé, Massage bien-être, Photographe, Prestataires événementiels] } }
-        - { id: cat_immobilier, slug: immobilier, name: Immobilier, tagline: Se loger en toute sérénité, number: '02', description: "Trouver, louer, s'installer, ou confier votre bien à une équipe présente sur place.", icon: Building, tint: neutral-100, iconColor: neutral-800, visual: { illustration: logement, image: null, alt: '' }, sortOrder: 2, serviceCount: 7, href: /services/immobilier, homeCard: { title: Immobilier, text: "Trouver, s'installer, louer en toute sérénité, ou confier votre bien à une équipe sur place.", textMobile: "Trouver, louer, s'installer ou confier votre bien.", chips: [Recherche de logement, Location & colocation, Logement temporaire, Gestion locative] } }
-        - { id: cat_proximite, slug: services-de-proximite, name: Services de proximité, tagline: Votre quotidien simplifié, number: '03', description: 'Repas, courses, colis : nous nous en chargeons pour vous et pour vos proches.', icon: ShoppingCart, tint: vert-50, iconColor: vert-700, visual: { illustration: livraison, image: null, alt: '' }, sortOrder: 3, serviceCount: 3, href: /services/services-de-proximite, homeCard: { title: Votre quotidien simplifié, text: "Repas, courses, colis : on s'en charge, vous gagnez du temps.", textMobile: 'Repas, courses et colis livrés pour vous.', chips: [Livraison de repas, Courses, Colis] } }
-        - { id: cat_culture, slug: culture-evenementiel, name: Culture & événementiel, tagline: Vivre le Cameroun, number: '04', description: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", icon: Compass, tint: neutral-900, iconColor: orange-400, visual: { illustration: marche, image: null, alt: '' }, sortOrder: 4, serviceCount: 4, href: /services/culture-evenementiel, homeCard: { title: Vivre le Cameroun, text: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", textMobile: 'Découvertes, sorties, événements, intégration locale.', chips: [Découverte du Cameroun, Sorties & loisirs, Événements Mambo, Intégration locale] } }
+        - { id: cat_experience, slug: experience, name: Expérience, tagline: Des moments sur mesure, number: '01', description: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', icon: Sparkles, tint: orange-50, iconColor: orange-700, visual: { illustration: chef, image: null, alt: '' }, thumbnail: { illustration: accueil, image: null, alt: '' }, sortOrder: 1, serviceCount: 5, href: /services/experience, homeCard: { title: Des moments sur mesure, text: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', textMobile: 'Voiture, chef privé, massage, photographe, événementiel.', chips: [Location de voiture, Chef privé, Massage bien-être, Photographe, Prestataires événementiels] } }
+        - { id: cat_immobilier, slug: immobilier, name: Immobilier, tagline: Se loger en toute sérénité, number: '02', description: "Trouver, louer, s'installer, ou confier votre bien à une équipe présente sur place.", icon: Building, tint: neutral-100, iconColor: neutral-800, visual: { illustration: logement, image: null, alt: '' }, thumbnail: { illustration: logement, image: null, alt: '' }, sortOrder: 2, serviceCount: 7, href: /services/immobilier, homeCard: { title: Immobilier, text: "Trouver, s'installer, louer en toute sérénité, ou confier votre bien à une équipe sur place.", textMobile: "Trouver, louer, s'installer ou confier votre bien.", chips: [Recherche de logement, Location & colocation, Logement temporaire, Gestion locative] } }
+        - { id: cat_proximite, slug: services-de-proximite, name: Services de proximité, tagline: Votre quotidien simplifié, number: '03', description: 'Repas, courses, colis : nous nous en chargeons pour vous et pour vos proches.', icon: ShoppingCart, tint: vert-50, iconColor: vert-700, visual: { illustration: livraison, image: null, alt: '' }, thumbnail: { illustration: courses, image: null, alt: '' }, sortOrder: 3, serviceCount: 3, href: /services/services-de-proximite, homeCard: { title: Votre quotidien simplifié, text: "Repas, courses, colis : on s'en charge, vous gagnez du temps.", textMobile: 'Repas, courses et colis livrés pour vous.', chips: [Livraison de repas, Courses, Colis] } }
+        - { id: cat_culture, slug: culture-evenementiel, name: Culture & événementiel, tagline: Vivre le Cameroun, number: '04', description: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", icon: Compass, tint: neutral-900, iconColor: orange-400, visual: { illustration: marche, image: null, alt: '' }, thumbnail: { illustration: culture, image: null, alt: '' }, sortOrder: 4, serviceCount: 4, href: /services/culture-evenementiel, homeCard: { title: Vivre le Cameroun, text: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", textMobile: 'Découvertes, sorties, événements, intégration locale.', chips: [Découverte du Cameroun, Sorties & loisirs, Événements Mambo, Intégration locale] } }
 
     CategoryExperience:
       summary: Rubrique Expérience
@@ -6380,7 +6387,7 @@ components:
           - { name: guests, label: Nombre de personnes, type: number, required: false, min: 1, max: 500, width: half }
           - { name: occasion, label: "Type d'occasion", type: select, required: false, options: [Anniversaire, Mariage, Dîner entre amis, Séjour en famille, Événement d'entreprise, Autre], width: half }
         otherCategories: []
-        cta: { title: "Un projet, une question ?\n==Parlons-en.==", text: 'Devis gratuit et sans engagement, réponse sous 24 h. Ou écrivez-nous directement sur WhatsApp.' }
+        cta: { title: "Envie d’un moment\nsur mesure ?", text: 'Dites-nous ce que vous imaginez : nous vous proposons un devis gratuit sous 24 h.' }
         seo: { title: 'Expérience : chef privé, location de voiture, photographe au Cameroun', description: 'Des prestataires de confiance réservés pour vous au Cameroun : location de voiture, chef privé, massage, photographe, événementiel.', ogImageUrl: null, noindex: false }
 
     ServiceChefPrive:
