@@ -3563,6 +3563,7 @@ components:
         label: { type: string, maxLength: 80 }
         href: { type: string, maxLength: 500, examples: [/devis] }
         external: { type: boolean, default: false }
+        labelMobile: { type: [string, 'null'], maxLength: 80, description: Libellé raccourci en mobile ; vide = libellé principal. }
 
     Seo:
       type: object
@@ -3640,6 +3641,7 @@ components:
         suffix: { type: string, maxLength: 8, examples: ['+'] }
         decimals: { type: integer, minimum: 0, maximum: 2, default: 0 }
         label: { type: string, maxLength: 80, examples: [projets accompagnés] }
+        labelMobile: { type: [string, 'null'], maxLength: 80, description: Libellé raccourci en mobile ; vide = libellé principal. }
 
     SiteSettings:
       type: object
@@ -3933,6 +3935,7 @@ components:
           properties:
             title: { type: string, examples: [Des moments sur mesure] }
             text: { type: string }
+            textMobile: { type: [string, 'null'], description: Texte raccourci en mobile ; null = texte principal. }
             chips: { type: array, items: { type: string } }
         services:
           type: array
@@ -4868,6 +4871,7 @@ components:
           properties:
             title: { type: string, maxLength: 80 }
             text: { type: string, maxLength: 200 }
+            textMobile: { type: [string, 'null'], maxLength: 120 }
             chips: { type: array, maxItems: 6, items: { type: string, maxLength: 40 } }
         icon: { $ref: '#/components/schemas/IconName' }
         illustration: { $ref: '#/components/schemas/IllustrationScene' }
@@ -5701,6 +5705,10 @@ components:
         eyebrow: { type: [string, 'null'], maxLength: 80 }
         title: { oneOf: [{ $ref: '#/components/schemas/AccentText' }, { type: 'null' }] }
         lead: { type: [string, 'null'], maxLength: 600 }
+        titleMobile:
+          oneOf: [{ $ref: '#/components/schemas/AccentText' }, { type: 'null' }]
+          description: Titre raccourci en mobile (< 768 px) ; null = titre principal.
+        leadMobile: { type: [string, 'null'], maxLength: 300, description: "Chapô raccourci en mobile ; null = chapô principal, chaîne vide = chapô masqué en mobile." }
 
     SectionItem:
       type: object
@@ -5711,6 +5719,7 @@ components:
         number: { type: [string, 'null'], maxLength: 4, examples: ['01'] }
         title: { type: string, maxLength: 160 }
         text: { type: [string, 'null'], maxLength: 800 }
+        textMobile: { type: [string, 'null'], maxLength: 300, description: Texte raccourci en mobile ; null = texte principal. }
         visual: { oneOf: [{ $ref: '#/components/schemas/Visual' }, { type: 'null' }] }
         tone: { $ref: '#/components/schemas/SectionTone' }
         chips: { type: array, items: { type: string, maxLength: 60 }, maxItems: 8 }
@@ -5765,6 +5774,11 @@ components:
           properties:
             type: { const: marquee }
             items: { type: array, minItems: 1, maxItems: 30, items: { type: string, maxLength: 60 } }
+            itemsMobile:
+              type: array
+              maxItems: 30
+              items: { type: string, maxLength: 60 }
+              description: Liste réduite affichée en mobile ; vide = même liste.
 
     StepsSection:
       allOf:
@@ -6011,8 +6025,8 @@ components:
         keyFigures:
           - { key: projects, value: 150, suffix: '+', label: projets accompagnés }
           - { key: partners, value: 40, suffix: '+', label: partenaires engagés }
-          - { key: services, value: 19, label: services réunis en 4 rubriques }
-          - { key: countries, value: 2, suffix: ' pays', label: 'couverts : France et Cameroun' }
+          - { key: services, value: 19, label: services réunis en 4 rubriques, labelMobile: 'services, 4 rubriques' }
+          - { key: countries, value: 2, suffix: ' pays', label: 'couverts : France et Cameroun', labelMobile: France et Cameroun }
         turnstileSiteKey: 1x00000000000000000000AA
         analytics: { ga4MeasurementId: null, searchConsoleVerification: null }
         seo:
@@ -6189,6 +6203,7 @@ components:
             badge: { tag: 'France  ·  Cameroun', text: Conciergerie de proximité }
             title: "Mambo, ce n'est pas qu'un service. ==C'est une expérience pensée pour vous.=="
             lead: Mobilité, chef privé, logement, courses, découvertes culturelles… Nous réunissons des prestataires de confiance pour vous simplifier la vie au Cameroun, que vous y viviez ou que vous prépariez votre venue.
+            leadMobile: Mobilité, chef privé, logement, courses, découvertes… Des prestataires de confiance pour vous simplifier la vie au Cameroun.
             primaryCta: { label: Demander un devis gratuit, href: /devis }
             secondaryCta: { label: Créer mon compte, href: /inscription }
             socialProof: '4,9/5 · plus de 150 projets accompagnés'
@@ -6202,6 +6217,7 @@ components:
             type: marquee
             enabled: true
             items: [Location de voiture, Chef privé, Massage bien-être, Photographe, Événementiel, Livraison de repas, Courses, Colis, Recherche de logement, Logement temporaire, Gestion locative, Découverte du Cameroun, Sorties culturelles]
+            itemsMobile: [Chef privé, Logement, Massage bien-être, Courses, Découverte du Cameroun]
           - id: univers
             type: dynamic
             enabled: true
@@ -6209,6 +6225,7 @@ components:
             eyebrow: Nos univers de services
             title: Tout ce dont vous avez besoin, réuni au même endroit.
             lead: 19 services regroupés en 4 univers. Choisissez, nous coordonnons tout avec des prestataires sélectionnés et suivis.
+            leadMobile: 19 services regroupés en 4 univers.
             link: { label: Voir tous les services, href: /services }
           - id: comment-ca-marche
             type: steps
@@ -6218,10 +6235,11 @@ components:
             eyebrow: Comment ça marche
             title: Simple comme un message.
             lead: Trois étapes, un seul interlocuteur. Vous restez informé du début à la fin.
+            leadMobile: Trois étapes, un seul interlocuteur.
             items:
-              - { number: '01', icon: FileText, title: Vous exprimez votre besoin, text: "Via le formulaire de devis, sur WhatsApp ou lors d'un rendez-vous, en France comme au Cameroun." }
-              - { number: '02', icon: Mail, title: Vous recevez un devis sur mesure, text: 'Sous 24 h, une proposition claire et personnalisée, sans engagement de votre part.' }
-              - { number: '03', icon: Shield, title: Nous nous occupons de tout, text: Nos prestataires sélectionnés interviennent. Vous êtes tenu informé à chaque étape. }
+              - { number: '01', icon: FileText, title: Vous exprimez votre besoin, text: "Via le formulaire de devis, sur WhatsApp ou lors d'un rendez-vous, en France comme au Cameroun.", textMobile: 'Formulaire, WhatsApp ou rendez-vous.' }
+              - { number: '02', icon: Mail, title: Vous recevez un devis sur mesure, text: 'Sous 24 h, une proposition claire et personnalisée, sans engagement de votre part.', textMobile: 'Sous 24 h, sans engagement.' }
+              - { number: '03', icon: Shield, title: Nous nous occupons de tout, text: Nos prestataires sélectionnés interviennent. Vous êtes tenu informé à chaque étape., textMobile: Vous êtes informé à chaque étape. }
             channelsLabel: 'Au choix :'
             channels:
               - { label: Formulaire en ligne, kind: form }
@@ -6233,6 +6251,7 @@ components:
             eyebrow: Nos engagements
             title: "La proximité, c'est notre métier."
             lead: 'Une équipe présente des deux côtés, des prestataires choisis avec soin et une seule promesse : vous simplifier la vie.'
+            leadMobile: ''
             visual: { illustration: equipe, image: null, alt: '' }
             items:
               - { icon: Users, title: Une équipe à vos côtés, text: 'Un interlocuteur unique qui vous accompagne pas à pas, en France comme au Cameroun.' }
@@ -6246,6 +6265,7 @@ components:
             source: reviews-highlight
             eyebrow: Avis clients
             title: Ils nous ont fait confiance, ils en parlent.
+            titleMobile: Ils en parlent.
             link: { label: Lire tous les avis, href: /avis-clients }
             limit: 3
           - id: partenaires
@@ -6253,7 +6273,7 @@ components:
             enabled: true
             source: partners-strip
             title: Ils travaillent à nos côtés
-            link: { label: 'Vous êtes prestataire ? Devenez partenaire', href: '/partenaires#devenir-partenaire' }
+            link: { label: 'Vous êtes prestataire ? Devenez partenaire', labelMobile: Devenez partenaire, href: '/partenaires#devenir-partenaire' }
             limit: 6
           - id: cta
             type: ctaBand
@@ -6266,10 +6286,10 @@ components:
     Categories:
       summary: Les 4 rubriques
       value:
-        - { id: cat_experience, slug: experience, name: Expérience, tagline: Des moments sur mesure, description: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', icon: Sparkles, tint: orange-50, iconColor: orange-700, visual: { illustration: chef, image: null, alt: '' }, sortOrder: 1, serviceCount: 5, href: /services/experience }
-        - { id: cat_immobilier, slug: immobilier, name: Immobilier, tagline: Se loger en toute sérénité, description: "Trouver, s'installer, louer en toute sérénité, ou confier votre bien à une équipe sur place.", icon: Building, tint: neutral-100, iconColor: neutral-800, visual: { illustration: logement, image: null, alt: '' }, sortOrder: 2, serviceCount: 7, href: /services/immobilier }
-        - { id: cat_proximite, slug: services-de-proximite, name: Services de proximité, tagline: Votre quotidien simplifié, description: "Repas, courses, colis : on s'en charge, vous gagnez du temps.", icon: ShoppingCart, tint: vert-50, iconColor: vert-700, visual: { illustration: courses, image: null, alt: '' }, sortOrder: 3, serviceCount: 3, href: /services/services-de-proximite }
-        - { id: cat_culture, slug: culture-evenementiel, name: Culture & événementiel, tagline: Vivre le Cameroun, description: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", icon: Compass, tint: neutral-900, iconColor: orange-400, visual: { illustration: culture, image: null, alt: '' }, sortOrder: 4, serviceCount: 4, href: /services/culture-evenementiel }
+        - { id: cat_experience, slug: experience, name: Expérience, tagline: Des moments sur mesure, description: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', icon: Sparkles, tint: orange-50, iconColor: orange-700, visual: { illustration: chef, image: null, alt: '' }, sortOrder: 1, serviceCount: 5, href: /services/experience, homeCard: { title: Des moments sur mesure, text: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', textMobile: 'Voiture, chef privé, massage, photographe, événementiel.', chips: [Location de voiture, Chef privé, Massage bien-être, Photographe, Prestataires événementiels] } }
+        - { id: cat_immobilier, slug: immobilier, name: Immobilier, tagline: Se loger en toute sérénité, description: "Trouver, s'installer, louer en toute sérénité, ou confier votre bien à une équipe sur place.", icon: Building, tint: neutral-100, iconColor: neutral-800, visual: { illustration: logement, image: null, alt: '' }, sortOrder: 2, serviceCount: 7, href: /services/immobilier, homeCard: { title: Immobilier, text: "Trouver, s'installer, louer en toute sérénité, ou confier votre bien à une équipe sur place.", textMobile: "Trouver, louer, s'installer ou confier votre bien.", chips: [Recherche de logement, Location & colocation, Logement temporaire, Gestion locative] } }
+        - { id: cat_proximite, slug: services-de-proximite, name: Services de proximité, tagline: Votre quotidien simplifié, description: "Repas, courses, colis : on s'en charge, vous gagnez du temps.", icon: ShoppingCart, tint: vert-50, iconColor: vert-700, visual: { illustration: courses, image: null, alt: '' }, sortOrder: 3, serviceCount: 3, href: /services/services-de-proximite, homeCard: { title: Votre quotidien simplifié, text: "Repas, courses, colis : on s'en charge, vous gagnez du temps.", textMobile: 'Repas, courses et colis livrés pour vous.', chips: [Livraison de repas, Courses, Colis] } }
+        - { id: cat_culture, slug: culture-evenementiel, name: Culture & événementiel, tagline: Vivre le Cameroun, description: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", icon: Compass, tint: neutral-900, iconColor: orange-400, visual: { illustration: culture, image: null, alt: '' }, sortOrder: 4, serviceCount: 4, href: /services/culture-evenementiel, homeCard: { title: Vivre le Cameroun, text: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", textMobile: 'Découvertes, sorties, événements, intégration locale.', chips: [Découverte du Cameroun, Sorties & loisirs, Événements Mambo, Intégration locale] } }
 
     CategoryExperience:
       summary: Rubrique Expérience
