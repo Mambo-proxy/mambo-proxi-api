@@ -5992,8 +5992,8 @@ components:
           number: '+237600000000'
           message: Bonjour Mambo Proxi, je souhaite des informations sur…
         social:
-          - { network: facebook, url: 'https://www.facebook.com/mamboproxi' }
           - { network: instagram, url: 'https://www.instagram.com/mamboproxi' }
+          - { network: facebook, url: 'https://www.facebook.com/mamboproxi' }
           - { network: linkedin, url: 'https://www.linkedin.com/company/mamboproxi' }
           - { network: tiktok, url: 'https://www.tiktok.com/@mamboproxi' }
         agency:
@@ -6098,13 +6098,13 @@ components:
             - slug: immobilier
               name: Immobilier
               tagline: Se loger en toute sérénité
-              icon: Building2
+              icon: Building
               tint: neutral-100
               href: /services/immobilier
               services:
                 - { slug: recherche-logement, name: Recherche de logement, href: /services/immobilier/recherche-logement }
                 - { slug: location-sous-location-colocation, name: 'Location, sous-location et colocation', href: /services/immobilier/location-sous-location-colocation }
-                - { slug: logement-adapte-meuble, name: Logement thérapeutique / adapté et appartement meublé, href: /services/immobilier/logement-adapte-meuble }
+                - { slug: logement-adapte-meuble, name: Logement adapté et appartement meublé, href: /services/immobilier/logement-adapte-meuble }
                 - { slug: gestion-locative, name: Gestion locative, href: /services/immobilier/gestion-locative }
                 - { slug: entretien-logements, name: Entretien des logements, href: /services/immobilier/entretien-logements }
                 - { slug: accompagnement-installation, name: 'Accompagnement à l''installation', href: /services/immobilier/accompagnement-installation }
@@ -6116,9 +6116,9 @@ components:
               tint: vert-50
               href: /services/services-de-proximite
               services:
-                - { slug: portage-livraison-repas, name: Portage et livraison de repas à domicile, href: /services/services-de-proximite/portage-livraison-repas }
-                - { slug: livraison-courses-commandes, name: Livraison de courses et de commandes à domicile, href: /services/services-de-proximite/livraison-courses-commandes }
-                - { slug: reception-colis-courrier, name: 'Réception de colis et de courrier à l''agence', href: /services/services-de-proximite/reception-colis-courrier }
+                - { slug: portage-livraison-repas, name: Portage et livraison de repas, href: /services/services-de-proximite/portage-livraison-repas }
+                - { slug: livraison-courses-commandes, name: Livraison de courses et de commandes, href: /services/services-de-proximite/livraison-courses-commandes }
+                - { slug: reception-colis-courrier, name: Réception de colis et de courrier, href: /services/services-de-proximite/reception-colis-courrier }
             - slug: culture-evenementiel
               name: 'Culture & événementiel'
               tagline: Vivre le Cameroun
@@ -6267,7 +6267,7 @@ components:
       summary: Les 4 rubriques
       value:
         - { id: cat_experience, slug: experience, name: Expérience, tagline: Des moments sur mesure, description: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', icon: Sparkles, tint: orange-50, iconColor: orange-700, visual: { illustration: chef, image: null, alt: '' }, sortOrder: 1, serviceCount: 5, href: /services/experience }
-        - { id: cat_immobilier, slug: immobilier, name: Immobilier, tagline: Se loger en toute sérénité, description: "Trouver, s'installer, louer en toute sérénité, ou confier votre bien à une équipe sur place.", icon: Building2, tint: neutral-100, iconColor: neutral-800, visual: { illustration: logement, image: null, alt: '' }, sortOrder: 2, serviceCount: 7, href: /services/immobilier }
+        - { id: cat_immobilier, slug: immobilier, name: Immobilier, tagline: Se loger en toute sérénité, description: "Trouver, s'installer, louer en toute sérénité, ou confier votre bien à une équipe sur place.", icon: Building, tint: neutral-100, iconColor: neutral-800, visual: { illustration: logement, image: null, alt: '' }, sortOrder: 2, serviceCount: 7, href: /services/immobilier }
         - { id: cat_proximite, slug: services-de-proximite, name: Services de proximité, tagline: Votre quotidien simplifié, description: "Repas, courses, colis : on s'en charge, vous gagnez du temps.", icon: ShoppingCart, tint: vert-50, iconColor: vert-700, visual: { illustration: courses, image: null, alt: '' }, sortOrder: 3, serviceCount: 3, href: /services/services-de-proximite }
         - { id: cat_culture, slug: culture-evenementiel, name: Culture & événementiel, tagline: Vivre le Cameroun, description: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", icon: Compass, tint: neutral-900, iconColor: orange-400, visual: { illustration: culture, image: null, alt: '' }, sortOrder: 4, serviceCount: 4, href: /services/culture-evenementiel }
 
