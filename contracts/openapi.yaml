@@ -6095,9 +6095,44 @@ components:
                 - { slug: chef-prive, name: Chef privé, href: /services/experience/chef-prive }
                 - { slug: massage-bien-etre, name: Massage bien-être, href: /services/experience/massage-bien-etre }
                 - { slug: services-evenementiels, name: Services événementiels, href: /services/experience/services-evenementiels }
+            - slug: immobilier
+              name: Immobilier
+              tagline: Se loger en toute sérénité
+              icon: Building2
+              tint: neutral-100
+              href: /services/immobilier
+              services:
+                - { slug: recherche-logement, name: Recherche de logement, href: /services/immobilier/recherche-logement }
+                - { slug: location-sous-location-colocation, name: 'Location, sous-location et colocation', href: /services/immobilier/location-sous-location-colocation }
+                - { slug: logement-adapte-meuble, name: Logement thérapeutique / adapté et appartement meublé, href: /services/immobilier/logement-adapte-meuble }
+                - { slug: gestion-locative, name: Gestion locative, href: /services/immobilier/gestion-locative }
+                - { slug: entretien-logements, name: Entretien des logements, href: /services/immobilier/entretien-logements }
+                - { slug: accompagnement-installation, name: 'Accompagnement à l''installation', href: /services/immobilier/accompagnement-installation }
+                - { slug: logement-temporaire, name: Solutions de logement temporaire, href: /services/immobilier/logement-temporaire }
+            - slug: services-de-proximite
+              name: Services de proximité
+              tagline: Votre quotidien simplifié
+              icon: ShoppingCart
+              tint: vert-50
+              href: /services/services-de-proximite
+              services:
+                - { slug: portage-livraison-repas, name: Portage et livraison de repas à domicile, href: /services/services-de-proximite/portage-livraison-repas }
+                - { slug: livraison-courses-commandes, name: Livraison de courses et de commandes à domicile, href: /services/services-de-proximite/livraison-courses-commandes }
+                - { slug: reception-colis-courrier, name: 'Réception de colis et de courrier à l''agence', href: /services/services-de-proximite/reception-colis-courrier }
+            - slug: culture-evenementiel
+              name: 'Culture & événementiel'
+              tagline: Vivre le Cameroun
+              icon: Compass
+              tint: neutral-900
+              href: /services/culture-evenementiel
+              services:
+                - { slug: decouverte-cameroun, name: Découverte du Cameroun, href: /services/culture-evenementiel/decouverte-cameroun }
+                - { slug: activites-culturelles-loisirs-sorties, name: 'Activités culturelles, loisirs et sorties', href: /services/culture-evenementiel/activites-culturelles-loisirs-sorties }
+                - { slug: organisation-activites-evenements, name: 'Organisation d''activités et d''événements', href: /services/culture-evenementiel/organisation-activites-evenements }
+                - { slug: decouverte-integration-locale, name: Découverte et intégration locale, href: /services/culture-evenementiel/decouverte-integration-locale }
           promo:
             title: Un besoin précis ?
-            text: Décrivez-le en quelques lignes, nous revenons vers vous sous 24 h.
+            text: Devis gratuit, réponse sous 24 h.
             cta: { label: Devis gratuit, href: /devis }
             illustration: accueil
         signUp:
@@ -6117,6 +6152,20 @@ components:
                 - { label: Immobilier, href: /services/immobilier }
                 - { label: Services de proximité, href: /services/services-de-proximite }
                 - { label: Culture & événementiel, href: /services/culture-evenementiel }
+                - { label: Devis gratuit, href: /devis }
+            - title: Mambo Proxi
+              links:
+                - { label: 'Qui sommes-nous ?', href: /qui-sommes-nous }
+                - { label: Mission, href: /mission }
+                - { label: Partenaires, href: /partenaires }
+                - { label: Avis clients, href: /avis-clients }
+                - { label: Contact, href: /contact }
+            - title: Nous rejoindre
+              links:
+                - { label: S'inscrire, href: /inscription }
+                - { label: Devenir partenaire, href: '/partenaires#devenir-partenaire' }
+                - { label: Recrutement, href: /recrutement }
+                - { label: Formation, href: /formation }
         legal:
           - { label: Mentions légales, href: /mentions-legales }
           - { label: CGU, href: /cgu }
