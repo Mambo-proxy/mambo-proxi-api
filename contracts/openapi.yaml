@@ -6408,10 +6408,10 @@ components:
         audiences:
           - Aux particuliers qui reçoivent famille ou amis
           - Aux familles de la diaspora en séjour au pays
-          - "Aux organisateurs d'anniversaires et de fêtes privées"
-          - "Aux entreprises pour un repas d'équipe ou un client"
+          - Aux organisateurs d’anniversaires et de fêtes privées
+          - Aux entreprises pour un repas d’équipe ou un client
         steps:
-          - { title: Échange sur votre projet, text: "Date, lieu, nombre d'invités, envies et contraintes alimentaires." }
+          - { title: Échange sur votre projet, text: 'Date, lieu, nombre d’invités, envies et contraintes alimentaires.' }
           - { title: Proposition de menu et devis, text: 'Le chef imagine un menu sur mesure ; vous recevez le devis sous 24 h.' }
           - { title: Courses et préparation, text: 'Produits frais achetés par le chef, préparation sur place.' }
           - { title: Service et rangement, text: 'Service à table, puis cuisine rangée et nettoyée.' }
@@ -6422,17 +6422,26 @@ components:
           - { icon: Clock, title: Du temps pour vous, text: 'Aucune course, aucune vaisselle : vous profitez.' }
           - { icon: Users, title: Un interlocuteur unique, text: Joignable depuis la France comme au Cameroun. }
         faq:
-          - { question: 'Combien coûte un chef privé ?', answer: "Chaque prestation est unique : le tarif dépend du menu, du nombre d'invités et du lieu. Il vous est communiqué sur devis, gratuitement." }
-          - { question: 'Dans quelles villes intervenez-vous ?', answer: 'À compléter par la cliente.' }
+          - { question: 'Combien coûte un chef privé ?', answer: 'Chaque prestation est unique : le tarif dépend du menu, du nombre d’invités et du lieu. Il vous est communiqué sur devis, gratuitement.' }
+          - { question: 'Dans quelles villes intervenez-vous ?', answer: 'À Douala, Yaoundé et Kribi. Pour une autre ville, écrivez-nous : nous étudions chaque demande.' }
+          - { question: 'Puis-je réserver depuis la France ?', answer: 'Oui. Vous faites votre demande en ligne ou sur WhatsApp ; nous organisons tout sur place et vous tenons informé à chaque étape.' }
+          - { question: 'Combien de temps à l’avance réserver ?', answer: 'Idéalement deux semaines avant la date. Pour une demande plus proche, contactez-nous : nous faisons notre possible.' }
         quoteBullets: [Gratuit et sans engagement, Menu et prestation sur mesure, Un seul interlocuteur du début à la fin]
         gallery:
           - { illustration: chef, image: null, alt: '' }
-          - { illustration: evenement, image: null, alt: '' }
-          - { illustration: accueil, image: null, alt: '' }
+          - { illustration: marche, image: null, alt: '' }
+          - { illustration: chef, image: null, alt: '' }
         showWhatsapp: true
         related:
           - { id: svc_location_voiture, slug: location-voiture, name: Location de voiture, shortName: null, summary: 'Véhicules récents, avec ou sans chauffeur, pour vos trajets et vos séjours.', icon: Car, visual: { illustration: voiture, image: null, alt: '' }, category: { slug: experience, name: Expérience }, href: /services/experience/location-voiture, featuredOnHome: true }
-        reviews: []
+          - { id: svc_photographe, slug: photographe, name: Photographe, shortName: null, summary: 'Portraits, événements, reportages : vos moments immortalisés.', icon: Camera, visual: { illustration: photo, image: null, alt: '' }, category: { slug: experience, name: Expérience }, href: /services/experience/photographe, featuredOnHome: false }
+          - { id: svc_massage_bien_etre, slug: massage-bien-etre, name: Massage bien-être, shortName: null, summary: 'Des praticiens qualifiés, chez vous ou sur votre lieu de séjour.', icon: Flower2, visual: { illustration: massage, image: null, alt: '' }, category: { slug: experience, name: Expérience }, href: /services/experience/massage-bien-etre, featuredOnHome: false }
+        reviewsTitle: Ils ont reçu un chef à domicile
+        reviews:
+          - { id: rev_jean_marc_chef, authorName: Jean-Marc T., initials: JT, city: Yaoundé, rating: 5, text: "Le chef a régalé nos invités pour l'anniversaire de ma mère. Service impeccable, du début à la fin.", service: { slug: chef-prive, name: Chef privé, categorySlug: experience, categoryName: Expérience }, verified: true, featured: false, date: '2026-09-12T10:00:00.000Z', reply: null }
+          - { id: rev_laure_chef, authorName: Laure B., initials: LB, city: Douala, rating: 5, text: 'Dîner de fiançailles parfait : menu revisité, table magnifique, et une cuisine rendue impeccable.', service: { slug: chef-prive, name: Chef privé, categorySlug: experience, categoryName: Expérience }, verified: true, featured: false, date: '2026-08-24T10:00:00.000Z', reply: null }
+        relatedTitle: Pour compléter votre événement
+        cta: { title: "Prêt à recevoir\nvos invités ?", text: 'Votre devis chef privé, gratuit et sans engagement, sous 24 h.' }
         reviewSummary: null
         seo: { title: 'Chef privé à domicile à Douala, Yaoundé, Kribi', description: 'Un chef à domicile pour vos dîners et réceptions au Cameroun. Menu sur mesure, devis gratuit sous 24 h.', ogImageUrl: null, noindex: false }
         toComplete: false
