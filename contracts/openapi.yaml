@@ -5726,6 +5726,7 @@ components:
         icon: { oneOf: [{ $ref: '#/components/schemas/IconName' }, { type: 'null' }] }
         number: { type: [string, 'null'], maxLength: 4, examples: ['01'] }
         title: { type: string, maxLength: 160 }
+        subtitle: { type: [string, 'null'], maxLength: 200, description: Sous-titre mis en avant (ex. métiers concernés d'un type de partenariat). }
         text: { type: [string, 'null'], maxLength: 800 }
         textMobile: { type: [string, 'null'], maxLength: 300, description: Texte raccourci en mobile ; null = texte principal. }
         visual: { oneOf: [{ $ref: '#/components/schemas/Visual' }, { type: 'null' }] }
