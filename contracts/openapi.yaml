@@ -1176,6 +1176,22 @@ paths:
         '204': { $ref: '#/components/responses/NoContent' }
         '401': { $ref: '#/components/responses/Unauthorized' }
 
+  /v1/admin/sidebar-counts:
+    get:
+      tags: [Admin — Tableau de bord]
+      operationId: adminGetSidebarCounts
+      summary: Compteurs de la barre latérale
+      description: Demandes nouvelles, rendez-vous à confirmer, avis à valider, candidatures non lues. Affichés sur tous les écrans du back-office.
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Compteurs.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SidebarCounts' }
+              example: { requests: 12, appointments: 3, reviews: 4, applications: 2 }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
   # ─────────────────────────── Admin — Demandes ───────────────────
   /v1/admin/requests:
     get:
