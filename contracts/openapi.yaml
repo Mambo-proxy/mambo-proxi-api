@@ -6853,8 +6853,7 @@ components:
           - id: cta
             type: ctaBand
             enabled: true
-            title: "Vous ne trouvez pas
-votre besoin ?"
+            title: "Vous ne trouvez pas\nvotre besoin ?"
             text: 'Décrivez-nous votre projet : nous trouvons la bonne solution et vous répondons sous 24 h.'
             primaryCta: { label: Demander un devis gratuit, href: /devis }
             showWhatsapp: true
@@ -6889,8 +6888,7 @@ votre besoin ?"
           - id: cta
             type: ctaBand
             enabled: true
-            title: "Can't find
-what you need?"
+            title: "Can't find\nwhat you need?"
             text: 'Tell us about your project: we find the right solution and reply within 24 hours.'
             primaryCta: { label: Request a free quote, href: /devis }
             showWhatsapp: true
