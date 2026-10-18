@@ -155,6 +155,7 @@ paths:
                 accueil: { $ref: '#/components/examples/PageAccueil' }
                 accueilEn: { $ref: '#/components/examples/PageAccueilEn' }
                 services: { $ref: '#/components/examples/PageServices' }
+                servicesEn: { $ref: '#/components/examples/PageServicesEn' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   /v1/zones:
@@ -6297,10 +6298,10 @@ components:
               href: /services/services-a-domicile
               countLabel: 4 formules
               services:
-                - { slug: maison-essentiel, name: Maison Essentiel, href: /services/services-a-domicile/maison-essentiel }
-                - { slug: maison-auto, name: Maison + Auto, href: /services/services-a-domicile/maison-auto }
-                - { slug: maison-linge, name: Maison + Linge, href: /services/services-a-domicile/maison-linge }
-                - { slug: maison-auto-linge, name: Maison + Auto + Linge, href: /services/services-a-domicile/maison-auto-linge }
+                - { slug: maison-essentiel, name: Maison Essentiel, href: '/services/services-a-domicile#formules' }
+                - { slug: maison-auto, name: Maison + Auto, href: '/services/services-a-domicile#formules' }
+                - { slug: maison-linge, name: Maison + Linge, href: '/services/services-a-domicile#formules' }
+                - { slug: maison-auto-linge, name: Maison + Auto + Linge, href: '/services/services-a-domicile#formules' }
             - slug: experience
               name: Expérience
               tagline: Des moments sur mesure
@@ -6472,10 +6473,10 @@ components:
               href: /services/services-a-domicile
               countLabel: 4 packages
               services:
-                - { slug: maison-essentiel, name: Home Essential, href: /services/services-a-domicile/maison-essentiel }
-                - { slug: maison-auto, name: Home + Car, href: /services/services-a-domicile/maison-auto }
-                - { slug: maison-linge, name: Home + Laundry, href: /services/services-a-domicile/maison-linge }
-                - { slug: maison-auto-linge, name: Home + Car + Laundry, href: /services/services-a-domicile/maison-auto-linge }
+                - { slug: maison-essentiel, name: Home Essential, href: '/services/services-a-domicile#formules' }
+                - { slug: maison-auto, name: Home + Car, href: '/services/services-a-domicile#formules' }
+                - { slug: maison-linge, name: Home + Laundry, href: '/services/services-a-domicile#formules' }
+                - { slug: maison-auto-linge, name: Home + Car + Laundry, href: '/services/services-a-domicile#formules' }
             - slug: experience
               name: Experience
               tagline: Tailor-made moments
@@ -6828,8 +6829,8 @@ components:
         key: services
         title: Nos services
         isPreview: false
-        updatedAt: '2026-10-05T08:00:00.000Z'
-        seo: { title: Nos services, description: 'Expérience, immobilier, services de proximité, culture et événementiel : 19 services coordonnés par MAMBO Proxi au Cameroun. Devis gratuit sous 24 h.', ogImageUrl: null, noindex: false }
+        updatedAt: '2026-10-18T08:00:00.000Z'
+        seo: { title: Nos services, description: 'Services à domicile, expérience, immobilier, services de proximité, culture et événementiel : 30 services à Douala, un seul interlocuteur. Devis gratuit sous 24 h.', ogImageUrl: null, noindex: false }
         sections:
           - id: hero
             type: hero
@@ -6837,11 +6838,14 @@ components:
             variant: page
             tone: muted
             eyebrow: Nos services
-            title: 19 services, ==un seul interlocuteur.==
-            lead: 'Expérience, immobilier, services de proximité, culture et événementiel : choisissez votre besoin, nous coordonnons tout avec des prestataires sélectionnés. Tarifs communiqués sur devis.'
+            title: 30 services, un seul interlocuteur.
+            lead: 'Expérience, immobilier, services de proximité, culture et événementiel : choisissez votre besoin, nous nous occupons de tout avec des prestataires sélectionnés. Tarifs communiqués sur devis.'
             primaryCta: { label: Demander un devis gratuit, href: /devis }
             showWhatsapp: true
-            visual: { illustration: accueil, image: null, alt: '' }
+            visual:
+              illustration: accueil
+              image: { id: photo-douala-ville, url: /photos/douala-ville.png, width: 1536, height: 1024, variants: [] }
+              alt: Douala au coucher du soleil, le pont sur le Wouri.
           - id: rubriques
             type: dynamic
             enabled: true
@@ -6849,17 +6853,53 @@ components:
           - id: cta
             type: ctaBand
             enabled: true
-            title: "Vous ne trouvez pas\nvotre besoin ?"
+            title: "Vous ne trouvez pas
+votre besoin ?"
             text: 'Décrivez-nous votre projet : nous trouvons la bonne solution et vous répondons sous 24 h.'
             primaryCta: { label: Demander un devis gratuit, href: /devis }
             showWhatsapp: true
 
+    PageServicesEn:
+      summary: Page « Nos services » en anglais (`?lang=en`)
+      value:
+        key: services
+        title: Our services
+        isPreview: false
+        updatedAt: '2026-10-18T08:00:00.000Z'
+        seo: { title: Our services, description: 'Home services, experience, real estate, local services, culture and events: 30 services in Douala, a single point of contact. Free quote within 24 hours.', ogImageUrl: null, noindex: false }
+        sections:
+          - id: hero
+            type: hero
+            enabled: true
+            variant: page
+            tone: muted
+            eyebrow: Our services
+            title: 30 services, a single point of contact.
+            lead: 'Experience, real estate, local services, culture and events: choose what you need, we take care of everything with selected professionals. Rates provided on quotation.'
+            primaryCta: { label: Request a free quote, href: /devis }
+            showWhatsapp: true
+            visual:
+              illustration: accueil
+              image: { id: photo-douala-ville, url: /photos/douala-ville.png, width: 1536, height: 1024, variants: [] }
+              alt: Douala at sunset, the bridge over the Wouri.
+          - id: rubriques
+            type: dynamic
+            enabled: true
+            source: categories-list
+          - id: cta
+            type: ctaBand
+            enabled: true
+            title: "Can't find
+what you need?"
+            text: 'Tell us about your project: we find the right solution and reply within 24 hours.'
+            primaryCta: { label: Request a free quote, href: /devis }
+            showWhatsapp: true
     Categories:
       summary: Les 5 rubriques
       value:
         - { id: cat_domicile, slug: services-a-domicile, name: Services à domicile, tagline: Plus de temps pour l’essentiel, number: '01', description: 'Une intervenante se déplace chez vous selon la formule choisie : logement, véhicule, linge.', icon: ShoppingCart, tint: vert-50, iconColor: vert-700, visual: { illustration: logement, image: { id: photo-formule-maison, url: /photos/formule-maison.png, width: 1280, height: 960, variants: [] }, alt: '' }, thumbnail: null, sortOrder: 1, serviceCount: 4, href: /services/services-a-domicile }
-        - { id: cat_experience, slug: experience, name: Expérience, tagline: Des moments sur mesure, number: '02', description: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', icon: Sparkles, tint: orange-50, iconColor: orange-700, visual: { illustration: chef, image: null, alt: '' }, thumbnail: { illustration: accueil, image: null, alt: '' }, sortOrder: 2, serviceCount: 5, href: /services/experience, homeCard: { title: Des moments sur mesure, text: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', textMobile: 'Voiture, chef privé, massage, photographe, événementiel.', chips: [Location de voiture, Chef privé, Massage bien-être, Photographe, Prestataires événementiels], visual: { illustration: chef, image: { id: photo-chef-2, url: /photos/chef-2.png, width: 1536, height: 1024, variants: [] }, alt: '' } } }
-        - { id: cat_immobilier, slug: immobilier, name: Immobilier, tagline: Se loger en toute sérénité, number: '03', description: 'Acheter, vendre, louer, s’installer ou confier votre bien à une équipe présente sur place.', icon: Building, tint: neutral-100, iconColor: neutral-800, visual: { illustration: logement, image: null, alt: '' }, thumbnail: { illustration: logement, image: null, alt: '' }, sortOrder: 3, serviceCount: 7, href: /services/immobilier, homeCard: { title: Immobilier, text: "Trouver, s'installer, louer en toute sérénité, ou confier votre bien à une équipe sur place.", textMobile: "Trouver, louer, s'installer ou confier votre bien.", chips: [Recherche de logement, Location & colocation, Logement temporaire, Gestion locative], visual: { illustration: logement, image: { id: photo-logement, url: /photos/logement.png, width: 465, height: 355, variants: [] }, alt: '' } } }
+        - { id: cat_experience, slug: experience, name: Expérience, tagline: Des moments sur mesure, number: '02', description: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', icon: Sparkles, tint: orange-50, iconColor: orange-700, visual: { illustration: chef, image: { id: photo-exp-hero, url: /photos/exp-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, thumbnail: { illustration: accueil, image: null, alt: '' }, sortOrder: 2, serviceCount: 5, href: /services/experience, homeCard: { title: Des moments sur mesure, text: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', textMobile: 'Voiture, chef privé, massage, photographe, événementiel.', chips: [Location de voiture, Chef privé, Massage bien-être, Photographe, Prestataires événementiels], visual: { illustration: chef, image: { id: photo-chef-2, url: /photos/chef-2.png, width: 1536, height: 1024, variants: [] }, alt: '' } } }
+        - { id: cat_immobilier, slug: immobilier, name: Immobilier, tagline: Se loger en toute sérénité, number: '03', description: 'Acheter, vendre, louer, s’installer ou confier votre bien à une équipe présente sur place.', icon: Building, tint: neutral-100, iconColor: neutral-800, visual: { illustration: logement, image: { id: photo-immo-hero, url: /photos/immo-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, thumbnail: { illustration: logement, image: null, alt: '' }, sortOrder: 3, serviceCount: 7, href: /services/immobilier, homeCard: { title: Immobilier, text: "Trouver, s'installer, louer en toute sérénité, ou confier votre bien à une équipe sur place.", textMobile: "Trouver, louer, s'installer ou confier votre bien.", chips: [Recherche de logement, Location & colocation, Logement temporaire, Gestion locative], visual: { illustration: logement, image: { id: photo-logement, url: /photos/logement.png, width: 465, height: 355, variants: [] }, alt: '' } } }
         - { id: cat_proximite, slug: services-de-proximite, name: Services de proximité, tagline: Votre quotidien simplifié, number: '04', description: 'Repas, courses, colis, linge : nous nous en chargeons pour vous et pour vos proches.', icon: ShoppingCart, tint: vert-50, iconColor: vert-700, visual: { illustration: livraison, image: { id: photo-prox-hero, url: /photos/prox-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, thumbnail: { illustration: courses, image: null, alt: '' }, sortOrder: 4, serviceCount: 4, href: /services/services-de-proximite, homeCard: { title: Votre quotidien simplifié, text: "Repas, courses, colis : on s'en charge, vous gagnez du temps.", textMobile: 'Repas, courses et colis livrés pour vous.', chips: [Livraison de repas, Courses, Colis], visual: null } }
         - { id: cat_culture, slug: culture-evenementiel, name: Culture & événementiel, tagline: Vivre le Cameroun, number: '05', description: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", icon: Compass, tint: neutral-900, iconColor: orange-400, visual: { illustration: marche, image: { id: photo-culture-hero, url: /photos/culture-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, thumbnail: { illustration: culture, image: null, alt: '' }, sortOrder: 5, serviceCount: 4, href: /services/culture-evenementiel, homeCard: { title: Vivre le Cameroun, text: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", textMobile: 'Découvertes, sorties, événements, intégration locale.', chips: [Découverte du Cameroun, Sorties & loisirs, Événements Mambo, Intégration locale], visual: { illustration: livraison, image: { id: photo-prox-hero, url: /photos/prox-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, visualMobile: { illustration: marche, image: { id: photo-culture-hero, url: /photos/culture-hero.png, width: 1280, height: 960, variants: [] }, alt: '' } } }
 
@@ -6867,8 +6907,8 @@ components:
       summary: Les 5 rubriques en anglais (`?lang=en`)
       value:
         - { id: cat_domicile, slug: services-a-domicile, name: Home services, tagline: More time for what matters, number: '01', description: 'A housekeeper comes to your home with the package you choose: home, car, laundry.', icon: ShoppingCart, tint: vert-50, iconColor: vert-700, visual: { illustration: logement, image: { id: photo-formule-maison, url: /photos/formule-maison.png, width: 1280, height: 960, variants: [] }, alt: '' }, thumbnail: null, sortOrder: 1, serviceCount: 4, href: /services/services-a-domicile }
-        - { id: cat_experience, slug: experience, name: Experience, tagline: Tailor-made moments, number: '02', description: 'Getting around, treating yourself, capturing a moment: hand-picked professionals, booked for you.', icon: Sparkles, tint: orange-50, iconColor: orange-700, visual: { illustration: chef, image: null, alt: '' }, thumbnail: { illustration: accueil, image: null, alt: '' }, sortOrder: 2, serviceCount: 5, href: /services/experience, homeCard: { title: Tailor-made moments, text: 'Getting around, treating yourself, capturing a moment: hand-picked professionals, booked for you.', textMobile: 'Car, private chef, massage, photographer, events.', chips: [Car rental, Private chef, Wellness massage, Photographer, Event providers], visual: { illustration: chef, image: { id: photo-chef-2, url: /photos/chef-2.png, width: 1536, height: 1024, variants: [] }, alt: '' } } }
-        - { id: cat_immobilier, slug: immobilier, name: Real estate, tagline: Find a home with peace of mind, number: '03', description: 'Buy, sell, rent, settle in or entrust your property to a team on the ground.', icon: Building, tint: neutral-100, iconColor: neutral-800, visual: { illustration: logement, image: null, alt: '' }, thumbnail: { illustration: logement, image: null, alt: '' }, sortOrder: 3, serviceCount: 7, href: /services/immobilier, homeCard: { title: Real estate, text: 'Find a home, settle in, rent with peace of mind, or entrust your property to a team on the ground.', textMobile: 'Find, rent, settle in or entrust your property.', chips: [Home search, Rental & flatsharing, Temporary housing, Property management], visual: { illustration: logement, image: { id: photo-logement, url: /photos/logement.png, width: 465, height: 355, variants: [] }, alt: '' } } }
+        - { id: cat_experience, slug: experience, name: Experience, tagline: Tailor-made moments, number: '02', description: 'Getting around, treating yourself, capturing a moment: hand-picked professionals, booked for you.', icon: Sparkles, tint: orange-50, iconColor: orange-700, visual: { illustration: chef, image: { id: photo-exp-hero, url: /photos/exp-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, thumbnail: { illustration: accueil, image: null, alt: '' }, sortOrder: 2, serviceCount: 5, href: /services/experience, homeCard: { title: Tailor-made moments, text: 'Getting around, treating yourself, capturing a moment: hand-picked professionals, booked for you.', textMobile: 'Car, private chef, massage, photographer, events.', chips: [Car rental, Private chef, Wellness massage, Photographer, Event providers], visual: { illustration: chef, image: { id: photo-chef-2, url: /photos/chef-2.png, width: 1536, height: 1024, variants: [] }, alt: '' } } }
+        - { id: cat_immobilier, slug: immobilier, name: Real estate, tagline: Find a home with peace of mind, number: '03', description: 'Buy, sell, rent, settle in or entrust your property to a team on the ground.', icon: Building, tint: neutral-100, iconColor: neutral-800, visual: { illustration: logement, image: { id: photo-immo-hero, url: /photos/immo-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, thumbnail: { illustration: logement, image: null, alt: '' }, sortOrder: 3, serviceCount: 7, href: /services/immobilier, homeCard: { title: Real estate, text: 'Find a home, settle in, rent with peace of mind, or entrust your property to a team on the ground.', textMobile: 'Find, rent, settle in or entrust your property.', chips: [Home search, Rental & flatsharing, Temporary housing, Property management], visual: { illustration: logement, image: { id: photo-logement, url: /photos/logement.png, width: 465, height: 355, variants: [] }, alt: '' } } }
         - { id: cat_proximite, slug: services-de-proximite, name: Local services, tagline: 'Everyday life, simplified', number: '04', description: 'Meals, groceries, parcels, laundry: we take care of it for you and your loved ones.', icon: ShoppingCart, tint: vert-50, iconColor: vert-700, visual: { illustration: livraison, image: { id: photo-prox-hero, url: /photos/prox-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, thumbnail: { illustration: courses, image: null, alt: '' }, sortOrder: 4, serviceCount: 4, href: /services/services-de-proximite, homeCard: { title: 'Everyday life, simplified', text: 'Meals, groceries, parcels: we handle it, you save time.', textMobile: 'Meals, groceries and parcels delivered for you.', chips: [Meal delivery, Groceries, Parcels], visual: null } }
         - { id: cat_culture, slug: culture-evenementiel, name: Culture & events, tagline: Experience Cameroon, number: '05', description: 'Discoveries, outings, events and local integration: the country seen from the inside.', icon: Compass, tint: neutral-900, iconColor: orange-400, visual: { illustration: marche, image: { id: photo-culture-hero, url: /photos/culture-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, thumbnail: { illustration: culture, image: null, alt: '' }, sortOrder: 5, serviceCount: 4, href: /services/culture-evenementiel, homeCard: { title: Experience Cameroon, text: 'Discoveries, outings, events and local integration: the country seen from the inside.', textMobile: 'Discoveries, outings, events, local integration.', chips: [Discover Cameroon, Outings & leisure, Mambo events, Local integration], visual: { illustration: livraison, image: { id: photo-prox-hero, url: /photos/prox-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, visualMobile: { illustration: marche, image: { id: photo-culture-hero, url: /photos/culture-hero.png, width: 1280, height: 960, variants: [] }, alt: '' } } }
 
