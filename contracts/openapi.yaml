@@ -4196,6 +4196,7 @@ components:
         city: { type: [string, 'null'], examples: [Douala] }
         rating: { type: integer, minimum: 1, maximum: 5 }
         text: { type: string, maxLength: 2000 }
+        excerpt: { type: [string, 'null'], maxLength: 200, description: "Citation courte d'un avis mis en avant (accueil en mobile) ; null = texte tronqué." }
         service:
           oneOf:
             - type: object
