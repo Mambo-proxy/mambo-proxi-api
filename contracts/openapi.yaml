@@ -153,8 +153,28 @@ paths:
               schema: { $ref: '#/components/schemas/Page' }
               examples:
                 accueil: { $ref: '#/components/examples/PageAccueil' }
+                accueilEn: { $ref: '#/components/examples/PageAccueilEn' }
                 services: { $ref: '#/components/examples/PageServices' }
         '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/zones:
+    get:
+      tags: [Site]
+      operationId: getServiceAreas
+      summary: Zones d'intervention et quartiers desservis
+      description: Carte, recherche de quartier et liste par zone (accueil, page Zones d'intervention). Tag de revalidation `zones`.
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+      responses:
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+        '200':
+          description: Zones publiées, dans l'ordre du back-office.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ServiceAreas' }
+              examples:
+                default: { $ref: '#/components/examples/ServiceAreas' }
+                en: { $ref: '#/components/examples/ServiceAreasEn' }
 
   /v1/sitemap:
     get:
@@ -216,6 +236,7 @@ paths:
                 items: { $ref: '#/components/schemas/CategorySummary' }
               examples:
                 default: { $ref: '#/components/examples/Categories' }
+                en: { $ref: '#/components/examples/CategoriesEn' }
 
   /v1/categories/{slug}:
     get:
@@ -3676,10 +3697,12 @@ components:
 
     KeyFigure:
       type: object
-      required: [key, value, label]
+      required: [key, label]
+      description: Chiffre clé ; `valueText` remplace le nombre animé (ex. « Douala »).
       properties:
         key: { type: string, examples: [projects] }
         value: { type: number, examples: [150] }
+        valueText: { type: [string, 'null'], maxLength: 24, examples: [Douala] }
         prefix: { type: string, maxLength: 4, default: '' }
         suffix: { type: string, maxLength: 16, examples: ['+', ' pays', ' countries'] }
         decimals: { type: integer, minimum: 0, maximum: 2, default: 0 }
@@ -3813,6 +3836,48 @@ components:
               name: { type: string }
               href: { type: string }
 
+    ZoneTone:
+      type: string
+      description: Couleur de la zone sur la carte et dans la légende.
+      enum: [zone1, zone2, zone3, special]
+
+    ZoneQuarter:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, examples: [Bonamoussadi] }
+        detail: { type: [string, 'null'], examples: [rive ouest du Wouri], description: Précision affichée dans la liste. }
+        mapLabel: { type: [string, 'null'], examples: [Cité SIC · base de départ], description: Libellé sur la carte ; null = nom. }
+        isBase: { type: boolean, default: false, description: Base de départ des interventions (point mis en avant). }
+        position:
+          description: Position sur la carte stylisée de Douala (0 à 1, origine en haut à gauche) ; null = absent de la carte.
+          oneOf:
+            - type: object
+              required: [x, y]
+              properties:
+                x: { type: number, minimum: 0, maximum: 1 }
+                y: { type: number, minimum: 0, maximum: 1 }
+            - type: 'null'
+
+    Zone:
+      type: object
+      required: [key, name, tone, description, result, quarters]
+      properties:
+        key: { $ref: '#/components/schemas/Slug' }
+        name: { type: string, examples: [Zone 3 — Élargie] }
+        tone: { $ref: '#/components/schemas/ZoneTone' }
+        description: { type: string, examples: [Quartiers résidentiels et périphérie.] }
+        result: { type: string, description: Réponse affichée quand un quartier de la zone est recherché., examples: [Intervention à domicile et livraison possibles. Conditions confirmées sur devis.] }
+        quarters: { type: array, items: { $ref: '#/components/schemas/ZoneQuarter' } }
+
+    ServiceAreas:
+      type: object
+      required: [zones]
+      properties:
+        zones: { type: array, items: { $ref: '#/components/schemas/Zone' } }
+        note: { type: [string, 'null'], examples: ["Votre quartier n'apparaît pas ? Contactez-nous : nous étudions chaque demande."] }
+        updatedAt: { $ref: '#/components/schemas/DateTime' }
+
     Navigation:
       type: object
       required: [main, megaMenu, signUp, footer, legal]
@@ -3867,7 +3932,7 @@ components:
 
     PageKey:
       type: string
-      enum: [accueil, services, qui-sommes-nous, mission, partenaires, formation, recrutement, avis-clients, contact, devis, devis-confirmation, inscription, suivi-mambo, questionnaire, mentions-legales, confidentialite, cookies, cgu, '404', erreur, maintenance, newsletter-confirmation, newsletter-desinscription]
+      enum: [accueil, services, zones-d-intervention, magazine, qui-sommes-nous, mission, partenaires, formation, recrutement, avis-clients, contact, devis, devis-confirmation, inscription, suivi-mambo, questionnaire, mentions-legales, confidentialite, cookies, cgu, '404', erreur, maintenance, newsletter-confirmation, newsletter-desinscription]
 
     Page:
       type: object
@@ -3992,6 +4057,12 @@ components:
             text: { type: string }
             textMobile: { type: [string, 'null'], description: Texte raccourci en mobile ; null = texte principal. }
             chips: { type: array, items: { type: string } }
+            visual:
+              oneOf: [{ $ref: '#/components/schemas/Visual' }, { type: 'null' }]
+              description: Visuel de la carte de l'accueil ; null = visuel principal de la rubrique.
+            visualMobile:
+              oneOf: [{ $ref: '#/components/schemas/Visual' }, { type: 'null' }]
+              description: Visuel de la carte en mobile ; null = visuel de la carte.
         services:
           type: array
           description: Présent avec `include=services`.
@@ -4071,6 +4142,11 @@ components:
         category: { $ref: '#/components/schemas/CategoryRef' }
         href: { type: string, examples: [/services/experience/chef-prive] }
         featuredOnHome: { type: boolean }
+        kind:
+          type: string
+          enum: [service, formula]
+          default: service
+          description: '`formula` : formule de la rubrique « Services à domicile » (carte avec photo, « Réserver un créneau » et « Devis »).'
 
     ServiceDetail:
       allOf:
@@ -6008,6 +6084,11 @@ components:
                 - training-form
                 - application-form
                 - suivi-preview
+                - formulas
+                - zones-map
+            categorySlug:
+              oneOf: [{ $ref: '#/components/schemas/Slug' }, { type: 'null' }]
+              description: Rubrique dont les services sont affichés (source `formulas`).
             link: { oneOf: [{ $ref: '#/components/schemas/Link' }, { type: 'null' }] }
             limit: { type: [integer, 'null'], minimum: 1, maximum: 50 }
             note: { type: [string, 'null'], maxLength: 400 }
@@ -6085,8 +6166,8 @@ components:
         keyFigures:
           - { key: projects, value: 150, suffix: '+', label: projets accompagnés }
           - { key: partners, value: 40, suffix: '+', label: partenaires engagés }
-          - { key: services, value: 19, label: services réunis en 4 rubriques, labelMobile: 'services, 4 rubriques' }
-          - { key: countries, value: 2, suffix: ' pays', label: 'couverts : France et Cameroun', labelMobile: France et Cameroun }
+          - { key: services, value: 30, label: services réunis en 6 univers, labelMobile: 'services, 6 univers' }
+          - { key: area, valueText: Douala, label: 'et environs, au départ de Cité SIC', labelMobile: et environs }
         turnstileSiteKey: 1x00000000000000000000AA
         analytics: { ga4MeasurementId: null, searchConsoleVerification: null }
         seo:
@@ -6132,8 +6213,8 @@ components:
         keyFigures:
           - { key: projects, value: 150, suffix: '+', label: projects supported }
           - { key: partners, value: 40, suffix: '+', label: committed partners }
-          - { key: services, value: 19, label: services across 4 categories, labelMobile: 'services, 4 categories' }
-          - { key: countries, value: 2, suffix: ' countries', label: 'covered: France and Cameroon', labelMobile: France and Cameroon }
+          - { key: services, value: 30, label: services across 6 areas, labelMobile: 'services, 6 areas' }
+          - { key: area, valueText: Douala, label: 'and surroundings, starting from Cité SIC', labelMobile: and surroundings }
         turnstileSiteKey: 1x00000000000000000000AA
         analytics: { ga4MeasurementId: null, searchConsoleVerification: null }
         seo:
@@ -6499,7 +6580,7 @@ components:
         key: accueil
         title: Accueil
         isPreview: false
-        updatedAt: '2026-10-05T08:00:00.000Z'
+        updatedAt: '2026-10-18T08:00:00.000Z'
         seo: { title: null, description: null, ogImageUrl: null, noindex: false }
         sections:
           - id: hero
@@ -6507,32 +6588,47 @@ components:
             enabled: true
             variant: home
             tone: muted
-            badge: { tag: 'France  ·  Cameroun', text: Conciergerie de proximité }
+            badge: { tag: 'Douala  ·  Cameroun', text: Services du quotidien à domicile }
             title: "Mambo, ce n'est pas qu'un service. ==C'est une expérience pensée pour vous.=="
-            lead: Mobilité, chef privé, logement, courses, découvertes culturelles… Nous réunissons des prestataires de confiance pour vous simplifier la vie au Cameroun, que vous y viviez ou que vous prépariez votre venue.
-            leadMobile: Mobilité, chef privé, logement, courses, découvertes… Des prestataires de confiance pour vous simplifier la vie au Cameroun.
+            lead: Entretien du logement, linge, repas, colis, chef privé, massage, photographe… Nos intervenants de confiance se déplacent chez vous, à Douala et environs.
+            leadMobile: Entretien du logement, linge, repas, colis, chef privé, massage… Nos intervenants de confiance se déplacent chez vous, à Douala.
             primaryCta: { label: Demander un devis gratuit, href: /devis }
-            secondaryCta: { label: Créer mon compte, href: /inscription }
+            secondaryCta: { label: S’inscrire, href: /inscription }
             socialProof: '4,9/5 · plus de 150 projets accompagnés'
-            visual: { illustration: accueil, image: null, alt: '' }
-            visualSecondary: { illustration: chef, image: null, alt: '' }
+            visual:
+              illustration: accueil
+              image: { id: photo-home-hero, url: /photos/home-hero.png, width: 960, height: 1280, variants: [] }
+              alt: Une famille sourit dans son salon pendant qu'une intervenante Mambo Proxi s'occupe du ménage.
+            visualSecondary:
+              illustration: chef
+              image: { id: photo-chef-2, url: /photos/chef-2.png, width: 1536, height: 1024, variants: [] }
+              alt: Un chef privé présente un plat de poisson braisé.
             floatingCards:
               - { icon: Check, title: Devis envoyé en 24 h, text: Chef privé · samedi 20h }
-              - { icon: Key, title: Logement trouvé, text: 'Bastos, Yaoundé', progress: 0.83, footnote: Installation prévue le 12 nov. }
+              - { icon: Key, title: Logement trouvé, text: 'Bonapriso, Douala', progress: 0.83, footnote: Installation prévue le 12 nov. }
             sticker: Pensé pour vous
           - id: bandeau-services
             type: marquee
             enabled: true
             items: [Location de voiture, Chef privé, Massage bien-être, Photographe, Événementiel, Livraison de repas, Courses, Colis, Recherche de logement, Logement temporaire, Gestion locative, Découverte du Cameroun, Sorties culturelles]
             itemsMobile: [Chef privé, Logement, Massage bien-être, Courses, Découverte du Cameroun]
+          - id: formules
+            type: dynamic
+            enabled: true
+            tone: muted
+            source: formulas
+            categorySlug: services-a-domicile
+            eyebrow: Services à domicile
+            title: Une intervenante chez vous, selon la formule choisie.
+            lead: Tarifs indicatifs sur devis, ajustés selon la surface, l’état du logement et les options. Le pressing est facturé séparément.
           - id: univers
             type: dynamic
             enabled: true
             source: categories-bento
             eyebrow: Nos univers de services
             title: Tout ce dont vous avez besoin, réuni au même endroit.
-            lead: 19 services regroupés en 4 univers. Choisissez, nous coordonnons tout avec des prestataires sélectionnés et suivis.
-            leadMobile: 19 services regroupés en 4 univers.
+            lead: 30 services regroupés en 6 univers. Choisissez, nous intervenons chez vous avec des intervenants sélectionnés et suivis.
+            leadMobile: 30 services regroupés en 6 univers.
             link: { label: Voir tous les services, href: /services }
           - id: comment-ca-marche
             type: steps
@@ -6544,7 +6640,7 @@ components:
             lead: Trois étapes, un seul interlocuteur. Vous restez informé du début à la fin.
             leadMobile: Trois étapes, un seul interlocuteur.
             items:
-              - { number: '01', icon: FileText, title: Vous exprimez votre besoin, text: "Via le formulaire de devis, sur WhatsApp ou lors d'un rendez-vous, en France comme au Cameroun.", textMobile: 'Formulaire, WhatsApp ou rendez-vous.' }
+              - { number: '01', icon: FileText, title: Vous exprimez votre besoin, text: "Via le formulaire de devis, sur WhatsApp, par téléphone ou lors d'un rendez-vous.", textMobile: 'Formulaire, WhatsApp ou rendez-vous.' }
               - { number: '02', icon: Mail, title: Vous recevez un devis sur mesure, text: 'Sous 24 h, une proposition claire et personnalisée, sans engagement de votre part.', textMobile: 'Sous 24 h, sans engagement.' }
               - { number: '03', icon: ShieldCheck, title: Nous nous occupons de tout, text: Nos prestataires sélectionnés interviennent. Vous êtes tenu informé à chaque étape., textMobile: Vous êtes informé à chaque étape. }
             channelsLabel: 'Au choix :'
@@ -6557,14 +6653,24 @@ components:
             enabled: true
             eyebrow: Nos engagements
             title: "La proximité, c'est notre métier."
-            lead: 'Une équipe présente des deux côtés, des prestataires choisis avec soin et une seule promesse : vous simplifier la vie.'
+            lead: 'Une équipe présente à Douala, des intervenants choisis avec soin et une seule promesse : vous simplifier la vie.'
             leadMobile: ''
-            visual: { illustration: equipe, image: null, alt: '' }
+            visual:
+              illustration: equipe
+              image: { id: photo-agence-equipe, url: /photos/agence-equipe.png, width: 1024, height: 1024, variants: [] }
+              alt: L'équipe Mambo Proxi réunie autour d'une table à l'agence.
             items:
-              - { icon: Users, title: Une équipe à vos côtés, text: 'Un interlocuteur unique qui vous accompagne pas à pas, en France comme au Cameroun.' }
+              - { icon: Users, title: Une équipe à vos côtés, text: 'Un interlocuteur unique qui vous accompagne pas à pas, de la demande à l’intervention.' }
               - { icon: ShieldCheck, title: Des solutions concrètes et durables, text: 'Des prestataires vérifiés, suivis et évalués après chaque mission.' }
-              - { icon: Globe, title: Un pont entre la France et le Cameroun, text: 'Préparez votre venue depuis la France, nous agissons sur place.' }
+              - { icon: Globe, title: Des intervenants sélectionnés et suivis, text: 'Références vérifiées, tests pratiques et suivi qualité après chaque intervention.' }
             figures: []
+          - id: zones
+            type: dynamic
+            enabled: true
+            source: zones-map
+            eyebrow: Nos zones d’intervention
+            title: Nous intervenons partout à Douala.
+            link: { label: Voir toutes les zones et les quartiers, href: /zones-d-intervention }
           - id: avis
             type: dynamic
             enabled: true
@@ -6589,6 +6695,129 @@ components:
             text: Devis gratuit et sans engagement, réponse sous 24 h. Ou écrivez-nous directement sur WhatsApp.
             textMobile: 'Devis gratuit, réponse sous 24 h.'
             primaryCta: { label: Demander un devis gratuit, href: /devis }
+            showWhatsapp: true
+
+    PageAccueilEn:
+      summary: Page d'accueil en anglais (`?lang=en`)
+      value:
+        key: accueil
+        title: Home
+        isPreview: false
+        updatedAt: '2026-10-18T08:00:00.000Z'
+        seo: { title: null, description: null, ogImageUrl: null, noindex: false }
+        sections:
+          - id: hero
+            type: hero
+            enabled: true
+            variant: home
+            tone: muted
+            badge: { tag: 'Douala  ·  Cameroon', text: Everyday services at home }
+            title: "Mambo isn't just a service. ==It's an experience designed for you.=="
+            lead: Home cleaning, laundry, meals, parcels, private chef, massage, photographer… Our trusted professionals come to your home, in Douala and the surrounding area.
+            leadMobile: Home cleaning, laundry, meals, parcels, private chef, massage… Our trusted professionals come to your home in Douala.
+            primaryCta: { label: Request a free quote, href: /devis }
+            secondaryCta: { label: Sign up, href: /inscription }
+            socialProof: '4.9/5 · more than 150 projects supported'
+            visual:
+              illustration: accueil
+              image: { id: photo-home-hero, url: /photos/home-hero.png, width: 960, height: 1280, variants: [] }
+              alt: A family smiles in their living room while a Mambo Proxi housekeeper does the cleaning.
+            visualSecondary:
+              illustration: chef
+              image: { id: photo-chef-2, url: /photos/chef-2.png, width: 1536, height: 1024, variants: [] }
+              alt: A private chef presents a grilled fish dish.
+            floatingCards:
+              - { icon: Check, title: Quote sent within 24 hours, text: Private chef · Saturday 8pm }
+              - { icon: Key, title: Home found, text: 'Bonapriso, Douala', progress: 0.83, footnote: Move-in planned on 12 Nov. }
+            sticker: Designed for you
+          - id: bandeau-services
+            type: marquee
+            enabled: true
+            items: [Car rental, Private chef, Wellness massage, Photographer, Events, Meal delivery, Groceries, Parcels, Home search, Temporary housing, Property management, Discover Cameroon, Cultural outings]
+            itemsMobile: [Private chef, Housing, Wellness massage, Groceries, Discover Cameroon]
+          - id: formules
+            type: dynamic
+            enabled: true
+            tone: muted
+            source: formulas
+            categorySlug: services-a-domicile
+            eyebrow: Home services
+            title: A housekeeper at your home, with the package you choose.
+            lead: Indicative rates on quotation, adjusted to the surface area, the condition of the home and the options. Dry cleaning is charged separately.
+          - id: univers
+            type: dynamic
+            enabled: true
+            source: categories-bento
+            eyebrow: Our service areas
+            title: Everything you need, all in one place.
+            lead: 30 services in 6 areas. Make your choice, we come to your home with selected and supervised professionals.
+            leadMobile: 30 services in 6 areas.
+            link: { label: See all services, href: /services }
+          - id: comment-ca-marche
+            type: steps
+            enabled: true
+            tone: muted
+            layout: cards
+            eyebrow: How it works
+            title: As simple as a message.
+            lead: Three steps, a single point of contact. You stay informed from start to finish.
+            leadMobile: Three steps, a single point of contact.
+            items:
+              - { number: '01', icon: FileText, title: You tell us what you need, text: 'Through the quote form, on WhatsApp, by phone or during an appointment.', textMobile: 'Form, WhatsApp or appointment.' }
+              - { number: '02', icon: Mail, title: You receive a tailored quote, text: 'Within 24 hours, a clear and personalised proposal, with no obligation.', textMobile: 'Within 24 hours, no obligation.' }
+              - { number: '03', icon: ShieldCheck, title: We take care of everything, text: Our selected professionals step in. You are kept informed at every stage., textMobile: You are informed at every stage. }
+            channelsLabel: 'Your choice:'
+            channels:
+              - { label: Online form, kind: form }
+              - { label: WhatsApp, kind: whatsapp }
+              - { label: Appointment, kind: appointment }
+          - id: engagements
+            type: featureList
+            enabled: true
+            eyebrow: Our commitments
+            title: Being close to you is what we do.
+            lead: 'A team based in Douala, carefully chosen professionals and a single promise: making your life easier.'
+            leadMobile: ''
+            visual:
+              illustration: equipe
+              image: { id: photo-agence-equipe, url: /photos/agence-equipe.png, width: 1024, height: 1024, variants: [] }
+              alt: The Mambo Proxi team gathered around a table at the agency.
+            items:
+              - { icon: Users, title: A team by your side, text: 'A single point of contact who guides you step by step, from your request to the visit.' }
+              - { icon: ShieldCheck, title: Practical and lasting solutions, text: 'Professionals who are vetted, supervised and assessed after every job.' }
+              - { icon: Globe, title: Selected and supervised professionals, text: 'Checked references, practical tests and quality follow-up after every visit.' }
+            figures: []
+          - id: zones
+            type: dynamic
+            enabled: true
+            source: zones-map
+            eyebrow: Where we work
+            title: We cover the whole of Douala.
+            link: { label: See all areas and neighbourhoods, href: /zones-d-intervention }
+          - id: avis
+            type: dynamic
+            enabled: true
+            tone: muted
+            source: reviews-highlight
+            eyebrow: Customer reviews
+            title: They trusted us, here is what they say.
+            titleMobile: What they say.
+            link: { label: Read all reviews, href: /avis-clients }
+            limit: 3
+          - id: partenaires
+            type: dynamic
+            enabled: true
+            source: partners-strip
+            title: They work alongside us
+            link: { label: 'Are you a provider? Become a partner', labelMobile: Become a partner, href: '/partenaires#devenir-partenaire' }
+            limit: 6
+          - id: cta
+            type: ctaBand
+            enabled: true
+            title: "A project, a question?\n==Let's talk.=="
+            text: Free quote with no obligation, reply within 24 hours. Or message us directly on WhatsApp.
+            textMobile: 'Free quote, reply within 24 hours.'
+            primaryCta: { label: Request a free quote, href: /devis }
             showWhatsapp: true
 
     PageServices:
@@ -6622,13 +6851,127 @@ components:
             text: 'Décrivez-nous votre projet : nous trouvons la bonne solution et vous répondons sous 24 h.'
             primaryCta: { label: Demander un devis gratuit, href: /devis }
             showWhatsapp: true
+
     Categories:
-      summary: Les 4 rubriques
+      summary: Les 5 rubriques
       value:
-        - { id: cat_experience, slug: experience, name: Expérience, tagline: Des moments sur mesure, number: '01', description: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', icon: Sparkles, tint: orange-50, iconColor: orange-700, visual: { illustration: chef, image: null, alt: '' }, thumbnail: { illustration: accueil, image: null, alt: '' }, sortOrder: 1, serviceCount: 5, href: /services/experience, homeCard: { title: Des moments sur mesure, text: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', textMobile: 'Voiture, chef privé, massage, photographe, événementiel.', chips: [Location de voiture, Chef privé, Massage bien-être, Photographe, Prestataires événementiels] } }
-        - { id: cat_immobilier, slug: immobilier, name: Immobilier, tagline: Se loger en toute sérénité, number: '02', description: "Trouver, louer, s'installer, ou confier votre bien à une équipe présente sur place.", icon: Building, tint: neutral-100, iconColor: neutral-800, visual: { illustration: logement, image: null, alt: '' }, thumbnail: { illustration: logement, image: null, alt: '' }, sortOrder: 2, serviceCount: 7, href: /services/immobilier, homeCard: { title: Immobilier, text: "Trouver, s'installer, louer en toute sérénité, ou confier votre bien à une équipe sur place.", textMobile: "Trouver, louer, s'installer ou confier votre bien.", chips: [Recherche de logement, Location & colocation, Logement temporaire, Gestion locative] } }
-        - { id: cat_proximite, slug: services-de-proximite, name: Services de proximité, tagline: Votre quotidien simplifié, number: '03', description: 'Repas, courses, colis : nous nous en chargeons pour vous et pour vos proches.', icon: ShoppingCart, tint: vert-50, iconColor: vert-700, visual: { illustration: livraison, image: null, alt: '' }, thumbnail: { illustration: courses, image: null, alt: '' }, sortOrder: 3, serviceCount: 3, href: /services/services-de-proximite, homeCard: { title: Votre quotidien simplifié, text: "Repas, courses, colis : on s'en charge, vous gagnez du temps.", textMobile: 'Repas, courses et colis livrés pour vous.', chips: [Livraison de repas, Courses, Colis] } }
-        - { id: cat_culture, slug: culture-evenementiel, name: Culture & événementiel, tagline: Vivre le Cameroun, number: '04', description: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", icon: Compass, tint: neutral-900, iconColor: orange-400, visual: { illustration: marche, image: null, alt: '' }, thumbnail: { illustration: culture, image: null, alt: '' }, sortOrder: 4, serviceCount: 4, href: /services/culture-evenementiel, homeCard: { title: Vivre le Cameroun, text: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", textMobile: 'Découvertes, sorties, événements, intégration locale.', chips: [Découverte du Cameroun, Sorties & loisirs, Événements Mambo, Intégration locale] } }
+        - { id: cat_domicile, slug: services-a-domicile, name: Services à domicile, tagline: Plus de temps pour l’essentiel, number: '01', description: 'Une intervenante se déplace chez vous selon la formule choisie : logement, véhicule, linge.', icon: ShoppingCart, tint: vert-50, iconColor: vert-700, visual: { illustration: logement, image: { id: photo-formule-maison, url: /photos/formule-maison.png, width: 1280, height: 960, variants: [] }, alt: '' }, thumbnail: null, sortOrder: 1, serviceCount: 4, href: /services/services-a-domicile }
+        - { id: cat_experience, slug: experience, name: Expérience, tagline: Des moments sur mesure, number: '02', description: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', icon: Sparkles, tint: orange-50, iconColor: orange-700, visual: { illustration: chef, image: null, alt: '' }, thumbnail: { illustration: accueil, image: null, alt: '' }, sortOrder: 2, serviceCount: 5, href: /services/experience, homeCard: { title: Des moments sur mesure, text: 'Se déplacer, se faire plaisir, immortaliser un moment : des prestataires triés sur le volet, réservés pour vous.', textMobile: 'Voiture, chef privé, massage, photographe, événementiel.', chips: [Location de voiture, Chef privé, Massage bien-être, Photographe, Prestataires événementiels], visual: { illustration: chef, image: { id: photo-chef-2, url: /photos/chef-2.png, width: 1536, height: 1024, variants: [] }, alt: '' } } }
+        - { id: cat_immobilier, slug: immobilier, name: Immobilier, tagline: Se loger en toute sérénité, number: '03', description: 'Acheter, vendre, louer, s’installer ou confier votre bien à une équipe présente sur place.', icon: Building, tint: neutral-100, iconColor: neutral-800, visual: { illustration: logement, image: null, alt: '' }, thumbnail: { illustration: logement, image: null, alt: '' }, sortOrder: 3, serviceCount: 7, href: /services/immobilier, homeCard: { title: Immobilier, text: "Trouver, s'installer, louer en toute sérénité, ou confier votre bien à une équipe sur place.", textMobile: "Trouver, louer, s'installer ou confier votre bien.", chips: [Recherche de logement, Location & colocation, Logement temporaire, Gestion locative], visual: { illustration: logement, image: { id: photo-logement, url: /photos/logement.png, width: 465, height: 355, variants: [] }, alt: '' } } }
+        - { id: cat_proximite, slug: services-de-proximite, name: Services de proximité, tagline: Votre quotidien simplifié, number: '04', description: 'Repas, courses, colis, linge : nous nous en chargeons pour vous et pour vos proches.', icon: ShoppingCart, tint: vert-50, iconColor: vert-700, visual: { illustration: livraison, image: { id: photo-prox-hero, url: /photos/prox-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, thumbnail: { illustration: courses, image: null, alt: '' }, sortOrder: 4, serviceCount: 4, href: /services/services-de-proximite, homeCard: { title: Votre quotidien simplifié, text: "Repas, courses, colis : on s'en charge, vous gagnez du temps.", textMobile: 'Repas, courses et colis livrés pour vous.', chips: [Livraison de repas, Courses, Colis], visual: null } }
+        - { id: cat_culture, slug: culture-evenementiel, name: Culture & événementiel, tagline: Vivre le Cameroun, number: '05', description: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", icon: Compass, tint: neutral-900, iconColor: orange-400, visual: { illustration: marche, image: { id: photo-culture-hero, url: /photos/culture-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, thumbnail: { illustration: culture, image: null, alt: '' }, sortOrder: 5, serviceCount: 4, href: /services/culture-evenementiel, homeCard: { title: Vivre le Cameroun, text: "Découvertes, sorties, événements et intégration locale : le pays vu de l'intérieur.", textMobile: 'Découvertes, sorties, événements, intégration locale.', chips: [Découverte du Cameroun, Sorties & loisirs, Événements Mambo, Intégration locale], visual: { illustration: livraison, image: { id: photo-prox-hero, url: /photos/prox-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, visualMobile: { illustration: marche, image: { id: photo-culture-hero, url: /photos/culture-hero.png, width: 1280, height: 960, variants: [] }, alt: '' } } }
+
+    CategoriesEn:
+      summary: Les 5 rubriques en anglais (`?lang=en`)
+      value:
+        - { id: cat_domicile, slug: services-a-domicile, name: Home services, tagline: More time for what matters, number: '01', description: 'A housekeeper comes to your home with the package you choose: home, car, laundry.', icon: ShoppingCart, tint: vert-50, iconColor: vert-700, visual: { illustration: logement, image: { id: photo-formule-maison, url: /photos/formule-maison.png, width: 1280, height: 960, variants: [] }, alt: '' }, thumbnail: null, sortOrder: 1, serviceCount: 4, href: /services/services-a-domicile }
+        - { id: cat_experience, slug: experience, name: Experience, tagline: Tailor-made moments, number: '02', description: 'Getting around, treating yourself, capturing a moment: hand-picked professionals, booked for you.', icon: Sparkles, tint: orange-50, iconColor: orange-700, visual: { illustration: chef, image: null, alt: '' }, thumbnail: { illustration: accueil, image: null, alt: '' }, sortOrder: 2, serviceCount: 5, href: /services/experience, homeCard: { title: Tailor-made moments, text: 'Getting around, treating yourself, capturing a moment: hand-picked professionals, booked for you.', textMobile: 'Car, private chef, massage, photographer, events.', chips: [Car rental, Private chef, Wellness massage, Photographer, Event providers], visual: { illustration: chef, image: { id: photo-chef-2, url: /photos/chef-2.png, width: 1536, height: 1024, variants: [] }, alt: '' } } }
+        - { id: cat_immobilier, slug: immobilier, name: Real estate, tagline: Find a home with peace of mind, number: '03', description: 'Buy, sell, rent, settle in or entrust your property to a team on the ground.', icon: Building, tint: neutral-100, iconColor: neutral-800, visual: { illustration: logement, image: null, alt: '' }, thumbnail: { illustration: logement, image: null, alt: '' }, sortOrder: 3, serviceCount: 7, href: /services/immobilier, homeCard: { title: Real estate, text: 'Find a home, settle in, rent with peace of mind, or entrust your property to a team on the ground.', textMobile: 'Find, rent, settle in or entrust your property.', chips: [Home search, Rental & flatsharing, Temporary housing, Property management], visual: { illustration: logement, image: { id: photo-logement, url: /photos/logement.png, width: 465, height: 355, variants: [] }, alt: '' } } }
+        - { id: cat_proximite, slug: services-de-proximite, name: Local services, tagline: 'Everyday life, simplified', number: '04', description: 'Meals, groceries, parcels, laundry: we take care of it for you and your loved ones.', icon: ShoppingCart, tint: vert-50, iconColor: vert-700, visual: { illustration: livraison, image: { id: photo-prox-hero, url: /photos/prox-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, thumbnail: { illustration: courses, image: null, alt: '' }, sortOrder: 4, serviceCount: 4, href: /services/services-de-proximite, homeCard: { title: 'Everyday life, simplified', text: 'Meals, groceries, parcels: we handle it, you save time.', textMobile: 'Meals, groceries and parcels delivered for you.', chips: [Meal delivery, Groceries, Parcels], visual: null } }
+        - { id: cat_culture, slug: culture-evenementiel, name: Culture & events, tagline: Experience Cameroon, number: '05', description: 'Discoveries, outings, events and local integration: the country seen from the inside.', icon: Compass, tint: neutral-900, iconColor: orange-400, visual: { illustration: marche, image: { id: photo-culture-hero, url: /photos/culture-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, thumbnail: { illustration: culture, image: null, alt: '' }, sortOrder: 5, serviceCount: 4, href: /services/culture-evenementiel, homeCard: { title: Experience Cameroon, text: 'Discoveries, outings, events and local integration: the country seen from the inside.', textMobile: 'Discoveries, outings, events, local integration.', chips: [Discover Cameroon, Outings & leisure, Mambo events, Local integration], visual: { illustration: livraison, image: { id: photo-prox-hero, url: /photos/prox-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, visualMobile: { illustration: marche, image: { id: photo-culture-hero, url: /photos/culture-hero.png, width: 1280, height: 960, variants: [] }, alt: '' } } }
+
+
+    ServiceAreas:
+      summary: Zones d'intervention (maquette « Zones d'intervention »)
+      value:
+        note: "Votre quartier n'apparaît pas ? Contactez-nous : nous étudions chaque demande. Délai moyen de livraison : 30 à 60 minutes selon le trafic."
+        updatedAt: '2026-10-18T08:00:00.000Z'
+        zones:
+          - key: zone-1
+            name: Zone 1 — Proximité
+            tone: zone1
+            description: Autour de la base de Cité SIC.
+            result: Intervention à domicile et livraison dans les meilleurs délais. Conditions confirmées sur devis.
+            quarters:
+              - { name: Cité SIC, mapLabel: Cité SIC · base de départ, isBase: true, position: { x: 0.5789, y: 0.5889 } }
+              - { name: Ndoghem, position: { x: 0.7895, y: 0.8370 } }
+              - { name: Bépanda, position: { x: 0.55, y: 0.4556 } }
+              - { name: Makèpè, position: { x: 0.6184, y: 0.3111 } }
+              - { name: Ndokoti, position: { x: 0.7105, y: 0.7407 } }
+          - key: zone-2
+            name: Zone 2 — Intermédiaire
+            tone: zone2
+            description: Centre-ville et quartiers voisins.
+            result: Intervention à domicile et livraison possibles. Conditions confirmées sur devis.
+            quarters:
+              - { name: Ndogbong, position: { x: 0.6947, y: 0.5556 } }
+              - { name: Cité des Palmiers, position: { x: 0.6289, y: 0.6704 } }
+              - { name: Akwa, position: { x: 0.4184, y: 0.6259 } }
+              - { name: New Bell, position: { x: 0.5158, y: 0.7963 } }
+              - { name: Deïdo, position: { x: 0.4368, y: 0.4963 } }
+          - key: zone-3
+            name: Zone 3 — Élargie
+            tone: zone3
+            description: Quartiers résidentiels et périphérie.
+            result: Intervention à domicile et livraison possibles. Conditions confirmées sur devis.
+            quarters:
+              - { name: Bonamoussadi, position: { x: 0.6842, y: 0.1926 } }
+              - { name: Bonanjo, position: { x: 0.3763, y: 0.7593 } }
+              - { name: Bonapriso, position: { x: 0.3947, y: 0.8704 } }
+              - { name: Kotto, position: { x: 0.7763, y: 0.2963 } }
+              - { name: Yassa, position: { x: 0.9079, y: 0.8704 } }
+              - { name: Makea, position: { x: 0.8553, y: 0.4370 } }
+              - { name: PK14, position: { x: 0.9211, y: 0.6222 } }
+              - { name: Lendi, position: { x: 0.8053, y: 0.1370 } }
+          - key: zone-speciale
+            name: Zone spéciale
+            tone: special
+            description: Intervention possible, sur devis.
+            result: Intervention possible selon votre demande. Conditions et délais confirmés sur devis.
+            quarters:
+              - { name: Bonabéri, detail: rive ouest du Wouri, position: { x: 0.1211, y: 0.4630 } }
+              - { name: Autres quartiers hors zone, position: null }
+
+    ServiceAreasEn:
+      summary: Zones d'intervention en anglais (`?lang=en`)
+      value:
+        note: "Can't find your neighbourhood? Contact us: we look at every request. Average delivery time: 30 to 60 minutes depending on traffic."
+        updatedAt: '2026-10-18T08:00:00.000Z'
+        zones:
+          - key: zone-1
+            name: Zone 1 — Nearby
+            tone: zone1
+            description: Around our Cité SIC base.
+            result: Home visits and delivery as quickly as possible. Terms confirmed in the quote.
+            quarters:
+              - { name: Cité SIC, mapLabel: Cité SIC · starting base, isBase: true, position: { x: 0.5789, y: 0.5889 } }
+              - { name: Ndoghem, position: { x: 0.7895, y: 0.8370 } }
+              - { name: Bépanda, position: { x: 0.55, y: 0.4556 } }
+              - { name: Makèpè, position: { x: 0.6184, y: 0.3111 } }
+              - { name: Ndokoti, position: { x: 0.7105, y: 0.7407 } }
+          - key: zone-2
+            name: Zone 2 — Intermediate
+            tone: zone2
+            description: City centre and neighbouring districts.
+            result: Home visits and delivery available. Terms confirmed in the quote.
+            quarters:
+              - { name: Ndogbong, position: { x: 0.6947, y: 0.5556 } }
+              - { name: Cité des Palmiers, position: { x: 0.6289, y: 0.6704 } }
+              - { name: Akwa, position: { x: 0.4184, y: 0.6259 } }
+              - { name: New Bell, position: { x: 0.5158, y: 0.7963 } }
+              - { name: Deïdo, position: { x: 0.4368, y: 0.4963 } }
+          - key: zone-3
+            name: Zone 3 — Extended
+            tone: zone3
+            description: Residential areas and outskirts.
+            result: Home visits and delivery available. Terms confirmed in the quote.
+            quarters:
+              - { name: Bonamoussadi, position: { x: 0.6842, y: 0.1926 } }
+              - { name: Bonanjo, position: { x: 0.3763, y: 0.7593 } }
+              - { name: Bonapriso, position: { x: 0.3947, y: 0.8704 } }
+              - { name: Kotto, position: { x: 0.7763, y: 0.2963 } }
+              - { name: Yassa, position: { x: 0.9079, y: 0.8704 } }
+              - { name: Makea, position: { x: 0.8553, y: 0.4370 } }
+              - { name: PK14, position: { x: 0.9211, y: 0.6222 } }
+              - { name: Lendi, position: { x: 0.8053, y: 0.1370 } }
+          - key: zone-speciale
+            name: Special zone
+            tone: special
+            description: Visits possible, on quotation.
+            result: Visits possible depending on your request. Terms and timing confirmed in the quote.
+            quarters:
+              - { name: Bonabéri, detail: west bank of the Wouri, position: { x: 0.1211, y: 0.4630 } }
+              - { name: Other areas outside the zones, position: null }
 
     CategoryExperience:
       summary: Rubrique Expérience
