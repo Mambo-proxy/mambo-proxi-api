@@ -3849,6 +3849,7 @@ components:
         detail: { type: [string, 'null'], examples: [rive ouest du Wouri], description: Précision affichée dans la liste. }
         mapLabel: { type: [string, 'null'], examples: [Cité SIC · base de départ], description: Libellé sur la carte ; null = nom. }
         isBase: { type: boolean, default: false, description: Base de départ des interventions (point mis en avant). }
+        labelOnSmallMap: { type: boolean, default: false, description: "Libellé affiché sur la carte réduite (mobile) ; les autres apparaissent en zoomant." }
         position:
           description: Position sur la carte stylisée de Douala (0 à 1, origine en haut à gauche) ; null = absent de la carte.
           oneOf:
@@ -6883,7 +6884,7 @@ components:
             description: Autour de la base de Cité SIC.
             result: Intervention à domicile et livraison dans les meilleurs délais. Conditions confirmées sur devis.
             quarters:
-              - { name: Cité SIC, mapLabel: Cité SIC · base de départ, isBase: true, position: { x: 0.5789, y: 0.5889 } }
+              - { name: Cité SIC, mapLabel: Cité SIC · base de départ, isBase: true, labelOnSmallMap: true, position: { x: 0.5789, y: 0.5889 } }
               - { name: Ndoghem, position: { x: 0.7895, y: 0.8370 } }
               - { name: Bépanda, position: { x: 0.55, y: 0.4556 } }
               - { name: Makèpè, position: { x: 0.6184, y: 0.3111 } }
@@ -6896,7 +6897,7 @@ components:
             quarters:
               - { name: Ndogbong, position: { x: 0.6947, y: 0.5556 } }
               - { name: Cité des Palmiers, position: { x: 0.6289, y: 0.6704 } }
-              - { name: Akwa, position: { x: 0.4184, y: 0.6259 } }
+              - { name: Akwa, labelOnSmallMap: true, position: { x: 0.4184, y: 0.6259 } }
               - { name: New Bell, position: { x: 0.5158, y: 0.7963 } }
               - { name: Deïdo, position: { x: 0.4368, y: 0.4963 } }
           - key: zone-3
@@ -6905,11 +6906,11 @@ components:
             description: Quartiers résidentiels et périphérie.
             result: Intervention à domicile et livraison possibles. Conditions confirmées sur devis.
             quarters:
-              - { name: Bonamoussadi, position: { x: 0.6842, y: 0.1926 } }
+              - { name: Bonamoussadi, labelOnSmallMap: true, position: { x: 0.6842, y: 0.1926 } }
               - { name: Bonanjo, position: { x: 0.3763, y: 0.7593 } }
               - { name: Bonapriso, position: { x: 0.3947, y: 0.8704 } }
               - { name: Kotto, position: { x: 0.7763, y: 0.2963 } }
-              - { name: Yassa, position: { x: 0.9079, y: 0.8704 } }
+              - { name: Yassa, labelOnSmallMap: true, position: { x: 0.9079, y: 0.8704 } }
               - { name: Makea, position: { x: 0.8553, y: 0.4370 } }
               - { name: PK14, position: { x: 0.9211, y: 0.6222 } }
               - { name: Lendi, position: { x: 0.8053, y: 0.1370 } }
@@ -6919,7 +6920,7 @@ components:
             description: Intervention possible, sur devis.
             result: Intervention possible selon votre demande. Conditions et délais confirmés sur devis.
             quarters:
-              - { name: Bonabéri, detail: rive ouest du Wouri, position: { x: 0.1211, y: 0.4630 } }
+              - { name: Bonabéri, detail: rive ouest du Wouri, labelOnSmallMap: true, position: { x: 0.1211, y: 0.4630 } }
               - { name: Autres quartiers hors zone, position: null }
 
     ServiceAreasEn:
@@ -6934,7 +6935,7 @@ components:
             description: Around our Cité SIC base.
             result: Home visits and delivery as quickly as possible. Terms confirmed in the quote.
             quarters:
-              - { name: Cité SIC, mapLabel: Cité SIC · starting base, isBase: true, position: { x: 0.5789, y: 0.5889 } }
+              - { name: Cité SIC, mapLabel: Cité SIC · starting base, isBase: true, labelOnSmallMap: true, position: { x: 0.5789, y: 0.5889 } }
               - { name: Ndoghem, position: { x: 0.7895, y: 0.8370 } }
               - { name: Bépanda, position: { x: 0.55, y: 0.4556 } }
               - { name: Makèpè, position: { x: 0.6184, y: 0.3111 } }
@@ -6947,7 +6948,7 @@ components:
             quarters:
               - { name: Ndogbong, position: { x: 0.6947, y: 0.5556 } }
               - { name: Cité des Palmiers, position: { x: 0.6289, y: 0.6704 } }
-              - { name: Akwa, position: { x: 0.4184, y: 0.6259 } }
+              - { name: Akwa, labelOnSmallMap: true, position: { x: 0.4184, y: 0.6259 } }
               - { name: New Bell, position: { x: 0.5158, y: 0.7963 } }
               - { name: Deïdo, position: { x: 0.4368, y: 0.4963 } }
           - key: zone-3
@@ -6956,11 +6957,11 @@ components:
             description: Residential areas and outskirts.
             result: Home visits and delivery available. Terms confirmed in the quote.
             quarters:
-              - { name: Bonamoussadi, position: { x: 0.6842, y: 0.1926 } }
+              - { name: Bonamoussadi, labelOnSmallMap: true, position: { x: 0.6842, y: 0.1926 } }
               - { name: Bonanjo, position: { x: 0.3763, y: 0.7593 } }
               - { name: Bonapriso, position: { x: 0.3947, y: 0.8704 } }
               - { name: Kotto, position: { x: 0.7763, y: 0.2963 } }
-              - { name: Yassa, position: { x: 0.9079, y: 0.8704 } }
+              - { name: Yassa, labelOnSmallMap: true, position: { x: 0.9079, y: 0.8704 } }
               - { name: Makea, position: { x: 0.8553, y: 0.4370 } }
               - { name: PK14, position: { x: 0.9211, y: 0.6222 } }
               - { name: Lendi, position: { x: 0.8053, y: 0.1370 } }
@@ -6970,7 +6971,7 @@ components:
             description: Visits possible, on quotation.
             result: Visits possible depending on your request. Terms and timing confirmed in the quote.
             quarters:
-              - { name: Bonabéri, detail: west bank of the Wouri, position: { x: 0.1211, y: 0.4630 } }
+              - { name: Bonabéri, detail: west bank of the Wouri, labelOnSmallMap: true, position: { x: 0.1211, y: 0.4630 } }
               - { name: Other areas outside the zones, position: null }
 
     CategoryExperience:
