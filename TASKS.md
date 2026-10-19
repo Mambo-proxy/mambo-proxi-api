@@ -16,7 +16,7 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
 - [ ] Tests de contrat : validation de chaque réponse contre `openapi.yaml` ; diff du document `@nestjs/swagger` en CI
 
 ### Modules (ordre docs/08)
-- [ ] settings · navigation · pages · categories · services (lecture publique, cache, preview)
+- [ ] settings · navigation · pages · categories · services (lecture publique, cache, preview ; offres en carrousel des fiches, `ServiceOffer`)
 - [ ] Formulaires publics : quote-requests, contact-messages, registrations, training-requests, partner-requests, event-registrations (anti-spam Turnstile + piège + délai, limitation de débit)
 - [ ] contacts · requests (références `MP-AAAA-NNNN`, historique, notes, export CSV, anonymisation)
 - [ ] mail (React Email, texte brut, gabarits Figma) + queue (BullMQ, réessais)

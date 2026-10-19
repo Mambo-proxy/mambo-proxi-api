@@ -299,6 +299,9 @@ paths:
               schema: { $ref: '#/components/schemas/ServiceDetail' }
               examples:
                 chefPrive: { $ref: '#/components/examples/ServiceChefPrive' }
+                chefPriveEn: { $ref: '#/components/examples/ServiceChefPriveEn' }
+                entretienDuLogement: { $ref: '#/components/examples/ServiceEntretienDuLogement' }
+                entretienDuLogementEn: { $ref: '#/components/examples/ServiceEntretienDuLogementEn' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   # ──────────────────────────── Avis ──────────────────────────────
@@ -4008,6 +4011,51 @@ components:
         question: { type: string, maxLength: 200 }
         answer: { type: string, maxLength: 2000 }
 
+    ServiceOffer:
+      type: object
+      description: |
+        Carte du carrousel « Nos offres » d'une fiche service (offre, chef, formule…). Deux actions : l'action
+        principale (`action`, libellé et flèche →) et l'autre action (flèche ↗) : devis ou prise de rendez-vous,
+        le service étant présélectionné.
+      required: [id, title, text, visual, action, actionLabel]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        title: { type: string, maxLength: 80, examples: [Entretien régulier] }
+        titleMobile: { type: [string, 'null'], maxLength: 60, description: Titre court en mobile (null = même titre). }
+        text: { type: string, maxLength: 200, examples: [Ménage hebdomadaire ou bimensuel, mêmes intervenantes à chaque passage.] }
+        textMobile: { type: [string, 'null'], maxLength: 160, description: Texte court en mobile (null = même texte). }
+        icon: { oneOf: [{ $ref: '#/components/schemas/IconName' }, { type: 'null' }], description: Pastille d'icône à gauche du titre (null = sans pastille). }
+        visual: { $ref: '#/components/schemas/Visual' }
+        action: { type: string, enum: [QUOTE, BOOKING], description: '`QUOTE` : devis gratuit ; `BOOKING` : prise de rendez-vous.' }
+        actionLabel: { type: string, maxLength: 40, examples: [Je demande un devis gratuit] }
+        actionLabelMobile: { type: [string, 'null'], maxLength: 24, examples: [Devis gratuit] }
+
+    ServiceOffers:
+      type: object
+      required: [eyebrow, title, items]
+      properties:
+        eyebrow: { type: string, maxLength: 40, examples: [Nos offres] }
+        title: { $ref: '#/components/schemas/AccentText' }
+        lead: { type: [string, 'null'], maxLength: 200 }
+        leadMobile: { type: [string, 'null'], maxLength: 120, description: Chapô court en mobile (null = même chapô). }
+        items: { type: array, minItems: 1, maxItems: 12, items: { $ref: '#/components/schemas/ServiceOffer' } }
+
+    ServiceOfferInput:
+      type: object
+      required: [title, text, action, actionLabel]
+      properties:
+        id: { oneOf: [{ $ref: '#/components/schemas/Id' }, { type: 'null' }], description: Absent ou null pour une nouvelle offre. }
+        title: { type: string, minLength: 2, maxLength: 80 }
+        titleMobile: { type: [string, 'null'], maxLength: 60 }
+        text: { type: string, minLength: 2, maxLength: 200 }
+        textMobile: { type: [string, 'null'], maxLength: 160 }
+        icon: { oneOf: [{ $ref: '#/components/schemas/IconName' }, { type: 'null' }] }
+        illustration: { $ref: '#/components/schemas/IllustrationScene' }
+        imageId: { oneOf: [{ $ref: '#/components/schemas/Id' }, { type: 'null' }] }
+        action: { type: string, enum: [QUOTE, BOOKING] }
+        actionLabel: { type: string, minLength: 2, maxLength: 40 }
+        actionLabelMobile: { type: [string, 'null'], maxLength: 24 }
+
     QuoteField:
       type: object
       description: Champ dynamique de l'étape « Votre besoin » du devis (défini par rubrique dans le back-office).
@@ -4173,6 +4221,11 @@ components:
               items: { $ref: '#/components/schemas/Visual' }
             showWhatsapp: { type: boolean }
             related: { type: array, items: { $ref: '#/components/schemas/ServiceSummary' } }
+            offers:
+              description: Carrousel « Nos offres » sous le héros (null = section absente).
+              oneOf:
+                - $ref: '#/components/schemas/ServiceOffers'
+                - type: 'null'
             reviews: { type: array, items: { $ref: '#/components/schemas/Review' } }
             reviewsTitle: { type: [string, 'null'], examples: [Ils ont reçu un chef à domicile] }
             relatedTitle: { type: [string, 'null'], examples: [Pour compléter votre événement] }
@@ -4926,6 +4979,11 @@ components:
         advantages: { type: array, maxItems: 8, items: { $ref: '#/components/schemas/IconTextItem' } }
         faq: { type: array, maxItems: 20, items: { $ref: '#/components/schemas/FaqItem' } }
         quoteBullets: { type: array, maxItems: 5, items: { type: string, maxLength: 120 } }
+        offersEyebrow: { type: [string, 'null'], maxLength: 40 }
+        offersTitle: { type: [string, 'null'], maxLength: 120 }
+        offersLead: { type: [string, 'null'], maxLength: 200 }
+        offersLeadMobile: { type: [string, 'null'], maxLength: 120 }
+        offers: { type: array, maxItems: 12, items: { $ref: '#/components/schemas/ServiceOfferInput' }, description: Vide = pas de carrousel. }
         relatedServiceIds: { type: array, maxItems: 6, items: { $ref: '#/components/schemas/Id' } }
         featuredReviewIds: { type: array, maxItems: 6, items: { $ref: '#/components/schemas/Id' } }
         showInMenu: { type: boolean }
@@ -4970,6 +5028,19 @@ components:
             advantages: { type: array, items: { $ref: '#/components/schemas/IconTextItem' } }
             faq: { type: array, items: { $ref: '#/components/schemas/FaqItem' } }
             quoteBullets: { type: array, items: { type: string } }
+            offersEyebrow: { type: [string, 'null'] }
+            offersTitle: { type: [string, 'null'] }
+            offersLead: { type: [string, 'null'] }
+            offersLeadMobile: { type: [string, 'null'] }
+            offers:
+              type: array
+              items:
+                allOf:
+                  - $ref: '#/components/schemas/ServiceOfferInput'
+                  - type: object
+                    required: [id]
+                    properties:
+                      image: { oneOf: [{ $ref: '#/components/schemas/MediaImage' }, { type: 'null' }] }
             relatedServiceIds: { type: array, items: { $ref: '#/components/schemas/Id' } }
             featuredReviewIds: { type: array, items: { $ref: '#/components/schemas/Id' } }
             showWhatsapp: { type: boolean }
@@ -7076,7 +7147,7 @@ components:
         seo: { title: 'Expérience : chef privé, location de voiture, photographe au Cameroun', description: 'Des prestataires de confiance réservés pour vous au Cameroun : location de voiture, chef privé, massage, photographe, événementiel.', ogImageUrl: null, noindex: false }
 
     ServiceChefPrive:
-      summary: Fiche « Chef privé »
+      summary: Fiche « Chef privé » (offres en carrousel « Nos chefs »)
       value:
         id: svc_chef_prive
         slug: chef-prive
@@ -7084,15 +7155,26 @@ components:
         shortName: null
         summary: Un chef à domicile pour vos dîners, réceptions et grandes occasions.
         icon: ChefHat
-        visual: { illustration: chef, image: null, alt: '' }
+        visual: { illustration: chef, image: { id: photo-chef-2, url: /photos/chef-2.png, width: 1536, height: 1024, variants: [] }, alt: '' }
         category: { slug: experience, name: Expérience }
         href: /services/experience/chef-prive
         featuredOnHome: true
         tagline: Un chef à domicile pour vos dîners, réceptions et grandes occasions. Vous profitez de vos invités, nous nous occupons du reste.
         cities: [Douala, Yaoundé, Kribi]
+        offers:
+          eyebrow: Nos chefs
+          title: Choisissez votre chef et votre formule.
+          lead: Faites défiler les chefs et les formules, puis demandez un devis.
+          leadMobile: Faites défiler, puis demandez un devis.
+          items:
+            - { id: off_chef_paul, title: Chef Paul — cuisine camerounaise, titleMobile: Chef Paul — camerounaise, text: 'Ndolé, poisson braisé, plantains · buffets et dîners', textMobile: 'Ndolé, poisson braisé, plantains', icon: null, visual: { illustration: chef, image: { id: photo-chef-2, url: /photos/chef-2.png, width: 1536, height: 1024, variants: [] }, alt: '' }, action: QUOTE, actionLabel: Demander un devis, actionLabelMobile: Devis }
+            - { id: off_chef_aicha, title: Chef Aïcha — cuisine fusion, titleMobile: Chef Aïcha — fusion, text: Menus gastronomiques · 2 à 12 convives, textMobile: Menus gastronomiques · 2 à 12, icon: null, visual: { illustration: chef, image: { id: photo-offre-chef-aicha, url: /photos/offre-chef-aicha.png, width: 1536, height: 864, variants: [] }, alt: '' }, action: QUOTE, actionLabel: Demander un devis, actionLabelMobile: Devis }
+            - { id: off_diner_terrasse, title: Dîner sur la terrasse, titleMobile: null, text: Service à table · ambiance soirée, textMobile: Service à table, icon: null, visual: { illustration: chef, image: { id: photo-exp-hero, url: /photos/exp-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, action: QUOTE, actionLabel: Demander un devis, actionLabelMobile: Devis }
+            - { id: off_tete_a_tete, title: Dîner en tête-à-tête, titleMobile: null, text: Menu romantique à domicile · service inclus, textMobile: Menu romantique à domicile, icon: null, visual: { illustration: chef, image: { id: photo-offre-tete-a-tete, url: /photos/offre-tete-a-tete.png, width: 1280, height: 960, variants: [] }, alt: '' }, action: QUOTE, actionLabel: Demander un devis, actionLabelMobile: Devis }
+            - { id: off_buffet_reception, title: Buffet de réception, titleMobile: null, text: Jusqu’à 80 invités · service et rangement, textMobile: Jusqu’à 80 invités, icon: null, visual: { illustration: evenement, image: { id: photo-offre-buffet-reception, url: /photos/offre-buffet-reception.png, width: 1536, height: 1024, variants: [] }, alt: '' }, action: QUOTE, actionLabel: Demander un devis, actionLabelMobile: Devis }
         audiences:
           - Aux particuliers qui reçoivent famille ou amis
-          - Aux familles de la diaspora en séjour au pays
+          - Aux familles en séjour à Douala
           - Aux organisateurs d’anniversaires et de fêtes privées
           - Aux entreprises pour un repas d’équipe ou un client
         steps:
@@ -7105,17 +7187,17 @@ components:
           - { icon: Sparkles, title: Un menu unique, text: Pensé pour vos goûts et votre occasion. }
           - { icon: ShieldCheck, title: Des chefs vérifiés, text: 'Sélectionnés, suivis et évalués après chaque prestation.' }
           - { icon: Clock, title: Du temps pour vous, text: 'Aucune course, aucune vaisselle : vous profitez.' }
-          - { icon: Users, title: Un interlocuteur unique, text: Joignable depuis la France comme au Cameroun. }
+          - { icon: Users, title: Un interlocuteur unique, text: 'Joignable par téléphone, WhatsApp et e-mail.' }
         faq:
           - { question: 'Combien coûte un chef privé ?', answer: 'Chaque prestation est unique : le tarif dépend du menu, du nombre d’invités et du lieu. Il vous est communiqué sur devis, gratuitement.' }
           - { question: 'Dans quelles villes intervenez-vous ?', answer: 'À Douala, Yaoundé et Kribi. Pour une autre ville, écrivez-nous : nous étudions chaque demande.' }
-          - { question: 'Puis-je réserver depuis la France ?', answer: 'Oui. Vous faites votre demande en ligne ou sur WhatsApp ; nous organisons tout sur place et vous tenons informé à chaque étape.' }
+          - { question: 'Puis-je réserver pour un proche ?', answer: 'Oui. Vous faites la demande en ligne ou sur WhatsApp, nous organisons la prestation chez votre proche et vous tenons informé à chaque étape.' }
           - { question: 'Combien de temps à l’avance réserver ?', answer: 'Idéalement deux semaines avant la date. Pour une demande plus proche, contactez-nous : nous faisons notre possible.' }
         quoteBullets: [Gratuit et sans engagement, Menu et prestation sur mesure, Un seul interlocuteur du début à la fin]
         gallery:
-          - { illustration: chef, image: null, alt: '' }
-          - { illustration: marche, image: null, alt: '' }
-          - { illustration: chef, image: null, alt: '' }
+          - { illustration: chef, image: { id: photo-chef-2, url: /photos/chef-2.png, width: 1536, height: 1024, variants: [] }, alt: '' }
+          - { illustration: chef, image: { id: photo-offre-chef-aicha, url: /photos/offre-chef-aicha.png, width: 1536, height: 864, variants: [] }, alt: '' }
+          - { illustration: marche, image: { id: photo-exp-hero, url: /photos/exp-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }
         showWhatsapp: true
         related:
           - { id: svc_location_voiture, slug: location-voiture, name: Location de voiture, shortName: null, summary: 'Véhicules récents, avec ou sans chauffeur, pour vos trajets et vos séjours.', icon: Car, visual: { illustration: voiture, image: null, alt: '' }, category: { slug: experience, name: Expérience }, href: /services/experience/location-voiture, featuredOnHome: true }
@@ -7130,7 +7212,213 @@ components:
         reviewSummary: null
         seo: { title: 'Chef privé à domicile à Douala, Yaoundé, Kribi', description: 'Un chef à domicile pour vos dîners et réceptions au Cameroun. Menu sur mesure, devis gratuit sous 24 h.', ogImageUrl: null, noindex: false }
         toComplete: false
-        updatedAt: '2026-10-05T08:00:00.000Z'
+        updatedAt: '2026-10-19T08:00:00.000Z'
+
+    ServiceChefPriveEn:
+      summary: « Private chef » page (English)
+      value:
+        id: svc_chef_prive
+        slug: chef-prive
+        name: Private chef
+        shortName: null
+        summary: A chef at your home for your dinners, receptions and special occasions.
+        icon: ChefHat
+        visual: { illustration: chef, image: { id: photo-chef-2, url: /photos/chef-2.png, width: 1536, height: 1024, variants: [] }, alt: '' }
+        category: { slug: experience, name: Experience }
+        href: /services/experience/chef-prive
+        featuredOnHome: true
+        tagline: A chef at your home for your dinners, receptions and special occasions. You enjoy your guests, we take care of the rest.
+        cities: [Douala, Yaoundé, Kribi]
+        offers:
+          eyebrow: Our chefs
+          title: Choose your chef and your package.
+          lead: Scroll through the chefs and packages, then ask for a quote.
+          leadMobile: Scroll through, then ask for a quote.
+          items:
+            - { id: off_chef_paul, title: Chef Paul — Cameroonian cuisine, titleMobile: Chef Paul — Cameroonian, text: 'Ndolé, grilled fish, plantains · buffets and dinners', textMobile: 'Ndolé, grilled fish, plantains', icon: null, visual: { illustration: chef, image: { id: photo-chef-2, url: /photos/chef-2.png, width: 1536, height: 1024, variants: [] }, alt: '' }, action: QUOTE, actionLabel: Ask for a quote, actionLabelMobile: Quote }
+            - { id: off_chef_aicha, title: Chef Aïcha — fusion cuisine, titleMobile: Chef Aïcha — fusion, text: Gourmet menus · 2 to 12 guests, textMobile: Gourmet menus · 2 to 12, icon: null, visual: { illustration: chef, image: { id: photo-offre-chef-aicha, url: /photos/offre-chef-aicha.png, width: 1536, height: 864, variants: [] }, alt: '' }, action: QUOTE, actionLabel: Ask for a quote, actionLabelMobile: Quote }
+            - { id: off_diner_terrasse, title: Dinner on the terrace, titleMobile: null, text: Table service · evening atmosphere, textMobile: Table service, icon: null, visual: { illustration: chef, image: { id: photo-exp-hero, url: /photos/exp-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }, action: QUOTE, actionLabel: Ask for a quote, actionLabelMobile: Quote }
+            - { id: off_tete_a_tete, title: Dinner for two, titleMobile: null, text: Romantic menu at home · service included, textMobile: Romantic menu at home, icon: null, visual: { illustration: chef, image: { id: photo-offre-tete-a-tete, url: /photos/offre-tete-a-tete.png, width: 1280, height: 960, variants: [] }, alt: '' }, action: QUOTE, actionLabel: Ask for a quote, actionLabelMobile: Quote }
+            - { id: off_buffet_reception, title: Reception buffet, titleMobile: null, text: Up to 80 guests · service and tidying up, textMobile: Up to 80 guests, icon: null, visual: { illustration: evenement, image: { id: photo-offre-buffet-reception, url: /photos/offre-buffet-reception.png, width: 1536, height: 1024, variants: [] }, alt: '' }, action: QUOTE, actionLabel: Ask for a quote, actionLabelMobile: Quote }
+        audiences:
+          - Individuals hosting family or friends
+          - Families staying in Douala
+          - Organisers of birthdays and private parties
+          - Companies hosting a team meal or a client
+        steps:
+          - { title: A chat about your project, text: 'Date, place, number of guests, wishes and dietary requirements.' }
+          - { title: Menu proposal and quote, text: 'The chef designs a tailor-made menu; you receive the quote within 24 hours.' }
+          - { title: Shopping and preparation, text: 'Fresh produce bought by the chef, prepared on site.' }
+          - { title: Service and tidying up, text: 'Table service, then a tidy, clean kitchen.' }
+          - { title: Your feedback, text: A short questionnaire to help us improve. }
+        advantages:
+          - { icon: Sparkles, title: A one-of-a-kind menu, text: Designed for your tastes and your occasion. }
+          - { icon: ShieldCheck, title: Vetted chefs, text: 'Selected, followed up and rated after every service.' }
+          - { icon: Clock, title: Time for yourself, text: 'No shopping, no washing up: you simply enjoy.' }
+          - { icon: Users, title: A single point of contact, text: 'Reachable by phone, WhatsApp and email.' }
+        faq:
+          - { question: How much does a private chef cost?, answer: 'Every service is unique: the price depends on the menu, the number of guests and the venue. It is given to you in a free quote.' }
+          - { question: Which cities do you cover?, answer: 'Douala, Yaoundé and Kribi. For another city, write to us: we look at every request.' }
+          - { question: Can I book for a relative?, answer: 'Yes. You make the request online or on WhatsApp, we organise the service at your relative’s home and keep you informed at every step.' }
+          - { question: How far in advance should I book?, answer: 'Ideally two weeks before the date. For a sooner request, contact us: we will do our best.' }
+        quoteBullets: [Free and with no obligation, Tailor-made menu and service, One point of contact from start to finish]
+        gallery:
+          - { illustration: chef, image: { id: photo-chef-2, url: /photos/chef-2.png, width: 1536, height: 1024, variants: [] }, alt: '' }
+          - { illustration: chef, image: { id: photo-offre-chef-aicha, url: /photos/offre-chef-aicha.png, width: 1536, height: 864, variants: [] }, alt: '' }
+          - { illustration: marche, image: { id: photo-exp-hero, url: /photos/exp-hero.png, width: 1280, height: 960, variants: [] }, alt: '' }
+        showWhatsapp: true
+        related:
+          - { id: svc_location_voiture, slug: location-voiture, name: Car rental, shortName: null, summary: 'Recent vehicles, with or without a driver, for your trips and stays.', icon: Car, visual: { illustration: voiture, image: null, alt: '' }, category: { slug: experience, name: Experience }, href: /services/experience/location-voiture, featuredOnHome: true }
+          - { id: svc_photographe, slug: photographe, name: Photographer, shortName: null, summary: 'Portraits, events, reports: your moments captured.', icon: Camera, visual: { illustration: photo, image: null, alt: '' }, category: { slug: experience, name: Experience }, href: /services/experience/photographe, featuredOnHome: false }
+          - { id: svc_massage_bien_etre, slug: massage-bien-etre, name: Wellness massage, shortName: null, summary: 'Qualified practitioners, at your home or where you are staying.', icon: Flower2, visual: { illustration: massage, image: null, alt: '' }, category: { slug: experience, name: Experience }, href: /services/experience/massage-bien-etre, featuredOnHome: false }
+        reviewsTitle: They welcomed a chef at home
+        reviews:
+          - { id: rev_jean_marc_chef, authorName: Jean-Marc T., initials: JT, city: Yaoundé, rating: 5, text: "Le chef a régalé nos invités pour l'anniversaire de ma mère. Service impeccable, du début à la fin.", service: { slug: chef-prive, name: Private chef, categorySlug: experience, categoryName: Experience }, verified: true, featured: false, date: '2026-09-12T10:00:00.000Z', reply: null }
+          - { id: rev_laure_chef, authorName: Laure B., initials: LB, city: Douala, rating: 5, text: 'Dîner de fiançailles parfait : menu revisité, table magnifique, et une cuisine rendue impeccable.', service: { slug: chef-prive, name: Private chef, categorySlug: experience, categoryName: Experience }, verified: true, featured: false, date: '2026-08-24T10:00:00.000Z', reply: null }
+        relatedTitle: To complete your event
+        cta: { title: "Ready to welcome\nyour guests?", text: 'Your private chef quote, free and with no obligation, within 24 hours.' }
+        reviewSummary: null
+        seo: { title: 'Private chef at home in Douala, Yaoundé, Kribi', description: 'A chef at your home for your dinners and receptions in Cameroon. Tailor-made menu, free quote within 24 hours.', ogImageUrl: null, noindex: false }
+        toComplete: false
+        updatedAt: '2026-10-19T08:00:00.000Z'
+
+    ServiceEntretienDuLogement:
+      summary: Fiche « Entretien du logement » (offres en carrousel)
+      value:
+        id: svc_entretien_du_logement
+        slug: entretien-du-logement
+        name: Entretien du logement
+        shortName: null
+        summary: 'Ménage, cuisine et salle de bain, sols et surfaces, ponctuellement ou chaque semaine.'
+        icon: Sparkles
+        visual: { illustration: logement, image: { id: photo-fiche-entretien, url: /photos/fiche-entretien.png, width: 860, height: 480, variants: [] }, alt: '' }
+        category: { slug: services-a-domicile, name: Services à domicile }
+        href: /services/services-a-domicile/entretien-du-logement
+        featuredOnHome: false
+        kind: service
+        tagline: 'Ménage, cuisine et salle de bain, sols et surfaces : une intervenante Mambo Proxi entretient votre logement, ponctuellement ou chaque semaine.'
+        cities: [Douala et environs]
+        offers:
+          eyebrow: Nos offres
+          title: Choisissez l’offre adaptée à votre logement.
+          lead: Faites défiler les offres, puis demandez un devis gratuit pour celle qui vous convient.
+          leadMobile: null
+          items:
+            - { id: off_entretien_regulier, title: Entretien régulier, titleMobile: null, text: 'Ménage hebdomadaire ou bimensuel, mêmes intervenantes à chaque passage.', textMobile: null, icon: Utensils, visual: { illustration: logement, image: { id: photo-offre-regulier, url: /photos/offre-regulier.png, width: 350, height: 220, variants: [] }, alt: '' }, action: QUOTE, actionLabel: Je demande un devis gratuit, actionLabelMobile: Devis gratuit }
+            - { id: off_grand_nettoyage, title: Grand nettoyage, titleMobile: null, text: 'Nettoyage en profondeur de toutes les pièces, idéal au changement de saison.', textMobile: null, icon: Utensils, visual: { illustration: logement, image: { id: photo-offre-grand-nettoyage, url: /photos/offre-grand-nettoyage.png, width: 350, height: 220, variants: [] }, alt: '' }, action: QUOTE, actionLabel: Je demande un devis gratuit, actionLabelMobile: Devis gratuit }
+            - { id: off_saisonnier, title: Ménage entre deux locations saisonnières, titleMobile: null, text: Logement remis en état et linge changé entre deux voyageurs., textMobile: null, icon: Utensils, visual: { illustration: logement, image: { id: photo-offre-saisonnier, url: /photos/offre-saisonnier.png, width: 350, height: 220, variants: [] }, alt: '' }, action: QUOTE, actionLabel: Je demande un devis gratuit, actionLabelMobile: Devis gratuit }
+            - { id: off_apres_travaux, title: Ménage après travaux, titleMobile: null, text: 'Poussières, traces de peinture et gravats retirés : le logement est prêt à vivre.', textMobile: null, icon: Utensils, visual: { illustration: logement, image: { id: photo-offre-travaux, url: /photos/offre-travaux.png, width: 1035, height: 720, variants: [] }, alt: '' }, action: QUOTE, actionLabel: Je demande un devis gratuit, actionLabelMobile: Devis gratuit }
+            - { id: off_evaluation, title: Évaluation à domicile, titleMobile: null, text: Un conseiller se déplace pour évaluer votre besoin et vous orienter vers la bonne offre., textMobile: null, icon: Utensils, visual: { illustration: logement, image: { id: photo-offre-evaluation, url: /photos/offre-evaluation.png, width: 1536, height: 1024, variants: [] }, alt: '' }, action: BOOKING, actionLabel: Je réserve mon évaluation, actionLabelMobile: Réserver }
+        audiences:
+          - Aux actifs et aux familles qui manquent de temps
+          - Aux proches de personnes âgées ou isolées
+          - Aux propriétaires de locations saisonnières
+          - 'Aux professionnels : bureaux, commerces, cabinets'
+        steps:
+          - { title: Votre demande, text: 'Surface, nombre de pièces, fréquence souhaitée et consignes particulières.' }
+          - { title: Évaluation et devis, text: 'Évaluation à domicile si besoin ; devis gratuit sous 24 h.' }
+          - { title: Intervention, text: 'Dépoussiérage, aspiration, lavage des sols, cuisine et salle de bain.' }
+          - { title: Contrôle qualité, text: Une personne dédiée vérifie la qualité et recueille votre retour. }
+          - { title: Votre avis, text: Un court questionnaire pour nous aider à progresser. }
+        advantages:
+          - { icon: Sparkles, title: Un logement impeccable, text: 'Un résultat soigné, pièce par pièce.' }
+          - { icon: ShieldCheck, title: Des intervenantes vérifiées, text: 'Sélectionnés, suivis et évalués après chaque prestation.' }
+          - { icon: Clock, title: Du temps pour vous, text: Vos soirées et vos week-ends vous appartiennent. }
+          - { icon: Users, title: Un interlocuteur unique, text: 'Joignable par téléphone, WhatsApp et e-mail.' }
+        faq:
+          - { question: 'Combien coûte un entretien du logement ?', answer: 'Le tarif dépend de la surface, de l’état du logement et de la fréquence. Il est confirmé sur devis, gratuit et sans engagement.' }
+          - { question: 'Dans quelles villes intervenez-vous ?', answer: 'À Douala et dans ses environs. Pour un autre lieu, écrivez-nous : nous étudions chaque demande.' }
+          - { question: 'Puis-je réserver pour un proche ?', answer: 'Oui. Vous faites la demande en ligne ou sur WhatsApp, l’intervenante se rend chez votre proche et nous vous tenons informé après chaque passage.' }
+          - { question: 'Faut-il fournir les produits d’entretien ?', answer: 'Non : l’intervenante apporte le matériel et les produits. Si vous préférez les vôtres, précisez-le dans votre demande.' }
+        quoteBullets: [Gratuit et sans engagement, Formule et fréquence sur mesure, Un seul interlocuteur du début à la fin]
+        gallery:
+          - { illustration: logement, image: { id: photo-fiche-entretien, url: /photos/fiche-entretien.png, width: 860, height: 480, variants: [] }, alt: '' }
+          - { illustration: logement, image: { id: photo-fiche-cuisine, url: /photos/fiche-cuisine.png, width: 436, height: 232, variants: [] }, alt: '' }
+          - { illustration: logement, image: { id: photo-fiche-sdb, url: /photos/fiche-sdb.png, width: 436, height: 232, variants: [] }, alt: '' }
+        showWhatsapp: true
+        related:
+          - { id: svc_pressing_laverie, slug: pressing-laverie, name: Pressing et laverie, shortName: null, summary: 'Collecte, lavage, repassage et retour de votre linge.', icon: Package, visual: { illustration: livraison, image: null, alt: '' }, category: { slug: services-de-proximite, name: Services de proximité }, href: /services/services-de-proximite/pressing-laverie, featuredOnHome: false }
+          - { id: svc_nettoyage_automobile, slug: nettoyage-automobile, name: Nettoyage automobile, shortName: null, summary: Votre véhicule nettoyé à domicile., icon: Car, visual: { illustration: voiture, image: { id: photo-formule-maison-auto, url: /photos/formule-maison-auto.png, width: 1536, height: 1024, variants: [] }, alt: '' }, category: { slug: services-a-domicile, name: Services à domicile }, href: /services/services-a-domicile/nettoyage-automobile, featuredOnHome: false }
+          - { id: cat_domicile, slug: services-a-domicile, name: Formules à domicile, shortName: null, summary: 'Maison, Auto et Linge en une seule intervention.', icon: ShoppingCart, visual: { illustration: logement, image: { id: photo-formule-maison, url: /photos/formule-maison.png, width: 1280, height: 960, variants: [] }, alt: '' }, category: { slug: services-a-domicile, name: Services à domicile }, href: '/services/services-a-domicile#formules', featuredOnHome: false, kind: formula }
+        reviewsTitle: Ils nous ont confié leur logement
+        reviews:
+          - { id: rev_jean_marc_entretien, authorName: Jean-Marc T., initials: JT, city: Bonapriso, rating: 5, text: 'Mon appartement est impeccable chaque vendredi. L’intervenante est ponctuelle et discrète.', service: { slug: entretien-du-logement, name: Entretien du logement, categorySlug: services-a-domicile, categoryName: Services à domicile }, verified: true, featured: false, date: '2026-10-10T10:00:00.000Z', reply: null }
+          - { id: rev_laure_entretien, authorName: Laure B., initials: LB, city: Makèpè, rating: 5, text: 'Ménage après travaux parfait : le logement était prêt le soir même.', service: { slug: entretien-du-logement, name: Entretien du logement, categorySlug: services-a-domicile, categoryName: Services à domicile }, verified: true, featured: false, date: '2026-09-26T10:00:00.000Z', reply: null }
+        relatedTitle: Pour aller plus loin à la maison
+        cta: { title: "Un logement entretenu,\nsans y penser ?", text: 'Votre devis entretien du logement, gratuit et sans engagement, sous 24 h.' }
+        reviewSummary: null
+        seo: { title: 'Entretien du logement à domicile à Douala', description: 'Ménage régulier, grand nettoyage, après travaux ou entre deux locations : une intervenante de confiance chez vous, à Douala. Devis gratuit sous 24 h.', ogImageUrl: null, noindex: false }
+        toComplete: false
+        updatedAt: '2026-10-19T08:00:00.000Z'
+
+    ServiceEntretienDuLogementEn:
+      summary: « Home cleaning » page (English)
+      value:
+        id: svc_entretien_du_logement
+        slug: entretien-du-logement
+        name: Home cleaning
+        shortName: null
+        summary: 'Cleaning, kitchen and bathroom, floors and surfaces, as a one-off or every week.'
+        icon: Sparkles
+        visual: { illustration: logement, image: { id: photo-fiche-entretien, url: /photos/fiche-entretien.png, width: 860, height: 480, variants: [] }, alt: '' }
+        category: { slug: services-a-domicile, name: Home services }
+        href: /services/services-a-domicile/entretien-du-logement
+        featuredOnHome: false
+        kind: service
+        tagline: 'Cleaning, kitchen and bathroom, floors and surfaces: a Mambo Proxi housekeeper looks after your home, as a one-off or every week.'
+        cities: [Douala and surroundings]
+        offers:
+          eyebrow: Our offers
+          title: Choose the offer that suits your home.
+          lead: Scroll through the offers, then ask for a free quote for the one that suits you.
+          leadMobile: null
+          items:
+            - { id: off_entretien_regulier, title: Regular cleaning, titleMobile: null, text: 'Weekly or fortnightly cleaning, with the same housekeepers every visit.', textMobile: null, icon: Utensils, visual: { illustration: logement, image: { id: photo-offre-regulier, url: /photos/offre-regulier.png, width: 350, height: 220, variants: [] }, alt: '' }, action: QUOTE, actionLabel: I ask for a free quote, actionLabelMobile: Free quote }
+            - { id: off_grand_nettoyage, title: Deep cleaning, titleMobile: null, text: 'Thorough cleaning of every room, ideal when the season changes.', textMobile: null, icon: Utensils, visual: { illustration: logement, image: { id: photo-offre-grand-nettoyage, url: /photos/offre-grand-nettoyage.png, width: 350, height: 220, variants: [] }, alt: '' }, action: QUOTE, actionLabel: I ask for a free quote, actionLabelMobile: Free quote }
+            - { id: off_saisonnier, title: Cleaning between two holiday lets, titleMobile: null, text: Home restored and linen changed between two guests., textMobile: null, icon: Utensils, visual: { illustration: logement, image: { id: photo-offre-saisonnier, url: /photos/offre-saisonnier.png, width: 350, height: 220, variants: [] }, alt: '' }, action: QUOTE, actionLabel: I ask for a free quote, actionLabelMobile: Free quote }
+            - { id: off_apres_travaux, title: After-works cleaning, titleMobile: null, text: 'Dust, paint marks and rubble removed: your home is ready to live in.', textMobile: null, icon: Utensils, visual: { illustration: logement, image: { id: photo-offre-travaux, url: /photos/offre-travaux.png, width: 1035, height: 720, variants: [] }, alt: '' }, action: QUOTE, actionLabel: I ask for a free quote, actionLabelMobile: Free quote }
+            - { id: off_evaluation, title: Home assessment, titleMobile: null, text: An advisor comes to assess your needs and point you to the right offer., textMobile: null, icon: Utensils, visual: { illustration: logement, image: { id: photo-offre-evaluation, url: /photos/offre-evaluation.png, width: 1536, height: 1024, variants: [] }, alt: '' }, action: BOOKING, actionLabel: I book my assessment, actionLabelMobile: Book }
+        audiences:
+          - Busy professionals and families short on time
+          - Relatives of elderly or isolated people
+          - Owners of holiday lets
+          - 'Businesses: offices, shops, practices'
+        steps:
+          - { title: Your request, text: 'Surface area, number of rooms, preferred frequency and special instructions.' }
+          - { title: Assessment and quote, text: 'Home assessment if needed; free quote within 24 hours.' }
+          - { title: Cleaning visit, text: 'Dusting, vacuuming, floor washing, kitchen and bathroom.' }
+          - { title: Quality check, text: A dedicated person checks the quality and gathers your feedback. }
+          - { title: Your feedback, text: A short questionnaire to help us improve. }
+        advantages:
+          - { icon: Sparkles, title: A spotless home, text: 'Careful results, room by room.' }
+          - { icon: ShieldCheck, title: Vetted housekeepers, text: 'Selected, followed up and rated after every visit.' }
+          - { icon: Clock, title: Time for yourself, text: Your evenings and weekends are yours again. }
+          - { icon: Users, title: A single point of contact, text: 'Reachable by phone, WhatsApp and email.' }
+        faq:
+          - { question: How much does home cleaning cost?, answer: 'The price depends on the surface area, the condition of the home and the frequency. It is confirmed in a quote, free and with no obligation.' }
+          - { question: Which cities do you cover?, answer: 'Douala and its surroundings. For another location, write to us: we look at every request.' }
+          - { question: Can I book for a relative?, answer: 'Yes. You make the request online or on WhatsApp, the housekeeper goes to your relative’s home and we keep you informed after every visit.' }
+          - { question: Do I need to provide cleaning products?, answer: 'No: the housekeeper brings the equipment and products. If you prefer your own, just mention it in your request.' }
+        quoteBullets: [Free and with no obligation, Tailor-made package and frequency, One point of contact from start to finish]
+        gallery:
+          - { illustration: logement, image: { id: photo-fiche-entretien, url: /photos/fiche-entretien.png, width: 860, height: 480, variants: [] }, alt: '' }
+          - { illustration: logement, image: { id: photo-fiche-cuisine, url: /photos/fiche-cuisine.png, width: 436, height: 232, variants: [] }, alt: '' }
+          - { illustration: logement, image: { id: photo-fiche-sdb, url: /photos/fiche-sdb.png, width: 436, height: 232, variants: [] }, alt: '' }
+        showWhatsapp: true
+        related:
+          - { id: svc_pressing_laverie, slug: pressing-laverie, name: Dry cleaning and laundry, shortName: null, summary: 'Pick-up, washing, ironing and return of your laundry.', icon: Package, visual: { illustration: livraison, image: null, alt: '' }, category: { slug: services-de-proximite, name: Local services }, href: /services/services-de-proximite/pressing-laverie, featuredOnHome: false }
+          - { id: svc_nettoyage_automobile, slug: nettoyage-automobile, name: Car cleaning, shortName: null, summary: Your vehicle cleaned at home., icon: Car, visual: { illustration: voiture, image: { id: photo-formule-maison-auto, url: /photos/formule-maison-auto.png, width: 1536, height: 1024, variants: [] }, alt: '' }, category: { slug: services-a-domicile, name: Home services }, href: /services/services-a-domicile/nettoyage-automobile, featuredOnHome: false }
+          - { id: cat_domicile, slug: services-a-domicile, name: Home packages, shortName: null, summary: 'Home, Car and Laundry in a single visit.', icon: ShoppingCart, visual: { illustration: logement, image: { id: photo-formule-maison, url: /photos/formule-maison.png, width: 1280, height: 960, variants: [] }, alt: '' }, category: { slug: services-a-domicile, name: Home services }, href: '/services/services-a-domicile#formules', featuredOnHome: false, kind: formula }
+        reviewsTitle: They trusted us with their home
+        reviews:
+          - { id: rev_jean_marc_entretien, authorName: Jean-Marc T., initials: JT, city: Bonapriso, rating: 5, text: 'Mon appartement est impeccable chaque vendredi. L’intervenante est ponctuelle et discrète.', service: { slug: entretien-du-logement, name: Home cleaning, categorySlug: services-a-domicile, categoryName: Home services }, verified: true, featured: false, date: '2026-10-10T10:00:00.000Z', reply: null }
+          - { id: rev_laure_entretien, authorName: Laure B., initials: LB, city: Makèpè, rating: 5, text: 'Ménage après travaux parfait : le logement était prêt le soir même.', service: { slug: entretien-du-logement, name: Home cleaning, categorySlug: services-a-domicile, categoryName: Home services }, verified: true, featured: false, date: '2026-09-26T10:00:00.000Z', reply: null }
+        relatedTitle: Going further at home
+        cta: { title: "A well-kept home,\nwithout a second thought?", text: 'Your home cleaning quote, free and with no obligation, within 24 hours.' }
+        reviewSummary: null
+        seo: { title: 'Home cleaning in Douala', description: 'Regular cleaning, deep cleaning, after works or between two lets: a trusted housekeeper at your home in Douala. Free quote within 24 hours.', ogImageUrl: null, noindex: false }
+        toComplete: false
+        updatedAt: '2026-10-19T08:00:00.000Z'
 
     ReviewsPage:
       summary: Avis publiés
