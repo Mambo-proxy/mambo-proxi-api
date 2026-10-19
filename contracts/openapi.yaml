@@ -4116,6 +4116,7 @@ components:
               oneOf:
                 - $ref: '#/components/schemas/CategoryHighlight'
                 - type: 'null'
+            processEyebrow: { type: [string, 'null'], examples: [Comment ça marche ?], description: Sur-titre du déroulé ; null = libellé par défaut. }
             processTitle: { type: [string, 'null'] }
             processSteps: { type: array, items: { $ref: '#/components/schemas/StepItem' } }
             testimonial:
