@@ -4072,10 +4072,13 @@ components:
 
     CategoryHighlight:
       type: object
-      description: Bloc spécifique à une rubrique (réception de colis, agenda culturel).
+      description: Bloc spécifique à une rubrique (réception de colis, agenda culturel, bande d'engagements).
       required: [kind, title]
       properties:
-        kind: { type: string, enum: [PARCEL_RECEPTION, AGENDA] }
+        kind:
+          type: string
+          enum: [PARCEL_RECEPTION, AGENDA, STEPS_BAND]
+          description: '`STEPS_BAND` : bande sombre de cartes numérotées avec note (ex. « Des intervenantes de confiance »), même présentation que la réception de colis.'
         eyebrow: { type: [string, 'null'] }
         title: { $ref: '#/components/schemas/AccentText' }
         text: { type: [string, 'null'] }
