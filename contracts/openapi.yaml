@@ -4029,6 +4029,7 @@ components:
         action: { type: string, enum: [QUOTE, BOOKING], description: '`QUOTE` : devis gratuit ; `BOOKING` : prise de rendez-vous.' }
         actionLabel: { type: string, maxLength: 40, examples: [Je demande un devis gratuit] }
         actionLabelMobile: { type: [string, 'null'], maxLength: 24, examples: [Devis gratuit] }
+        serviceSlug: { oneOf: [{ $ref: '#/components/schemas/Slug' }, { type: 'null' }], description: "Service présélectionné par les deux actions (carrousels d'une rubrique) ; null = service de la fiche." }
 
     ServiceOffers:
       type: object
@@ -4036,6 +4037,7 @@ components:
       properties:
         eyebrow: { type: string, maxLength: 40, examples: [Nos offres] }
         title: { $ref: '#/components/schemas/AccentText' }
+        titleMobile: { type: [string, 'null'], maxLength: 80, description: Titre court en mobile (null = même titre). }
         lead: { type: [string, 'null'], maxLength: 200 }
         leadMobile: { type: [string, 'null'], maxLength: 120, description: Chapô court en mobile (null = même chapô). }
         items: { type: array, minItems: 1, maxItems: 12, items: { $ref: '#/components/schemas/ServiceOffer' } }
@@ -4055,6 +4057,7 @@ components:
         action: { type: string, enum: [QUOTE, BOOKING] }
         actionLabel: { type: string, minLength: 2, maxLength: 40 }
         actionLabelMobile: { type: [string, 'null'], maxLength: 24 }
+        serviceId: { oneOf: [{ $ref: '#/components/schemas/Id' }, { type: 'null' }], description: "Service présélectionné (carrousels d'une rubrique) ; null = service de la fiche." }
 
     QuoteField:
       type: object
@@ -4164,6 +4167,10 @@ components:
               oneOf:
                 - $ref: '#/components/schemas/CategoryHighlight'
                 - type: 'null'
+            offerSections:
+              type: array
+              description: "Carrousels d'offres sous les services de la rubrique (ex. véhicules, prestataires) ; chaque offre précise son service."
+              items: { $ref: '#/components/schemas/ServiceOffers' }
             processEyebrow: { type: [string, 'null'], examples: [Comment ça marche ?], description: Sur-titre du déroulé ; null = libellé par défaut. }
             processTitle: { type: [string, 'null'] }
             processSteps: { type: array, items: { $ref: '#/components/schemas/StepItem' } }
@@ -5103,6 +5110,19 @@ components:
               title: { type: string }
               serviceSlugs: { type: array, items: { $ref: '#/components/schemas/Slug' } }
         highlight: { oneOf: [{ $ref: '#/components/schemas/CategoryHighlight' }, { type: 'null' }] }
+        offerSections:
+          type: array
+          maxItems: 4
+          items:
+            type: object
+            required: [eyebrow, title, offers]
+            properties:
+              eyebrow: { type: string, maxLength: 40 }
+              title: { type: string, maxLength: 120 }
+              titleMobile: { type: [string, 'null'], maxLength: 80 }
+              lead: { type: [string, 'null'], maxLength: 200 }
+              leadMobile: { type: [string, 'null'], maxLength: 120 }
+              offers: { type: array, maxItems: 12, items: { $ref: '#/components/schemas/ServiceOfferInput' } }
         quoteFields: { type: array, maxItems: 12, items: { $ref: '#/components/schemas/QuoteField' } }
         ctaTitle: { type: [string, 'null'] }
         ctaText: { type: [string, 'null'] }
