@@ -3880,7 +3880,7 @@ components:
       required: [zones]
       properties:
         zones: { type: array, items: { $ref: '#/components/schemas/Zone' } }
-        note: { type: [string, 'null'], examples: ["Votre quartier n'apparaît pas ? Contactez-nous : nous étudions chaque demande."] }
+        note: { type: [string, 'null'], examples: ["Votre quartier n’apparaît pas ? Contactez-nous : nous étudions chaque demande."] }
         updatedAt: { $ref: '#/components/schemas/DateTime' }
 
     Navigation:
@@ -7016,7 +7016,7 @@ components:
     ServiceAreas:
       summary: Zones d'intervention (maquette « Zones d'intervention »)
       value:
-        note: "Votre quartier n'apparaît pas ? Contactez-nous : nous étudions chaque demande. Délai moyen de livraison : 30 à 60 minutes selon le trafic."
+        note: "Votre quartier n’apparaît pas ? Contactez-nous : nous étudions chaque demande. Délai moyen de livraison : 30 à 60 minutes selon le trafic."
         updatedAt: '2026-10-18T08:00:00.000Z'
         zones:
           - key: zone-1
@@ -7067,7 +7067,7 @@ components:
     ServiceAreasEn:
       summary: Zones d'intervention en anglais (`?lang=en`)
       value:
-        note: "Can't find your neighbourhood? Contact us: we look at every request. Average delivery time: 30 to 60 minutes depending on traffic."
+        note: "Can’t find your neighbourhood? Contact us: we look at every request. Average delivery time: 30 to 60 minutes depending on traffic."
         updatedAt: '2026-10-18T08:00:00.000Z'
         zones:
           - key: zone-1
