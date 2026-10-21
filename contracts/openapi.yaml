@@ -6152,6 +6152,9 @@ components:
             text: { type: [string, 'null'], maxLength: 300 }
             textMobile: { type: [string, 'null'], maxLength: 200, description: Texte raccourci en mobile ; null = texte principal. }
             primaryCta: { oneOf: [{ $ref: '#/components/schemas/Link' }, { type: 'null' }] }
+            secondaryCta:
+              oneOf: [{ $ref: '#/components/schemas/Link' }, { type: 'null' }]
+              description: Second bouton (vert), à la place du bouton WhatsApp (ex. « Lire en anglais » du Magazine).
             showWhatsapp: { type: boolean, default: true }
 
     DynamicSection:
