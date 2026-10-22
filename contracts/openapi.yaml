@@ -67,6 +67,8 @@ tags:
     description: 'Back-office : formations.'
   - name: Admin — Magazine
     description: 'Back-office : magazine (éditions, articles, envoi par la newsletter).'
+  - name: Admin — Zones
+    description: 'Back-office : zones d’intervention, quartiers, délais et tarifs indicatifs.'
   - name: Admin — Agenda
     description: 'Back-office : agenda.'
   - name: Admin — Contacts
@@ -2805,6 +2807,93 @@ paths:
         '204': { $ref: '#/components/responses/NoContent' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+
+  # ──────────────────────────── Admin — Zones d'intervention ──────
+  /v1/admin/zones:
+    get:
+      tags: [Admin — Zones]
+      operationId: adminListZones
+      summary: Zones d'intervention, quartiers, délais et tarifs indicatifs
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Zones dans l'ordre d'affichage du site.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminZones' }
+              examples:
+                default: { $ref: '#/components/examples/AdminZones' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      tags: [Admin — Zones]
+      operationId: adminCreateZone
+      summary: Créer une zone
+      security: [{ cookieAuth: [], csrfToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ZoneInput' }
+      responses:
+        '201':
+          description: Zone créée (à la fin de la liste, inactive tant qu'elle n'est pas activée).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminZone' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/zones/reorder:
+    patch:
+      tags: [Admin — Zones]
+      operationId: adminReorderZones
+      summary: Ordre des zones (légende, liste et recherche du site)
+      security: [{ cookieAuth: [], csrfToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ReorderInput' }
+      responses:
+        '204': { $ref: '#/components/responses/NoContent' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/admin/zones/{id}:
+    patch:
+      tags: [Admin — Zones]
+      operationId: adminUpdateZone
+      summary: Modifier une zone et ses quartiers
+      description: |
+        `quarters` remplace la liste des quartiers de la zone ; un quartier déjà présent dans une autre zone y est retiré
+        (un quartier n'appartient qu'à une zone). Revalide le tag `zones`.
+      security: [{ cookieAuth: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdPath' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ZonePatch' }
+      responses:
+        '200':
+          description: Zone enregistrée.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminZone' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+    delete:
+      tags: [Admin — Zones]
+      operationId: adminDeleteZone
+      summary: Supprimer une zone
+      description: Une zone qui contient encore des quartiers ne peut pas être supprimée (409).
+      security: [{ cookieAuth: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdPath' }]
+      responses:
+        '204': { $ref: '#/components/responses/NoContent' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
 
   # ──────────────────────────── Admin — Agenda ────────────────────
   /v1/admin/events:
@@ -6022,6 +6111,71 @@ components:
         articlesCount: { type: integer }
         lastCampaign: { oneOf: [{ $ref: '#/components/schemas/MagazineCampaignStats' }, { type: 'null' }] }
 
+    # ──────────────────────────── Admin — Zones d'intervention ──────
+    ZoneFee:
+      type: object
+      description: 'Tarif indicatif de déplacement ; masqué sur le site tant que l''option « Afficher les tarifs » est désactivée (cahier §9 : devis uniquement).'
+      required: [amount, from]
+      properties:
+        amount: { type: integer, minimum: 0, examples: [1500] }
+        currency: { type: string, enum: [XAF], default: XAF }
+        from: { type: boolean, description: '« Dès 3 500 FCFA » : montant minimal.' }
+
+    ZoneFields:
+      type: object
+      properties:
+        name: { type: string, minLength: 1, maxLength: 60 }
+        nameEn: { type: [string, 'null'], maxLength: 60 }
+        tone: { $ref: '#/components/schemas/ZoneTone' }
+        description: { type: string, maxLength: 160 }
+        descriptionEn: { type: [string, 'null'], maxLength: 160 }
+        result: { type: string, maxLength: 240, description: Réponse affichée quand un quartier de la zone est recherché. }
+        resultEn: { type: [string, 'null'], maxLength: 240 }
+        delay: { type: [string, 'null'], maxLength: 30, description: 'Délai moyen d''intervention ; `null` = « Sur devis ».', examples: [30–45 min] }
+        fee: { oneOf: [{ $ref: '#/components/schemas/ZoneFee' }, { type: 'null' }] }
+        active: { type: boolean, description: 'Zone affichée sur le site (carte, légende, recherche, formulaires).' }
+        quarters: { type: array, maxItems: 80, items: { $ref: '#/components/schemas/ZoneQuarter' } }
+
+    ZoneInput:
+      allOf:
+        - $ref: '#/components/schemas/ZoneFields'
+        - type: object
+          required: [name, tone]
+
+    ZonePatch:
+      allOf:
+        - $ref: '#/components/schemas/ZoneFields'
+        - type: object
+          minProperties: 1
+
+    AdminZone:
+      type: object
+      required: [id, key, name, nameEn, tone, description, descriptionEn, result, resultEn, delay, fee, active, quarters, requestsCount, sortOrder, updatedAt]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        key: { $ref: '#/components/schemas/Slug' }
+        name: { type: string, examples: [Zone 1 — Proximité] }
+        nameEn: { type: [string, 'null'] }
+        tone: { $ref: '#/components/schemas/ZoneTone' }
+        description: { type: string }
+        descriptionEn: { type: [string, 'null'] }
+        result: { type: string }
+        resultEn: { type: [string, 'null'] }
+        delay: { type: [string, 'null'] }
+        fee: { oneOf: [{ $ref: '#/components/schemas/ZoneFee' }, { type: 'null' }] }
+        active: { type: boolean }
+        quarters: { type: array, items: { $ref: '#/components/schemas/ZoneQuarter' } }
+        requestsCount: { type: integer, description: 'Demandes des 12 derniers mois dont la ville commence par un quartier de la zone.' }
+        sortOrder: { type: integer }
+        updatedAt: { $ref: '#/components/schemas/DateTime' }
+
+    AdminZones:
+      type: object
+      required: [zones, showFees]
+      properties:
+        zones: { type: array, items: { $ref: '#/components/schemas/AdminZone' } }
+        showFees: { type: boolean, description: 'Option « Afficher les tarifs » des paramètres ; désactivée, les tarifs indicatifs restent masqués sur le site.' }
+
     # ──────────────────────────── Admin — Agenda ────────────────────
     EventFields:
       type: object
@@ -8196,6 +8350,48 @@ components:
           - { id: art_bien_manger, title: Bien manger au quotidien sans se ruiner, titleEn: Eating well every day without breaking the bank, theme: Santé et nutrition, themeEn: Health and nutrition, excerpt: null, excerptEn: null, body: '<p>…</p>', bodyEn: '<p>…</p>', image: { id: photo-magazine-bien-manger, url: /photos/magazine-bien-manger.png, width: 420, height: 285, alt: '', variants: [] }, languages: [fr, en], edition: { id: mag_n1, label: N° 1 }, updatedAt: '2026-09-28T10:00:00.000Z' }
           - { id: art_kribi, title: 'Kribi, la nature à deux heures de Douala', titleEn: null, theme: Culture, themeEn: null, excerpt: null, excerptEn: null, body: '<p>…</p>', bodyEn: null, image: { id: photo-culture-decouverte, url: /photos/culture-decouverte.png, width: 1536, height: 1024, alt: '', variants: [] }, languages: [fr], edition: { id: mag_n1, label: N° 1 }, updatedAt: '2026-09-29T10:00:00.000Z' }
         newsletter: { subscribers: { fr: 1012, en: 236 }, scheduledAt: '2026-10-06T08:00:00.000Z', sentAt: null }
+
+    AdminZones:
+      summary: Zones d'intervention (maquette « BO — Zones d'intervention »)
+      value:
+        showFees: false
+        zones:
+          - id: zon_1
+            key: zone-1
+            name: Zone 1 — Proximité
+            nameEn: Zone 1 — Nearby
+            tone: zone1
+            description: Autour de la base de Cité SIC.
+            descriptionEn: Around our Cité SIC base.
+            result: Intervention à domicile et livraison dans les meilleurs délais. Conditions confirmées sur devis.
+            resultEn: Home service and delivery as quickly as possible. Terms confirmed in your quote.
+            delay: 30–45 min
+            fee: { amount: 1500, currency: XAF, from: false }
+            active: true
+            quarters:
+              - { name: Cité SIC, mapLabel: Cité SIC · base de départ, isBase: true, labelOnSmallMap: true, position: { x: 0.5789, y: 0.5889 } }
+              - { name: Ndoghem, position: { x: 0.7895, y: 0.8370 } }
+            requestsCount: 41
+            sortOrder: 0
+            updatedAt: '2026-10-18T08:00:00.000Z'
+          - id: zon_speciale
+            key: zone-speciale
+            name: Zone spéciale
+            nameEn: Special zone
+            tone: special
+            description: Intervention possible, sur devis.
+            descriptionEn: Service possible, on quote.
+            result: Intervention possible selon votre demande. Conditions et délais confirmés sur devis.
+            resultEn: Service possible depending on your request. Terms and timing confirmed in your quote.
+            delay: null
+            fee: { amount: 3500, currency: XAF, from: true }
+            active: true
+            quarters:
+              - { name: Bonabéri, detail: rive ouest du Wouri, labelOnSmallMap: true, position: { x: 0.1211, y: 0.4630 } }
+              - { name: Autres quartiers hors zone, position: null }
+            requestsCount: 3
+            sortOrder: 3
+            updatedAt: '2026-10-18T08:00:00.000Z'
 
     AdminServices:
       summary: Liste des services
