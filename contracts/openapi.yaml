@@ -1256,6 +1256,7 @@ paths:
         - name: country
           in: query
           schema: { $ref: '#/components/schemas/CountryCode' }
+        - $ref: '#/components/parameters/District'
         - $ref: '#/components/parameters/From'
         - $ref: '#/components/parameters/To'
         - $ref: '#/components/parameters/Q'
@@ -1291,6 +1292,13 @@ paths:
         - name: status
           in: query
           schema: { $ref: '#/components/schemas/RequestStatus' }
+        - name: category
+          in: query
+          schema: { $ref: '#/components/schemas/Slug' }
+        - name: country
+          in: query
+          schema: { $ref: '#/components/schemas/CountryCode' }
+        - $ref: '#/components/parameters/District'
         - $ref: '#/components/parameters/From'
         - $ref: '#/components/parameters/To'
       responses:
@@ -3342,6 +3350,13 @@ components:
       name: X-CSRF-Token
       description: Recopie du cookie `mp_csrf` (double-submit). Obligatoire sur toutes les mutations authentifiées.
   parameters:
+    District:
+      name: district
+      in: query
+      description: |
+        Quartier (nom tel que dans `GET /v1/zones`, ex. `Bonapriso`) : contacts dont la ville commence par ce quartier
+        (« Bonapriso, Douala »), sans tenir compte de la casse ni des accents.
+      schema: { type: string, maxLength: 80, examples: [Bonapriso] }
     Lang:
       name: lang
       in: query
@@ -7570,7 +7585,7 @@ components:
         serviceSlug: chef-prive
         needs: { eventDate: '2026-11-14', city: Douala, guests: 12, occasion: Anniversaire }
         description: Dîner pour les 60 ans de ma mère, cuisine camerounaise revisitée, un invité végétarien.
-        contact: { fullName: Aurélie Kamga, email: aurelie.k@example.com, phone: '+33612345678', country: FR, city: Paris }
+        contact: { fullName: Aurélie Kamga, email: aurelie.k@example.com, phone: '+237612345678', country: CM, city: 'Bonapriso, Douala' }
         contactPreference: WHATSAPP
         consent: true
         antiSpam: { turnstileToken: XXXX.DUMMY.TOKEN.XXXX, honeypot: '', startedAt: '2026-10-05T08:09:30.000Z' }
@@ -7613,10 +7628,11 @@ components:
           - { label: S40, start: '2026-09-28', count: 14 }
           - { label: S41, start: '2026-10-05', count: 12 }
         byCategory:
-          - { slug: immobilier, name: Immobilier, count: 21, percent: 39.6 }
-          - { slug: experience, name: Expérience, count: 17, percent: 32.1 }
-          - { slug: services-de-proximite, name: Services de proximité, count: 9, percent: 17 }
-          - { slug: culture-evenementiel, name: Culture & événementiel, count: 6, percent: 11.3 }
+          - { slug: services-a-domicile, name: Services à domicile, count: 24, percent: 31.2 }
+          - { slug: immobilier, name: Immobilier, count: 21, percent: 27.3 }
+          - { slug: experience, name: Expérience, count: 17, percent: 22.1 }
+          - { slug: services-de-proximite, name: Services de proximité, count: 9, percent: 11.7 }
+          - { slug: culture-evenementiel, name: Culture & événementiel, count: 6, percent: 7.8 }
         latestRequests: []
         todo: { reviewsToValidate: 4, unreadApplications: 2, appointmentsToConfirm: 3, partnershipRequests: 1, newRegistrations: 5 }
         surveys: { sent: 34, answered: 23, responseRate: 68 }
@@ -7632,7 +7648,7 @@ components:
             reference: MP-2026-0142
             type: DEVIS
             status: NOUVELLE
-            contact: { id: ctc_aurelie, fullName: Aurélie Kamga, initials: AK, email: aurelie.k@example.com, phone: '+33612345678', country: FR, city: Paris, profile: PARTICULIER }
+            contact: { id: ctc_aurelie, fullName: Aurélie Kamga, initials: AK, email: aurelie.k@example.com, phone: '+237612345678', country: CM, city: 'Bonapriso, Douala', profile: PARTICULIER }
             service: { id: svc_chef_prive, name: Chef privé, slug: chef-prive }
             category: { slug: experience, name: Expérience }
             subject: Chef privé
@@ -7648,7 +7664,7 @@ components:
         reference: MP-2026-0142
         type: DEVIS
         status: NOUVELLE
-        contact: { id: ctc_aurelie, fullName: Aurélie Kamga, initials: AK, email: aurelie.k@example.com, phone: '+33612345678', country: FR, city: Paris, profile: PARTICULIER }
+        contact: { id: ctc_aurelie, fullName: Aurélie Kamga, initials: AK, email: aurelie.k@example.com, phone: '+237612345678', country: CM, city: 'Bonapriso, Douala', profile: PARTICULIER }
         service: { id: svc_chef_prive, name: Chef privé, slug: chef-prive }
         category: { slug: experience, name: Expérience }
         subject: Chef privé
@@ -7670,7 +7686,7 @@ components:
         attachments: []
         consentAt: '2026-10-05T08:12:00.000Z'
         survey: null
-        whatsappUrl: 'https://wa.me/33612345678?text=Bonjour%20Aur%C3%A9lie%2C%20c%27est%20Mambo%20Proxi%20au%20sujet%20de%20votre%20demande%20MP-2026-0142.'
+        whatsappUrl: 'https://wa.me/237612345678?text=Bonjour%20Aur%C3%A9lie%2C%20c%27est%20Mambo%20Proxi%20au%20sujet%20de%20votre%20demande%20MP-2026-0142.'
         completedAt: null
         closedAt: null
         updatedAt: '2026-10-05T08:12:05.000Z'
