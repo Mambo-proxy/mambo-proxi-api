@@ -7580,7 +7580,7 @@ components:
       value:
         reference: MP-2026-0142
         firstName: Aurélie
-        service: { name: Chef privé, categoryName: Expérience, visual: { illustration: chef, image: null, alt: '' } }
+        service: { name: Chef privé, categoryName: Expérience, visual: { illustration: chef, image: { id: photo-chef-2, url: /photos/chef-2.png, width: 1536, height: 1024, variants: [] }, alt: '' } }
         serviceDate: '2026-11-14T18:00:00.000Z'
         expiresAt: '2026-12-16T09:00:00.000Z'
         questions:
