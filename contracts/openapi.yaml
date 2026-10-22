@@ -4352,16 +4352,34 @@ components:
       allOf:
         - $ref: '#/components/schemas/JobOfferSummary'
         - type: object
-          required: [missions, profile, benefits]
+          required: [missions, profile, benefits, sectors]
           properties:
             startDate: { type: [string, 'null'], examples: ['janvier 2027'] }
             workingTime: { type: [string, 'null'], examples: [temps plein] }
             locationLabel: { type: [string, 'null'], examples: ['Douala, Cameroun'] }
+            sectors:
+              type: array
+              items: { type: string }
+              description: "Quartiers d'intervention ; affichés « Secteurs : … » à la place du lieu quand la liste n'est pas vide."
+              examples: [[Bonamoussadi, Makèpè, Cité SIC]]
+            salary:
+              oneOf: [{ $ref: '#/components/schemas/JobSalary' }, { type: 'null' }]
+            schedule: { type: [string, 'null'], examples: ['8 h par jour · 5 jours par semaine'] }
             description: { type: [string, 'null'] }
             missions: { type: array, items: { type: string } }
             profile: { type: array, items: { type: string } }
             benefits: { type: array, items: { type: string } }
             expiresAt: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }] }
+
+    JobSalary:
+      type: object
+      description: Rémunération du poste (salaire proposé au candidat, sans rapport avec le prix des prestations). Affichée « 90 000 – 120 000 FCFA par mois ».
+      required: [min, max, currency, period]
+      properties:
+        min: { type: integer, minimum: 0, examples: [90000] }
+        max: { type: [integer, 'null'], minimum: 0, description: Absent pour un montant unique., examples: [120000] }
+        currency: { type: string, enum: [XAF, EUR] }
+        period: { type: string, enum: [HOUR, DAY, WEEK, MONTH, YEAR] }
 
     Event:
       type: object
@@ -5386,7 +5404,12 @@ components:
         startDate: { type: [string, 'null'], maxLength: 60 }
         workingTime: { type: [string, 'null'], maxLength: 60 }
         locationLabel: { type: [string, 'null'], maxLength: 120 }
+        sectors: { type: array, maxItems: 20, items: { type: string, maxLength: 80 } }
+        salary:
+          oneOf: [{ $ref: '#/components/schemas/JobSalary' }, { type: 'null' }]
+        schedule: { type: [string, 'null'], maxLength: 120 }
         summary: { type: string, maxLength: 1000 }
+        description: { type: [string, 'null'], maxLength: 3000 }
         missions: { type: array, maxItems: 20, items: { type: string, maxLength: 300 } }
         profile: { type: array, maxItems: 20, items: { type: string, maxLength: 300 } }
         benefits: { type: array, maxItems: 20, items: { type: string, maxLength: 300 } }
@@ -7478,28 +7501,32 @@ components:
       summary: Offres publiées
       value:
         - { id: job_coordinateur, slug: coordinateur-rice-de-services, title: Coordinateur·rice de services, city: Douala, country: CM, contractType: CDI, summary: Vous coordonnez les prestations de nos clients et le réseau de prestataires à Douala., publishedAt: '2026-10-02T08:00:00.000Z', isNew: true }
-        - { id: job_relation_diaspora, slug: charge-e-relation-clients-diaspora, title: Chargé·e de relation clients diaspora, city: France · télétravail, country: FR, contractType: CDD 12 mois, summary: Vous accompagnez nos clients de la diaspora depuis la France., publishedAt: '2026-09-28T08:00:00.000Z', isNew: false }
+        - { id: job_relation_clients, slug: charge-e-relation-clients, title: Chargé·e de relation clients, city: Douala · sur site, country: CM, contractType: CDD 12 mois, summary: Vous accompagnez nos clients depuis l’agence de Douala., publishedAt: '2026-09-28T08:00:00.000Z', isNew: false }
         - { id: job_entretien, slug: agent-e-entretien-logements, title: Agent·e d’entretien des logements, city: Yaoundé, country: CM, contractType: Temps partiel, summary: Vous assurez l'entretien des logements gérés par l'agence., publishedAt: '2026-09-21T08:00:00.000Z', isNew: false }
         - { id: job_chauffeur, slug: chauffeur-euse-partenaire, title: Chauffeur·euse partenaire, city: Douala, country: CM, contractType: Freelance, summary: Vous réalisez des transferts et mises à disposition pour nos clients., publishedAt: '2026-09-14T08:00:00.000Z', isNew: false }
+        - { id: job_intervenant, slug: intervenant-e-a-domicile, title: Intervenant·e à domicile, city: Douala, country: CM, contractType: CDI, summary: Vous réalisez les prestations à domicile de nos clients dans les quartiers nord de Douala., publishedAt: '2026-10-02T08:00:00.000Z', isNew: true }
 
     JobDetail:
       summary: Détail d'une offre
       value:
-        id: job_coordinateur
-        slug: coordinateur-rice-de-services
-        title: Coordinateur·rice de services
+        id: job_intervenant
+        slug: intervenant-e-a-domicile
+        title: Intervenant·e à domicile
         city: Douala
         country: CM
         contractType: CDI
-        summary: Vous coordonnez les prestations de nos clients et le réseau de prestataires à Douala.
+        summary: Vous réalisez les prestations à domicile de nos clients dans les quartiers nord de Douala.
         publishedAt: '2026-10-02T08:00:00.000Z'
         isNew: true
         startDate: janvier 2027
         workingTime: temps plein
         locationLabel: Douala, Cameroun
-        description: Au cœur de l’agence de Douala, vous coordonnez les demandes de nos clients, de la réception du besoin jusqu’au suivi de la prestation, avec notre réseau de prestataires.
+        sectors: [Bonamoussadi, Makèpè, Cité SIC]
+        salary: { min: 90000, max: 120000, currency: XAF, period: MONTH }
+        schedule: 8 h par jour · 5 jours par semaine
+        description: Au cœur de l’agence de Douala, vous organisez les demandes de nos clients, de la réception du besoin jusqu’au suivi de la prestation, avec notre réseau de prestataires.
         missions: [Analyser les demandes et préparer les devis, Sélectionner et briefer les prestataires, Suivre chaque prestation et informer le client, Mettre à jour les dossiers dans l’outil de gestion]
-        profile: [Expérience en relation client ou coordination, Sens de l’organisation et du service, Aisance à l’écrit et à l’oral en français, Maîtrise des outils numériques courants]
+        profile: [Expérience en entretien de logement ou service à domicile, Sens de l’organisation et du service, Aisance à l’écrit et à l’oral en français, Maîtrise des outils numériques courants]
         benefits: [Une équipe bienveillante et engagée, Des formations régulières, 'Des missions utiles, au service des familles']
         expiresAt: null
 
