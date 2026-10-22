@@ -65,6 +65,8 @@ tags:
     description: 'Back-office : partenaires.'
   - name: Admin — Formations
     description: 'Back-office : formations.'
+  - name: Admin — Magazine
+    description: 'Back-office : magazine (éditions, articles, envoi par la newsletter).'
   - name: Admin — Agenda
     description: 'Back-office : agenda.'
   - name: Admin — Contacts
@@ -2496,6 +2498,307 @@ paths:
       tags: [Admin — Formations]
       operationId: adminDeleteTraining
       summary: Supprimer une formation
+      security: [{ cookieAuth: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdPath' }]
+      responses:
+        '204': { $ref: '#/components/responses/NoContent' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ──────────────────────────── Admin — Magazine ──────────────────
+  /v1/admin/magazine:
+    get:
+      tags: [Admin — Magazine]
+      operationId: adminGetMagazine
+      summary: Éditions du magazine et statistiques de la dernière campagne
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Éditions (la plus récente en premier), nombre d'articles, dernière campagne envoyée.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminMagazineOverview' }
+              examples:
+                default: { $ref: '#/components/examples/AdminMagazineOverview' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /v1/admin/magazine/editions:
+    post:
+      tags: [Admin — Magazine]
+      operationId: adminCreateMagazineEdition
+      summary: Créer une édition (brouillon)
+      security: [{ cookieAuth: [], csrfToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MagazineEditionInput' }
+      responses:
+        '201':
+          description: Édition créée.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminMagazineEdition' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/magazine/editions/{id}:
+    get:
+      tags: [Admin — Magazine]
+      operationId: adminGetMagazineEdition
+      summary: Édition complète (édito, articles dans l'ordre de lecture, envoi par la newsletter)
+      security: [{ cookieAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdPath' }]
+      responses:
+        '200':
+          description: Édition.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminMagazineEdition' }
+              examples:
+                default: { $ref: '#/components/examples/AdminMagazineEdition' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      tags: [Admin — Magazine]
+      operationId: adminUpdateMagazineEdition
+      summary: Enregistrer une édition
+      description: Une édition publiée est mise à jour en ligne immédiatement (tag de revalidation `page:magazine`). Un numéro déjà pris renvoie 409.
+      security: [{ cookieAuth: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdPath' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MagazineEditionPatch' }
+      responses:
+        '200':
+          description: Édition enregistrée.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminMagazineEdition' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+    delete:
+      tags: [Admin — Magazine]
+      operationId: adminDeleteMagazineEdition
+      summary: Supprimer une édition non publiée
+      description: Ses articles restent disponibles, détachés de l'édition. Une édition publiée doit d'abord repasser en brouillon (409).
+      security: [{ cookieAuth: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdPath' }]
+      responses:
+        '204': { $ref: '#/components/responses/NoContent' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /v1/admin/magazine/editions/{id}/publish:
+    post:
+      tags: [Admin — Magazine]
+      operationId: adminPublishMagazineEdition
+      summary: Publier ou programmer la publication
+      description: Sans date (ou avec une date passée), l'édition est publiée tout de suite ; avec une date future, elle est programmée (`SCHEDULED`).
+      security: [{ cookieAuth: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdPath' }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                publishAt: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }] }
+      responses:
+        '200':
+          description: Édition publiée ou programmée.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminMagazineEdition' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/magazine/editions/{id}/unpublish:
+    post:
+      tags: [Admin — Magazine]
+      operationId: adminUnpublishMagazineEdition
+      summary: Repasser une édition en brouillon
+      security: [{ cookieAuth: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdPath' }]
+      responses:
+        '200':
+          description: Édition en brouillon.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminMagazineEdition' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/admin/magazine/editions/{id}/articles:
+    put:
+      tags: [Admin — Magazine]
+      operationId: adminSetMagazineEditionArticles
+      summary: Articles de l'édition, dans l'ordre de lecture
+      description: Remplace la liste ; un article ajouté est retiré de son édition précédente, un article retiré reste disponible sans édition.
+      security: [{ cookieAuth: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdPath' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ids]
+              properties:
+                ids: { type: array, maxItems: 40, items: { $ref: '#/components/schemas/Id' } }
+      responses:
+        '200':
+          description: Édition mise à jour.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminMagazineEdition' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/magazine/editions/{id}/preview-token:
+    get:
+      tags: [Admin — Magazine]
+      operationId: adminGetMagazineEditionPreviewToken
+      summary: Jeton de prévisualisation de l'édition sur le site (30 min)
+      security: [{ cookieAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdPath' }]
+      responses:
+        '200':
+          description: Jeton et URL d'aperçu.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PreviewToken' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /v1/admin/magazine/editions/{id}/newsletter/test:
+    post:
+      tags: [Admin — Magazine]
+      operationId: adminTestMagazineNewsletter
+      summary: Envoi de test de l'édition (une version par langue complète)
+      security: [{ cookieAuth: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdPath' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { $ref: '#/components/schemas/Email' }
+      responses:
+        '202':
+          description: Test envoyé.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MessageResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /v1/admin/magazine/editions/{id}/newsletter/schedule:
+    post:
+      tags: [Admin — Magazine]
+      operationId: adminScheduleMagazineNewsletter
+      summary: Programmer l'envoi de l'édition par la newsletter
+      description: |
+        Crée (ou reprogramme) une campagne par langue, envoyée aux seuls inscrits confirmés de cette langue ; tant que la
+        version anglaise est incomplète, les inscrits anglophones reçoivent la version française. L'édition doit être
+        publiée, ou programmée avant la date d'envoi (409 sinon).
+      security: [{ cookieAuth: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdPath' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scheduledAt]
+              properties:
+                scheduledAt: { $ref: '#/components/schemas/DateTime' }
+      responses:
+        '200':
+          description: Envoi programmé.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminMagazineEdition' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/magazine/articles:
+    get:
+      tags: [Admin — Magazine]
+      operationId: adminListMagazineArticles
+      summary: Articles du magazine
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: edition
+          in: query
+          description: Identifiant d'une édition, ou `none` pour les articles sans édition.
+          schema: { type: string }
+        - $ref: '#/components/parameters/Q'
+      responses:
+        '200':
+          description: Articles, les plus récemment modifiés en premier.
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/AdminMagazineArticle' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      tags: [Admin — Magazine]
+      operationId: adminCreateMagazineArticle
+      summary: Créer un article
+      security: [{ cookieAuth: [], csrfToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MagazineArticleInput' }
+      responses:
+        '201':
+          description: Article créé (ajouté à la fin de son édition, le cas échéant).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminMagazineArticle' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  /v1/admin/magazine/articles/{id}:
+    patch:
+      tags: [Admin — Magazine]
+      operationId: adminUpdateMagazineArticle
+      summary: Modifier un article
+      security: [{ cookieAuth: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdPath' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MagazineArticlePatch' }
+      responses:
+        '200':
+          description: Article enregistré.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminMagazineArticle' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+    delete:
+      tags: [Admin — Magazine]
+      operationId: adminDeleteMagazineArticle
+      summary: Supprimer un article
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       responses:
@@ -5556,6 +5859,169 @@ components:
             sortOrder: { type: integer }
             requestsCount: { type: integer }
 
+    # ──────────────────────────── Admin — Magazine ──────────────────
+    MagazineEditionStatus:
+      type: string
+      description: '`SCHEDULED` : publication programmée (`publishAt` dans le futur).'
+      enum: [DRAFT, SCHEDULED, PUBLISHED, ARCHIVED]
+
+    MagazineLanguage:
+      type: string
+      enum: [fr, en]
+
+    MagazineArticleFields:
+      type: object
+      properties:
+        title: { type: string, minLength: 1, maxLength: 160 }
+        titleEn: { type: [string, 'null'], maxLength: 160 }
+        theme: { type: string, minLength: 1, maxLength: 60, description: Thème affiché sous le titre., examples: [Santé et nutrition] }
+        themeEn: { type: [string, 'null'], maxLength: 60 }
+        excerpt: { type: [string, 'null'], maxLength: 400 }
+        excerptEn: { type: [string, 'null'], maxLength: 400 }
+        body: { type: [string, 'null'], maxLength: 60000, description: 'HTML de l''éditeur (titres, listes, citations, liens).' }
+        bodyEn: { type: [string, 'null'], maxLength: 60000 }
+        imageId: { oneOf: [{ $ref: '#/components/schemas/Id' }, { type: 'null' }] }
+        editionId: { oneOf: [{ $ref: '#/components/schemas/Id' }, { type: 'null' }] }
+
+    MagazineArticleInput:
+      allOf:
+        - $ref: '#/components/schemas/MagazineArticleFields'
+        - type: object
+          required: [title, theme]
+
+    MagazineArticlePatch:
+      allOf:
+        - $ref: '#/components/schemas/MagazineArticleFields'
+        - type: object
+          minProperties: 1
+
+    AdminMagazineArticle:
+      type: object
+      required: [id, title, titleEn, theme, themeEn, excerpt, excerptEn, body, bodyEn, image, languages, edition, updatedAt]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        title: { type: string }
+        titleEn: { type: [string, 'null'] }
+        theme: { type: string }
+        themeEn: { type: [string, 'null'] }
+        excerpt: { type: [string, 'null'] }
+        excerptEn: { type: [string, 'null'] }
+        body: { type: [string, 'null'] }
+        bodyEn: { type: [string, 'null'] }
+        image: { oneOf: [{ $ref: '#/components/schemas/MediaImage' }, { type: 'null' }] }
+        languages:
+          type: array
+          description: Langues complètes (titre et texte renseignés) ; `en` absent = « EN à traduire ».
+          items: { $ref: '#/components/schemas/MagazineLanguage' }
+        edition:
+          type: [object, 'null']
+          required: [id, label]
+          properties:
+            id: { $ref: '#/components/schemas/Id' }
+            label: { type: string, examples: [N° 1] }
+        updatedAt: { $ref: '#/components/schemas/DateTime' }
+
+    MagazineEditionFields:
+      type: object
+      properties:
+        number: { type: [integer, 'null'], minimum: 1, description: '`null` pour un hors-série.' }
+        title: { type: string, minLength: 1, maxLength: 120 }
+        titleEn: { type: [string, 'null'], maxLength: 120 }
+        subtitle: { type: [string, 'null'], maxLength: 120, examples: [Édition spéciale] }
+        subtitleEn: { type: [string, 'null'], maxLength: 120 }
+        themes: { type: [string, 'null'], maxLength: 80, description: Thèmes résumés dans la liste des éditions., examples: [Bien-être global] }
+        publishAt: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }], description: Date de publication affichée (et date de programmation). }
+        coverId: { oneOf: [{ $ref: '#/components/schemas/Id' }, { type: 'null' }] }
+        editorial: { type: [string, 'null'], maxLength: 20000, description: 'HTML de l''édito, signé, affiché en ouverture de l''édition.' }
+        editorialEn: { type: [string, 'null'], maxLength: 20000 }
+        signature: { type: [string, 'null'], maxLength: 120 }
+        signatureEn: { type: [string, 'null'], maxLength: 120 }
+
+    MagazineEditionInput:
+      allOf:
+        - $ref: '#/components/schemas/MagazineEditionFields'
+        - type: object
+          required: [title]
+
+    MagazineEditionPatch:
+      allOf:
+        - $ref: '#/components/schemas/MagazineEditionFields'
+        - type: object
+          minProperties: 1
+
+    AdminMagazineEditionSummary:
+      type: object
+      required: [id, number, label, title, subtitle, themes, cover, articlesCount, toTranslate, languages, readers, status, publishAt, updatedAt]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        number: { type: [integer, 'null'] }
+        label: { type: string, description: « N° 1 » ou « Hors-série »., examples: [N° 1] }
+        title: { type: string }
+        subtitle: { type: [string, 'null'] }
+        themes: { type: [string, 'null'] }
+        cover: { oneOf: [{ $ref: '#/components/schemas/MediaImage' }, { type: 'null' }] }
+        articlesCount: { type: integer }
+        toTranslate: { type: integer, description: Articles sans version anglaise complète. }
+        languages:
+          type: array
+          description: Langues dans lesquelles l'édition est complète.
+          items: { $ref: '#/components/schemas/MagazineLanguage' }
+        readers: { type: [integer, 'null'], description: 'Lecteurs uniques (site et e-mail) ; `null` avant la publication.' }
+        status: { $ref: '#/components/schemas/MagazineEditionStatus' }
+        publishAt: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }] }
+        updatedAt: { $ref: '#/components/schemas/DateTime' }
+
+    AdminMagazineEdition:
+      allOf:
+        - $ref: '#/components/schemas/AdminMagazineEditionSummary'
+        - type: object
+          required: [titleEn, subtitleEn, coverId, editorial, editorialEn, signature, signatureEn, articles, newsletter]
+          properties:
+            titleEn: { type: [string, 'null'] }
+            subtitleEn: { type: [string, 'null'] }
+            coverId: { oneOf: [{ $ref: '#/components/schemas/Id' }, { type: 'null' }] }
+            editorial: { type: [string, 'null'] }
+            editorialEn: { type: [string, 'null'] }
+            signature: { type: [string, 'null'] }
+            signatureEn: { type: [string, 'null'] }
+            articles:
+              type: array
+              description: Articles dans l'ordre de lecture.
+              items: { $ref: '#/components/schemas/AdminMagazineArticle' }
+            newsletter:
+              type: object
+              required: [subscribers, scheduledAt, sentAt]
+              properties:
+                subscribers:
+                  type: object
+                  description: Inscrits confirmés par langue.
+                  required: [fr, en]
+                  properties:
+                    fr: { type: integer }
+                    en: { type: integer }
+                scheduledAt: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }] }
+                sentAt: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }] }
+
+    MagazineCampaignStats:
+      type: object
+      required: [editionId, editionLabel, sent, openRate, openRateDelta, clicks, newSubscribers]
+      properties:
+        editionId: { $ref: '#/components/schemas/Id' }
+        editionLabel: { type: string, examples: [Édition n° 1] }
+        sent: { type: integer, description: Envois aux inscrits confirmés (toutes langues). }
+        openRate: { type: [number, 'null'], description: 'Pourcentage ; `null` si la mesure est désactivée.' }
+        openRateDelta: { type: [number, 'null'], description: Écart avec la moyenne des campagnes (points). }
+        clicks: { type: [integer, 'null'], description: Clics vers le site (édito et articles). }
+        newSubscribers: { type: integer, description: Nouveaux inscrits depuis la publication. }
+
+    AdminMagazineOverview:
+      type: object
+      required: [editions, articlesCount, lastCampaign]
+      properties:
+        editions: { type: array, items: { $ref: '#/components/schemas/AdminMagazineEditionSummary' } }
+        articlesCount: { type: integer }
+        lastCampaign: { oneOf: [{ $ref: '#/components/schemas/MagazineCampaignStats' }, { type: 'null' }] }
+
     # ──────────────────────────── Admin — Agenda ────────────────────
     EventFields:
       type: object
@@ -7690,6 +8156,46 @@ components:
         completedAt: null
         closedAt: null
         updatedAt: '2026-10-05T08:12:05.000Z'
+
+    AdminMagazineOverview:
+      summary: Éditions du magazine (maquette « BO — Magazine »)
+      value:
+        articlesCount: 18
+        editions:
+          - { id: mag_n1, number: 1, label: N° 1, title: Ensemble vers un bien-être global, subtitle: Édition spéciale, themes: Bien-être global, cover: { id: photo-magazine-hero, url: /photos/magazine-hero.png, width: 1280, height: 960, alt: 'Une lectrice feuillette le magazine Mambo Proxi sur une terrasse.', variants: [] }, articlesCount: 6, toTranslate: 2, languages: [fr, en], readers: 1248, status: PUBLISHED, publishAt: '2026-10-02T07:00:00.000Z', updatedAt: '2026-10-04T09:00:00.000Z' }
+          - { id: mag_n2, number: 2, label: N° 2, title: Bien manger au quotidien, subtitle: null, themes: Santé et nutrition, cover: { id: photo-prox-courses, url: /photos/prox-courses.png, width: 1536, height: 1024, alt: '', variants: [] }, articlesCount: 5, toTranslate: 0, languages: [fr, en], readers: null, status: SCHEDULED, publishAt: '2026-11-06T07:00:00.000Z', updatedAt: '2026-10-03T16:00:00.000Z' }
+          - { id: mag_n3, number: 3, label: N° 3, title: Se loger à Douala, subtitle: null, themes: Immobilier, cover: { id: photo-immo-hero, url: /photos/immo-hero.png, width: 1280, height: 960, alt: '', variants: [] }, articlesCount: 4, toTranslate: 4, languages: [fr], readers: null, status: DRAFT, publishAt: null, updatedAt: '2026-10-04T15:20:00.000Z' }
+          - { id: mag_hs1, number: null, label: Hors-série, title: Solidarité et culture, subtitle: null, themes: Solidarité, cover: { id: photo-culture-hero, url: /photos/culture-hero.png, width: 1280, height: 960, alt: '', variants: [] }, articlesCount: 3, toTranslate: 3, languages: [fr], readers: null, status: DRAFT, publishAt: null, updatedAt: '2026-09-30T10:00:00.000Z' }
+        lastCampaign: { editionId: mag_n1, editionLabel: Édition n° 1, sent: 1248, openRate: 62, openRateDelta: 8, clicks: 318, newSubscribers: 56 }
+
+    AdminMagazineEdition:
+      summary: Édition n° 1 (maquette « BO — Magazine · Éditer une édition »)
+      value:
+        id: mag_n1
+        number: 1
+        label: N° 1
+        title: Ensemble vers un bien-être global
+        titleEn: Together towards overall well-being
+        subtitle: Édition spéciale
+        subtitleEn: Special issue
+        themes: Bien-être global
+        coverId: photo-magazine-hero
+        cover: { id: photo-magazine-hero, url: /photos/magazine-hero.png, width: 1280, height: 960, alt: 'Une lectrice feuillette le magazine Mambo Proxi sur une terrasse.', variants: [] }
+        articlesCount: 6
+        toTranslate: 2
+        languages: [fr, en]
+        readers: 1248
+        status: PUBLISHED
+        publishAt: '2026-10-02T07:00:00.000Z'
+        updatedAt: '2026-10-04T09:00:00.000Z'
+        editorial: '<p>Chers lecteurs, chères lectrices,</p><p>Ce premier numéro de Mambo Proxi est bien plus qu’un magazine : c’est une histoire de vie que je partage avec vous.</p>'
+        editorialEn: '<p>Dear readers,</p><p>This first issue of Mambo Proxi is much more than a magazine: it is a life story that I am sharing with you.</p>'
+        signature: Mireille Bell, fondatrice de Mambo Proxi
+        signatureEn: Mireille Bell, founder of Mambo Proxi
+        articles:
+          - { id: art_bien_manger, title: Bien manger au quotidien sans se ruiner, titleEn: Eating well every day without breaking the bank, theme: Santé et nutrition, themeEn: Health and nutrition, excerpt: null, excerptEn: null, body: '<p>…</p>', bodyEn: '<p>…</p>', image: { id: photo-magazine-bien-manger, url: /photos/magazine-bien-manger.png, width: 420, height: 285, alt: '', variants: [] }, languages: [fr, en], edition: { id: mag_n1, label: N° 1 }, updatedAt: '2026-09-28T10:00:00.000Z' }
+          - { id: art_kribi, title: 'Kribi, la nature à deux heures de Douala', titleEn: null, theme: Culture, themeEn: null, excerpt: null, excerptEn: null, body: '<p>…</p>', bodyEn: null, image: { id: photo-culture-decouverte, url: /photos/culture-decouverte.png, width: 1536, height: 1024, alt: '', variants: [] }, languages: [fr], edition: { id: mag_n1, label: N° 1 }, updatedAt: '2026-09-29T10:00:00.000Z' }
+        newsletter: { subscribers: { fr: 1012, en: 236 }, scheduledAt: '2026-10-06T08:00:00.000Z', sentAt: null }
 
     AdminServices:
       summary: Liste des services
