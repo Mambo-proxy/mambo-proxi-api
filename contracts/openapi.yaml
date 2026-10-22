@@ -4554,15 +4554,17 @@ components:
 
     RegistrationInput:
       type: object
-      required: [profile, firstName, lastName, email, phone, country, consent, antiSpam]
+      required: [profile, firstName, lastName, email, phone, consent, antiSpam]
       properties:
         profile: { type: string, enum: [PARTICULIER, PROFESSIONNEL] }
         firstName: { type: string, minLength: 1, maxLength: 60 }
         lastName: { type: string, minLength: 1, maxLength: 60 }
         email: { $ref: '#/components/schemas/Email' }
         phone: { $ref: '#/components/schemas/PhoneE164' }
-        country: { $ref: '#/components/schemas/CountryCode' }
-        city: { type: [string, 'null'], maxLength: 80 }
+        country:
+          description: Pays de résidence ; absent ou `null` quand la personne vit hors du Cameroun sans préciser (champ « Ville ou quartier » de la maquette).
+          oneOf: [{ $ref: '#/components/schemas/CountryCode' }, { type: 'null' }]
+        city: { type: [string, 'null'], maxLength: 80, description: 'Ville, avec le quartier s’il est indiqué (« Akwa, Douala »).' }
         interests:
           type: array
           description: Slugs des rubriques qui intéressent le contact (particulier) ou rubriques d'intervention (professionnel).
