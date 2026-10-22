@@ -3756,6 +3756,10 @@ components:
             addressLines: { type: array, items: { type: string } }
             city: { type: string }
             country: { $ref: '#/components/schemas/CountryCode' }
+            phone:
+              oneOf: [{ $ref: '#/components/schemas/PhoneE164' }, { type: 'null' }]
+              description: Téléphone de l'agence (carte « Douala » de la page Contact) ; vide = carte masquée.
+            phoneDisplay: { type: [string, 'null'], examples: ['+237 6 00 00 00 00'] }
             latitude: { type: [number, 'null'] }
             longitude: { type: [number, 'null'] }
             mapsUrl: { type: [string, 'null'], format: uri }
@@ -6280,9 +6284,11 @@ components:
           - { network: tiktok, url: 'https://www.tiktok.com/@mamboproxi' }
         agency:
           name: Agence MAMBO Proxi
-          addressLines: [Adresse de l'agence à compléter]
+          addressLines: ['Adresse de l’agence']
           city: Douala
           country: CM
+          phone: '+237600000000'
+          phoneDisplay: '+237 6 00 00 00 00'
           latitude: 4.0511
           longitude: 9.7679
           mapsUrl: 'https://www.google.com/maps/search/?api=1&query=4.0511,9.7679'
@@ -6327,9 +6333,11 @@ components:
           - { network: tiktok, url: 'https://www.tiktok.com/@mamboproxi' }
         agency:
           name: MAMBO Proxi agency
-          addressLines: [Agency address to be confirmed]
+          addressLines: ['Agency address']
           city: Douala
           country: CM
+          phone: '+237600000000'
+          phoneDisplay: '+237 6 00 00 00 00'
           latitude: 4.0511
           longitude: 9.7679
           mapsUrl: 'https://www.google.com/maps/search/?api=1&query=4.0511,9.7679'
