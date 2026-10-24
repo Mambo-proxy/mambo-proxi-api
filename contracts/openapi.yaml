@@ -2507,6 +2507,35 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
 
+  /v1/admin/training-requests:
+    get:
+      tags: [Admin — Formations]
+      operationId: adminListTrainingRequests
+      summary: Demandes de formation
+      description: >-
+        Demandes « Demande de formation » du site (type `FORMATION` des demandes), avec la structure, la formation
+        souhaitée, le nombre de participants et la période. Le détail et le statut se gèrent dans les demandes
+        (`/v1/admin/requests/{id}`).
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/RequestStatus' }
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Page de demandes de formation, la plus récente en premier.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/AdminTrainingRequest' } }
+                  meta: { $ref: '#/components/schemas/PaginationMeta' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
   # ──────────────────────────── Admin — Magazine ──────────────────
   /v1/admin/magazine:
     get:
@@ -5953,6 +5982,30 @@ components:
             status: { $ref: '#/components/schemas/PublishStatus' }
             sortOrder: { type: integer }
             requestsCount: { type: integer }
+
+    AdminTrainingRequest:
+      type: object
+      required: [id, reference, status, contact, participants, createdAt]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        reference: { $ref: '#/components/schemas/Reference' }
+        status: { $ref: '#/components/schemas/RequestStatus' }
+        organization: { type: [string, 'null'], examples: [Hôtel La Falaise] }
+        contact: { $ref: '#/components/schemas/ContactSummary' }
+        training:
+          description: Formation du catalogue ; `null` pour une demande « Autre » (`otherTraining`).
+          oneOf:
+            - type: object
+              required: [id, slug, title]
+              properties:
+                id: { $ref: '#/components/schemas/Id' }
+                slug: { $ref: '#/components/schemas/Slug' }
+                title: { type: string }
+            - type: 'null'
+        otherTraining: { type: [string, 'null'] }
+        participants: { type: integer, minimum: 1 }
+        period: { type: [string, 'null'], examples: [Janvier 2027] }
+        createdAt: { $ref: '#/components/schemas/DateTime' }
 
     # ──────────────────────────── Admin — Magazine ──────────────────
     MagazineEditionStatus:
