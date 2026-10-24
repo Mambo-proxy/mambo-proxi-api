@@ -3027,8 +3027,10 @@ paths:
         - name: country
           in: query
           schema: { $ref: '#/components/schemas/CountryCode' }
+        - $ref: '#/components/parameters/District'
         - name: interest
           in: query
+          description: Rubrique d'intérêt (slug).
           schema: { $ref: '#/components/schemas/Slug' }
         - $ref: '#/components/parameters/Q'
         - $ref: '#/components/parameters/Page'
@@ -3061,6 +3063,10 @@ paths:
         - name: country
           in: query
           schema: { $ref: '#/components/schemas/CountryCode' }
+        - $ref: '#/components/parameters/District'
+        - name: interest
+          in: query
+          schema: { $ref: '#/components/schemas/Slug' }
       responses:
         '200':
           description: Fichier CSV.
@@ -6319,6 +6325,16 @@ components:
         byCountry:
           type: object
           additionalProperties: { type: integer }
+        locations:
+          description: >-
+            Répartition des contacts (indicateur « Douala et environs ») : à Douala (quartier d'une zone
+            d'intervention), dans les environs (reste du Cameroun) et ailleurs.
+          type: object
+          required: [douala, surroundings, elsewhere]
+          properties:
+            douala: { type: integer }
+            surroundings: { type: integer }
+            elsewhere: { type: integer }
 
     # ─────────────────────────── Admin — Newsletter ─────────────────
     Subscriber:
