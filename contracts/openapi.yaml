@@ -3996,6 +3996,13 @@ components:
       description: 'HTML assaini côté serveur (balises autorisées : p, h2, h3, h4, strong, em, a, ul, ol, li, br, blockquote).'
       maxLength: 200000
 
+    EmailHtml:
+      type: string
+      description: >-
+        Corps d'un e-mail, assaini côté serveur : balises de `Html`, plus `img` (`src` d'une image de la médiathèque,
+        `alt`) et les boutons d'appel à l'action `<a data-button href="…">`. Variable disponible `{prénom}`.
+      maxLength: 200000
+
     Problem:
       type: object
       description: Erreur au format RFC 9457 (Problem Details).
@@ -6370,17 +6377,14 @@ components:
       properties:
         subject: { type: string, maxLength: 150 }
         preheader: { type: [string, 'null'], maxLength: 150 }
-        content:
-          type: object
-          description: Document de l'éditeur (JSON Tiptap). Variable disponible `{prénom}`.
-          additionalProperties: true
+        html: { $ref: '#/components/schemas/EmailHtml' }
         segment: { $ref: '#/components/schemas/CampaignSegment' }
 
     CampaignInput:
       allOf:
         - $ref: '#/components/schemas/CampaignFields'
         - type: object
-          required: [subject, content, segment]
+          required: [subject, html, segment]
 
     CampaignPatch:
       allOf:
@@ -6404,6 +6408,7 @@ components:
             clicks: { type: [integer, 'null'] }
             unsubscribes: { type: integer }
             createdAt: { $ref: '#/components/schemas/DateTime' }
+            updatedAt: { $ref: '#/components/schemas/DateTime' }
 
     NewsletterStats:
       type: object
