@@ -6451,10 +6451,12 @@ components:
     SettingsCoordonnees:
       type: object
       title: coordonnees
-      required: [group, phoneFrance, phoneCameroon, email, hoursLabel, agency]
+      required: [group, phoneCameroon, email, hoursLabel, agency]
       properties:
         group: { type: string, const: coordonnees }
-        phoneFrance: { $ref: '#/components/schemas/PhoneE164' }
+        phoneFrance:
+          oneOf: [{ $ref: '#/components/schemas/PhoneE164' }, { type: 'null' }]
+          description: Facultatif depuis le recentrage sur Douala (n'est plus affiché par le site). Le numéro WhatsApp des coordonnées est celui du groupe `whatsapp`.
         phoneCameroon: { $ref: '#/components/schemas/PhoneE164' }
         email: { $ref: '#/components/schemas/Email' }
         hoursLabel: { type: string }
@@ -6500,6 +6502,10 @@ components:
         defaultTitle: { type: string, maxLength: 60 }
         defaultDescription: { type: string, maxLength: 160 }
         ogImageId: { oneOf: [{ $ref: '#/components/schemas/Id' }, { type: 'null' }] }
+        ogImage:
+          readOnly: true
+          description: Image de partage correspondant à `ogImageId` (lecture seule, ignorée à l'enregistrement).
+          oneOf: [{ $ref: '#/components/schemas/MediaImage' }, { type: 'null' }]
         searchConsoleVerification: { type: [string, 'null'] }
 
     SettingsAnalytics:
