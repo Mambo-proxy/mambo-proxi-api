@@ -5669,12 +5669,18 @@ components:
       required: [average, published, toValidate, responseRate, distribution]
       properties:
         average: { type: number }
+        averageDelta:
+          type: [number, 'null']
+          description: Évolution de la note moyenne sur 30 jours (écart avec les 30 jours précédents, en points de note).
         published: { type: integer }
         toValidate: { type: integer }
         hidden: { type: integer }
         responseRate: { type: number, description: Taux de réponse au questionnaire (%). }
         surveysSent: { type: integer }
         recommendationRate: { type: [number, 'null'], description: Part des notes de recommandation 9 ou 10 (%). }
+        recommendationDelta:
+          type: [number, 'null']
+          description: Évolution de la part des notes 9 ou 10 sur 30 jours (en points de pourcentage).
         npsAverage: { type: [number, 'null'] }
         distribution: { $ref: '#/components/schemas/ReviewSummary/properties/distribution' }
 
