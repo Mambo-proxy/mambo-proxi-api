@@ -17,6 +17,12 @@ info:
 
     Authentification du back-office : cookies `httpOnly` (`mp_at` jeton d'accès 15 min, `mp_rt` jeton de rafraîchissement rotatif),
     plus un jeton CSRF « double-submit » : cookie lisible `mp_csrf` recopié dans l'en-tête `X-CSRF-Token` pour toute mutation.
+
+    Droits du back-office : chaque opération `/v1/admin` porte l'extension `x-permissions` (une des permissions listées
+    suffit, sinon `403`). La matrice rôle → permissions est décrite par le schéma `Role` ; les permissions effectives
+    sont renvoyées avec l'utilisateur connecté (`GET /v1/auth/me`) et par `GET /v1/admin/roles`, pour que le
+    back-office adapte menus et tableau de bord sans coder la matrice en dur. Les permissions `…-assigned`
+    restreignent l'accès aux demandes et rendez-vous assignés à l'utilisateur.
   contact:
     name: MAMBO Proxi
     email: contact@mamboproxi.com
@@ -43,12 +49,18 @@ tags:
     description: Inscription en double opt-in, confirmation, désinscription.
   - name: Questionnaire
     description: Questionnaire de satisfaction (lien reçu par e-mail).
+  - name: Recherche
+    description: Recherche globale du site public.
+  - name: Mesure d'audience
+    description: Collecte des pages vues et des actions (selon le consentement), pour les statistiques du back-office.
   - name: Santé
     description: Supervision de l'API.
   - name: Authentification
     description: Connexion au back-office (mot de passe + code par e-mail), sessions.
   - name: Admin — Tableau de bord
     description: 'Back-office : tableau de bord.'
+  - name: Admin — Statistiques
+    description: 'Back-office : statistiques d''audience du site.'
   - name: Admin — Demandes
     description: 'Back-office : demandes.'
   - name: Admin — Services
@@ -198,6 +210,140 @@ paths:
               example:
                 - { path: /, lastModified: '2026-10-20T08:00:00.000Z', changeFrequency: weekly, priority: 1 }
                 - { path: /services/experience/chef-prive, lastModified: '2026-10-18T14:12:00.000Z', changeFrequency: monthly, priority: 0.8 }
+
+  # ─────────────────────────── Recherche ──────────────────────────
+  /v1/search:
+    get:
+      tags: [Recherche]
+      operationId: searchSite
+      summary: Recherche globale du site public
+      description: |
+        Recherche plein texte dans les contenus publiés, dans la langue demandée (un contenu non traduit est cherché et
+        renvoyé en français) : services, rubriques, pages éditoriales (qui sommes-nous, mission, zones d'intervention,
+        contact…), articles du Magazine, offres d'emploi et formations. Insensible à la casse et aux accents (« deido »
+        trouve « Deïdo »), racinisation française ou anglaise selon `lang`. Les brouillons, contenus archivés et pages
+        techniques (`404`, `erreur`, `maintenance`, confirmations, questionnaire) ne sont jamais renvoyés.
+
+        Résultats groupés par type, dans l'ordre de `types` (par défaut : services, rubriques, pages, articles, offres
+        d'emploi, formations), groupes vides omis ; tri par pertinence dans chaque groupe. Public, sans session ;
+        réponse mise en cache 5 min par adresse complète.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Texte recherché (espaces de début et de fin ignorés), 2 caractères au moins.
+          schema: { type: string, minLength: 2, maxLength: 120, examples: [chef] }
+        - $ref: '#/components/parameters/Lang'
+        - name: types
+          in: query
+          description: Types cherchés, séparés par des virgules (`types=service,article`) ; absent = tous.
+          style: form
+          explode: false
+          schema:
+            type: array
+            minItems: 1
+            uniqueItems: true
+            items: { $ref: '#/components/schemas/SearchResultType' }
+        - name: limit
+          in: query
+          description: Nombre maximal de résultats par type.
+          schema: { type: integer, minimum: 1, maximum: 20, default: 5 }
+      responses:
+        '200':
+          description: Résultats groupés par type.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SearchResults' }
+              examples:
+                default: { $ref: '#/components/examples/SearchResults' }
+                en: { $ref: '#/components/examples/SearchResultsEn' }
+        '400':
+          description: Recherche invalide (texte trop court ou trop long, type inconnu, limite hors bornes).
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+              example:
+                type: https://api.mamboproxi.com/problems/invalid-query
+                title: Recherche invalide
+                status: 400
+                detail: Saisissez au moins 2 caractères pour lancer la recherche.
+                errors:
+                  - { path: q, code: too_short, message: Saisissez au moins 2 caractères. }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  # ─────────────────────── Mesure d'audience ──────────────────────
+  /v1/analytics/events:
+    post:
+      tags: [Mesure d'audience]
+      operationId: collectAnalyticsEvents
+      summary: Envoi d'un lot d'événements de mesure d'audience
+      description: |
+        Mesure d'audience interne (statistiques du tableau de bord), sans outil tiers et sans cookie déposé par l'API.
+        Le site regroupe les événements (pages vues, clics sur les actions : devis, WhatsApp, appel, e-mail,
+        « Je participe », inscription à la newsletter…) et les envoie au plus toutes les 10 s, ainsi qu'à la fermeture
+        de la page avec `navigator.sendBeacon` : le même JSON est alors accepté en `text/plain` (pas de requête préalable CORS).
+
+        Consentement (bandeau cookies, catégorie « Mesure d'audience ») :
+        - donné → `consent: true` et `visitorId` (identifiant pseudonyme du navigateur) : visiteurs uniques comptés ;
+        - absent ou refusé → `consent: false` **sans** `visitorId` (sinon `422`) : événements comptés uniquement en
+          agrégats (pages vues, actions), sans identifiant ni recoupement ;
+        - l'adresse IP et l'agent utilisateur servent seulement au filtrage des abus et des robots et ne sont pas
+          conservés avec les événements ; aucune donnée saisie dans un formulaire n'est transmise.
+
+        Anti-abus : en-tête `Origin` limité aux adresses du site (`403`), corps de 16 Kio au plus (`413`), 50 événements
+        par lot, 30 lots par minute et par adresse IP (`429`), robots déclarés ignorés ; les événements horodatés plus
+        de 24 h dans le passé ou plus de 5 min dans le futur sont ignorés et comptés dans `rejected`.
+        Traitement asynchrone : `202` dès la validation du lot.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AnalyticsEventBatch' }
+            examples:
+              withConsent:
+                summary: Visiteur ayant consenti (page de service, clic WhatsApp puis devis)
+                value:
+                  consent: true
+                  visitorId: 6f1c2a4e-8b3d-4c7a-9e21-5d0f3b7a1c88
+                  events:
+                    - { type: page_view, path: /services/experience/chef-prive, lang: fr, occurredAt: '2026-10-25T09:12:03.000Z', device: mobile, referrerHost: www.google.com }
+                    - { type: action, action: whatsapp, step: click, target: chef-prive, placement: hero, path: /services/experience/chef-prive, lang: fr, occurredAt: '2026-10-25T09:12:41.000Z', device: mobile }
+                    - { type: action, action: quote, step: submit, target: chef-prive, placement: form, path: /devis, lang: fr, occurredAt: '2026-10-25T09:15:10.000Z', device: mobile }
+              withoutConsent:
+                summary: Sans consentement (aucun identifiant)
+                value:
+                  consent: false
+                  events:
+                    - { type: page_view, path: /zones-d-intervention, lang: en, occurredAt: '2026-10-25T09:20:00.000Z', device: desktop, referrerHost: null }
+          text/plain:
+            schema: { type: string, maxLength: 16384, description: 'Même contenu JSON qu''en `application/json` (envoi par `navigator.sendBeacon`).' }
+      responses:
+        '202':
+          description: Lot accepté.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AnalyticsBatchAccepted' }
+              example: { accepted: 3, rejected: 0 }
+        '400':
+          description: Corps illisible (JSON invalide).
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+              example: { type: https://api.mamboproxi.com/problems/invalid-body, title: Requête invalide, status: 400, detail: Le contenu envoyé n'est pas un JSON valide. }
+        '403':
+          description: Origine non autorisée.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+              example: { type: https://api.mamboproxi.com/problems/forbidden-origin, title: Origine non autorisée, status: 403, detail: Ces mesures ne sont acceptées que depuis le site MAMBO Proxi. }
+        '413':
+          description: Lot trop volumineux (16 Kio au plus).
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+              example: { type: https://api.mamboproxi.com/problems/payload-too-large, title: Envoi trop volumineux, status: 413, detail: Envoyez au plus 50 événements et 16 Kio par lot. }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
 
   /v1/health:
     get:
@@ -952,7 +1098,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/LoginResult' }
-              example: { status: AUTHENTICATED, user: { id: clx8m2k4p0001mp9a7v3f2c1d, email: mireille@mamboproxi.com, name: Mireille Bell, firstName: Mireille, initials: MB, role: ADMIN, lastLoginAt: '2026-10-19T07:58:00.000Z' } }
+              example: {"status": "AUTHENTICATED", "user": {"id": "clx8m2k4p0001mp9a7v3f2c1d", "email": "mireille@mamboproxi.com", "name": "Mireille Bell", "firstName": "Mireille", "initials": "MB", "role": "ADMIN", "permissions": ["dashboard:read", "analytics:read", "team:read", "requests:read", "requests:write", "requests:assign", "requests:export", "requests:anonymize", "requests:revert-status", "appointments:read", "appointments:write", "appointments:assign", "availability:write", "applications:read", "applications:write", "contacts:read", "contacts:write", "contacts:export", "reviews:moderate", "content:read", "content:write", "media:write", "newsletter:read", "newsletter:write", "settings:read", "settings:write", "settings:admin", "users:manage", "audit:read"], "lastLoginAt": "2026-10-19T07:58:00.000Z"}}
         '202':
           description: Code de vérification envoyé par e-mail.
           content:
@@ -1050,6 +1196,7 @@ paths:
       tags: [Authentification]
       operationId: getMe
       summary: Utilisateur connecté
+      description: Renvoie aussi les permissions du rôle (`permissions`), qui pilotent menus et tableau de bord.
       security: [{ cookieAuth: [] }]
       responses:
         '200':
@@ -1057,6 +1204,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/CurrentUser' }
+              examples:
+                default:
+                  summary: Administratrice
+                  value: {"id": "clx8m2k4p0001mp9a7v3f2c1d", "email": "mireille@mamboproxi.com", "name": "Mireille Bell", "firstName": "Mireille", "initials": "MB", "role": "ADMIN", "permissions": ["dashboard:read", "analytics:read", "team:read", "requests:read", "requests:write", "requests:assign", "requests:export", "requests:anonymize", "requests:revert-status", "appointments:read", "appointments:write", "appointments:assign", "availability:write", "applications:read", "applications:write", "contacts:read", "contacts:write", "contacts:export", "reviews:moderate", "content:read", "content:write", "media:write", "newsletter:read", "newsletter:write", "settings:read", "settings:write", "settings:admin", "users:manage", "audit:read"], "lastLoginAt": "2026-10-19T07:58:00.000Z"}
+                agent:
+                  summary: Chargé de clientèle
+                  value: {"id": "usr_paul", "email": "paul.ngando@mamboproxi.com", "name": "Paul Ngando", "firstName": "Paul", "initials": "PN", "role": "AGENT", "permissions": ["dashboard:read", "requests:read-assigned", "requests:write-assigned", "appointments:read-assigned", "appointments:write-assigned"], "lastLoginAt": "2026-10-25T08:10:00.000Z"}
         '401': { $ref: '#/components/responses/Unauthorized' }
 
   /v1/auth/forgot-password:
@@ -1126,7 +1280,13 @@ paths:
     get:
       tags: [Admin — Tableau de bord]
       operationId: adminGetDashboard
+      x-permissions: [dashboard:read]
       summary: Indicateurs du tableau de bord
+      description: |
+        Indicateurs calculés selon les permissions de l'utilisateur : avec `requests:read-assigned` seulement, demandes
+        et rendez-vous se limitent à ceux qui lui sont assignés ; sans permission sur les demandes (`WRITER`), les blocs
+        correspondants sont vides. Le bloc « Mes tâches » est servi par `GET /v1/admin/me/tasks`, les statistiques
+        d'audience par `GET /v1/admin/analytics/summary`.
       security: [{ cookieAuth: [] }]
       parameters:
         - name: range
@@ -1146,7 +1306,9 @@ paths:
     get:
       tags: [Admin — Tableau de bord]
       operationId: adminSearch
+      x-permissions: [dashboard:read]
       summary: Recherche globale (palette ⌘K)
+      description: Seuls les groupes et éléments accessibles avec les permissions de l'utilisateur sont renvoyés.
       security: [{ cookieAuth: [] }]
       parameters:
         - name: q
@@ -1191,6 +1353,7 @@ paths:
     get:
       tags: [Admin — Tableau de bord]
       operationId: adminListNotifications
+      x-permissions: [dashboard:read]
       summary: Notifications récentes
       security: [{ cookieAuth: [] }]
       responses:
@@ -1210,6 +1373,7 @@ paths:
     patch:
       tags: [Admin — Tableau de bord]
       operationId: adminMarkNotificationsRead
+      x-permissions: [dashboard:read]
       summary: Marquer des notifications comme lues
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -1228,8 +1392,9 @@ paths:
     get:
       tags: [Admin — Tableau de bord]
       operationId: adminGetSidebarCounts
+      x-permissions: [dashboard:read]
       summary: Compteurs de la barre latérale
-      description: Demandes nouvelles, rendez-vous à confirmer, avis à valider, candidatures non lues. Affichés sur tous les écrans du back-office.
+      description: Demandes nouvelles, rendez-vous à confirmer, avis à valider, candidatures non lues. Affichés sur tous les écrans du back-office. Chaque compteur est limité au périmètre des permissions (dossiers assignés pour un rôle `…-assigned`, `0` sans permission).
       security: [{ cookieAuth: [] }]
       responses:
         '200':
@@ -1240,12 +1405,77 @@ paths:
               example: { requests: 12, appointments: 3, reviews: 4, applications: 2 }
         '401': { $ref: '#/components/responses/Unauthorized' }
 
+  /v1/admin/me/tasks:
+    get:
+      tags: [Admin — Tableau de bord]
+      operationId: adminGetMyTasks
+      x-permissions: [dashboard:read]
+      summary: Mes tâches (demandes et rendez-vous qui me sont assignés)
+      description: |
+        Bloc « Mes tâches » du tableau de bord, pour l'utilisateur connecté (tous les rôles).
+        Demandes ouvertes (`NOUVELLE`, `EN_COURS`) qui lui sont assignées : nombre par statut, en retard (`dueAt`
+        dépassée), à traiter aujourd'hui (`dueAt` dans la journée, fuseau `Africa/Douala`) et les 10 plus urgentes
+        (en retard d'abord, puis par échéance). Rendez-vous qui lui sont assignés : aujourd'hui, à confirmer, et les
+        5 prochains (7 jours). Les liens « Voir tout » utilisent `assignee=me` et `due=` sur `GET /v1/admin/requests`,
+        `assignee=me` sur `GET /v1/admin/appointments`. `unassigned` (demandes ouvertes sans assignation) n'est
+        renseigné qu'avec la permission `requests:assign`, sinon `null`.
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Tâches de l'utilisateur connecté.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MyTasks' }
+              examples:
+                default:
+                  summary: Tâches de Paul Ngando (chargé de clientèle)
+                  value: {"generatedAt": "2026-10-25T09:30:00.000Z", "requests": {"open": 7, "byStatus": {"NOUVELLE": 2, "EN_COURS": 5}, "overdue": 1, "dueToday": 2, "items": [{"id": "req_0151", "reference": "MP-2026-0151", "type": "DEVIS", "status": "EN_COURS", "contact": {"id": "ctc_req_0151", "fullName": "Christelle Ngo Mbe", "initials": "CN", "email": "christelle.ngo@example.com", "phone": "+237677112233", "country": "CM", "city": "Bonamoussadi, Douala", "profile": "PARTICULIER"}, "service": {"id": "svc_recherche_logement", "name": "Recherche de logement", "slug": "recherche-logement"}, "category": {"slug": "immobilier", "name": "Immobilier"}, "subject": "Recherche de logement", "assignedTo": {"id": "usr_paul", "name": "Paul Ngando", "initials": "PN"}, "dueAt": "2026-10-24T16:00:00.000Z", "isOverdue": true, "createdAt": "2026-10-22T10:05:00.000Z"}, {"id": "req_0156", "reference": "MP-2026-0156", "type": "DEVIS", "status": "NOUVELLE", "contact": {"id": "ctc_req_0156", "fullName": "Hervé Tchoumi", "initials": "HT", "email": "herve.tchoumi@example.com", "phone": "+237699887766", "country": "CM", "city": "Akwa, Douala", "profile": "PARTICULIER"}, "service": {"id": "svc_entretien_logement", "name": "Entretien du logement", "slug": "entretien-du-logement"}, "category": {"slug": "services-a-domicile", "name": "Services à domicile"}, "subject": "Entretien du logement", "assignedTo": {"id": "usr_paul", "name": "Paul Ngando", "initials": "PN"}, "dueAt": "2026-10-25T14:20:00.000Z", "isOverdue": false, "createdAt": "2026-10-24T14:20:00.000Z"}, {"id": "req_0157", "reference": "MP-2026-0157", "type": "DEVIS", "status": "EN_COURS", "contact": {"id": "ctc_req_0157", "fullName": "Aurélie Kamga", "initials": "AK", "email": "aurelie.k@example.com", "phone": "+237612345678", "country": "CM", "city": "Bonapriso, Douala", "profile": "PARTICULIER"}, "service": {"id": "svc_chef_prive", "name": "Chef privé", "slug": "chef-prive"}, "category": {"slug": "experience", "name": "Expérience"}, "subject": "Chef privé", "assignedTo": {"id": "usr_paul", "name": "Paul Ngando", "initials": "PN"}, "dueAt": "2026-10-25T17:00:00.000Z", "isOverdue": false, "createdAt": "2026-10-24T17:00:00.000Z"}]}, "appointments": {"today": 1, "toConfirm": 1, "upcoming": [{"id": "apt_7", "reference": "MP-2026-0153", "contact": {"id": "ctc_samuel", "fullName": "Samuel Eto Mbarga", "initials": "SE", "email": "samuel.em@example.com", "phone": "+33612345678", "country": "FR", "city": "Lyon", "profile": "PARTICULIER"}, "reason": "IMMOBILIER", "format": "VISIO", "startsAt": "2026-10-25T13:00:00.000Z", "endsAt": "2026-10-25T14:30:00.000Z", "status": "CONFIRME", "proposedStartsAt": null, "location": null, "videoLink": "https://meet.example.com/mambo-samuel", "message": null, "notes": null, "reminderSentAt": "2026-10-24T13:00:00.000Z", "assignedTo": {"id": "usr_paul", "name": "Paul Ngando", "initials": "PN"}, "createdAt": "2026-10-20T09:00:00.000Z"}, {"id": "apt_9", "reference": "MP-2026-0158", "contact": {"id": "ctc_brigitte", "fullName": "Brigitte Nana", "initials": "BN", "email": "brigitte.nana@example.com", "phone": "+237655443322", "country": "CM", "city": "Makèpè, Douala", "profile": "PARTICULIER"}, "reason": "DEVIS", "format": "AGENCE", "startsAt": "2026-10-27T09:00:00.000Z", "endsAt": "2026-10-27T10:30:00.000Z", "status": "A_CONFIRMER", "proposedStartsAt": null, "location": null, "videoLink": null, "message": "Je voudrais un devis pour le ménage hebdomadaire de mon appartement.", "notes": null, "reminderSentAt": null, "assignedTo": {"id": "usr_paul", "name": "Paul Ngando", "initials": "PN"}, "createdAt": "2026-10-24T18:40:00.000Z"}]}, "unassigned": null}
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  # ─────────────────────── Admin — Statistiques ───────────────────
+  /v1/admin/analytics/summary:
+    get:
+      tags: [Admin — Statistiques]
+      operationId: adminGetAnalyticsSummary
+      x-permissions: [analytics:read]
+      summary: Statistiques d'audience du site
+      description: |
+        Agrégats de la mesure d'audience interne (`POST /v1/analytics/events`) sur la période (jours entiers jusqu'à
+        hier, fuseau `Africa/Douala`), comparés à la période précédente de même durée. Les visiteurs uniques ne
+        comptent que les visiteurs ayant consenti (identifiant pseudonyme) ; pages vues et actions comptent tous les
+        événements. Agrégats recalculés toutes les 15 min environ (`generatedAt`) ; événements bruts conservés 13 mois.
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: period
+          in: query
+          schema: { type: string, enum: [7d, 30d, 90d], default: 30d }
+        - name: lang
+          in: query
+          description: Limiter aux pages vues dans une langue ; absent = toutes les langues.
+          schema: { type: string, enum: [fr, en] }
+      responses:
+        '200':
+          description: Statistiques de la période.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AnalyticsSummary' }
+              examples:
+                default:
+                  summary: Statistiques sur 30 jours
+                  value: {"period": "30d", "from": "2026-09-25", "to": "2026-10-24", "generatedAt": "2026-10-25T09:15:00.000Z", "totals": {"visitors": {"value": 1864, "previous": 1590, "deltaPercent": 17.2, "unit": null}, "pageViews": {"value": 7412, "previous": 6630, "deltaPercent": 11.8, "unit": null}, "actions": {"value": 486, "previous": 402, "deltaPercent": 20.9, "unit": null}, "consentRate": 62.4}, "actions": [{"action": "whatsapp", "label": "WhatsApp", "count": 168, "previous": 131, "deltaPercent": 28.2}, {"action": "quote", "label": "Devis", "count": 132, "previous": 118, "deltaPercent": 11.9}, {"action": "call", "label": "Appel", "count": 54, "previous": 49, "deltaPercent": 10.2}, {"action": "participate", "label": "« Je participe »", "count": 38, "previous": 22, "deltaPercent": 72.7}, {"action": "newsletter", "label": "Inscription newsletter", "count": 33, "previous": 28, "deltaPercent": 17.9}, {"action": "email", "label": "E-mail", "count": 21, "previous": 24, "deltaPercent": -12.5}, {"action": "appointment", "label": "Rendez-vous", "count": 19, "previous": 15, "deltaPercent": 26.7}, {"action": "sign_up", "label": "Inscription", "count": 11, "previous": 9, "deltaPercent": 22.2}, {"action": "contact", "label": "Message de contact", "count": 10, "previous": 6, "deltaPercent": 66.7}, {"action": "application", "label": "Candidature", "count": 0, "previous": 0, "deltaPercent": null}, {"action": "partner", "label": "Demande de partenariat", "count": 0, "previous": 0, "deltaPercent": null}, {"action": "training", "label": "Demande de formation", "count": 0, "previous": 0, "deltaPercent": null}], "series": [{"date": "2026-09-25", "visitors": 56, "pageViews": 207, "actions": 14}, {"date": "2026-09-26", "visitors": 50, "pageViews": 186, "actions": 12}, {"date": "2026-09-27", "visitors": 45, "pageViews": 165, "actions": 11}, {"date": "2026-09-28", "visitors": 71, "pageViews": 264, "actions": 17}, {"date": "2026-09-29", "visitors": 66, "pageViews": 243, "actions": 16}, {"date": "2026-09-30", "visitors": 60, "pageViews": 222, "actions": 15}, {"date": "2026-10-01", "visitors": 70, "pageViews": 261, "actions": 17}, {"date": "2026-10-02", "visitors": 65, "pageViews": 240, "actions": 16}, {"date": "2026-10-03", "visitors": 59, "pageViews": 219, "actions": 14}, {"date": "2026-10-04", "visitors": 53, "pageViews": 198, "actions": 13}, {"date": "2026-10-05", "visitors": 64, "pageViews": 237, "actions": 16}, {"date": "2026-10-06", "visitors": 75, "pageViews": 276, "actions": 18}, {"date": "2026-10-07", "visitors": 69, "pageViews": 255, "actions": 17}, {"date": "2026-10-08", "visitors": 63, "pageViews": 234, "actions": 15}, {"date": "2026-10-09", "visitors": 74, "pageViews": 273, "actions": 18}, {"date": "2026-10-10", "visitors": 52, "pageViews": 192, "actions": 13}, {"date": "2026-10-11", "visitors": 62, "pageViews": 231, "actions": 15}, {"date": "2026-10-12", "visitors": 73, "pageViews": 270, "actions": 18}, {"date": "2026-10-13", "visitors": 67, "pageViews": 249, "actions": 16}, {"date": "2026-10-14", "visitors": 78, "pageViews": 288, "actions": 19}, {"date": "2026-10-15", "visitors": 72, "pageViews": 267, "actions": 18}, {"date": "2026-10-16", "visitors": 83, "pageViews": 306, "actions": 20}, {"date": "2026-10-17", "visitors": 61, "pageViews": 225, "actions": 15}, {"date": "2026-10-18", "visitors": 55, "pageViews": 204, "actions": 13}, {"date": "2026-10-19", "visitors": 82, "pageViews": 303, "actions": 20}, {"date": "2026-10-20", "visitors": 76, "pageViews": 282, "actions": 19}, {"date": "2026-10-21", "visitors": 70, "pageViews": 261, "actions": 17}, {"date": "2026-10-22", "visitors": 81, "pageViews": 300, "actions": 20}, {"date": "2026-10-23", "visitors": 75, "pageViews": 279, "actions": 18}, {"date": "2026-10-24", "visitors": 70, "pageViews": 275, "actions": 16}], "topPages": [{"path": "/", "title": "Accueil", "pageViews": 2310, "visitors": 1205, "actions": 151}, {"path": "/services/experience/chef-prive", "title": "Chef privé", "pageViews": 812, "visitors": 498, "actions": 74}, {"path": "/services/services-a-domicile", "title": "Services à domicile", "pageViews": 640, "visitors": 402, "actions": 41}, {"path": "/zones-d-intervention", "title": "Zones d'intervention", "pageViews": 520, "visitors": 371, "actions": 28}, {"path": "/devis", "title": "Demande de devis", "pageViews": 488, "visitors": 341, "actions": 62}, {"path": "/services/immobilier/recherche-logement", "title": "Recherche de logement", "pageViews": 402, "visitors": 260, "actions": 33}, {"path": "/magazine", "title": "Magazine", "pageViews": 355, "visitors": 248, "actions": 18}, {"path": "/recrutement", "title": "Recrutement", "pageViews": 290, "visitors": 201, "actions": 0}, {"path": "/contact", "title": "Contact", "pageViews": 260, "visitors": 188, "actions": 57}, {"path": "/qui-sommes-nous", "title": "Qui sommes-nous", "pageViews": 231, "visitors": 170, "actions": 9}], "actionsByPage": [{"path": "/", "title": "Accueil", "total": 151, "byAction": [{"action": "whatsapp", "count": 58}, {"action": "quote", "count": 41}, {"action": "participate", "count": 26}, {"action": "call", "count": 15}, {"action": "newsletter", "count": 11}]}, {"path": "/services/experience/chef-prive", "title": "Chef privé", "total": 74, "byAction": [{"action": "quote", "count": 38}, {"action": "whatsapp", "count": 30}, {"action": "call", "count": 6}]}, {"path": "/devis", "title": "Demande de devis", "total": 62, "byAction": [{"action": "quote", "count": 62}]}, {"path": "/contact", "title": "Contact", "total": 57, "byAction": [{"action": "whatsapp", "count": 20}, {"action": "email", "count": 15}, {"action": "call", "count": 12}, {"action": "contact", "count": 10}]}, {"path": "/services/services-a-domicile", "title": "Services à domicile", "total": 41, "byAction": [{"action": "quote", "count": 22}, {"action": "whatsapp", "count": 19}]}], "languages": [{"lang": "fr", "pageViews": 6150, "percent": 83.0}, {"lang": "en", "pageViews": 1262, "percent": 17.0}]}
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
   # ─────────────────────────── Admin — Demandes ───────────────────
   /v1/admin/requests:
     get:
       tags: [Admin — Demandes]
       operationId: adminListRequests
+      x-permissions: [requests:read, requests:read-assigned]
       summary: Demandes (devis, contacts, inscriptions, candidatures…)
+      description: |
+        Avec la seule permission `requests:read-assigned`, la liste et les compteurs se limitent aux demandes assignées
+        à l'utilisateur connecté (`assignee=me` appliqué d'office, autre valeur → `403`).
       security: [{ cookieAuth: [] }]
       parameters:
         - name: type
@@ -1261,6 +1491,8 @@ paths:
           in: query
           schema: { $ref: '#/components/schemas/CountryCode' }
         - $ref: '#/components/parameters/District'
+        - $ref: '#/components/parameters/Assignee'
+        - $ref: '#/components/parameters/Due'
         - $ref: '#/components/parameters/From'
         - $ref: '#/components/parameters/To'
         - $ref: '#/components/parameters/Q'
@@ -1287,6 +1519,7 @@ paths:
     get:
       tags: [Admin — Demandes]
       operationId: adminExportRequests
+      x-permissions: [requests:export]
       summary: Export CSV (mêmes filtres que la liste)
       security: [{ cookieAuth: [] }]
       parameters:
@@ -1303,6 +1536,8 @@ paths:
           in: query
           schema: { $ref: '#/components/schemas/CountryCode' }
         - $ref: '#/components/parameters/District'
+        - $ref: '#/components/parameters/Assignee'
+        - $ref: '#/components/parameters/Due'
         - $ref: '#/components/parameters/From'
         - $ref: '#/components/parameters/To'
       responses:
@@ -1317,6 +1552,7 @@ paths:
     get:
       tags: [Admin — Demandes]
       operationId: adminGetRequest
+      x-permissions: [requests:read, requests:read-assigned]
       summary: Détail d'une demande
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -1333,10 +1569,21 @@ paths:
     patch:
       tags: [Admin — Demandes]
       operationId: adminUpdateRequest
+      x-permissions: [requests:write, requests:write-assigned, requests:assign]
       summary: Changer le statut ou l'assignation
       description: |
         Chaque changement crée un événement d'historique. Le passage à `PRESTATION_REALISEE` d'un devis planifie
-        l'invitation au questionnaire (délai paramétrable). Le retour arrière est réservé aux administrateurs.
+        l'invitation au questionnaire (délai paramétrable). Le retour arrière du statut demande la permission
+        `requests:revert-status` (administrateurs).
+
+        Assignation (`assignedToId`, permission `requests:assign`) : la personne doit être un membre actif pouvant traiter
+        des demandes (`assignable` dans `GET /v1/admin/users/presence`), sinon `422` ; `null` retire l'assignation.
+        Avec `requests:write-assigned` seulement, on peut changer le statut et l'échéance de ses propres demandes, mais
+        pas les réassigner (`403`). Toute assignation crée l'événement `ASSIGNED` et prévient la personne assignée par
+        une notification `ASSIGNMENT` du back-office (`GET /v1/admin/notifications`) et par l'e-mail `team-assignment`
+        (désactivable dans les modèles d'e-mails) ; s'assigner soi-même ne notifie pas.
+
+        Échéance (`dueAt`) : fixée à la réception (24 h après la demande), modifiable ; `null` = sans échéance.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       requestBody:
@@ -1349,6 +1596,7 @@ paths:
               properties:
                 status: { $ref: '#/components/schemas/RequestStatus' }
                 assignedToId: { oneOf: [{ $ref: '#/components/schemas/Id' }, { type: 'null' }] }
+                dueAt: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }] }
       responses:
         '200':
           description: Demande mise à jour.
@@ -1362,6 +1610,7 @@ paths:
     delete:
       tags: [Admin — Demandes]
       operationId: adminAnonymizeRequest
+      x-permissions: [requests:anonymize]
       summary: Anonymiser une demande (RGPD)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -1375,6 +1624,7 @@ paths:
     post:
       tags: [Admin — Demandes]
       operationId: adminAddRequestNote
+      x-permissions: [requests:write, requests:write-assigned]
       summary: Ajouter une note interne
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -1401,6 +1651,7 @@ paths:
     post:
       tags: [Admin — Demandes]
       operationId: adminDuplicateRequest
+      x-permissions: [requests:write]
       summary: Dupliquer une demande (nouvelle référence, statut « Nouvelle »)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -1417,6 +1668,7 @@ paths:
     get:
       tags: [Admin — Demandes]
       operationId: adminGetRequestAttachment
+      x-permissions: [requests:read, requests:read-assigned]
       summary: URL signée (5 min) d'une pièce jointe
       security: [{ cookieAuth: [] }]
       parameters:
@@ -1439,6 +1691,7 @@ paths:
     get:
       tags: [Admin — Services]
       operationId: adminListServices
+      x-permissions: [content:read]
       summary: Services (toutes rubriques, tous statuts)
       security: [{ cookieAuth: [] }]
       parameters:
@@ -1468,6 +1721,7 @@ paths:
     post:
       tags: [Admin — Services]
       operationId: adminCreateService
+      x-permissions: [content:write]
       summary: Créer un service (brouillon)
       description: Seuls le nom, la rubrique et l'accroche sont nécessaires ; le slug et le SEO sont pré-remplis.
       security: [{ cookieAuth: [], csrfToken: [] }]
@@ -1490,6 +1744,7 @@ paths:
     patch:
       tags: [Admin — Services]
       operationId: adminReorderServices
+      x-permissions: [content:write]
       summary: Ordre d'affichage dans une rubrique
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -1506,6 +1761,7 @@ paths:
     get:
       tags: [Admin — Services]
       operationId: adminGetService
+      x-permissions: [content:read]
       summary: Service à éditer
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -1520,6 +1776,7 @@ paths:
     patch:
       tags: [Admin — Services]
       operationId: adminUpdateService
+      x-permissions: [content:write]
       summary: Enregistrer (sauvegarde automatique ou manuelle)
       description: Mise à jour partielle. Si le service est publié, les modifications sont en ligne immédiatement (revalidation). En-tête `If-Match` facultatif pour éviter d'écraser une version plus récente.
       security: [{ cookieAuth: [], csrfToken: [] }]
@@ -1551,6 +1808,7 @@ paths:
     delete:
       tags: [Admin — Services]
       operationId: adminDeleteService
+      x-permissions: [content:write]
       summary: Supprimer un service (brouillon ou archivé)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -1568,6 +1826,7 @@ paths:
     post:
       tags: [Admin — Services]
       operationId: adminPublishService
+      x-permissions: [content:write]
       summary: Publier
       description: Crée la page, la carte de rubrique, l'entrée de menu (si `showInMenu`), l'option du devis et l'entrée du sitemap ; revalide le site. Exige nom, rubrique et accroche.
       security: [{ cookieAuth: [], csrfToken: [] }]
@@ -1586,6 +1845,7 @@ paths:
     post:
       tags: [Admin — Services]
       operationId: adminUnpublishService
+      x-permissions: [content:write]
       summary: Dépublier (repasse en brouillon)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -1602,6 +1862,7 @@ paths:
     post:
       tags: [Admin — Services]
       operationId: adminDuplicateService
+      x-permissions: [content:write]
       summary: Dupliquer (copie en brouillon)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -1618,6 +1879,7 @@ paths:
     get:
       tags: [Admin — Services]
       operationId: adminGetServicePreviewToken
+      x-permissions: [content:read]
       summary: Jeton de prévisualisation de la page complète (30 min)
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -1634,6 +1896,7 @@ paths:
     get:
       tags: [Admin — Services]
       operationId: adminGetServiceCompleteness
+      x-permissions: [content:read]
       summary: Indicateur de complétude (7 critères)
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -1650,6 +1913,7 @@ paths:
     get:
       tags: [Admin — Services]
       operationId: adminListCategories
+      x-permissions: [content:read]
       summary: Rubriques (tous statuts)
       security: [{ cookieAuth: [] }]
       responses:
@@ -1662,6 +1926,7 @@ paths:
     post:
       tags: [Admin — Services]
       operationId: adminCreateCategory
+      x-permissions: [content:write]
       summary: Créer une rubrique
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -1683,6 +1948,7 @@ paths:
     patch:
       tags: [Admin — Services]
       operationId: adminReorderCategories
+      x-permissions: [content:write]
       summary: Ordre des rubriques
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -1698,6 +1964,7 @@ paths:
     get:
       tags: [Admin — Services]
       operationId: adminGetCategory
+      x-permissions: [content:read]
       summary: Rubrique à éditer
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -1712,6 +1979,7 @@ paths:
     patch:
       tags: [Admin — Services]
       operationId: adminUpdateCategory
+      x-permissions: [content:write]
       summary: Modifier une rubrique
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -1732,6 +2000,7 @@ paths:
     delete:
       tags: [Admin — Services]
       operationId: adminDeleteCategory
+      x-permissions: [content:write]
       summary: Supprimer une rubrique vide
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -1749,6 +2018,7 @@ paths:
     get:
       tags: [Admin — Pages]
       operationId: adminListPages
+      x-permissions: [content:read]
       summary: Pages éditables
       security: [{ cookieAuth: [] }]
       responses:
@@ -1763,6 +2033,7 @@ paths:
     get:
       tags: [Admin — Pages]
       operationId: adminGetPage
+      x-permissions: [content:read]
       summary: Page avec son brouillon
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/PageKeyPath' }]
@@ -1777,6 +2048,7 @@ paths:
     put:
       tags: [Admin — Pages]
       operationId: adminSavePageDraft
+      x-permissions: [content:write]
       summary: Enregistrer le brouillon (sauvegarde automatique)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/PageKeyPath' }]
@@ -1799,6 +2071,7 @@ paths:
     post:
       tags: [Admin — Pages]
       operationId: adminPublishPage
+      x-permissions: [content:write]
       summary: Publier les modifications
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/PageKeyPath' }]
@@ -1815,6 +2088,7 @@ paths:
     post:
       tags: [Admin — Pages]
       operationId: adminDiscardPageDraft
+      x-permissions: [content:write]
       summary: Abandonner le brouillon
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/PageKeyPath' }]
@@ -1830,6 +2104,7 @@ paths:
     get:
       tags: [Admin — Pages]
       operationId: adminGetPagePreviewToken
+      x-permissions: [content:read]
       summary: Jeton d'aperçu du brouillon
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/PageKeyPath' }]
@@ -1846,6 +2121,7 @@ paths:
     get:
       tags: [Admin — Avis]
       operationId: adminListReviews
+      x-permissions: [reviews:moderate]
       summary: Avis (à valider, publiés, masqués)
       security: [{ cookieAuth: [] }]
       parameters:
@@ -1881,6 +2157,7 @@ paths:
     post:
       tags: [Admin — Avis]
       operationId: adminCreateReview
+      x-permissions: [reviews:moderate]
       summary: Ajout manuel d'un témoignage (marqué « non vérifié »)
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -1901,6 +2178,7 @@ paths:
     get:
       tags: [Admin — Avis]
       operationId: adminGetReviewStats
+      x-permissions: [reviews:moderate]
       summary: KPI des avis et du questionnaire
       security: [{ cookieAuth: [] }]
       responses:
@@ -1915,6 +2193,7 @@ paths:
     patch:
       tags: [Admin — Avis]
       operationId: adminUpdateReview
+      x-permissions: [reviews:moderate]
       summary: Publier, masquer, mettre en avant
       description: La publication est refusée (`409`) si le client n'a pas consenti à la publication.
       security: [{ cookieAuth: [], csrfToken: [] }]
@@ -1947,6 +2226,7 @@ paths:
     delete:
       tags: [Admin — Avis]
       operationId: adminDeleteReview
+      x-permissions: [reviews:moderate]
       summary: Supprimer un avis ajouté manuellement
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -1959,6 +2239,7 @@ paths:
     post:
       tags: [Admin — Avis]
       operationId: adminReplyReview
+      x-permissions: [reviews:moderate]
       summary: Répondre à un avis (réponse publique de l'agence)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -1984,6 +2265,7 @@ paths:
     get:
       tags: [Admin — Avis]
       operationId: adminListSurveyQuestions
+      x-permissions: [reviews:moderate]
       summary: Questions du questionnaire de satisfaction
       security: [{ cookieAuth: [] }]
       responses:
@@ -1996,6 +2278,7 @@ paths:
     put:
       tags: [Admin — Avis]
       operationId: adminReplaceSurveyQuestions
+      x-permissions: [reviews:moderate]
       summary: Enregistrer la liste des questions (5 maximum actives)
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -2020,6 +2303,7 @@ paths:
     get:
       tags: [Admin — Rendez-vous]
       operationId: adminListAppointments
+      x-permissions: [appointments:read, appointments:read-assigned]
       summary: Rendez-vous sur une période
       security: [{ cookieAuth: [] }]
       parameters:
@@ -2034,9 +2318,12 @@ paths:
         - name: status
           in: query
           schema: { $ref: '#/components/schemas/AppointmentStatus' }
+        - $ref: '#/components/parameters/Assignee'
       responses:
         '200':
-          description: Rendez-vous de la période + file « À confirmer » (toutes dates).
+          description: |
+            Rendez-vous de la période + file « À confirmer » (toutes dates), filtrés par `assignee` le cas échéant.
+            Avec la seule permission `appointments:read-assigned`, limités aux rendez-vous assignés à l'utilisateur.
           content:
             application/json:
               schema:
@@ -2051,6 +2338,7 @@ paths:
     post:
       tags: [Admin — Rendez-vous]
       operationId: adminCreateAppointment
+      x-permissions: [appointments:write]
       summary: Saisie manuelle d'un rendez-vous (confirmé)
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -2072,6 +2360,7 @@ paths:
     get:
       tags: [Admin — Rendez-vous]
       operationId: adminGetAppointment
+      x-permissions: [appointments:read, appointments:read-assigned]
       summary: Détail d'un rendez-vous
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2086,11 +2375,14 @@ paths:
     patch:
       tags: [Admin — Rendez-vous]
       operationId: adminActOnAppointment
+      x-permissions: [appointments:write, appointments:write-assigned, appointments:assign]
       summary: Confirmer, proposer un autre créneau, annuler, terminer
       description: |
         `confirm` → e-mail de confirmation avec fichier `.ics` (+ lien visio si format Visio).
         `propose` → e-mail avec bouton d'acceptation du nouveau créneau.
         `cancel` → e-mail d'annulation. `complete` → statut « Terminé ».
+        `assign` (permission `appointments:assign`) → assigne le rendez-vous (`null` = retirer) ; la personne assignée
+        reçoit une notification `ASSIGNMENT` et l'e-mail `team-assignment`, comme pour les demandes.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       requestBody:
@@ -2146,6 +2438,7 @@ paths:
     get:
       tags: [Admin — Rendez-vous]
       operationId: adminGetAvailability
+      x-permissions: [appointments:read, availability:write]
       summary: Règles de disponibilité et fermetures
       security: [{ cookieAuth: [] }]
       responses:
@@ -2160,6 +2453,7 @@ paths:
     put:
       tags: [Admin — Rendez-vous]
       operationId: adminSaveAvailability
+      x-permissions: [availability:write]
       summary: Enregistrer les règles et fermetures
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -2181,6 +2475,7 @@ paths:
     get:
       tags: [Admin — Recrutement]
       operationId: adminListJobs
+      x-permissions: [content:read]
       summary: Offres d'emploi
       security: [{ cookieAuth: [] }]
       parameters:
@@ -2197,6 +2492,7 @@ paths:
     post:
       tags: [Admin — Recrutement]
       operationId: adminCreateJob
+      x-permissions: [content:write]
       summary: Créer une offre
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -2217,6 +2513,7 @@ paths:
     get:
       tags: [Admin — Recrutement]
       operationId: adminGetJob
+      x-permissions: [content:read]
       summary: Offre à éditer
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2231,6 +2528,7 @@ paths:
     patch:
       tags: [Admin — Recrutement]
       operationId: adminUpdateJob
+      x-permissions: [content:write]
       summary: Modifier une offre (dont publication via `status`)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2251,6 +2549,7 @@ paths:
     delete:
       tags: [Admin — Recrutement]
       operationId: adminDeleteJob
+      x-permissions: [content:write]
       summary: Supprimer une offre (les candidatures sont conservées)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2263,6 +2562,7 @@ paths:
     get:
       tags: [Admin — Recrutement]
       operationId: adminListApplications
+      x-permissions: [applications:read]
       summary: Candidatures
       security: [{ cookieAuth: [] }]
       parameters:
@@ -2292,6 +2592,7 @@ paths:
     get:
       tags: [Admin — Recrutement]
       operationId: adminGetApplication
+      x-permissions: [applications:read]
       summary: Détail d'une candidature (passe au statut « Lu »)
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2306,6 +2607,7 @@ paths:
     patch:
       tags: [Admin — Recrutement]
       operationId: adminUpdateApplication
+      x-permissions: [applications:write]
       summary: Changer le statut
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2331,6 +2633,7 @@ paths:
     get:
       tags: [Admin — Recrutement]
       operationId: adminGetApplicationCv
+      x-permissions: [applications:read]
       summary: URL signée du CV (5 min)
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2348,6 +2651,7 @@ paths:
     get:
       tags: [Admin — Partenaires]
       operationId: adminListPartners
+      x-permissions: [content:read]
       summary: Logos de partenaires
       security: [{ cookieAuth: [] }]
       parameters:
@@ -2364,6 +2668,7 @@ paths:
     post:
       tags: [Admin — Partenaires]
       operationId: adminCreatePartner
+      x-permissions: [content:write]
       summary: Ajouter un logo
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -2384,6 +2689,7 @@ paths:
     patch:
       tags: [Admin — Partenaires]
       operationId: adminReorderPartners
+      x-permissions: [content:write]
       summary: Ordre d'affichage
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -2399,6 +2705,7 @@ paths:
     patch:
       tags: [Admin — Partenaires]
       operationId: adminUpdatePartner
+      x-permissions: [content:write]
       summary: Modifier un partenaire (dont visibilité)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2419,6 +2726,7 @@ paths:
     delete:
       tags: [Admin — Partenaires]
       operationId: adminDeletePartner
+      x-permissions: [content:write]
       summary: Supprimer un partenaire
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2432,6 +2740,7 @@ paths:
     get:
       tags: [Admin — Formations]
       operationId: adminListTrainings
+      x-permissions: [content:read]
       summary: Catalogue des formations
       security: [{ cookieAuth: [] }]
       responses:
@@ -2444,6 +2753,7 @@ paths:
     post:
       tags: [Admin — Formations]
       operationId: adminCreateTraining
+      x-permissions: [content:write]
       summary: Créer une formation
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -2464,6 +2774,7 @@ paths:
     patch:
       tags: [Admin — Formations]
       operationId: adminReorderTrainings
+      x-permissions: [content:write]
       summary: Ordre du catalogue
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -2479,6 +2790,7 @@ paths:
     patch:
       tags: [Admin — Formations]
       operationId: adminUpdateTraining
+      x-permissions: [content:write]
       summary: Modifier une formation
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2499,6 +2811,7 @@ paths:
     delete:
       tags: [Admin — Formations]
       operationId: adminDeleteTraining
+      x-permissions: [content:write]
       summary: Supprimer une formation
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2511,6 +2824,7 @@ paths:
     get:
       tags: [Admin — Formations]
       operationId: adminListTrainingRequests
+      x-permissions: [requests:read]
       summary: Demandes de formation
       description: >-
         Demandes « Demande de formation » du site (type `FORMATION` des demandes), avec la structure, la formation
@@ -2541,6 +2855,7 @@ paths:
     get:
       tags: [Admin — Magazine]
       operationId: adminGetMagazine
+      x-permissions: [content:read]
       summary: Éditions du magazine et statistiques de la dernière campagne
       security: [{ cookieAuth: [] }]
       responses:
@@ -2557,6 +2872,7 @@ paths:
     post:
       tags: [Admin — Magazine]
       operationId: adminCreateMagazineEdition
+      x-permissions: [content:write]
       summary: Créer une édition (brouillon)
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -2578,6 +2894,7 @@ paths:
     get:
       tags: [Admin — Magazine]
       operationId: adminGetMagazineEdition
+      x-permissions: [content:read]
       summary: Édition complète (édito, articles dans l'ordre de lecture, envoi par la newsletter)
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2594,6 +2911,7 @@ paths:
     patch:
       tags: [Admin — Magazine]
       operationId: adminUpdateMagazineEdition
+      x-permissions: [content:write]
       summary: Enregistrer une édition
       description: Une édition publiée est mise à jour en ligne immédiatement (tag de revalidation `page:magazine`). Un numéro déjà pris renvoie 409.
       security: [{ cookieAuth: [], csrfToken: [] }]
@@ -2616,6 +2934,7 @@ paths:
     delete:
       tags: [Admin — Magazine]
       operationId: adminDeleteMagazineEdition
+      x-permissions: [content:write]
       summary: Supprimer une édition non publiée
       description: Ses articles restent disponibles, détachés de l'édition. Une édition publiée doit d'abord repasser en brouillon (409).
       security: [{ cookieAuth: [], csrfToken: [] }]
@@ -2630,6 +2949,7 @@ paths:
     post:
       tags: [Admin — Magazine]
       operationId: adminPublishMagazineEdition
+      x-permissions: [content:write]
       summary: Publier ou programmer la publication
       description: Sans date (ou avec une date passée), l'édition est publiée tout de suite ; avec une date future, elle est programmée (`SCHEDULED`).
       security: [{ cookieAuth: [], csrfToken: [] }]
@@ -2655,6 +2975,7 @@ paths:
     post:
       tags: [Admin — Magazine]
       operationId: adminUnpublishMagazineEdition
+      x-permissions: [content:write]
       summary: Repasser une édition en brouillon
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2671,6 +2992,7 @@ paths:
     put:
       tags: [Admin — Magazine]
       operationId: adminSetMagazineEditionArticles
+      x-permissions: [content:write]
       summary: Articles de l'édition, dans l'ordre de lecture
       description: Remplace la liste ; un article ajouté est retiré de son édition précédente, un article retiré reste disponible sans édition.
       security: [{ cookieAuth: [], csrfToken: [] }]
@@ -2698,6 +3020,7 @@ paths:
     get:
       tags: [Admin — Magazine]
       operationId: adminGetMagazineEditionPreviewToken
+      x-permissions: [content:read]
       summary: Jeton de prévisualisation de l'édition sur le site (30 min)
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2714,6 +3037,7 @@ paths:
     post:
       tags: [Admin — Magazine]
       operationId: adminTestMagazineNewsletter
+      x-permissions: [newsletter:write]
       summary: Envoi de test de l'édition (une version par langue complète)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2740,6 +3064,7 @@ paths:
     post:
       tags: [Admin — Magazine]
       operationId: adminScheduleMagazineNewsletter
+      x-permissions: [newsletter:write]
       summary: Programmer l'envoi de l'édition par la newsletter
       description: |
         Crée (ou reprogramme) une campagne par langue, envoyée aux seuls inscrits confirmés de cette langue ; tant que la
@@ -2771,6 +3096,7 @@ paths:
     get:
       tags: [Admin — Magazine]
       operationId: adminListMagazineArticles
+      x-permissions: [content:read]
       summary: Articles du magazine
       security: [{ cookieAuth: [] }]
       parameters:
@@ -2789,6 +3115,7 @@ paths:
     post:
       tags: [Admin — Magazine]
       operationId: adminCreateMagazineArticle
+      x-permissions: [content:write]
       summary: Créer un article
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -2809,6 +3136,7 @@ paths:
     patch:
       tags: [Admin — Magazine]
       operationId: adminUpdateMagazineArticle
+      x-permissions: [content:write]
       summary: Modifier un article
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2829,6 +3157,7 @@ paths:
     delete:
       tags: [Admin — Magazine]
       operationId: adminDeleteMagazineArticle
+      x-permissions: [content:write]
       summary: Supprimer un article
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2842,6 +3171,7 @@ paths:
     get:
       tags: [Admin — Zones]
       operationId: adminListZones
+      x-permissions: [content:read]
       summary: Zones d'intervention, quartiers, délais et tarifs indicatifs
       security: [{ cookieAuth: [] }]
       responses:
@@ -2856,6 +3186,7 @@ paths:
     post:
       tags: [Admin — Zones]
       operationId: adminCreateZone
+      x-permissions: [content:write]
       summary: Créer une zone
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -2876,6 +3207,7 @@ paths:
     patch:
       tags: [Admin — Zones]
       operationId: adminReorderZones
+      x-permissions: [content:write]
       summary: Ordre des zones (légende, liste et recherche du site)
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -2891,10 +3223,13 @@ paths:
     patch:
       tags: [Admin — Zones]
       operationId: adminUpdateZone
+      x-permissions: [content:write]
       summary: Modifier une zone et ses quartiers
       description: |
         `quarters` remplace la liste des quartiers de la zone ; un quartier déjà présent dans une autre zone y est retiré
         (un quartier n'appartient qu'à une zone). Revalide le tag `zones`.
+        Coordonnées des quartiers (`coordinates`) et contour (`area`) en WGS84, contrôlés dans l'emprise du Cameroun
+        (latitude 1,6 à 13,1 ; longitude 8,4 à 16,2), sinon `422` avec le chemin du point fautif.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       requestBody:
@@ -2914,6 +3249,7 @@ paths:
     delete:
       tags: [Admin — Zones]
       operationId: adminDeleteZone
+      x-permissions: [content:write]
       summary: Supprimer une zone
       description: Une zone qui contient encore des quartiers ne peut pas être supprimée (409).
       security: [{ cookieAuth: [], csrfToken: [] }]
@@ -2929,6 +3265,7 @@ paths:
     get:
       tags: [Admin — Agenda]
       operationId: adminListEvents
+      x-permissions: [content:read]
       summary: Événements (passés et à venir)
       security: [{ cookieAuth: [] }]
       parameters:
@@ -2945,6 +3282,7 @@ paths:
     post:
       tags: [Admin — Agenda]
       operationId: adminCreateEvent
+      x-permissions: [content:write]
       summary: Créer un événement
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -2965,6 +3303,7 @@ paths:
     get:
       tags: [Admin — Agenda]
       operationId: adminGetEvent
+      x-permissions: [content:read]
       summary: Événement et ses inscriptions
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -2985,6 +3324,7 @@ paths:
     patch:
       tags: [Admin — Agenda]
       operationId: adminUpdateEvent
+      x-permissions: [content:write]
       summary: Modifier un événement (dont publication)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3005,6 +3345,7 @@ paths:
     delete:
       tags: [Admin — Agenda]
       operationId: adminDeleteEvent
+      x-permissions: [content:write]
       summary: Supprimer un événement
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3018,6 +3359,7 @@ paths:
     get:
       tags: [Admin — Contacts]
       operationId: adminListContacts
+      x-permissions: [contacts:read]
       summary: Contacts et inscrits
       security: [{ cookieAuth: [] }]
       parameters:
@@ -3054,6 +3396,7 @@ paths:
     get:
       tags: [Admin — Contacts]
       operationId: adminExportContacts
+      x-permissions: [contacts:export]
       summary: Export CSV des contacts
       security: [{ cookieAuth: [] }]
       parameters:
@@ -3079,6 +3422,7 @@ paths:
     get:
       tags: [Admin — Contacts]
       operationId: adminGetContact
+      x-permissions: [contacts:read]
       summary: Fiche contact (demandes, abonnement)
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3093,6 +3437,7 @@ paths:
     delete:
       tags: [Admin — Contacts]
       operationId: adminEraseContact
+      x-permissions: [contacts:write]
       summary: Droit à l'effacement (anonymise le contact et ses demandes)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3105,6 +3450,7 @@ paths:
     get:
       tags: [Admin — Contacts]
       operationId: adminExportContactData
+      x-permissions: [contacts:export]
       summary: Export RGPD de toutes les données d'un contact (JSON)
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3122,6 +3468,7 @@ paths:
     get:
       tags: [Admin — Newsletter]
       operationId: adminListSubscribers
+      x-permissions: [newsletter:read]
       summary: Inscrits à la newsletter
       security: [{ cookieAuth: [] }]
       parameters:
@@ -3148,6 +3495,7 @@ paths:
     get:
       tags: [Admin — Newsletter]
       operationId: adminExportSubscribers
+      x-permissions: [contacts:export]
       summary: Export CSV des inscrits confirmés
       security: [{ cookieAuth: [] }]
       responses:
@@ -3162,6 +3510,7 @@ paths:
     delete:
       tags: [Admin — Newsletter]
       operationId: adminDeleteSubscriber
+      x-permissions: [newsletter:write]
       summary: Supprimer un inscrit
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3174,6 +3523,7 @@ paths:
     get:
       tags: [Admin — Newsletter]
       operationId: adminListCampaigns
+      x-permissions: [newsletter:read]
       summary: Envois de newsletter + KPI
       security: [{ cookieAuth: [] }]
       responses:
@@ -3191,6 +3541,7 @@ paths:
     post:
       tags: [Admin — Newsletter]
       operationId: adminCreateCampaign
+      x-permissions: [newsletter:write]
       summary: Nouvel envoi (brouillon)
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
@@ -3211,6 +3562,7 @@ paths:
     get:
       tags: [Admin — Newsletter]
       operationId: adminListCampaignSegments
+      x-permissions: [newsletter:read]
       summary: Segments disponibles et nombre de destinataires
       security: [{ cookieAuth: [] }]
       responses:
@@ -3233,6 +3585,7 @@ paths:
     get:
       tags: [Admin — Newsletter]
       operationId: adminGetCampaign
+      x-permissions: [newsletter:read]
       summary: Campagne
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3247,6 +3600,7 @@ paths:
     patch:
       tags: [Admin — Newsletter]
       operationId: adminUpdateCampaign
+      x-permissions: [newsletter:write]
       summary: Modifier un brouillon
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3272,6 +3626,7 @@ paths:
     delete:
       tags: [Admin — Newsletter]
       operationId: adminDeleteCampaign
+      x-permissions: [newsletter:write]
       summary: Supprimer un brouillon
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3284,6 +3639,7 @@ paths:
     get:
       tags: [Admin — Newsletter]
       operationId: adminPreviewCampaign
+      x-permissions: [newsletter:read]
       summary: Rendu HTML réel de l'e-mail
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3299,6 +3655,7 @@ paths:
     post:
       tags: [Admin — Newsletter]
       operationId: adminTestCampaign
+      x-permissions: [newsletter:write]
       summary: Envoi de test à une adresse
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3324,6 +3681,7 @@ paths:
     post:
       tags: [Admin — Newsletter]
       operationId: adminScheduleCampaign
+      x-permissions: [newsletter:write]
       summary: Programmer l'envoi
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3350,6 +3708,7 @@ paths:
     post:
       tags: [Admin — Newsletter]
       operationId: adminCancelCampaign
+      x-permissions: [newsletter:write]
       summary: Annuler une campagne programmée (repasse en brouillon)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3366,6 +3725,7 @@ paths:
     post:
       tags: [Admin — Newsletter]
       operationId: adminSendCampaignNow
+      x-permissions: [newsletter:write]
       summary: Envoyer maintenant (par lots via la file d'attente)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3383,6 +3743,7 @@ paths:
     get:
       tags: [Admin — Paramètres]
       operationId: adminGetSettings
+      x-permissions: [settings:read]
       summary: Groupe de paramètres
       security: [{ cookieAuth: [] }]
       parameters:
@@ -3398,8 +3759,9 @@ paths:
     put:
       tags: [Admin — Paramètres]
       operationId: adminSaveSettings
+      x-permissions: [settings:write, settings:admin]
       summary: Enregistrer un groupe de paramètres (mise à jour partout sur le site)
-      description: Les groupes `analytics` et `securite` sont réservés aux administrateurs.
+      description: Les groupes `analytics` et `securite` demandent la permission `settings:admin` (administrateurs) ; les autres, `settings:write`.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters:
         - $ref: '#/components/parameters/SettingsGroupPath'
@@ -3422,6 +3784,7 @@ paths:
     get:
       tags: [Admin — Paramètres]
       operationId: adminGetSystemStatus
+      x-permissions: [settings:read]
       summary: Sauvegardes, HTTPS, version
       security: [{ cookieAuth: [] }]
       responses:
@@ -3436,6 +3799,7 @@ paths:
     get:
       tags: [Admin — Paramètres]
       operationId: adminListEmailTemplates
+      x-permissions: [settings:read]
       summary: E-mails automatiques
       security: [{ cookieAuth: [] }]
       responses:
@@ -3450,6 +3814,7 @@ paths:
     get:
       tags: [Admin — Paramètres]
       operationId: adminGetEmailTemplate
+      x-permissions: [settings:read]
       summary: Modèle d'e-mail
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/EmailTemplateKeyPath' }]
@@ -3464,6 +3829,7 @@ paths:
     put:
       tags: [Admin — Paramètres]
       operationId: adminSaveEmailTemplate
+      x-permissions: [settings:write]
       summary: Modifier un modèle (objet, titre, paragraphes, bouton, activation)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/EmailTemplateKeyPath' }]
@@ -3485,6 +3851,7 @@ paths:
     post:
       tags: [Admin — Paramètres]
       operationId: adminPreviewEmailTemplate
+      x-permissions: [settings:read]
       summary: Aperçu avec des données d'exemple (contenu non enregistré possible)
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/EmailTemplateKeyPath' }]
@@ -3504,6 +3871,7 @@ paths:
     post:
       tags: [Admin — Paramètres]
       operationId: adminTestEmailTemplate
+      x-permissions: [settings:write]
       summary: Envoi de test
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/EmailTemplateKeyPath' }]
@@ -3529,7 +3897,8 @@ paths:
     get:
       tags: [Admin — Utilisateurs]
       operationId: adminListUsers
-      summary: Utilisateurs du back-office (ADMIN)
+      x-permissions: [users:manage]
+      summary: Utilisateurs du back-office
       security: [{ cookieAuth: [] }]
       responses:
         '200':
@@ -3540,11 +3909,59 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
 
+  /v1/admin/users/presence:
+    get:
+      tags: [Admin — Utilisateurs]
+      operationId: adminGetUsersPresence
+      x-permissions: [team:read]
+      summary: Équipe connectée, dernière activité et dernière connexion
+      description: |
+        Membres actifs du back-office (statut `ACTIF`) : connectés d'abord (activité depuis moins de
+        `onlineWindowMinutes`), puis par dernière activité décroissante. L'activité est mise à jour par toute requête
+        authentifiée (au plus une écriture par minute et par session) ; une session révoquée ou expirée rend le membre
+        « hors ligne ». Sert aussi de liste des personnes assignables (`assignable`). Rafraîchissement conseillé : 60 s.
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Présence de l'équipe.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TeamPresence' }
+              examples:
+                default:
+                  summary: Deux membres connectés
+                  value: {"onlineWindowMinutes": 5, "onlineCount": 2, "generatedAt": "2026-10-25T09:30:00.000Z", "data": [{"user": {"id": "usr_mireille", "name": "Mireille Bell", "initials": "MB"}, "role": "ADMIN", "online": true, "lastActiveAt": "2026-10-25T09:29:00.000Z", "lastLoginAt": "2026-10-25T07:58:00.000Z", "assignable": true, "openTasks": 3}, {"user": {"id": "usr_paul", "name": "Paul Ngando", "initials": "PN"}, "role": "AGENT", "online": true, "lastActiveAt": "2026-10-25T09:27:00.000Z", "lastLoginAt": "2026-10-25T08:10:00.000Z", "assignable": true, "openTasks": 9}, {"user": {"id": "usr_carine", "name": "Carine Eboa", "initials": "CE"}, "role": "MANAGER", "online": false, "lastActiveAt": "2026-10-24T18:05:00.000Z", "lastLoginAt": "2026-10-24T07:45:00.000Z", "assignable": true, "openTasks": 4}, {"user": {"id": "usr_equipe", "name": "Équipe Douala", "initials": "ED"}, "role": "EDITOR", "online": false, "lastActiveAt": "2026-10-24T16:42:00.000Z", "lastLoginAt": "2026-10-24T08:02:00.000Z", "assignable": true, "openTasks": 2}, {"user": {"id": "usr_grace", "name": "Grace Nkongo", "initials": "GN"}, "role": "WRITER", "online": false, "lastActiveAt": "2026-10-20T15:12:00.000Z", "lastLoginAt": "2026-10-20T09:30:00.000Z", "assignable": false, "openTasks": 0}]}
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /v1/admin/roles:
+    get:
+      tags: [Admin — Utilisateurs]
+      operationId: adminListRoles
+      x-permissions: [team:read]
+      summary: Rôles du back-office et permissions associées
+      description: Libellés, périmètres et permissions de chaque rôle (choix du rôle à l'invitation, écran « Utilisateurs »).
+      security: [{ cookieAuth: [] }]
+      responses:
+        '200':
+          description: Rôles dans l'ordre d'affichage.
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/RoleDefinition' } }
+              examples:
+                default:
+                  summary: Les cinq rôles
+                  value: [{"role": "ADMIN", "label": "Administrateur·rice", "description": "Tout le back-office, paramètres sensibles, utilisateurs et journal compris.", "permissions": ["dashboard:read", "analytics:read", "team:read", "requests:read", "requests:write", "requests:assign", "requests:export", "requests:anonymize", "requests:revert-status", "appointments:read", "appointments:write", "appointments:assign", "availability:write", "applications:read", "applications:write", "contacts:read", "contacts:write", "contacts:export", "reviews:moderate", "content:read", "content:write", "media:write", "newsletter:read", "newsletter:write", "settings:read", "settings:write", "settings:admin", "users:manage", "audit:read"]}, {"role": "MANAGER", "label": "Responsable", "description": "Demandes, rendez-vous, assignation, candidatures, contacts et statistiques ; contenus en lecture.", "permissions": ["dashboard:read", "analytics:read", "team:read", "requests:read", "requests:write", "requests:assign", "requests:export", "requests:anonymize", "appointments:read", "appointments:write", "appointments:assign", "availability:write", "applications:read", "applications:write", "contacts:read", "contacts:write", "contacts:export", "reviews:moderate", "content:read", "newsletter:read", "settings:read"]}, {"role": "AGENT", "label": "Chargé·e de clientèle", "description": "Traite les demandes et rendez-vous qui lui sont assignés.", "permissions": ["dashboard:read", "requests:read-assigned", "requests:write-assigned", "appointments:read-assigned", "appointments:write-assigned"]}, {"role": "EDITOR", "label": "Éditeur·rice", "description": "Demandes et contenus (périmètre historique, inchangé).", "permissions": ["dashboard:read", "team:read", "requests:read", "requests:write", "requests:assign", "requests:export", "requests:anonymize", "appointments:read", "appointments:write", "appointments:assign", "availability:write", "applications:read", "applications:write", "contacts:read", "contacts:write", "contacts:export", "reviews:moderate", "content:read", "content:write", "media:write", "newsletter:read", "newsletter:write", "settings:read", "settings:write"]}, {"role": "WRITER", "label": "Rédacteur·rice", "description": "Contenus du site, magazine et médiathèque ; aucun accès aux demandes ni aux données personnelles.", "permissions": ["dashboard:read", "content:read", "content:write", "media:write"]}]
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
   /v1/admin/users/invite:
     post:
       tags: [Admin — Utilisateurs]
       operationId: adminInviteUser
+      x-permissions: [users:manage]
       summary: Inviter un utilisateur (lien valable 7 jours)
+      description: Le rôle détermine les permissions (voir `Role` et `GET /v1/admin/roles`).
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
         required: true
@@ -3572,6 +3989,7 @@ paths:
     patch:
       tags: [Admin — Utilisateurs]
       operationId: adminUpdateUser
+      x-permissions: [users:manage]
       summary: Modifier le rôle, désactiver / réactiver
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3603,6 +4021,7 @@ paths:
     delete:
       tags: [Admin — Utilisateurs]
       operationId: adminDeleteUser
+      x-permissions: [users:manage]
       summary: Supprimer un utilisateur
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3616,6 +4035,7 @@ paths:
     post:
       tags: [Admin — Utilisateurs]
       operationId: adminResetUserPassword
+      x-permissions: [users:manage]
       summary: Envoyer un lien de réinitialisation et révoquer les sessions
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3633,6 +4053,7 @@ paths:
     get:
       tags: [Admin — Médias]
       operationId: adminListMedia
+      x-permissions: [content:read]
       summary: Médiathèque
       security: [{ cookieAuth: [] }]
       parameters:
@@ -3654,6 +4075,7 @@ paths:
     post:
       tags: [Admin — Médias]
       operationId: adminUploadMedia
+      x-permissions: [media:write]
       summary: Envoyer une image (JPG, PNG, WebP, SVG assaini ; 10 Mo max)
       description: Génère les variantes WebP/AVIF 480/960/1600 en tâche de fond.
       security: [{ cookieAuth: [], csrfToken: [] }]
@@ -3690,6 +4112,7 @@ paths:
     patch:
       tags: [Admin — Médias]
       operationId: adminUpdateMedia
+      x-permissions: [media:write]
       summary: Texte alternatif et point focal
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3719,6 +4142,7 @@ paths:
     delete:
       tags: [Admin — Médias]
       operationId: adminDeleteMedia
+      x-permissions: [media:write]
       summary: Supprimer un média non utilisé
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
@@ -3738,6 +4162,7 @@ paths:
     get:
       tags: [Admin — Journal]
       operationId: adminListAuditLog
+      x-permissions: [audit:read]
       summary: Journal d'activité
       security: [{ cookieAuth: [] }]
       parameters:
@@ -3784,6 +4209,23 @@ components:
         Quartier (nom tel que dans `GET /v1/zones`, ex. `Bonapriso`) : contacts dont la ville commence par ce quartier
         (« Bonapriso, Douala »), sans tenir compte de la casse ni des accents.
       schema: { type: string, maxLength: 80, examples: [Bonapriso] }
+    Assignee:
+      name: assignee
+      in: query
+      description: |
+        Personne assignée : `me` (utilisateur connecté), `none` (non assigné) ou identifiant d'un utilisateur.
+      schema:
+        anyOf:
+          - { type: string, enum: [me, none] }
+          - $ref: '#/components/schemas/Id'
+        examples: [me]
+    Due:
+      name: due
+      in: query
+      description: |
+        Échéance des demandes ouvertes (`NOUVELLE`, `EN_COURS`) : `overdue` en retard, `today` à traiter aujourd'hui,
+        `week` dans les 7 prochains jours (fuseau `Africa/Douala`).
+      schema: { type: string, enum: [overdue, today, week] }
     Lang:
       name: lang
       in: query
@@ -4209,8 +4651,8 @@ components:
               oneOf: [{ $ref: '#/components/schemas/PhoneE164' }, { type: 'null' }]
               description: Téléphone de l'agence (carte « Douala » de la page Contact) ; vide = carte masquée.
             phoneDisplay: { type: [string, 'null'], examples: ['+237 6 00 00 00 00'] }
-            latitude: { type: [number, 'null'] }
-            longitude: { type: [number, 'null'] }
+            latitude: { type: [number, 'null'], minimum: -90, maximum: 90, description: "Latitude WGS84 de l'agence (repère de la carte interactive et de la page Contact)." }
+            longitude: { type: [number, 'null'], minimum: -180, maximum: 180, description: "Longitude WGS84 de l'agence." }
             mapsUrl: { type: [string, 'null'], format: uri }
             openingHours:
               type: array
@@ -4298,6 +4740,66 @@ components:
       description: Couleur de la zone sur la carte et dans la légende.
       enum: [zone1, zone2, zone3, special]
 
+    GeoPoint:
+      type: object
+      description: Point géographique WGS84 (EPSG:4326), en degrés décimaux (6 décimales au plus, ≈ 0,1 m).
+      required: [lat, lng]
+      properties:
+        lat: { type: number, minimum: -90, maximum: 90, examples: [4.0565] }
+        lng: { type: number, minimum: -180, maximum: 180, examples: [9.732] }
+
+    GeoJsonPosition:
+      type: array
+      description: 'Position GeoJSON `[longitude, latitude]` (ordre RFC 7946, inverse de `GeoPoint`).'
+      minItems: 2
+      maxItems: 2
+      items: { type: number }
+      examples: [[9.732, 4.0565]]
+
+    GeoJsonLinearRing:
+      type: array
+      description: Anneau fermé (premier point = dernier point), 4 à 500 positions ; extérieur dans le sens inverse des aiguilles d'une montre.
+      minItems: 4
+      maxItems: 500
+      items: { $ref: '#/components/schemas/GeoJsonPosition' }
+
+    GeoJsonPolygon:
+      type: object
+      required: [type, coordinates]
+      properties:
+        type: { type: string, const: Polygon }
+        coordinates:
+          type: array
+          description: Anneau extérieur puis éventuels trous.
+          minItems: 1
+          maxItems: 10
+          items: { $ref: '#/components/schemas/GeoJsonLinearRing' }
+
+    GeoJsonMultiPolygon:
+      type: object
+      required: [type, coordinates]
+      properties:
+        type: { type: string, const: MultiPolygon }
+        coordinates:
+          type: array
+          minItems: 1
+          maxItems: 20
+          items:
+            type: array
+            minItems: 1
+            maxItems: 10
+            items: { $ref: '#/components/schemas/GeoJsonLinearRing' }
+
+    ZoneArea:
+      description: |
+        Contour d'une zone sur la carte interactive (fond OpenStreetMap) : géométrie GeoJSON RFC 7946 `Polygon` ou
+        `MultiPolygon` (une zone en plusieurs morceaux, ex. de part et d'autre du Wouri), en WGS84. Directement
+        utilisable par `L.geoJSON()` (Leaflet) ou une source `geojson` (MapLibre), et importable depuis geojson.io ou uMap.
+        5 000 positions au plus par zone ; validée côté serveur (anneaux fermés, emprise du Cameroun).
+      oneOf:
+        - $ref: '#/components/schemas/GeoJsonPolygon'
+        - $ref: '#/components/schemas/GeoJsonMultiPolygon'
+
     ZoneQuarter:
       type: object
       required: [name]
@@ -4307,8 +4809,13 @@ components:
         mapLabel: { type: [string, 'null'], examples: [Cité SIC · base de départ], description: Libellé sur la carte ; null = nom. }
         isBase: { type: boolean, default: false, description: Base de départ des interventions (point mis en avant). }
         labelOnSmallMap: { type: boolean, default: false, description: "Libellé affiché sur la carte réduite (mobile) ; les autres apparaissent en zoomant." }
+        coordinates:
+          description: Position géographique du quartier (repère de la carte interactive OpenStreetMap) ; `null` = non placé.
+          oneOf:
+            - $ref: '#/components/schemas/GeoPoint'
+            - type: 'null'
         position:
-          description: Position sur la carte stylisée de Douala (0 à 1, origine en haut à gauche) ; null = absent de la carte.
+          description: Position sur la carte stylisée de Douala (0 à 1, origine en haut à gauche) ; null = absent de la carte. Conservée pour la carte illustrée.
           oneOf:
             - type: object
               required: [x, y]
@@ -4327,12 +4834,34 @@ components:
         description: { type: string, examples: [Quartiers résidentiels et périphérie.] }
         result: { type: string, description: Réponse affichée quand un quartier de la zone est recherché., examples: [Intervention à domicile et livraison possibles. Conditions confirmées sur devis.] }
         quarters: { type: array, items: { $ref: '#/components/schemas/ZoneQuarter' } }
+        area:
+          description: Contour de la zone sur la carte interactive ; `null` = pas de contour (seuls les quartiers sont placés).
+          oneOf:
+            - $ref: '#/components/schemas/ZoneArea'
+            - type: 'null'
 
     ServiceAreas:
       type: object
       required: [zones]
       properties:
         zones: { type: array, items: { $ref: '#/components/schemas/Zone' } }
+        map:
+          description: |
+            Cadrage initial de la carte interactive, calculé par l'API à partir des contours et des quartiers placés ;
+            `null` si aucune zone n'est géolocalisée. L'agence est placée avec `SiteSettings.agency.latitude/longitude`.
+          oneOf:
+            - type: object
+              required: [center, zoom, bounds]
+              properties:
+                center: { $ref: '#/components/schemas/GeoPoint' }
+                zoom: { type: number, minimum: 1, maximum: 19, examples: [12] }
+                bounds:
+                  type: array
+                  description: Emprise `[sud-ouest, nord-est]` couvrant zones et quartiers.
+                  minItems: 2
+                  maxItems: 2
+                  items: { $ref: '#/components/schemas/GeoPoint' }
+            - type: 'null'
         note: { type: [string, 'null'], examples: ["Votre quartier n’apparaît pas ? Contactez-nous : nous étudions chaque demande."] }
         updatedAt: { $ref: '#/components/schemas/DateTime' }
 
@@ -4435,6 +4964,139 @@ components:
             database: { type: string, enum: [up, down] }
             redis: { type: string, enum: [up, down] }
             storage: { type: string, enum: [up, down] }
+
+    # ─────────────────────────── Recherche ──────────────────────────
+    SearchResultType:
+      type: string
+      description: Libellés — Service, Rubrique, Page, Article du Magazine, Offre d'emploi, Formation.
+      enum: [service, category, page, article, job, training]
+
+    TextRange:
+      type: object
+      description: Plage d'un texte à surligner, en positions UTF-16 (`String.prototype.slice`), `end` exclu.
+      required: [start, end]
+      properties:
+        start: { type: integer, minimum: 0 }
+        end: { type: integer, minimum: 1 }
+
+    SearchResult:
+      type: object
+      required: [type, id, key, title, context, excerpt, titleHighlights, highlights, href, visual, icon]
+      properties:
+        type: { $ref: '#/components/schemas/SearchResultType' }
+        id: { $ref: '#/components/schemas/Id' }
+        key:
+          type: [string, 'null']
+          description: 'Slug du service, de la rubrique, de l''offre ou de la formation ; clé de page (`PageKey`) ; `null` pour un article.'
+          examples: [chef-prive]
+        title: { type: string }
+        context: { type: [string, 'null'], description: 'Précision affichée avec le titre : rubrique d''un service, thème d''un article, contrat et ville d''une offre…', examples: [Expérience] }
+        excerpt: { type: string, maxLength: 240, description: 'Extrait en texte brut, centré sur le premier passage trouvé (« … » s''il est coupé).' }
+        titleHighlights: { type: array, items: { $ref: '#/components/schemas/TextRange' }, description: Plages de `title` correspondant à la recherche. }
+        highlights: { type: array, items: { $ref: '#/components/schemas/TextRange' }, description: Plages de `excerpt` correspondant à la recherche. }
+        href:
+          type: string
+          maxLength: 500
+          description: |
+            Adresse interne française, comme partout dans le contrat ; le site la convertit dans la langue de la page
+            (`SiteLink`). Services `/services/{rubrique}/{service}`, rubriques `/services/{rubrique}`, offres
+            `/recrutement/{slug}`, formations `/formation#{slug}`, articles `/magazine#article-{id}`, pages : leur adresse.
+          examples: [/services/experience/chef-prive]
+        visual:
+          description: Photo ou illustration du contenu ; `null` pour une page sans visuel ou une offre d'emploi.
+          oneOf: [{ $ref: '#/components/schemas/Visual' }, { type: 'null' }]
+        icon:
+          description: Icône (rubriques, formations) ; `null` sinon.
+          oneOf: [{ $ref: '#/components/schemas/IconName' }, { type: 'null' }]
+
+    SearchGroup:
+      type: object
+      required: [type, label, total, items]
+      properties:
+        type: { $ref: '#/components/schemas/SearchResultType' }
+        label: { type: string, description: Titre du groupe dans la langue demandée., examples: [Services] }
+        total: { type: integer, minimum: 1, description: 'Nombre total de résultats du type (au-delà de `limit`).' }
+        items: { type: array, minItems: 1, items: { $ref: '#/components/schemas/SearchResult' } }
+
+    SearchResults:
+      type: object
+      required: [query, lang, total, groups]
+      properties:
+        query: { type: string, description: Texte recherché tel qu'interprété (espaces superflus retirés). }
+        lang: { type: string, enum: [fr, en] }
+        total: { type: integer, minimum: 0 }
+        groups: { type: array, items: { $ref: '#/components/schemas/SearchGroup' }, description: Groupes non vides ; aucun résultat = liste vide. }
+
+    # ─────────────────────── Mesure d'audience ──────────────────────
+    AnalyticsAction:
+      type: string
+      description: 'Action mesurée — `quote` Devis, `whatsapp` WhatsApp, `call` Appel, `email` E-mail, `participate` « Je participe », `newsletter` Inscription newsletter, `appointment` Rendez-vous, `sign_up` Inscription, `contact` Message de contact, `application` Candidature, `partner` Demande de partenariat, `training` Demande de formation.'
+      enum: [quote, whatsapp, call, email, participate, newsletter, appointment, sign_up, contact, application, partner, training]
+
+    AnalyticsEventBase:
+      type: object
+      required: [path, lang, occurredAt]
+      properties:
+        path:
+          type: string
+          maxLength: 300
+          pattern: '^/'
+          description: |
+            Adresse interne française de la page (sans préfixe de langue, paramètres ni ancre), ex.
+            `/services/experience/chef-prive` pour `/en/services/experience/private-chef`. Les adresses de
+            prévisualisation et du back-office sont ignorées.
+          examples: [/services/experience/chef-prive]
+        lang: { type: string, enum: [fr, en] }
+        occurredAt: { $ref: '#/components/schemas/DateTime' }
+        device: { type: string, enum: [mobile, tablet, desktop], description: 'Selon la largeur de la fenêtre (< 768, < 1280, au-delà).' }
+
+    AnalyticsPageView:
+      title: Page vue
+      allOf:
+        - $ref: '#/components/schemas/AnalyticsEventBase'
+        - type: object
+          required: [type]
+          properties:
+            type: { type: string, const: page_view }
+            referrerHost: { type: [string, 'null'], maxLength: 253, description: 'Domaine du site d''origine, sans chemin ; `null` = accès direct ou navigation interne.', examples: [www.google.com] }
+
+    AnalyticsActionEvent:
+      title: Action
+      allOf:
+        - $ref: '#/components/schemas/AnalyticsEventBase'
+        - type: object
+          required: [type, action]
+          properties:
+            type: { type: string, const: action }
+            action: { $ref: '#/components/schemas/AnalyticsAction' }
+            step: { type: string, enum: [click, submit], default: click, description: '`click` : clic sur le bouton ou le lien ; `submit` : formulaire envoyé avec succès.' }
+            target: { type: [string, 'null'], maxLength: 120, description: 'Contenu concerné : slug du service, de l''offre, de la formation ou de l''événement.', examples: [chef-prive] }
+            placement: { type: [string, 'null'], maxLength: 40, description: 'Emplacement du bouton : `header`, `hero`, `section`, `sticky`, `footer`, `form`…', examples: [hero] }
+
+    AnalyticsEvent:
+      oneOf:
+        - $ref: '#/components/schemas/AnalyticsPageView'
+        - $ref: '#/components/schemas/AnalyticsActionEvent'
+
+    AnalyticsEventBatch:
+      type: object
+      required: [consent, events]
+      properties:
+        consent: { type: boolean, description: Consentement « Mesure d'audience » donné dans le bandeau cookies. }
+        visitorId:
+          type: string
+          format: uuid
+          description: |
+            Identifiant pseudonyme aléatoire (UUID v4) généré et conservé par le navigateur, **uniquement si
+            `consent` vaut `true`** (sinon `422`) ; renouvelé si le consentement est retiré puis redonné, 13 mois au plus.
+        events: { type: array, minItems: 1, maxItems: 50, items: { $ref: '#/components/schemas/AnalyticsEvent' } }
+
+    AnalyticsBatchAccepted:
+      type: object
+      required: [accepted, rejected]
+      properties:
+        accepted: { type: integer, minimum: 0 }
+        rejected: { type: integer, minimum: 0, description: 'Événements ignorés (horodatage hors fenêtre, page exclue, doublon).' }
 
     # ─────────────────────────── Catalogue ──────────────────────────
     CategoryTint:
@@ -5104,11 +5766,137 @@ components:
     # ─────────────────────────── Authentification ───────────────────
     Role:
       type: string
-      enum: [ADMIN, EDITOR]
+      enum: [ADMIN, MANAGER, AGENT, EDITOR, WRITER]
+      description: |
+        Libellés — Administrateur·rice, Responsable, Chargé·e de clientèle, Éditeur·rice, Rédacteur·rice.
+
+        Matrice de référence rôle → permissions. La liste effective est toujours celle renvoyée par l'API
+        (`CurrentUser.permissions`, `GET /v1/admin/roles`) : le back-office ne code pas cette matrice en dur.
+        `ADMIN` et `EDITOR` conservent leurs droits antérieurs (`EDITOR` : « Demandes et contenus ») ; `WRITER` est
+        le rôle limité aux contenus. Les permissions `…-assigned` restreignent au périmètre des dossiers assignés.
+
+        | Permission | ADMIN | MANAGER | AGENT | EDITOR | WRITER |
+        |---|---|---|---|---|---|
+        | `dashboard:read` | ✓ | ✓ | ✓ | ✓ | ✓ |
+        | `analytics:read` | ✓ | ✓ |  |  |  |
+        | `team:read` | ✓ | ✓ |  | ✓ |  |
+        | `requests:read` | ✓ | ✓ |  | ✓ |  |
+        | `requests:read-assigned` |  |  | ✓ |  |  |
+        | `requests:write` | ✓ | ✓ |  | ✓ |  |
+        | `requests:write-assigned` |  |  | ✓ |  |  |
+        | `requests:assign` | ✓ | ✓ |  | ✓ |  |
+        | `requests:export` | ✓ | ✓ |  | ✓ |  |
+        | `requests:anonymize` | ✓ | ✓ |  | ✓ |  |
+        | `requests:revert-status` | ✓ |  |  |  |  |
+        | `appointments:read` | ✓ | ✓ |  | ✓ |  |
+        | `appointments:read-assigned` |  |  | ✓ |  |  |
+        | `appointments:write` | ✓ | ✓ |  | ✓ |  |
+        | `appointments:write-assigned` |  |  | ✓ |  |  |
+        | `appointments:assign` | ✓ | ✓ |  | ✓ |  |
+        | `availability:write` | ✓ | ✓ |  | ✓ |  |
+        | `applications:read` | ✓ | ✓ |  | ✓ |  |
+        | `applications:write` | ✓ | ✓ |  | ✓ |  |
+        | `contacts:read` | ✓ | ✓ |  | ✓ |  |
+        | `contacts:write` | ✓ | ✓ |  | ✓ |  |
+        | `contacts:export` | ✓ | ✓ |  | ✓ |  |
+        | `reviews:moderate` | ✓ | ✓ |  | ✓ |  |
+        | `content:read` | ✓ | ✓ |  | ✓ | ✓ |
+        | `content:write` | ✓ |  |  | ✓ | ✓ |
+        | `media:write` | ✓ |  |  | ✓ | ✓ |
+        | `newsletter:read` | ✓ | ✓ |  | ✓ |  |
+        | `newsletter:write` | ✓ |  |  | ✓ |  |
+        | `settings:read` | ✓ | ✓ |  | ✓ |  |
+        | `settings:write` | ✓ |  |  | ✓ |  |
+        | `settings:admin` | ✓ |  |  |  |  |
+        | `users:manage` | ✓ |  |  |  |  |
+        | `audit:read` | ✓ |  |  |  |  |
+
+    Permission:
+      type: string
+      description: |
+        Droit élémentaire du back-office (`domaine:action`). Chaque opération `/v1/admin` indique dans
+        `x-permissions` les permissions qui y donnent accès (une seule suffit).
+
+        - `dashboard:read` : Tableau de bord, « Mes tâches », notifications, compteurs et recherche du back-office ;
+        - `analytics:read` : Statistiques d'audience du site ;
+        - `team:read` : Équipe connectée, rôles et personnes assignables ;
+        - `requests:read` : Toutes les demandes (liste, détail, pièces jointes, demandes de formation) ;
+        - `requests:read-assigned` : Demandes assignées à soi uniquement ;
+        - `requests:write` : Statut, notes, échéance et duplication de toute demande ;
+        - `requests:write-assigned` : Statut, notes et échéance de ses demandes ;
+        - `requests:assign` : Assigner et réassigner les demandes ;
+        - `requests:export` : Export CSV des demandes ;
+        - `requests:anonymize` : Anonymisation d'une demande (RGPD) ;
+        - `requests:revert-status` : Retour arrière du statut d'une demande ;
+        - `appointments:read` : Tous les rendez-vous ;
+        - `appointments:read-assigned` : Rendez-vous assignés à soi uniquement ;
+        - `appointments:write` : Saisir, confirmer, déplacer, annuler, terminer tout rendez-vous ;
+        - `appointments:write-assigned` : Mêmes actions sur ses rendez-vous ;
+        - `appointments:assign` : Assigner et réassigner les rendez-vous ;
+        - `availability:write` : Disponibilités de la prise de rendez-vous ;
+        - `applications:read` : Candidatures et CV ;
+        - `applications:write` : Statut et notes des candidatures ;
+        - `contacts:read` : Contacts et inscrits ;
+        - `contacts:write` : Modifier ou effacer un contact (RGPD) ;
+        - `contacts:export` : Exports CSV et RGPD des contacts et abonnés ;
+        - `reviews:moderate` : Avis clients et questions du questionnaire ;
+        - `content:read` : Contenus du back-office : services, rubriques, pages, partenaires, formations, offres, magazine, zones, agenda, médiathèque ;
+        - `content:write` : Créer, modifier, publier et réordonner ces contenus ;
+        - `media:write` : Téléverser, modifier et supprimer des médias ;
+        - `newsletter:read` : Abonnés et campagnes ;
+        - `newsletter:write` : Campagnes (création, test, programmation, envoi), envoi du magazine, abonnés ;
+        - `settings:read` : Paramètres, modèles d'e-mails, état du système ;
+        - `settings:write` : Paramètres courants (coordonnées, WhatsApp, réseaux, e-mails, référencement, chiffres, RGPD) et modèles d'e-mails ;
+        - `settings:admin` : Paramètres sensibles (groupes `analytics` et `securite`) ;
+        - `users:manage` : Utilisateurs : invitation, rôle, désactivation, réinitialisation ;
+        - `audit:read` : Journal d'activité.
+      enum:
+        - dashboard:read
+        - analytics:read
+        - team:read
+        - requests:read
+        - requests:read-assigned
+        - requests:write
+        - requests:write-assigned
+        - requests:assign
+        - requests:export
+        - requests:anonymize
+        - requests:revert-status
+        - appointments:read
+        - appointments:read-assigned
+        - appointments:write
+        - appointments:write-assigned
+        - appointments:assign
+        - availability:write
+        - applications:read
+        - applications:write
+        - contacts:read
+        - contacts:write
+        - contacts:export
+        - reviews:moderate
+        - content:read
+        - content:write
+        - media:write
+        - newsletter:read
+        - newsletter:write
+        - settings:read
+        - settings:write
+        - settings:admin
+        - users:manage
+        - audit:read
+
+    RoleDefinition:
+      type: object
+      required: [role, label, description, permissions]
+      properties:
+        role: { $ref: '#/components/schemas/Role' }
+        label: { type: string, examples: [Responsable] }
+        description: { type: string }
+        permissions: { type: array, items: { $ref: '#/components/schemas/Permission' } }
 
     CurrentUser:
       type: object
-      required: [id, email, name, role]
+      required: [id, email, name, role, permissions]
       properties:
         id: { $ref: '#/components/schemas/Id' }
         email: { $ref: '#/components/schemas/Email' }
@@ -5116,6 +5904,10 @@ components:
         firstName: { type: string, examples: [Mireille] }
         initials: { type: string, examples: [MB] }
         role: { $ref: '#/components/schemas/Role' }
+        permissions:
+          type: array
+          description: Permissions du rôle, à utiliser pour adapter menus, actions et tableau de bord.
+          items: { $ref: '#/components/schemas/Permission' }
         lastLoginAt: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }] }
 
     LoginInput:
@@ -5195,7 +5987,7 @@ components:
       required: [id, kind, title, createdAt]
       properties:
         id: { $ref: '#/components/schemas/Id' }
-        kind: { type: string, enum: [REQUEST, APPOINTMENT, REVIEW, APPLICATION, PARTNERSHIP, REGISTRATION, SYSTEM] }
+        kind: { type: string, enum: [REQUEST, APPOINTMENT, REVIEW, APPLICATION, PARTNERSHIP, REGISTRATION, ASSIGNMENT, SYSTEM], description: '`ASSIGNMENT` : une demande ou un rendez-vous vient de vous être assigné.' }
         title: { type: string, examples: ['Nouvelle demande de devis — Chef privé (MP-2026-0142)'] }
         link: { type: [string, 'null'] }
         readAt: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }] }
@@ -5288,6 +6080,110 @@ components:
         reviews: { type: integer, description: Avis « À valider ». }
         applications: { type: integer, description: Candidatures « Nouveau ». }
 
+    MyTasks:
+      type: object
+      required: [generatedAt, requests, appointments, unassigned]
+      properties:
+        generatedAt: { $ref: '#/components/schemas/DateTime' }
+        requests:
+          type: object
+          required: [open, byStatus, overdue, dueToday, items]
+          properties:
+            open: { type: integer, minimum: 0, description: Demandes ouvertes assignées. }
+            byStatus:
+              type: object
+              required: [NOUVELLE, EN_COURS]
+              properties:
+                NOUVELLE: { type: integer, minimum: 0 }
+                EN_COURS: { type: integer, minimum: 0 }
+            overdue: { type: integer, minimum: 0 }
+            dueToday: { type: integer, minimum: 0 }
+            items: { type: array, maxItems: 10, items: { $ref: '#/components/schemas/RequestListItem' } }
+        appointments:
+          type: object
+          required: [today, toConfirm, upcoming]
+          properties:
+            today: { type: integer, minimum: 0, description: Rendez-vous confirmés du jour. }
+            toConfirm: { type: integer, minimum: 0 }
+            upcoming: { type: array, maxItems: 5, items: { $ref: '#/components/schemas/AdminAppointment' } }
+        unassigned: { type: [integer, 'null'], minimum: 0, description: Demandes ouvertes non assignées (permission `requests:assign`). }
+
+    # ─────────────────────── Admin — Statistiques ───────────────────
+    AnalyticsActionCount:
+      type: object
+      required: [action, count]
+      properties:
+        action: { $ref: '#/components/schemas/AnalyticsAction' }
+        label: { type: string, examples: [WhatsApp] }
+        count: { type: integer, minimum: 0 }
+        previous: { type: [integer, 'null'] }
+        deltaPercent: { type: [number, 'null'] }
+
+    AnalyticsSummary:
+      type: object
+      required: [period, from, to, generatedAt, totals, actions, series, topPages, actionsByPage, languages]
+      properties:
+        period: { type: string, enum: [7d, 30d, 90d] }
+        from: { type: string, format: date }
+        to: { type: string, format: date, description: Dernier jour inclus. }
+        generatedAt: { $ref: '#/components/schemas/DateTime' }
+        totals:
+          type: object
+          required: [visitors, pageViews, actions, consentRate]
+          properties:
+            visitors: { $ref: '#/components/schemas/Kpi', description: Visiteurs uniques (avec consentement). }
+            pageViews: { $ref: '#/components/schemas/Kpi' }
+            actions: { $ref: '#/components/schemas/Kpi', description: 'Clics et envois mesurés, toutes actions.' }
+            consentRate: { type: [number, 'null'], description: 'Part des pages vues avec consentement (0–100) ; `null` sans données.' }
+        actions:
+          type: array
+          description: Toutes les actions, de la plus fréquente à la moins fréquente (y compris à 0).
+          items: { $ref: '#/components/schemas/AnalyticsActionCount' }
+        series:
+          type: array
+          description: Un point par jour de la période.
+          items:
+            type: object
+            required: [date, visitors, pageViews, actions]
+            properties:
+              date: { type: string, format: date }
+              visitors: { type: integer, minimum: 0 }
+              pageViews: { type: integer, minimum: 0 }
+              actions: { type: integer, minimum: 0 }
+        topPages:
+          type: array
+          maxItems: 10
+          items:
+            type: object
+            required: [path, title, pageViews, visitors, actions]
+            properties:
+              path: { type: string, description: Adresse interne française de la page. }
+              title: { type: string }
+              pageViews: { type: integer, minimum: 0 }
+              visitors: { type: integer, minimum: 0 }
+              actions: { type: integer, minimum: 0 }
+        actionsByPage:
+          type: array
+          maxItems: 10
+          description: Pages générant le plus d'actions, avec le détail par action (actions à 0 omises).
+          items:
+            type: object
+            required: [path, title, total, byAction]
+            properties:
+              path: { type: string }
+              title: { type: string }
+              total: { type: integer, minimum: 0 }
+              byAction: { type: array, items: { $ref: '#/components/schemas/AnalyticsActionCount' } }
+        languages:
+          type: array
+          items:
+            type: object
+            required: [lang, pageViews, percent]
+            properties:
+              lang: { type: string, enum: [fr, en] }
+              pageViews: { type: integer, minimum: 0 }
+              percent: { type: number }
+
     # ─────────────────────────── Admin — Demandes ───────────────────
     RequestType:
       type: string
@@ -5347,6 +6243,10 @@ components:
         category: { oneOf: [{ $ref: '#/components/schemas/CategoryRef' }, { type: 'null' }] }
         subject: { type: [string, 'null'], description: 'Libellé court (service, formation, poste, événement…).' }
         assignedTo: { oneOf: [{ $ref: '#/components/schemas/UserRef' }, { type: 'null' }] }
+        dueAt:
+          description: Échéance de traitement (24 h après réception par défaut, modifiable) ; `null` = sans échéance.
+          oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }]
+        isOverdue: { type: boolean, description: 'Échéance dépassée alors que la demande est encore ouverte (`NOUVELLE`, `EN_COURS`).' }
         createdAt: { $ref: '#/components/schemas/DateTime' }
 
     RequestNote:
@@ -5770,6 +6670,7 @@ components:
         message: { type: [string, 'null'] }
         notes: { type: [string, 'null'] }
         reminderSentAt: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }] }
+        assignedTo: { oneOf: [{ $ref: '#/components/schemas/UserRef' }, { type: 'null' }], description: Personne chargée du rendez-vous. }
         createdAt: { $ref: '#/components/schemas/DateTime' }
 
     AdminAppointmentInput:
@@ -5785,6 +6686,7 @@ components:
         videoLink: { type: [string, 'null'], format: uri }
         notes: { type: [string, 'null'], maxLength: 2000 }
         notifyClient: { type: boolean, default: true }
+        assignedToId: { oneOf: [{ $ref: '#/components/schemas/Id' }, { type: 'null' }], description: Absent = l'utilisateur qui saisit le rendez-vous. }
 
     AppointmentAction:
       oneOf:
@@ -5819,6 +6721,12 @@ components:
           properties:
             action: { type: string, const: notes }
             notes: { type: [string, 'null'], maxLength: 2000 }
+        - type: object
+          title: Assigner
+          required: [action, assignedToId]
+          properties:
+            action: { type: string, const: assign }
+            assignedToId: { oneOf: [{ $ref: '#/components/schemas/Id' }, { type: 'null' }] }
 
     AvailabilityConfig:
       type: object
@@ -6206,7 +7114,12 @@ components:
         delay: { type: [string, 'null'], maxLength: 30, description: 'Délai moyen d''intervention ; `null` = « Sur devis ».', examples: [30–45 min] }
         fee: { oneOf: [{ $ref: '#/components/schemas/ZoneFee' }, { type: 'null' }] }
         active: { type: boolean, description: 'Zone affichée sur le site (carte, légende, recherche, formulaires).' }
-        quarters: { type: array, maxItems: 80, items: { $ref: '#/components/schemas/ZoneQuarter' } }
+        quarters: { type: array, maxItems: 80, items: { $ref: '#/components/schemas/ZoneQuarter' }, description: 'Chaque quartier peut recevoir ses coordonnées (`coordinates`), saisies sur la carte ou au clavier.' }
+        area:
+          description: Contour dessiné sur la carte ou importé (GeoJSON) ; `null` = supprimer le contour.
+          oneOf:
+            - $ref: '#/components/schemas/ZoneArea'
+            - type: 'null'
 
     ZoneInput:
       allOf:
@@ -6237,6 +7150,10 @@ components:
         fee: { oneOf: [{ $ref: '#/components/schemas/ZoneFee' }, { type: 'null' }] }
         active: { type: boolean }
         quarters: { type: array, items: { $ref: '#/components/schemas/ZoneQuarter' } }
+        area:
+          oneOf:
+            - $ref: '#/components/schemas/ZoneArea'
+            - type: 'null'
         requestsCount: { type: integer, description: 'Demandes des 12 derniers mois dont la ville commence par un quartier de la zone.' }
         sortOrder: { type: integer }
         updatedAt: { $ref: '#/components/schemas/DateTime' }
@@ -6560,6 +7477,7 @@ components:
       enum:
         - quote-ack
         - team-new-request
+        - team-assignment
         - contact-ack
         - appointment-received
         - appointment-confirmed
@@ -6626,7 +7544,31 @@ components:
         status: { type: string, enum: [ACTIF, INVITE, DESACTIVE] }
         invitedAt: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }] }
         lastLoginAt: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }] }
+        lastActiveAt:
+          description: Dernière requête authentifiée (mise à jour au plus une fois par minute).
+          oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }]
         createdAt: { $ref: '#/components/schemas/DateTime' }
+
+    TeamMemberPresence:
+      type: object
+      required: [user, role, online, lastActiveAt, lastLoginAt, assignable, openTasks]
+      properties:
+        user: { $ref: '#/components/schemas/UserRef' }
+        role: { $ref: '#/components/schemas/Role' }
+        online: { type: boolean, description: Activité depuis moins de `onlineWindowMinutes` sur une session encore valide. }
+        lastActiveAt: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }] }
+        lastLoginAt: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }] }
+        assignable: { type: boolean, description: 'Peut recevoir des demandes et des rendez-vous (`requests:read` ou `requests:read-assigned`).' }
+        openTasks: { type: integer, minimum: 0, description: 'Demandes ouvertes (`NOUVELLE`, `EN_COURS`) et rendez-vous à venir qui lui sont assignés.' }
+
+    TeamPresence:
+      type: object
+      required: [onlineWindowMinutes, onlineCount, generatedAt, data]
+      properties:
+        onlineWindowMinutes: { type: integer, examples: [5] }
+        onlineCount: { type: integer, minimum: 0 }
+        generatedAt: { $ref: '#/components/schemas/DateTime' }
+        data: { type: array, items: { $ref: '#/components/schemas/TeamMemberPresence' } }
 
     # ──────────────────────────── Admin — Médias ────────────────────
     Media:
@@ -7032,6 +7974,14 @@ components:
           ogImageUrl: null
         features: { maintenanceMode: false, newsletterTracking: false }
         updatedAt: '2026-10-05T08:00:00.000Z'
+
+    SearchResults:
+      summary: Recherche « chef »
+      value: {"query": "chef", "lang": "fr", "total": 6, "groups": [{"type": "service", "label": "Services", "total": 1, "items": [{"type": "service", "id": "svc_chef_prive", "key": "chef-prive", "title": "Chef privé", "context": "Expérience", "excerpt": "Un chef cuisine chez vous pour un dîner en famille, un anniversaire ou une réception : cuisine camerounaise, africaine ou internationale.", "titleHighlights": [{"start": 0, "end": 4}], "highlights": [{"start": 3, "end": 7}], "href": "/services/experience/chef-prive", "visual": {"illustration": "chef", "image": {"id": "photo-chef-2", "url": "/photos/chef-2.png", "width": 1536, "height": 1024, "variants": []}, "alt": ""}, "icon": null}]}, {"type": "category", "label": "Rubriques", "total": 1, "items": [{"type": "category", "id": "cat_experience", "key": "experience", "title": "Expérience", "context": "Rubrique · 5 services", "excerpt": "Voiture, chef privé, massage, photographe, événementiel.", "titleHighlights": [], "highlights": [{"start": 9, "end": 13}], "href": "/services/experience", "visual": {"illustration": "chef", "image": {"id": "photo-exp-hero", "url": "/photos/exp-hero.png", "width": 1280, "height": 960, "variants": []}, "alt": ""}, "icon": "Sparkles"}]}, {"type": "page", "label": "Pages", "total": 1, "items": [{"type": "page", "id": "page_qui_sommes_nous", "key": "qui-sommes-nous", "title": "Qui sommes-nous", "context": null, "excerpt": "… des prestataires triés sur le volet : chefs, chauffeurs, photographes et artisans de Douala, que nous connaissons personnellement.", "titleHighlights": [], "highlights": [{"start": 40, "end": 45}], "href": "/qui-sommes-nous", "visual": null, "icon": null}]}, {"type": "article", "label": "Magazine", "total": 2, "items": [{"type": "article", "id": "mag_art_2", "key": null, "title": "Recevoir à la camerounaise : les conseils d'un chef de Bonapriso", "context": "Art de vivre", "excerpt": "Ndolé, poisson braisé, beignets-haricots : un chef de Bonapriso partage ses astuces pour recevoir douze personnes sans stress.", "titleHighlights": [{"start": 47, "end": 51}], "highlights": [{"start": 46, "end": 50}], "href": "/magazine#article-mag_art_2", "visual": {"illustration": "marche", "image": null, "alt": ""}, "icon": null}, {"type": "article", "id": "mag_art_5", "key": null, "title": "Bien manger au quotidien à Douala", "context": "Santé et nutrition", "excerpt": "… les conseils de notre chef pour des repas équilibrés avec les produits du marché Sandaga.", "titleHighlights": [], "highlights": [{"start": 24, "end": 28}], "href": "/magazine#article-mag_art_5", "visual": {"illustration": "marche", "image": null, "alt": ""}, "icon": null}]}, {"type": "job", "label": "Offres d'emploi", "total": 1, "items": [{"type": "job", "id": "job_chef_domicile", "key": "chef-cuisinier-a-domicile", "title": "Chef cuisinier à domicile (H/F)", "context": "Freelance · Douala", "excerpt": "Vous cuisinez chez nos clients pour des dîners et des réceptions, à partir des menus validés avec eux.", "titleHighlights": [{"start": 0, "end": 4}], "highlights": [], "href": "/recrutement/chef-cuisinier-a-domicile", "visual": null, "icon": null}]}]}
+
+    SearchResultsEn:
+      summary: Recherche « chef » en anglais (`?lang=en`)
+      value: {"query": "chef", "lang": "en", "total": 5, "groups": [{"type": "service", "label": "Services", "total": 1, "items": [{"type": "service", "id": "svc_chef_prive", "key": "chef-prive", "title": "Private chef", "context": "Experience", "excerpt": "A chef cooks at your home for a family dinner, a birthday or a reception: Cameroonian, African or international cuisine.", "titleHighlights": [{"start": 8, "end": 12}], "highlights": [{"start": 2, "end": 6}], "href": "/services/experience/chef-prive", "visual": {"illustration": "chef", "image": {"id": "photo-chef-2", "url": "/photos/chef-2.png", "width": 1536, "height": 1024, "variants": []}, "alt": ""}, "icon": null}]}, {"type": "category", "label": "Categories", "total": 1, "items": [{"type": "category", "id": "cat_experience", "key": "experience", "title": "Experience", "context": "Category · 5 services", "excerpt": "Car, private chef, massage, photographer, events.", "titleHighlights": [], "highlights": [{"start": 13, "end": 17}], "href": "/services/experience", "visual": {"illustration": "chef", "image": {"id": "photo-exp-hero", "url": "/photos/exp-hero.png", "width": 1280, "height": 960, "variants": []}, "alt": ""}, "icon": "Sparkles"}]}, {"type": "page", "label": "Pages", "total": 1, "items": [{"type": "page", "id": "page_qui_sommes_nous", "key": "qui-sommes-nous", "title": "About us", "context": null, "excerpt": "… hand-picked professionals: chefs, drivers, photographers and craftspeople from Douala whom we know personally.", "titleHighlights": [], "highlights": [{"start": 29, "end": 34}], "href": "/qui-sommes-nous", "visual": null, "icon": null}]}, {"type": "article", "label": "Magazine", "total": 1, "items": [{"type": "article", "id": "mag_art_2", "key": null, "title": "Hosting the Cameroonian way: tips from a Bonapriso chef", "context": "Art of living", "excerpt": "Ndolé, grilled fish, beans and puff-puff: a Bonapriso chef shares his tips for hosting twelve people stress-free.", "titleHighlights": [{"start": 51, "end": 55}], "highlights": [{"start": 54, "end": 58}], "href": "/magazine#article-mag_art_2", "visual": {"illustration": "marche", "image": null, "alt": ""}, "icon": null}]}, {"type": "job", "label": "Jobs", "total": 1, "items": [{"type": "job", "id": "job_chef_domicile", "key": "chef-cuisinier-a-domicile", "title": "Home chef (M/F)", "context": "Freelance · Douala", "excerpt": "You cook in our clients’ homes for dinners and receptions, using menus agreed with them.", "titleHighlights": [{"start": 5, "end": 9}], "highlights": [], "href": "/recrutement/chef-cuisinier-a-domicile", "visual": null, "icon": null}]}]}
 
     SiteSettingsEn:
       summary: Paramètres en anglais (`?lang=en`)
@@ -7773,6 +8723,7 @@ components:
     ServiceAreas:
       summary: Zones d'intervention (maquette « Zones d'intervention »)
       value:
+        map: { center: { lat: 4.0565, lng: 9.7400 }, zoom: 12, bounds: [{ lat: 4.0000, lng: 9.6550 }, { lat: 4.1100, lng: 9.8150 }] }
         note: "Votre quartier n’apparaît pas ? Contactez-nous : nous étudions chaque demande. Délai moyen de livraison : 30 à 60 minutes selon le trafic."
         updatedAt: '2026-10-18T08:00:00.000Z'
         zones:
@@ -7781,49 +8732,54 @@ components:
             tone: zone1
             description: Autour de la base de Cité SIC.
             result: Intervention à domicile et livraison dans les meilleurs délais. Conditions confirmées sur devis.
+            area: { type: Polygon, coordinates: [[[9.7150, 4.0700], [9.7550, 4.0900], [9.7700, 4.0500], [9.7650, 4.0180], [9.7350, 4.0250], [9.7150, 4.0700]]] }
             quarters:
-              - { name: Cité SIC, mapLabel: Cité SIC · base de départ, isBase: true, labelOnSmallMap: true, position: { x: 0.5789, y: 0.5889 } }
-              - { name: Ndoghem, position: { x: 0.7895, y: 0.8370 } }
-              - { name: Bépanda, position: { x: 0.55, y: 0.4556 } }
-              - { name: Makèpè, position: { x: 0.6184, y: 0.3111 } }
-              - { name: Ndokoti, position: { x: 0.7105, y: 0.7407 } }
+              - { name: Cité SIC, mapLabel: Cité SIC · base de départ, isBase: true, labelOnSmallMap: true, coordinates: { lat: 4.0565, lng: 9.732 }, position: { x: 0.5789, y: 0.5889 } }
+              - { name: Ndoghem, coordinates: { lat: 4.0262, lng: 9.76 }, position: { x: 0.7895, y: 0.8370 } }
+              - { name: Bépanda, coordinates: { lat: 4.064, lng: 9.721 }, position: { x: 0.55, y: 0.4556 } }
+              - { name: Makèpè, coordinates: { lat: 4.083, lng: 9.752 }, position: { x: 0.6184, y: 0.3111 } }
+              - { name: Ndokoti, coordinates: { lat: 4.042, lng: 9.748 }, position: { x: 0.7105, y: 0.7407 } }
           - key: zone-2
             name: Zone 2 — Intermédiaire
             tone: zone2
             description: Centre-ville et quartiers voisins.
             result: Intervention à domicile et livraison possibles. Conditions confirmées sur devis.
+            area: null
             quarters:
-              - { name: Ndogbong, position: { x: 0.6947, y: 0.5556 } }
-              - { name: Cité des Palmiers, position: { x: 0.6289, y: 0.6704 } }
-              - { name: Akwa, labelOnSmallMap: true, position: { x: 0.4184, y: 0.6259 } }
-              - { name: New Bell, position: { x: 0.5158, y: 0.7963 } }
-              - { name: Deïdo, position: { x: 0.4368, y: 0.4963 } }
+              - { name: Ndogbong, coordinates: { lat: 4.052, lng: 9.746 }, position: { x: 0.6947, y: 0.5556 } }
+              - { name: Cité des Palmiers, coordinates: { lat: 4.038, lng: 9.739 }, position: { x: 0.6289, y: 0.6704 } }
+              - { name: Akwa, labelOnSmallMap: true, coordinates: { lat: 4.049, lng: 9.697 }, position: { x: 0.4184, y: 0.6259 } }
+              - { name: New Bell, coordinates: { lat: 4.035, lng: 9.712 }, position: { x: 0.5158, y: 0.7963 } }
+              - { name: Deïdo, coordinates: { lat: 4.062, lng: 9.7 }, position: { x: 0.4368, y: 0.4963 } }
           - key: zone-3
             name: Zone 3 — Élargie
             tone: zone3
             description: Quartiers résidentiels et périphérie.
             result: Intervention à domicile et livraison possibles. Conditions confirmées sur devis.
+            area: null
             quarters:
-              - { name: Bonamoussadi, labelOnSmallMap: true, position: { x: 0.6842, y: 0.1926 } }
-              - { name: Bonanjo, position: { x: 0.3763, y: 0.7593 } }
-              - { name: Bonapriso, position: { x: 0.3947, y: 0.8704 } }
-              - { name: Kotto, position: { x: 0.7763, y: 0.2963 } }
-              - { name: Yassa, labelOnSmallMap: true, position: { x: 0.9079, y: 0.8704 } }
-              - { name: Makea, position: { x: 0.8553, y: 0.4370 } }
-              - { name: PK14, position: { x: 0.9211, y: 0.6222 } }
-              - { name: Lendi, position: { x: 0.8053, y: 0.1370 } }
+              - { name: Bonamoussadi, labelOnSmallMap: true, coordinates: { lat: 4.093, lng: 9.74 }, position: { x: 0.6842, y: 0.1926 } }
+              - { name: Bonanjo, coordinates: { lat: 4.034, lng: 9.69 }, position: { x: 0.3763, y: 0.7593 } }
+              - { name: Bonapriso, coordinates: { lat: 4.023, lng: 9.695 }, position: { x: 0.3947, y: 0.8704 } }
+              - { name: Kotto, coordinates: { lat: 4.08, lng: 9.763 }, position: { x: 0.7763, y: 0.2963 } }
+              - { name: Yassa, labelOnSmallMap: true, coordinates: { lat: 4.008, lng: 9.8 }, position: { x: 0.9079, y: 0.8704 } }
+              - { name: Makea, coordinates: { lat: 4.06, lng: 9.77 }, position: { x: 0.8553, y: 0.4370 } }
+              - { name: PK14, coordinates: { lat: 4.04, lng: 9.81 }, position: { x: 0.9211, y: 0.6222 } }
+              - { name: Lendi, coordinates: { lat: 4.105, lng: 9.755 }, position: { x: 0.8053, y: 0.1370 } }
           - key: zone-speciale
             name: Zone spéciale
             tone: special
             description: Intervention possible, sur devis.
             result: Intervention possible selon votre demande. Conditions et délais confirmés sur devis.
+            area: null
             quarters:
-              - { name: Bonabéri, detail: rive ouest du Wouri, labelOnSmallMap: true, position: { x: 0.1211, y: 0.4630 } }
-              - { name: Autres quartiers hors zone, position: null }
+              - { name: Bonabéri, detail: rive ouest du Wouri, labelOnSmallMap: true, coordinates: { lat: 4.073, lng: 9.662 }, position: { x: 0.1211, y: 0.4630 } }
+              - { name: Autres quartiers hors zone, coordinates: null, position: null }
 
     ServiceAreasEn:
       summary: Zones d'intervention en anglais (`?lang=en`)
       value:
+        map: { center: { lat: 4.0565, lng: 9.7400 }, zoom: 12, bounds: [{ lat: 4.0000, lng: 9.6550 }, { lat: 4.1100, lng: 9.8150 }] }
         note: "Can’t find your neighbourhood? Contact us: we look at every request. Average delivery time: 30 to 60 minutes depending on traffic."
         updatedAt: '2026-10-18T08:00:00.000Z'
         zones:
@@ -7832,45 +8788,49 @@ components:
             tone: zone1
             description: Around our Cité SIC base.
             result: Home visits and delivery as quickly as possible. Terms confirmed in the quote.
+            area: { type: Polygon, coordinates: [[[9.7150, 4.0700], [9.7550, 4.0900], [9.7700, 4.0500], [9.7650, 4.0180], [9.7350, 4.0250], [9.7150, 4.0700]]] }
             quarters:
-              - { name: Cité SIC, mapLabel: Cité SIC · starting base, isBase: true, labelOnSmallMap: true, position: { x: 0.5789, y: 0.5889 } }
-              - { name: Ndoghem, position: { x: 0.7895, y: 0.8370 } }
-              - { name: Bépanda, position: { x: 0.55, y: 0.4556 } }
-              - { name: Makèpè, position: { x: 0.6184, y: 0.3111 } }
-              - { name: Ndokoti, position: { x: 0.7105, y: 0.7407 } }
+              - { name: Cité SIC, mapLabel: Cité SIC · starting base, isBase: true, labelOnSmallMap: true, coordinates: { lat: 4.0565, lng: 9.732 }, position: { x: 0.5789, y: 0.5889 } }
+              - { name: Ndoghem, coordinates: { lat: 4.0262, lng: 9.76 }, position: { x: 0.7895, y: 0.8370 } }
+              - { name: Bépanda, coordinates: { lat: 4.064, lng: 9.721 }, position: { x: 0.55, y: 0.4556 } }
+              - { name: Makèpè, coordinates: { lat: 4.083, lng: 9.752 }, position: { x: 0.6184, y: 0.3111 } }
+              - { name: Ndokoti, coordinates: { lat: 4.042, lng: 9.748 }, position: { x: 0.7105, y: 0.7407 } }
           - key: zone-2
             name: Zone 2 — Intermediate
             tone: zone2
             description: City centre and neighbouring districts.
             result: Home visits and delivery available. Terms confirmed in the quote.
+            area: null
             quarters:
-              - { name: Ndogbong, position: { x: 0.6947, y: 0.5556 } }
-              - { name: Cité des Palmiers, position: { x: 0.6289, y: 0.6704 } }
-              - { name: Akwa, labelOnSmallMap: true, position: { x: 0.4184, y: 0.6259 } }
-              - { name: New Bell, position: { x: 0.5158, y: 0.7963 } }
-              - { name: Deïdo, position: { x: 0.4368, y: 0.4963 } }
+              - { name: Ndogbong, coordinates: { lat: 4.052, lng: 9.746 }, position: { x: 0.6947, y: 0.5556 } }
+              - { name: Cité des Palmiers, coordinates: { lat: 4.038, lng: 9.739 }, position: { x: 0.6289, y: 0.6704 } }
+              - { name: Akwa, labelOnSmallMap: true, coordinates: { lat: 4.049, lng: 9.697 }, position: { x: 0.4184, y: 0.6259 } }
+              - { name: New Bell, coordinates: { lat: 4.035, lng: 9.712 }, position: { x: 0.5158, y: 0.7963 } }
+              - { name: Deïdo, coordinates: { lat: 4.062, lng: 9.7 }, position: { x: 0.4368, y: 0.4963 } }
           - key: zone-3
             name: Zone 3 — Extended
             tone: zone3
             description: Residential areas and outskirts.
             result: Home visits and delivery available. Terms confirmed in the quote.
+            area: null
             quarters:
-              - { name: Bonamoussadi, labelOnSmallMap: true, position: { x: 0.6842, y: 0.1926 } }
-              - { name: Bonanjo, position: { x: 0.3763, y: 0.7593 } }
-              - { name: Bonapriso, position: { x: 0.3947, y: 0.8704 } }
-              - { name: Kotto, position: { x: 0.7763, y: 0.2963 } }
-              - { name: Yassa, labelOnSmallMap: true, position: { x: 0.9079, y: 0.8704 } }
-              - { name: Makea, position: { x: 0.8553, y: 0.4370 } }
-              - { name: PK14, position: { x: 0.9211, y: 0.6222 } }
-              - { name: Lendi, position: { x: 0.8053, y: 0.1370 } }
+              - { name: Bonamoussadi, labelOnSmallMap: true, coordinates: { lat: 4.093, lng: 9.74 }, position: { x: 0.6842, y: 0.1926 } }
+              - { name: Bonanjo, coordinates: { lat: 4.034, lng: 9.69 }, position: { x: 0.3763, y: 0.7593 } }
+              - { name: Bonapriso, coordinates: { lat: 4.023, lng: 9.695 }, position: { x: 0.3947, y: 0.8704 } }
+              - { name: Kotto, coordinates: { lat: 4.08, lng: 9.763 }, position: { x: 0.7763, y: 0.2963 } }
+              - { name: Yassa, labelOnSmallMap: true, coordinates: { lat: 4.008, lng: 9.8 }, position: { x: 0.9079, y: 0.8704 } }
+              - { name: Makea, coordinates: { lat: 4.06, lng: 9.77 }, position: { x: 0.8553, y: 0.4370 } }
+              - { name: PK14, coordinates: { lat: 4.04, lng: 9.81 }, position: { x: 0.9211, y: 0.6222 } }
+              - { name: Lendi, coordinates: { lat: 4.105, lng: 9.755 }, position: { x: 0.8053, y: 0.1370 } }
           - key: zone-speciale
             name: Special zone
             tone: special
             description: Visits possible, on quotation.
             result: Visits possible depending on your request. Terms and timing confirmed in the quote.
+            area: null
             quarters:
-              - { name: Bonabéri, detail: west bank of the Wouri, labelOnSmallMap: true, position: { x: 0.1211, y: 0.4630 } }
-              - { name: Other areas outside the zones, position: null }
+              - { name: Bonabéri, detail: west bank of the Wouri, labelOnSmallMap: true, coordinates: { lat: 4.073, lng: 9.662 }, position: { x: 0.1211, y: 0.4630 } }
+              - { name: Other areas outside the zones, coordinates: null, position: null }
 
     CategoryExperience:
       summary: Rubrique Expérience
@@ -8359,6 +9319,8 @@ components:
             category: { slug: experience, name: Expérience }
             subject: Chef privé
             assignedTo: null
+            dueAt: '2026-10-06T08:12:00.000Z'
+            isOverdue: false
             createdAt: '2026-10-05T08:12:00.000Z'
         meta: { page: 1, pageSize: 8, total: 58, totalPages: 8 }
         counts: { ALL: 58, NOUVELLE: 12, EN_COURS: 18, PRESTATION_REALISEE: 21, CLOTUREE: 7 }
@@ -8375,6 +9337,8 @@ components:
         category: { slug: experience, name: Expérience }
         subject: Chef privé
         assignedTo: null
+        dueAt: '2026-10-06T08:12:00.000Z'
+        isOverdue: false
         createdAt: '2026-10-05T08:12:00.000Z'
         contactPreference: WHATSAPP
         message: Dîner pour les 60 ans de ma mère, cuisine camerounaise revisitée, un invité végétarien.
@@ -8454,9 +9418,10 @@ components:
             delay: 30–45 min
             fee: { amount: 1500, currency: XAF, from: false }
             active: true
+            area: { type: Polygon, coordinates: [[[9.7150, 4.0700], [9.7550, 4.0900], [9.7700, 4.0500], [9.7650, 4.0180], [9.7350, 4.0250], [9.7150, 4.0700]]] }
             quarters:
-              - { name: Cité SIC, mapLabel: Cité SIC · base de départ, isBase: true, labelOnSmallMap: true, position: { x: 0.5789, y: 0.5889 } }
-              - { name: Ndoghem, position: { x: 0.7895, y: 0.8370 } }
+              - { name: Cité SIC, mapLabel: Cité SIC · base de départ, isBase: true, labelOnSmallMap: true, coordinates: { lat: 4.0565, lng: 9.732 }, position: { x: 0.5789, y: 0.5889 } }
+              - { name: Ndoghem, coordinates: { lat: 4.0262, lng: 9.76 }, position: { x: 0.7895, y: 0.8370 } }
             requestsCount: 41
             sortOrder: 0
             updatedAt: '2026-10-18T08:00:00.000Z'
@@ -8472,9 +9437,10 @@ components:
             delay: null
             fee: { amount: 3500, currency: XAF, from: true }
             active: true
+            area: null
             quarters:
-              - { name: Bonabéri, detail: rive ouest du Wouri, labelOnSmallMap: true, position: { x: 0.1211, y: 0.4630 } }
-              - { name: Autres quartiers hors zone, position: null }
+              - { name: Bonabéri, detail: rive ouest du Wouri, labelOnSmallMap: true, coordinates: { lat: 4.073, lng: 9.662 }, position: { x: 0.1211, y: 0.4630 } }
+              - { name: Autres quartiers hors zone, coordinates: null, position: null }
             requestsCount: 3
             sortOrder: 3
             updatedAt: '2026-10-18T08:00:00.000Z'
@@ -8517,9 +9483,9 @@ components:
       summary: Semaine du 5 octobre
       value:
         data:
-          - { id: apt_1, reference: MP-2026-0139, contact: { id: ctc_ruth, fullName: Ruth Abena, initials: RA, email: ruth.a@example.com, phone: '+32470000000', country: BE, city: Bruxelles, profile: PARTICULIER }, reason: IMMOBILIER, format: VISIO, startsAt: '2026-10-06T08:00:00.000Z', endsAt: '2026-10-06T09:30:00.000Z', status: CONFIRME, proposedStartsAt: null, location: null, videoLink: 'https://meet.example.com/mambo-ruth', message: null, notes: null, reminderSentAt: null, createdAt: '2026-10-02T10:00:00.000Z' }
+          - { id: apt_1, reference: MP-2026-0139, contact: { id: ctc_ruth, fullName: Ruth Abena, initials: RA, email: ruth.a@example.com, phone: '+32470000000', country: BE, city: Bruxelles, profile: PARTICULIER }, reason: IMMOBILIER, format: VISIO, startsAt: '2026-10-06T08:00:00.000Z', endsAt: '2026-10-06T09:30:00.000Z', status: CONFIRME, proposedStartsAt: null, location: null, videoLink: 'https://meet.example.com/mambo-ruth', message: null, notes: null, reminderSentAt: null, assignedTo: { id: usr_mireille, name: Mireille Bell, initials: MB }, createdAt: '2026-10-02T10:00:00.000Z' }
         pending:
-          - { id: apt_2, reference: MP-2026-0143, contact: { id: ctc_aminata, fullName: Aminata Diallo, initials: AD, email: aminata.diallo@example.com, phone: '+237600000000', country: CM, city: Douala, profile: PARTICULIER }, reason: DEVIS, format: AGENCE, startsAt: '2026-10-08T13:00:00.000Z', endsAt: '2026-10-08T14:30:00.000Z', status: A_CONFIRMER, proposedStartsAt: null, location: null, videoLink: null, message: "Je souhaite parler d'un dîner pour 12 personnes en décembre.", notes: null, reminderSentAt: null, createdAt: '2026-10-05T07:30:00.000Z' }
+          - { id: apt_2, reference: MP-2026-0143, contact: { id: ctc_aminata, fullName: Aminata Diallo, initials: AD, email: aminata.diallo@example.com, phone: '+237600000000', country: CM, city: Douala, profile: PARTICULIER }, reason: DEVIS, format: AGENCE, startsAt: '2026-10-08T13:00:00.000Z', endsAt: '2026-10-08T14:30:00.000Z', status: A_CONFIRMER, proposedStartsAt: null, location: null, videoLink: null, message: "Je souhaite parler d'un dîner pour 12 personnes en décembre.", notes: null, reminderSentAt: null, assignedTo: null, createdAt: '2026-10-05T07:30:00.000Z' }
 
     AvailabilityConfig:
       summary: Disponibilités par défaut
