@@ -1,0 +1,1681 @@
+// Modèle de données de l'API MAMBO Proxi (PostgreSQL).
+// Source de vérité des échanges : contracts/openapi.yaml. Documentation : docs/MODELE_DE_DONNEES.md.
+//
+// Conventions appliquées partout :
+// - identifiants `cuid(2)` ; `createdAt` / `updatedAt` en `timestamptz` (UTC) ;
+// - tables et colonnes en snake_case (`@@map` / `@map`), champs Prisma en camelCase comme le JSON du contrat ;
+// - le français est la langue de référence des colonnes ordinaires. Traductions anglaises (`?lang=en`) :
+//   · colonnes `…En` pour les modèles dont le contrat édite déjà les champs `…En` (zones, quartiers, magazine) ;
+//   · ailleurs, colonne `translations` (JSON) `{ "en": { "<champ>": <valeur> } }` : recouvrement partiel des
+//     champs traduisibles, de même forme que le champ français (y compris les champs JSON structurés). Un champ
+//     absent est renvoyé en français, comme le prévoit le contrat. Ce choix évite de doubler une quarantaine de
+//     colonnes, dont beaucoup sont déjà des structures JSON (étapes, FAQ, sections de pages), et reste extensible ;
+// - aucun prix des prestations n'est stocké (devis uniquement) ;
+// - `isDemo` marque les données de démonstration supprimées par `pnpm db:purge-demo`.
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  runtime             = "nodejs"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ═══════════════════════════════════════════ Énumérations ═══════════════════════════════════════════
+
+/// Rôles du back-office (matrice rôle → permissions décrite par le schéma `Role` du contrat, appliquée par l'API).
+enum Role {
+  ADMIN
+  MANAGER
+  AGENT
+  EDITOR
+  WRITER
+}
+
+/// Statut de publication des contenus.
+enum PublishStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+/// Langue d'un contenu, d'un abonné ou d'une mesure d'audience.
+enum Language {
+  FR @map("fr")
+  EN @map("en")
+}
+
+enum RequestType {
+  DEVIS
+  CONTACT
+  INFORMATION
+  INSCRIPTION
+  FORMATION
+  CANDIDATURE
+  PARTENARIAT
+  EVENEMENT
+  RENDEZ_VOUS
+}
+
+/// Nouvelle → En cours → Prestation réalisée → Clôturée (retour arrière réservé à `requests:revert-status`).
+enum RequestStatus {
+  NOUVELLE
+  EN_COURS
+  PRESTATION_REALISEE
+  CLOTUREE
+}
+
+enum RequestEventKind {
+  RECEIVED
+  ACK_SENT
+  TEAM_ALERT_SENT
+  STATUS_CHANGED
+  ASSIGNED
+  NOTE_ADDED
+  SURVEY_SCHEDULED
+  SURVEY_SENT
+  SURVEY_REMINDED
+  SURVEY_ANSWERED
+  EMAIL_SENT
+  ANONYMIZED
+  DUPLICATED
+}
+
+enum ContactProfile {
+  PARTICULIER
+  PROFESSIONNEL
+}
+
+enum ContactPreference {
+  WHATSAPP
+  TELEPHONE
+  EMAIL
+}
+
+enum PartnershipType {
+  PRESTATAIRE_EXPERIENCE
+  IMMOBILIER
+  ENTREPRISE_PRESTATAIRE
+  AUTRE
+}
+
+enum AppointmentStatus {
+  A_CONFIRMER
+  CONFIRME
+  AUTRE_CRENEAU_PROPOSE
+  ANNULE
+  TERMINE
+}
+
+enum AppointmentFormat {
+  AGENCE
+  TELEPHONE
+  VISIO
+}
+
+enum AppointmentReason {
+  DEVIS
+  IMMOBILIER
+  PARTENARIAT
+  RECRUTEMENT
+  AUTRE
+}
+
+enum ReviewStatus {
+  A_VALIDER
+  PUBLIE
+  MASQUE
+}
+
+enum SurveyQuestionKind {
+  STARS
+  CHOICE
+  NPS
+  TEXT
+}
+
+/// État de l'invitation au questionnaire (`RequestDetail.survey.status`).
+enum SurveyStatus {
+  SCHEDULED
+  SENT
+  REMINDED
+  ANSWERED
+  EXPIRED
+}
+
+enum ApplicationStatus {
+  NOUVEAU
+  LU
+  RETENU
+  REFUSE
+}
+
+enum CampaignStatus {
+  BROUILLON
+  PROGRAMMEE
+  EN_COURS_ENVOI
+  ENVOYEE
+  ANNULEE
+}
+
+enum CampaignSegmentKind {
+  ALL
+  FRANCE
+  CAMEROUN
+  PROFESSIONNELS
+  TAGS
+}
+
+enum SubscriberStatus {
+  EN_ATTENTE
+  CONFIRME
+  DESINSCRIT
+}
+
+/// Formulaire d'origine d'une inscription à la newsletter.
+enum SubscriberSource {
+  FOOTER      @map("footer")
+  SUIVI_MAMBO @map("suivi-mambo")
+  INSCRIPTION @map("inscription")
+  AUTRE       @map("autre")
+}
+
+/// État d'un envoi individuel de campagne.
+enum DeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+  BOUNCED
+}
+
+enum CategoryTint {
+  ORANGE_50   @map("orange-50")
+  NEUTRAL_100 @map("neutral-100")
+  VERT_50     @map("vert-50")
+  NEUTRAL_900 @map("neutral-900")
+}
+
+/// Scène illustrée provisoire affichée tant qu'aucune photo n'est fournie.
+enum IllustrationScene {
+  accueil
+  chef
+  colis
+  courses
+  culture
+  equipe
+  evenement
+  formation
+  livraison
+  logement
+  marche
+  massage
+  photo
+  portrait
+  voiture
+}
+
+/// `FORMULA` : formule de la rubrique « Services à domicile ».
+enum ServiceKind {
+  SERVICE
+  FORMULA
+}
+
+/// Action principale d'une carte du carrousel « Nos offres ».
+enum OfferAction {
+  QUOTE
+  BOOKING
+}
+
+enum ZoneTone {
+  zone1
+  zone2
+  zone3
+  special
+}
+
+enum Currency {
+  XAF
+  EUR
+}
+
+enum SalaryPeriod {
+  HOUR
+  DAY
+  WEEK
+  MONTH
+  YEAR
+}
+
+enum PartnerCategory {
+  EXPERIENCE
+  IMMOBILIER
+  ENTREPRISES
+}
+
+enum TrainingCategory {
+  PROFESSIONNELS
+  ATELIERS
+  SENSIBILISATION
+}
+
+enum MagazineEditionStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum NotificationKind {
+  REQUEST
+  APPOINTMENT
+  REVIEW
+  APPLICATION
+  PARTNERSHIP
+  REGISTRATION
+  ASSIGNMENT
+  SYSTEM
+}
+
+/// Groupe d'une page dans la liste du back-office.
+enum PageGroup {
+  principales
+  formulaires
+  legales
+  systeme
+}
+
+enum MediaStatus {
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum MediaMimeType {
+  JPEG @map("image/jpeg")
+  PNG  @map("image/png")
+  WEBP @map("image/webp")
+  SVG  @map("image/svg+xml")
+}
+
+enum AttachmentKind {
+  CV
+  OTHER
+}
+
+/// Résultat de l'analyse antivirus facultative (ClamAV).
+enum ScanStatus {
+  PENDING
+  CLEAN
+  INFECTED
+  SKIPPED
+}
+
+enum AnalyticsAction {
+  QUOTE       @map("quote")
+  WHATSAPP    @map("whatsapp")
+  CALL        @map("call")
+  EMAIL       @map("email")
+  PARTICIPATE @map("participate")
+  NEWSLETTER  @map("newsletter")
+  APPOINTMENT @map("appointment")
+  SIGN_UP     @map("sign_up")
+  CONTACT     @map("contact")
+  APPLICATION @map("application")
+  PARTNER     @map("partner")
+  TRAINING    @map("training")
+}
+
+enum AnalyticsStep {
+  CLICK  @map("click")
+  SUBMIT @map("submit")
+}
+
+/// Type d'appareil déduit de la largeur de fenêtre ; `UNKNOWN` si non transmis.
+enum Device {
+  MOBILE  @map("mobile")
+  TABLET  @map("tablet")
+  DESKTOP @map("desktop")
+  UNKNOWN @map("unknown")
+}
+
+/// État d'une tâche technique (revalidation, sauvegarde).
+enum TaskStatus {
+  PENDING
+  RUNNING
+  SUCCEEDED
+  FAILED
+}
+
+// ═══════════════════════════════════════ Utilisateurs & sécurité ═══════════════════════════════════════
+
+/// Utilisateur du back-office. Statut affiché dérivé : `INVITE` (pas encore de mot de passe), `ACTIF`,
+/// `DESACTIVE` (`isActive = false`). Un utilisateur ayant un historique (notes, événements) est désactivé plutôt
+/// que supprimé ; le dernier administrateur actif ne peut être ni rétrogradé ni désactivé (409).
+model User {
+  id                String    @id @default(cuid(2))
+  email             String    @unique /// Stockée en minuscules.
+  name              String
+  role              Role      @default(EDITOR)
+  passwordHash      String?   @map("password_hash") /// argon2id ; null tant que l'invitation n'est pas acceptée.
+  isActive          Boolean   @default(true) @map("is_active")
+  invitedAt         DateTime? @map("invited_at") @db.Timestamptz(3)
+  invitedById       String?   @map("invited_by_id")
+  activatedAt       DateTime? @map("activated_at") @db.Timestamptz(3)
+  lastLoginAt       DateTime? @map("last_login_at") @db.Timestamptz(3)
+  lastActiveAt      DateTime? @map("last_active_at") @db.Timestamptz(3) /// Dernière requête authentifiée (écrite au plus une fois par minute).
+  failedLoginCount  Int       @default(0) @map("failed_login_count") /// Verrouillage progressif.
+  lockedUntil       DateTime? @map("locked_until") @db.Timestamptz(3)
+  passwordChangedAt DateTime? @map("password_changed_at") @db.Timestamptz(3)
+  isDemo            Boolean   @default(false) @map("is_demo")
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  invitedBy             User?           @relation("UserInvitedBy", fields: [invitedById], references: [id], onDelete: SetNull)
+  invitedUsers          User[]          @relation("UserInvitedBy")
+  sessions              Session[]
+  trustedDevices        TrustedDevice[]
+  otpChallenges         OtpChallenge[]
+  passwordResets        PasswordReset[]
+  invitations           Invitation[]    @relation("InvitationUser")
+  sentInvitations       Invitation[]    @relation("InvitationSender")
+  notifications         Notification[]
+  auditLogs             AuditLog[]
+  assignedRequests      Request[]       @relation("RequestAssignee")
+  requestNotes          RequestNote[]
+  requestEvents         RequestEvent[]
+  assignedAppointments  Appointment[]   @relation("AppointmentAssignee")
+  createdAppointments   Appointment[]   @relation("AppointmentCreator")
+  reviewReplies         Review[]        @relation("ReviewReplier")
+  updatedPages          Page[]          @relation("PageUpdater")
+  publishedPages        Page[]          @relation("PagePublisher")
+  uploadedMedia         Media[]
+  createdCampaigns      Campaign[]
+  updatedSettings       Setting[]
+  updatedEmailTemplates EmailTemplate[]
+
+  @@index([role, isActive])
+  @@index([lastActiveAt])
+  @@map("users")
+}
+
+/// Session du back-office (jeton de rafraîchissement rotatif, 7 jours ou 30 avec « Rester connecté »).
+/// Seul le condensat du jeton est stocké ; `replacedById` chaîne les rotations pour détecter la réutilisation.
+model Session {
+  id               String    @id @default(cuid(2))
+  userId           String    @map("user_id")
+  refreshTokenHash String    @unique @map("refresh_token_hash")
+  replacedById     String?   @unique @map("replaced_by_id")
+  rememberMe       Boolean   @default(false) @map("remember_me")
+  trustedDeviceId  String?   @map("trusted_device_id")
+  userAgent        String?   @map("user_agent")
+  ip               String? /// Adresse de connexion (sécurité) ; jamais recopiée dans les journaux applicatifs.
+  lastActiveAt     DateTime? @map("last_active_at") @db.Timestamptz(3)
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz(3)
+  revokedAt        DateTime? @map("revoked_at") @db.Timestamptz(3)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trustedDevice TrustedDevice? @relation(fields: [trustedDeviceId], references: [id], onDelete: SetNull)
+  replacedBy    Session?       @relation("SessionRotation", fields: [replacedById], references: [id], onDelete: SetNull)
+  replaces      Session?       @relation("SessionRotation")
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+/// Appareil de confiance (cookie `mp_td`) : dispense du code OTP pendant `trustedDeviceDays` (30 j par défaut).
+model TrustedDevice {
+  id         String    @id @default(cuid(2))
+  userId     String    @map("user_id")
+  tokenHash  String    @unique @map("token_hash")
+  label      String? /// Navigateur et système déduits de l'agent utilisateur.
+  lastUsedAt DateTime? @map("last_used_at") @db.Timestamptz(3)
+  expiresAt  DateTime  @map("expires_at") @db.Timestamptz(3)
+  revokedAt  DateTime? @map("revoked_at") @db.Timestamptz(3)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessions Session[]
+
+  @@index([userId])
+  @@map("trusted_devices")
+}
+
+/// Défi de connexion par code à 6 chiffres envoyé par e-mail : 10 min, 5 essais, renvoi après 60 s.
+model OtpChallenge {
+  id                String    @id @default(cuid(2))
+  userId            String    @map("user_id")
+  codeHash          String    @map("code_hash")
+  rememberMe        Boolean   @default(false) @map("remember_me")
+  attempts          Int       @default(0)
+  resendAvailableAt DateTime  @map("resend_available_at") @db.Timestamptz(3)
+  expiresAt         DateTime  @map("expires_at") @db.Timestamptz(3)
+  consumedAt        DateTime? @map("consumed_at") @db.Timestamptz(3)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("otp_challenges")
+}
+
+/// Lien de réinitialisation du mot de passe (usage unique). L'utilisation révoque toutes les sessions.
+model PasswordReset {
+  id          String    @id @default(cuid(2))
+  userId      String    @map("user_id")
+  tokenHash   String    @unique @map("token_hash")
+  requestedBy String?   @map("requested_by") /// Identifiant de l'administrateur à l'origine de l'envoi (null = demande de l'utilisateur).
+  expiresAt   DateTime  @map("expires_at") @db.Timestamptz(3)
+  usedAt      DateTime? @map("used_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("password_resets")
+}
+
+/// Invitation au back-office (lien valable 7 jours). L'utilisateur est créé dès l'invitation, sans mot de passe.
+model Invitation {
+  id          String    @id @default(cuid(2))
+  userId      String    @map("user_id")
+  role        Role
+  tokenHash   String    @unique @map("token_hash")
+  invitedById String?   @map("invited_by_id")
+  expiresAt   DateTime  @map("expires_at") @db.Timestamptz(3)
+  acceptedAt  DateTime? @map("accepted_at") @db.Timestamptz(3)
+  revokedAt   DateTime? @map("revoked_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user      User  @relation("InvitationUser", fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy User? @relation("InvitationSender", fields: [invitedById], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@map("invitations")
+}
+
+/// Notification du back-office, une ligne par destinataire (`readAt` propre à chacun).
+/// `ASSIGNMENT` : une demande ou un rendez-vous vient d'être assigné (pas de notification si l'on s'assigne soi-même).
+model Notification {
+  id         String           @id @default(cuid(2))
+  userId     String           @map("user_id")
+  kind       NotificationKind
+  title      String
+  link       String?
+  entityType String?          @map("entity_type") /// Ex. `Request`, `Appointment`.
+  entityId   String?          @map("entity_id")
+  readAt     DateTime?        @map("read_at") @db.Timestamptz(3)
+  createdAt  DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt])
+  @@map("notifications")
+}
+
+/// Journal d'activité du back-office : états avant / après (le `diff` du contrat en est déduit).
+/// Aucune donnée sensible (mot de passe, jeton, code) n'y est recopiée.
+model AuditLog {
+  id        String   @id @default(cuid(2))
+  actorId   String?  @map("actor_id")
+  action    String /// Ex. `service.publish`.
+  entity    String /// Ex. `Service`.
+  entityId  String?  @map("entity_id")
+  label     String /// Libellé prêt à afficher (« A publié le service « Chef privé » »).
+  before    Json?
+  after     Json?
+  ip        String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+  @@index([actorId, createdAt])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ═══════════════════════════════════════════ Catalogue ═══════════════════════════════════════════
+
+/// Rubrique (5 au lancement). Les blocs structurés (publics, étapes, groupes, bloc spécifique, champs du devis,
+/// carte de l'accueil, visuels secondaires) sont des JSON de la forme du contrat. Suppression possible seulement
+/// si elle ne contient aucun service (`Restrict` côté services).
+model Category {
+  id             String            @id @default(cuid(2))
+  slug           String            @unique
+  slugEn         String?           @unique @map("slug_en") /// Adresse anglaise éventuelle (`/en/services/…`).
+  name           String
+  tagline        String
+  description    String
+  eyebrow        String?
+  heroTitle      String            @map("hero_title") /// Texte à accent `==…==`.
+  heroLead       String            @map("hero_lead")
+  icon           String /// Icône lucide-react.
+  iconColor      String?           @map("icon_color") /// Token de couleur (ex. `orange-700`).
+  tint           CategoryTint
+  illustration   IllustrationScene @default(accueil)
+  imageId        String?           @map("image_id")
+  /// Visuels secondaires `{ hero, thumbnail, testimonial, homeCard, homeCardMobile }` → `{ illustration, imageId, alt }`.
+  visuals        Json?
+  homeCard       Json?             @map("home_card") /// `{ title, text, textMobile, chips[] }` (carte « Nos univers »).
+  audiencesTitle String?           @map("audiences_title")
+  audiences      Json              @default("[]") /// IconTextItem[]
+  servicesTitle  String?           @map("services_title")
+  servicesLead   String?           @map("services_lead")
+  groups         Json              @default("[]") /// [{ title, serviceSlugs[] }]
+  highlight      Json? /// CategoryHighlight
+  processEyebrow String?           @map("process_eyebrow")
+  processTitle   String?           @map("process_title")
+  processSteps   Json              @default("[]") @map("process_steps") /// StepItem[]
+  testimonialId  String?           @map("testimonial_id")
+  quoteFields    Json              @default("[]") @map("quote_fields") /// QuoteField[] : champs dynamiques de l'étape 2 du devis.
+  ctaTitle       String?           @map("cta_title")
+  ctaText        String?           @map("cta_text")
+  seoTitle       String?           @map("seo_title")
+  seoDescription String?           @map("seo_description")
+  status         PublishStatus     @default(DRAFT)
+  sortOrder      Int               @default(0) @map("sort_order")
+  translations   Json? /// `{ en: { … } }`
+  isDemo         Boolean           @default(false) @map("is_demo")
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  image         Media?                 @relation("CategoryImage", fields: [imageId], references: [id], onDelete: Restrict)
+  testimonial   Review?                @relation("CategoryTestimonial", fields: [testimonialId], references: [id], onDelete: SetNull)
+  services      Service[]
+  offerSections CategoryOfferSection[]
+  requests      Request[]
+  interestedBy  ContactInterest[]
+
+  @@index([status, sortOrder])
+  @@map("categories")
+}
+
+/// Carrousel d'offres d'une page rubrique (ex. véhicules, prestataires), sous la liste des services.
+model CategoryOfferSection {
+  id           String   @id @default(cuid(2))
+  categoryId   String   @map("category_id")
+  eyebrow      String
+  title        String /// Texte à accent `==…==`.
+  titleMobile  String?  @map("title_mobile")
+  lead         String?
+  leadMobile   String?  @map("lead_mobile")
+  sortOrder    Int      @default(0) @map("sort_order")
+  translations Json?
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  category Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  offers   ServiceOffer[]
+
+  @@index([categoryId, sortOrder])
+  @@map("category_offer_sections")
+}
+
+/// Service (19 au cahier des charges) ou formule (`kind = FORMULA`). Aucun prix : demande de devis uniquement.
+/// Publier crée la fiche, la carte, l'entrée de menu (`showInMenu`) et l'entrée du plan du site ; un changement de
+/// slug d'un service publié crée une redirection 301 (`Redirect`). `version` sert à l'en-tête `If-Match`.
+model Service {
+  id               String            @id @default(cuid(2))
+  slug             String            @unique
+  slugEn           String?           @unique @map("slug_en")
+  name             String
+  shortName        String?           @map("short_name")
+  categoryId       String            @map("category_id")
+  kind             ServiceKind       @default(SERVICE)
+  tagline          String
+  summary          String            @default("")
+  icon             String            @default("Sparkles")
+  illustration     IllustrationScene @default(accueil)
+  coverImageId     String?           @map("cover_image_id")
+  cities           String[]          @default([])
+  audiences        String[]          @default([])
+  steps            Json              @default("[]") /// StepItem[]
+  advantages       Json              @default("[]") /// IconTextItem[]
+  faq              Json              @default("[]") /// FaqItem[]
+  quoteBullets     String[]          @default([]) @map("quote_bullets")
+  offersEyebrow    String?           @map("offers_eyebrow")
+  offersTitle      String?           @map("offers_title")
+  offersLead       String?           @map("offers_lead")
+  offersLeadMobile String?           @map("offers_lead_mobile")
+  showInMenu       Boolean           @default(true) @map("show_in_menu")
+  featuredOnHome   Boolean           @default(false) @map("featured_on_home")
+  showWhatsapp     Boolean           @default(true) @map("show_whatsapp")
+  reviewsTitle     String?           @map("reviews_title")
+  relatedTitle     String?           @map("related_title")
+  ctaTitle         String?           @map("cta_title")
+  ctaText          String?           @map("cta_text")
+  seoTitle         String?           @map("seo_title")
+  seoDescription   String?           @map("seo_description")
+  toComplete       Boolean           @default(false) @map("to_complete") /// Contenu provisoire à compléter par la cliente.
+  status           PublishStatus     @default(DRAFT)
+  sortOrder        Int               @default(0) @map("sort_order") /// Ordre dans la rubrique.
+  version          Int               @default(1) /// Incrémentée à chaque enregistrement (verrouillage optimiste).
+  publishedAt      DateTime?         @map("published_at") @db.Timestamptz(3)
+  translations     Json?
+  isDemo           Boolean           @default(false) @map("is_demo")
+  createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  category         Category                @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  coverImage       Media?                  @relation("ServiceCover", fields: [coverImageId], references: [id], onDelete: Restrict)
+  gallery          ServiceGalleryImage[]
+  offers           ServiceOffer[]          @relation("ServiceOffers")
+  targetedByOffers ServiceOffer[]          @relation("OfferTargetService")
+  related          ServiceRelation[]       @relation("ServiceRelationFrom")
+  relatedFrom      ServiceRelation[]       @relation("ServiceRelationTo")
+  featuredReviews  ServiceFeaturedReview[]
+  reviews          Review[]
+  requests         Request[]
+
+  @@index([categoryId, status, sortOrder])
+  @@index([status, featuredOnHome])
+  @@map("services")
+}
+
+/// Galerie d'une fiche service (3 visuels au plus, ordonnés).
+model ServiceGalleryImage {
+  serviceId String  @map("service_id")
+  mediaId   String  @map("media_id")
+  sortOrder Int     @default(0) @map("sort_order")
+  alt       String?
+
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  media   Media   @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+
+  @@id([serviceId, mediaId])
+  @@index([mediaId])
+  @@map("service_gallery_images")
+}
+
+/// Services liés d'une fiche (6 au plus, ordonnés).
+model ServiceRelation {
+  serviceId        String @map("service_id")
+  relatedServiceId String @map("related_service_id")
+  sortOrder        Int    @default(0) @map("sort_order")
+
+  service        Service @relation("ServiceRelationFrom", fields: [serviceId], references: [id], onDelete: Cascade)
+  relatedService Service @relation("ServiceRelationTo", fields: [relatedServiceId], references: [id], onDelete: Cascade)
+
+  @@id([serviceId, relatedServiceId])
+  @@index([relatedServiceId])
+  @@map("service_relations")
+}
+
+/// Avis mis en avant sur une fiche service (6 au plus, choisis parmi les avis publiés).
+model ServiceFeaturedReview {
+  serviceId String @map("service_id")
+  reviewId  String @map("review_id")
+  sortOrder Int    @default(0) @map("sort_order")
+
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  review  Review  @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+
+  @@id([serviceId, reviewId])
+  @@index([reviewId])
+  @@map("service_featured_reviews")
+}
+
+/// Carte du carrousel « Nos offres » : soit d'une fiche service (`serviceId`), soit d'un carrousel de rubrique
+/// (`sectionId`) — exactement un des deux (contrainte CHECK ajoutée dans la migration). `targetServiceId` est le
+/// service présélectionné par les actions devis / rendez-vous (null = service de la fiche). Aucun prix.
+model ServiceOffer {
+  id                String            @id @default(cuid(2))
+  serviceId         String?           @map("service_id")
+  sectionId         String?           @map("section_id")
+  targetServiceId   String?           @map("target_service_id")
+  title             String
+  titleMobile       String?           @map("title_mobile")
+  text              String
+  textMobile        String?           @map("text_mobile")
+  icon              String?
+  illustration      IllustrationScene @default(accueil)
+  imageId           String?           @map("image_id")
+  action            OfferAction
+  actionLabel       String            @map("action_label")
+  actionLabelMobile String?           @map("action_label_mobile")
+  sortOrder         Int               @default(0) @map("sort_order")
+  translations      Json?
+  isDemo            Boolean           @default(false) @map("is_demo")
+  createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  service       Service?              @relation("ServiceOffers", fields: [serviceId], references: [id], onDelete: Cascade)
+  section       CategoryOfferSection? @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  targetService Service?              @relation("OfferTargetService", fields: [targetServiceId], references: [id], onDelete: SetNull)
+  image         Media?                @relation("OfferImage", fields: [imageId], references: [id], onDelete: Restrict)
+
+  @@index([serviceId, sortOrder])
+  @@index([sectionId, sortOrder])
+  @@map("service_offers")
+}
+
+/// Redirection permanente (changement de slug d'un contenu publié), servie par `GET /v1/site/redirects`.
+model Redirect {
+  id        String   @id @default(cuid(2))
+  fromPath  String   @unique @map("from_path")
+  toPath    String   @map("to_path")
+  permanent Boolean  @default(true)
+  entity    String? /// Ex. `Service`.
+  entityId  String?  @map("entity_id")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([entity, entityId])
+  @@map("redirects")
+}
+
+// ═══════════════════════════════════════════ Pages & paramètres ═══════════════════════════════════════════
+
+/// Page éditoriale (clé `PageKey` du contrat : `accueil`, `zones-d-intervention`, `404`…). Les sections sont une
+/// union discriminée par `type` (`PageSection`) stockée en JSON, dans l'ordre d'affichage, masquées comprises.
+/// Brouillon (`draft…`, sauvegarde automatique) distinct de la version publiée ; « Publier » recopie le brouillon,
+/// « Abandonner » l'efface. Les sections `dynamic` ne contiennent que l'en-tête : le contenu vient d'autres écrans.
+model Page {
+  key               String    @id
+  title             String
+  path              String
+  group             PageGroup @default(principales)
+  sections          Json      @default("[]") /// PageSection[] publiées.
+  seo               Json? /// `{ title, description, ogImageUrl, noindex }`
+  translations      Json? /// `{ en: { title, sections, seo } }` (sections anglaises complètes, même ordre et mêmes `id`).
+  draftSections     Json?     @map("draft_sections") /// null = pas de brouillon.
+  draftSeo          Json?     @map("draft_seo")
+  draftTranslations Json?     @map("draft_translations")
+  draftUpdatedAt    DateTime? @map("draft_updated_at") @db.Timestamptz(3)
+  allowedSections   String[]  @default([]) @map("allowed_sections") /// Types de sections autorisés (`PageSectionType`).
+  publishedAt       DateTime? @map("published_at") @db.Timestamptz(3)
+  publishedById     String?   @map("published_by_id")
+  updatedById       String?   @map("updated_by_id")
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  publishedBy User? @relation("PagePublisher", fields: [publishedById], references: [id], onDelete: SetNull)
+  updatedBy   User? @relation("PageUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@map("pages")
+}
+
+/// Paramètres par groupe (`key`) : groupes du contrat `coordonnees`, `whatsapp`, `reseaux`, `emails`, `seo`,
+/// `analytics` (dont `newsletterTracking`), `chiffres`, `rgpd`, `securite` (dont `maintenanceMode`,
+/// `trustedDeviceDays`) ; groupes internes `site` (nom, accroche, signature), `navigation` (pied de page, promotion
+/// du méga-menu), `zones` (`showFees`, `note`) et `availability` (délai minimal, horizon, adresse, lien visio).
+/// `value` suit la forme du groupe ; `translations` porte les textes anglais.
+model Setting {
+  key          String   @id
+  value        Json
+  translations Json?
+  updatedById  String?  @map("updated_by_id")
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  updatedBy User? @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@map("settings")
+}
+
+/// Modèle d'e-mail automatique (clé `EmailTemplateKey`, ex. `quote-ack`). Les e-mails de sécurité (`otp-code`,
+/// `password-reset`) ne peuvent pas être désactivés (règle applicative).
+model EmailTemplate {
+  key          String   @id
+  subject      String
+  preheader    String?
+  title        String
+  paragraphs   String[] @default([])
+  buttonLabel  String?  @map("button_label")
+  enabled      Boolean  @default(true)
+  translations Json?
+  updatedById  String?  @map("updated_by_id")
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  updatedBy User? @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+
+  @@map("email_templates")
+}
+
+/// File de revalidation du site (`POST {WEB_URL}/api/revalidate` avec les tags) : réessayée en cas d'échec.
+model RevalidationRequest {
+  id        String     @id @default(cuid(2))
+  tags      String[]
+  status    TaskStatus @default(PENDING)
+  attempts  Int        @default(0)
+  lastError String?    @map("last_error")
+  sentAt    DateTime?  @map("sent_at") @db.Timestamptz(3)
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([status, createdAt])
+  @@map("revalidation_requests")
+}
+
+/// Sauvegarde quotidienne de la base (`pg_dump` vers le stockage objet, rotation 30 jours) — `GET /admin/system-status`.
+model BackupRun {
+  id         String     @id @default(cuid(2))
+  status     TaskStatus @default(RUNNING)
+  storageKey String?    @map("storage_key")
+  sizeBytes  BigInt?    @map("size_bytes")
+  error      String?
+  startedAt  DateTime   @default(now()) @map("started_at") @db.Timestamptz(3)
+  finishedAt DateTime?  @map("finished_at") @db.Timestamptz(3)
+
+  @@index([status, startedAt])
+  @@map("backup_runs")
+}
+
+// ═══════════════════════════════════════════ Médiathèque ═══════════════════════════════════════════
+
+/// Image de la médiathèque (JPG, PNG, WebP, SVG assaini ; 10 Mo). Variantes AVIF/WebP 480/960/1600 générées en
+/// tâche de fond (`variants` : [{ url, storageKey, width, format }]). Texte alternatif obligatoire, point focal
+/// facultatif. Les références par clé étrangère sont en `Restrict` : un média utilisé ne peut pas être supprimé.
+model Media {
+  id           String        @id @default(cuid(2))
+  storageKey   String        @unique @map("storage_key")
+  fileName     String        @map("file_name")
+  mimeType     MediaMimeType @map("mime_type")
+  size         Int
+  width        Int?
+  height       Int?
+  alt          String
+  focalX       Float?        @map("focal_x") /// 0 à 1.
+  focalY       Float?        @map("focal_y")
+  blurDataUrl  String?       @map("blur_data_url")
+  variants     Json          @default("[]")
+  status       MediaStatus   @default(PROCESSING)
+  checksum     String? /// SHA-256 du fichier d'origine (détection des doublons).
+  uploadedById String?       @map("uploaded_by_id")
+  isDemo       Boolean       @default(false) @map("is_demo")
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  uploadedBy       User?                 @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  usages           MediaUsage[]
+  categories       Category[]            @relation("CategoryImage")
+  serviceCovers    Service[]             @relation("ServiceCover")
+  serviceGalleries ServiceGalleryImage[]
+  offers           ServiceOffer[]        @relation("OfferImage")
+  partners         Partner[]
+  events           Event[]
+  magazineCovers   MagazineEdition[]
+  magazineArticles MagazineArticle[]
+
+  @@index([status, createdAt])
+  @@index([checksum])
+  @@map("media")
+}
+
+/// Usages d'un média tenus à jour par l'API à chaque enregistrement, y compris pour les références situées dans
+/// des JSON (sections de pages, visuels secondaires des rubriques, paramètres) : alimente `Media.usages` et bloque
+/// la suppression (409) d'une image encore utilisée.
+model MediaUsage {
+  id        String   @id @default(cuid(2))
+  mediaId   String   @map("media_id")
+  kind      String /// Ex. `service.cover`, `page.section`.
+  entityId  String   @map("entity_id")
+  slot      String   @default("") /// Emplacement précis (ex. identifiant de section).
+  label     String /// « Chef privé (photo principale) ».
+  href      String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+
+  @@unique([mediaId, kind, entityId, slot])
+  @@index([kind, entityId])
+  @@map("media_usages")
+}
+
+// ═══════════════════════════════════════════ Zones d'intervention ═══════════════════════════════════════════
+
+/// Zone d'intervention à Douala (carte, légende, recherche de quartier, formulaires). `area` : contour GeoJSON
+/// RFC 7946 (`Polygon` ou `MultiPolygon`, WGS84, 5 000 positions au plus, emprise du Cameroun contrôlée par l'API).
+/// Tarif indicatif de déplacement (`fee…`) : donnée interne exposée par le contrat (`ZoneFee`), masquée sur le site
+/// tant que l'option « Afficher les tarifs » est désactivée ; ce n'est pas un prix de prestation (devis uniquement).
+model Zone {
+  id            String    @id @default(cuid(2))
+  key           String    @unique
+  name          String
+  nameEn        String?   @map("name_en")
+  tone          ZoneTone
+  description   String    @default("")
+  descriptionEn String?   @map("description_en")
+  result        String    @default("") /// Réponse affichée quand un quartier de la zone est recherché.
+  resultEn      String?   @map("result_en")
+  delay         String? /// Délai moyen (« 30–45 min ») ; null = « Sur devis ».
+  feeAmount     Int?      @map("fee_amount")
+  feeCurrency   Currency? @default(XAF) @map("fee_currency")
+  feeFrom       Boolean   @default(false) @map("fee_from") /// « Dès … » : montant minimal.
+  area          Json?
+  active        Boolean   @default(false) /// Une zone créée reste inactive tant qu'elle n'est pas activée.
+  sortOrder     Int       @default(0) @map("sort_order")
+  isDemo        Boolean   @default(false) @map("is_demo")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  quarters ZoneQuarter[]
+
+  @@index([active, sortOrder])
+  @@map("zones")
+}
+
+/// Quartier desservi. Un quartier n'appartient qu'à une zone (`normalizedName` unique : minuscules, sans accents).
+/// `lat`/`lng` : repère sur la carte OpenStreetMap (null = non placé) ; `mapX`/`mapY` : position sur la carte
+/// illustrée (0 à 1).
+model ZoneQuarter {
+  id              String   @id @default(cuid(2))
+  zoneId          String   @map("zone_id")
+  name            String
+  normalizedName  String   @unique @map("normalized_name")
+  detail          String?
+  detailEn        String?  @map("detail_en")
+  mapLabel        String?  @map("map_label")
+  mapLabelEn      String?  @map("map_label_en")
+  isBase          Boolean  @default(false) @map("is_base")
+  labelOnSmallMap Boolean  @default(false) @map("label_on_small_map")
+  lat             Float?
+  lng             Float?
+  mapX            Float?   @map("map_x")
+  mapY            Float?   @map("map_y")
+  sortOrder       Int      @default(0) @map("sort_order")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  zone Zone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  @@index([zoneId, sortOrder])
+  @@map("zone_quarters")
+}
+
+// ═══════════════════════════════════════════ Contacts & demandes ═══════════════════════════════════════════
+
+/// Personne ayant écrit à l'agence (une fiche par adresse e-mail). `district` : quartier extrait de la ville
+/// (« Bonapriso, Douala » → `Bonapriso`) pour le filtre `district`. Effacement RGPD = anonymisation (`anonymizedAt`),
+/// les demandes étant conservées sans données personnelles ; contacts inactifs anonymisés après la durée paramétrée.
+model Contact {
+  id               String             @id @default(cuid(2))
+  email            String             @unique /// Stockée en minuscules ; remplacée par une adresse factice à l'anonymisation.
+  fullName         String             @map("full_name")
+  firstName        String?            @map("first_name")
+  lastName         String?            @map("last_name")
+  phone            String? /// E.164.
+  country          String? /// ISO 3166-1 alpha-2.
+  city             String?
+  district         String?
+  profile          ContactProfile     @default(PARTICULIER)
+  organization     String?
+  activity         String?
+  preferredChannel ContactPreference? @map("preferred_channel")
+  source           String? /// Formulaire d'origine (ex. `devis`, `inscription`).
+  language         Language           @default(FR)
+  lastActivityAt   DateTime           @default(now()) @map("last_activity_at") @db.Timestamptz(3) /// Base de la durée de conservation.
+  anonymizedAt     DateTime?          @map("anonymized_at") @db.Timestamptz(3)
+  isDemo           Boolean            @default(false) @map("is_demo")
+  createdAt        DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  interests    ContactInterest[]
+  requests     Request[]
+  appointments Appointment[]
+  subscriber   Subscriber?
+
+  @@index([profile, createdAt])
+  @@index([country])
+  @@index([district])
+  @@index([lastActivityAt])
+  @@map("contacts")
+}
+
+/// Rubriques qui intéressent un contact (particulier) ou rubriques d'intervention (professionnel).
+model ContactInterest {
+  contactId  String @map("contact_id")
+  categoryId String @map("category_id")
+
+  contact  Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([contactId, categoryId])
+  @@index([categoryId])
+  @@map("contact_interests")
+}
+
+/// Compteur des références lisibles `MP-AAAA-NNNN`, une ligne par année, partagé par les demandes et les
+/// rendez-vous. Incrément atomique : `INSERT … ON CONFLICT (year) DO UPDATE SET last_value = last_value + 1
+/// RETURNING last_value`, dans la transaction de création (pas de trou ni de doublon).
+model ReferenceCounter {
+  year      Int      @id
+  lastValue Int      @default(0) @map("last_value")
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@map("reference_counters")
+}
+
+/// Demande reçue par un formulaire public (ou dupliquée). Champs communs en colonnes (filtres, tris, assignation,
+/// échéance) ; champs propres au formulaire dans `payload` (valeurs `needs` du devis, etc.). Échéance `dueAt` fixée
+/// à réception + 24 h. Anonymisation RGPD : `anonymizedAt` posé, `payload`, `message`, `ip`, `userAgent` effacés.
+model Request {
+  id                String             @id @default(cuid(2))
+  reference         String             @unique
+  type              RequestType
+  status            RequestStatus      @default(NOUVELLE)
+  contactId         String             @map("contact_id")
+  categoryId        String?            @map("category_id")
+  serviceId         String?            @map("service_id")
+  jobOfferId        String?            @map("job_offer_id")
+  trainingId        String?            @map("training_id")
+  otherTraining     String?            @map("other_training") /// Formation « Autre ».
+  eventId           String?            @map("event_id")
+  seats             Int? /// Inscription à un événement.
+  participants      Int? /// Demande de formation.
+  period            String? /// Période souhaitée (formation).
+  organization      String?
+  partnershipType   PartnershipType?   @map("partnership_type")
+  contactPreference ContactPreference? @map("contact_preference")
+  subject           String? /// Libellé court (service, formation, poste, événement, sujet du contact).
+  payload           Json               @default("{}")
+  message           String?
+  language          Language           @default(FR)
+  consentAt         DateTime           @map("consent_at") @db.Timestamptz(3)
+  ip                String? /// Preuve du consentement ; effacée à l'anonymisation.
+  userAgent         String?            @map("user_agent")
+  assignedToId      String?            @map("assigned_to_id")
+  assignedAt        DateTime?          @map("assigned_at") @db.Timestamptz(3)
+  dueAt             DateTime?          @map("due_at") @db.Timestamptz(3)
+  completedAt       DateTime?          @map("completed_at") @db.Timestamptz(3)
+  closedAt          DateTime?          @map("closed_at") @db.Timestamptz(3)
+  anonymizedAt      DateTime?          @map("anonymized_at") @db.Timestamptz(3)
+  duplicatedFromId  String?            @map("duplicated_from_id")
+  isDemo            Boolean            @default(false) @map("is_demo")
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  contact        Contact         @relation(fields: [contactId], references: [id], onDelete: Restrict)
+  category       Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  service        Service?        @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  jobOffer       JobOffer?       @relation(fields: [jobOfferId], references: [id], onDelete: SetNull)
+  training       Training?       @relation(fields: [trainingId], references: [id], onDelete: SetNull)
+  event          Event?          @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  assignedTo     User?           @relation("RequestAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  duplicatedFrom Request?        @relation("RequestDuplicate", fields: [duplicatedFromId], references: [id], onDelete: SetNull)
+  duplicates     Request[]       @relation("RequestDuplicate")
+  notes          RequestNote[]
+  history        RequestEvent[]
+  attachments    Attachment[]
+  survey         Survey?
+  application    JobApplication?
+  appointment    Appointment?
+
+  @@index([type, status, createdAt])
+  @@index([status, dueAt])
+  @@index([assignedToId, status])
+  @@index([categoryId, createdAt])
+  @@index([serviceId, createdAt])
+  @@index([contactId])
+  @@index([trainingId])
+  @@index([eventId])
+  @@index([jobOfferId])
+  @@index([createdAt])
+  @@map("requests")
+}
+
+/// Note interne d'une demande.
+model RequestNote {
+  id        String   @id @default(cuid(2))
+  requestId String   @map("request_id")
+  authorId  String   @map("author_id")
+  body      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  request Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  author  User    @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([requestId, createdAt])
+  @@map("request_notes")
+}
+
+/// Historique d'une demande (chaque changement de statut, assignation, envoi…). Le libellé affiché est calculé à
+/// partir de `kind` et `data` (ex. `{ from: "NOUVELLE", to: "EN_COURS" }`).
+model RequestEvent {
+  id        String           @id @default(cuid(2))
+  requestId String           @map("request_id")
+  kind      RequestEventKind
+  data      Json?
+  actorId   String?          @map("actor_id")
+  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  request Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  actor   User?   @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([requestId, createdAt])
+  @@map("request_events")
+}
+
+/// Pièce jointe d'une demande (CV…), en stockage objet privé ; téléchargement par URL signée de 5 min.
+/// Type réel contrôlé par signature de fichier.
+model Attachment {
+  id         String         @id @default(cuid(2))
+  requestId  String?        @map("request_id")
+  kind       AttachmentKind @default(OTHER)
+  storageKey String         @unique @map("storage_key")
+  fileName   String         @map("file_name")
+  mimeType   String         @map("mime_type")
+  size       Int
+  checksum   String? /// SHA-256.
+  scanStatus ScanStatus     @default(SKIPPED) @map("scan_status")
+  createdAt  DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  request     Request?        @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  application JobApplication?
+
+  @@index([requestId])
+  @@map("attachments")
+}
+
+// ═══════════════════════════════════════════ Rendez-vous ═══════════════════════════════════════════
+
+/// Rendez-vous (demande publique `A_CONFIRMER` ou saisie manuelle confirmée). Référence `MP-AAAA-NNNN` du même
+/// compteur que les demandes ; `requestId` relie la demande `RENDEZ_VOUS` correspondante. L'acceptation d'un autre
+/// créneau se fait par le lien de l'e-mail (`proposalTokenHash`). Un même créneau ne peut être pris deux fois par des
+/// rendez-vous `A_CONFIRMER` / `CONFIRME` (index unique partiel ajouté dans la migration). Rappel la veille à 9 h.
+model Appointment {
+  id                String            @id @default(cuid(2))
+  reference         String            @unique
+  requestId         String?           @unique @map("request_id")
+  contactId         String            @map("contact_id")
+  reason            AppointmentReason
+  format            AppointmentFormat
+  startsAt          DateTime          @map("starts_at") @db.Timestamptz(3)
+  endsAt            DateTime          @map("ends_at") @db.Timestamptz(3)
+  status            AppointmentStatus @default(A_CONFIRMER)
+  proposedStartsAt  DateTime?         @map("proposed_starts_at") @db.Timestamptz(3)
+  proposalTokenHash String?           @unique @map("proposal_token_hash")
+  proposalExpiresAt DateTime?         @map("proposal_expires_at") @db.Timestamptz(3)
+  location          String?
+  videoLink         String?           @map("video_link")
+  message           String? /// Message du client.
+  notes             String? /// Notes internes.
+  language          Language          @default(FR)
+  assignedToId      String?           @map("assigned_to_id")
+  createdById       String?           @map("created_by_id") /// null = demande du site.
+  confirmedAt       DateTime?         @map("confirmed_at") @db.Timestamptz(3)
+  cancelledAt       DateTime?         @map("cancelled_at") @db.Timestamptz(3)
+  completedAt       DateTime?         @map("completed_at") @db.Timestamptz(3)
+  reminderSentAt    DateTime?         @map("reminder_sent_at") @db.Timestamptz(3)
+  isDemo            Boolean           @default(false) @map("is_demo")
+  createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  request    Request? @relation(fields: [requestId], references: [id], onDelete: SetNull)
+  contact    Contact  @relation(fields: [contactId], references: [id], onDelete: Restrict)
+  assignedTo User?    @relation("AppointmentAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  createdBy  User?    @relation("AppointmentCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([startsAt])
+  @@index([status, startsAt])
+  @@index([assignedToId, startsAt])
+  @@index([contactId])
+  @@map("appointments")
+}
+
+/// Règle hebdomadaire de disponibilité (1 = lundi … 7 = dimanche, heures locales `Africa/Douala` « HH:MM »).
+/// Créneaux libres = règles − fermetures − rendez-vous à confirmer / confirmés − délai minimal (paramètre `availability`).
+model AvailabilityRule {
+  id          String              @id @default(cuid(2))
+  weekday     Int
+  startTime   String              @map("start_time") @db.VarChar(5)
+  endTime     String              @map("end_time") @db.VarChar(5)
+  slotMinutes Int                 @default(90) @map("slot_minutes")
+  formats     AppointmentFormat[]
+  createdAt   DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime            @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([weekday])
+  @@map("availability_rules")
+}
+
+/// Fermeture exceptionnelle (journée entière si `closed`, sinon plage horaire modifiée).
+model AvailabilityException {
+  id        String   @id @default(cuid(2))
+  date      DateTime @db.Date
+  closed    Boolean  @default(true)
+  startTime String?  @map("start_time") @db.VarChar(5)
+  endTime   String?  @map("end_time") @db.VarChar(5)
+  label     String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([date])
+  @@map("availability_exceptions")
+}
+
+// ═══════════════════════════════════════════ Avis & questionnaire ═══════════════════════════════════════════
+
+/// Invitation au questionnaire d'une demande de devis passée à `PRESTATION_REALISEE` (envoi après le délai
+/// paramétré, relance unique). Jeton à usage unique valable 30 jours (condensat seul stocké). Réponses : instantané
+/// `[{ questionId, label, kind, value }]` ; `rating` (étoiles) et `npsScore` extraits pour les statistiques.
+/// Un avis `A_VALIDER` n'est créé que si `publishConsent` est vrai.
+model Survey {
+  id             String       @id @default(cuid(2))
+  requestId      String       @unique @map("request_id")
+  tokenHash      String       @unique @map("token_hash")
+  status         SurveyStatus @default(SCHEDULED)
+  language       Language     @default(FR)
+  scheduledFor   DateTime?    @map("scheduled_for") @db.Timestamptz(3)
+  sentAt         DateTime?    @map("sent_at") @db.Timestamptz(3)
+  remindedAt     DateTime?    @map("reminded_at") @db.Timestamptz(3)
+  expiresAt      DateTime     @map("expires_at") @db.Timestamptz(3)
+  completedAt    DateTime?    @map("completed_at") @db.Timestamptz(3)
+  answers        Json?
+  rating         Int?
+  npsScore       Int?         @map("nps_score")
+  publishConsent Boolean      @default(false) @map("publish_consent")
+  displayName    String?      @map("display_name") /// « Prénom N. »
+  city           String?
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  request Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  review  Review?
+
+  @@index([status, scheduledFor])
+  @@index([completedAt])
+  @@map("surveys")
+}
+
+/// Question du questionnaire de satisfaction (ordonnable ; 5 actives au plus).
+model SurveyQuestion {
+  id           String             @id @default(cuid(2))
+  order        Int                @map("sort_order")
+  kind         SurveyQuestionKind
+  label        String
+  helpText     String?            @map("help_text")
+  options      String[]           @default([])
+  required     Boolean            @default(true)
+  active       Boolean            @default(true)
+  translations Json?
+  createdAt    DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  @@index([active, order])
+  @@map("survey_questions")
+}
+
+/// Avis client : issu du questionnaire (`verified`, `surveyId`) ou saisi manuellement (non vérifié). Publication
+/// impossible sans consentement (`publishConsent`). Nom affiché « Prénom N. ». `date` : date affichée.
+model Review {
+  id              String       @id @default(cuid(2))
+  authorName      String       @map("author_name")
+  city            String?
+  rating          Int
+  text            String
+  excerpt         String?
+  serviceId       String?      @map("service_id")
+  surveyId        String?      @unique @map("survey_id")
+  status          ReviewStatus @default(A_VALIDER)
+  verified        Boolean      @default(false)
+  featured        Boolean      @default(false)
+  publishConsent  Boolean      @default(false) @map("publish_consent")
+  answersSnapshot Json?        @map("answers_snapshot") /// [{ question, answer }]
+  serviceDate     DateTime?    @map("service_date") @db.Timestamptz(3)
+  date            DateTime     @default(now()) @db.Timestamptz(3)
+  reply           String?
+  repliedAt       DateTime?    @map("replied_at") @db.Timestamptz(3)
+  repliedById     String?      @map("replied_by_id")
+  publishedAt     DateTime?    @map("published_at") @db.Timestamptz(3)
+  isDemo          Boolean      @default(false) @map("is_demo")
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  service       Service?                @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  survey        Survey?                 @relation(fields: [surveyId], references: [id], onDelete: SetNull)
+  repliedBy     User?                   @relation("ReviewReplier", fields: [repliedById], references: [id], onDelete: SetNull)
+  featuredOn    ServiceFeaturedReview[]
+  testimonialOf Category[]              @relation("CategoryTestimonial")
+
+  @@index([status, date])
+  @@index([serviceId, status])
+  @@index([featured, status])
+  @@map("reviews")
+}
+
+// ═══════════════════════════════════════════ Contenus ═══════════════════════════════════════════
+
+/// Logo de partenaire affiché (ordonnable par catégorie). Les demandes de partenariat sont des `Request` `PARTENARIAT`.
+model Partner {
+  id          String          @id @default(cuid(2))
+  name        String
+  category    PartnerCategory
+  logoImageId String?         @map("logo_image_id")
+  url         String?
+  visible     Boolean         @default(true)
+  sortOrder   Int             @default(0) @map("sort_order")
+  isDemo      Boolean         @default(false) @map("is_demo")
+  createdAt   DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  logoImage Media? @relation(fields: [logoImageId], references: [id], onDelete: Restrict)
+
+  @@index([category, visible, sortOrder])
+  @@map("partners")
+}
+
+/// Formation du catalogue. Les demandes de formation sont des `Request` `FORMATION` (`trainingId` ou `otherTraining`).
+model Training {
+  id            String           @id @default(cuid(2))
+  slug          String           @unique
+  title         String
+  category      TrainingCategory
+  audienceLabel String           @map("audience_label")
+  icon          String
+  duration      String
+  format        String
+  location      String?
+  description   String?
+  status        PublishStatus    @default(PUBLISHED)
+  sortOrder     Int              @default(0) @map("sort_order")
+  translations  Json?
+  isDemo        Boolean          @default(false) @map("is_demo")
+  createdAt     DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  requests Request[]
+
+  @@index([status, category, sortOrder])
+  @@map("trainings")
+}
+
+/// Offre d'emploi. `salary…` : rémunération proposée au candidat (sans rapport avec le prix des prestations).
+/// `sectors` : quartiers d'intervention du poste. Supprimer une offre conserve les candidatures (`SetNull`).
+model JobOffer {
+  id             String        @id @default(cuid(2))
+  slug           String        @unique
+  title          String
+  city           String
+  country        String        @db.Char(2)
+  contractType   String        @map("contract_type")
+  startDate      String?       @map("start_date") /// Libellé libre (« janvier 2027 »).
+  workingTime    String?       @map("working_time")
+  locationLabel  String?       @map("location_label")
+  sectors        String[]      @default([])
+  salaryMin      Int?          @map("salary_min")
+  salaryMax      Int?          @map("salary_max")
+  salaryCurrency Currency?     @map("salary_currency")
+  salaryPeriod   SalaryPeriod? @map("salary_period")
+  schedule       String?
+  summary        String
+  description    String?
+  missions       String[]      @default([])
+  profile        String[]      @default([])
+  benefits       String[]      @default([])
+  status         PublishStatus @default(DRAFT)
+  publishedAt    DateTime?     @map("published_at") @db.Timestamptz(3)
+  expiresAt      DateTime?     @map("expires_at") @db.Timestamptz(3)
+  translations   Json?
+  isDemo         Boolean       @default(false) @map("is_demo")
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  requests     Request[]
+  applications JobApplication[]
+
+  @@index([status, publishedAt])
+  @@index([status, expiresAt])
+  @@index([city])
+  @@map("job_offers")
+}
+
+/// Candidature (offre ou spontanée), rattachée à sa `Request` `CANDIDATURE`. CV obligatoire (PDF/DOC/DOCX ≤ 5 Mo)
+/// en stockage privé. Passe à `LU` à la première consultation ; candidatures refusées supprimées après la durée
+/// paramétrée (24 mois par défaut).
+model JobApplication {
+  id             String            @id @default(cuid(2))
+  requestId      String            @unique @map("request_id")
+  jobOfferId     String?           @map("job_offer_id")
+  status         ApplicationStatus @default(NOUVEAU)
+  cvAttachmentId String            @unique @map("cv_attachment_id")
+  notes          String?
+  readAt         DateTime?         @map("read_at") @db.Timestamptz(3)
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  request      Request    @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  jobOffer     JobOffer?  @relation(fields: [jobOfferId], references: [id], onDelete: SetNull)
+  cvAttachment Attachment @relation(fields: [cvAttachmentId], references: [id], onDelete: Restrict)
+
+  @@index([status, createdAt])
+  @@index([jobOfferId, status])
+  @@map("job_applications")
+}
+
+/// Événement de l'agenda culturel. Les inscriptions sont des `Request` `EVENEMENT` (`eventId`, `seats`) ; places
+/// restantes = `capacity` − somme des `seats` des inscriptions non clôturées.
+model Event {
+  id           String            @id @default(cuid(2))
+  slug         String            @unique
+  title        String
+  startsAt     DateTime          @map("starts_at") @db.Timestamptz(3)
+  endsAt       DateTime?         @map("ends_at") @db.Timestamptz(3)
+  city         String
+  place        String?
+  tag          String
+  illustration IllustrationScene @default(evenement)
+  imageId      String?           @map("image_id")
+  description  String?
+  capacity     Int?
+  limited      Boolean           @default(false)
+  status       PublishStatus     @default(DRAFT)
+  publishedAt  DateTime?         @map("published_at") @db.Timestamptz(3)
+  translations Json?
+  isDemo       Boolean           @default(false) @map("is_demo")
+  createdAt    DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  image         Media?    @relation(fields: [imageId], references: [id], onDelete: Restrict)
+  registrations Request[]
+
+  @@index([status, startsAt])
+  @@map("events")
+}
+
+// ═══════════════════════════════════════════ Magazine ═══════════════════════════════════════════
+
+/// Édition du magazine (numérotée, ou hors-série si `number` est null — unicité des numéros, plusieurs hors-séries
+/// possibles). `SCHEDULED` : publication programmée à `publishAt`. Envoi par la newsletter : une campagne par langue
+/// (`Campaign.magazineEditionId`) ; les inscrits anglophones reçoivent le français tant que l'anglais est incomplet.
+model MagazineEdition {
+  id                    String                @id @default(cuid(2))
+  number                Int?                  @unique
+  title                 String
+  titleEn               String?               @map("title_en")
+  subtitle              String?
+  subtitleEn            String?               @map("subtitle_en")
+  themes                String?
+  publishAt             DateTime?             @map("publish_at") @db.Timestamptz(3)
+  publishedAt           DateTime?             @map("published_at") @db.Timestamptz(3)
+  status                MagazineEditionStatus @default(DRAFT)
+  coverId               String?               @map("cover_id")
+  editorial             String? /// HTML assaini.
+  editorialEn           String?               @map("editorial_en")
+  signature             String?
+  signatureEn           String?               @map("signature_en")
+  newsletterScheduledAt DateTime?             @map("newsletter_scheduled_at") @db.Timestamptz(3)
+  newsletterSentAt      DateTime?             @map("newsletter_sent_at") @db.Timestamptz(3)
+  isDemo                Boolean               @default(false) @map("is_demo")
+  createdAt             DateTime              @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime              @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  cover     Media?            @relation(fields: [coverId], references: [id], onDelete: Restrict)
+  articles  MagazineArticle[]
+  campaigns Campaign[]
+
+  @@index([status, publishAt])
+  @@map("magazine_editions")
+}
+
+/// Article du magazine. Supprimer une édition détache ses articles (`SetNull`) ; `sortOrder` = ordre de lecture
+/// dans l'édition. Un article est complet en anglais quand `titleEn` et `bodyEn` sont renseignés.
+model MagazineArticle {
+  id        String   @id @default(cuid(2))
+  editionId String?  @map("edition_id")
+  sortOrder Int      @default(0) @map("sort_order")
+  title     String
+  titleEn   String?  @map("title_en")
+  theme     String
+  themeEn   String?  @map("theme_en")
+  excerpt   String?
+  excerptEn String?  @map("excerpt_en")
+  body      String? /// HTML assaini.
+  bodyEn    String?  @map("body_en")
+  imageId   String?  @map("image_id")
+  isDemo    Boolean  @default(false) @map("is_demo")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  edition MagazineEdition? @relation(fields: [editionId], references: [id], onDelete: SetNull)
+  image   Media?           @relation(fields: [imageId], references: [id], onDelete: Restrict)
+
+  @@index([editionId, sortOrder])
+  @@map("magazine_articles")
+}
+
+// ═══════════════════════════════════════════ Newsletter ═══════════════════════════════════════════
+
+/// Abonné à la newsletter, en double opt-in : `EN_ATTENTE` jusqu'au clic sur le lien de confirmation (condensat du
+/// jeton), puis `CONFIRME` ; désinscription en un clic (`List-Unsubscribe`). Consentement horodaté (`consentAt`).
+model Subscriber {
+  id                  String           @id @default(cuid(2))
+  email               String           @unique /// Stockée en minuscules.
+  name                String?
+  phone               String?
+  country             String?
+  contactId           String?          @unique @map("contact_id")
+  status              SubscriberStatus @default(EN_ATTENTE)
+  language            Language         @default(FR)
+  source              SubscriberSource @default(FOOTER)
+  tags                String[]         @default([])
+  consentAt           DateTime         @map("consent_at") @db.Timestamptz(3)
+  confirmTokenHash    String?          @unique @map("confirm_token_hash")
+  confirmTokenExpires DateTime?        @map("confirm_token_expires") @db.Timestamptz(3)
+  confirmedAt         DateTime?        @map("confirmed_at") @db.Timestamptz(3)
+  unsubscribedAt      DateTime?        @map("unsubscribed_at") @db.Timestamptz(3)
+  isDemo              Boolean          @default(false) @map("is_demo")
+  createdAt           DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  contact    Contact?           @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  deliveries CampaignDelivery[]
+
+  @@index([status, language])
+  @@index([createdAt])
+  @@map("subscribers")
+}
+
+/// Campagne de newsletter (corps HTML assaini de l'éditeur, variable `{prénom}`). Segment : `segmentKind` (+ `tags`
+/// pour `TAGS`) et, pour les envois du magazine, `language`. Envoi par lots via la file d'attente.
+/// `opens` / `clicks` restent null si la mesure est désactivée dans les paramètres.
+model Campaign {
+  id                String              @id @default(cuid(2))
+  subject           String
+  preheader         String?
+  html              String
+  text              String? /// Version texte brut générée.
+  segmentKind       CampaignSegmentKind @default(ALL) @map("segment_kind")
+  segmentTags       String[]            @default([]) @map("segment_tags")
+  language          Language?
+  magazineEditionId String?             @map("magazine_edition_id")
+  status            CampaignStatus      @default(BROUILLON)
+  scheduledAt       DateTime?           @map("scheduled_at") @db.Timestamptz(3)
+  startedAt         DateTime?           @map("started_at") @db.Timestamptz(3)
+  sentAt            DateTime?           @map("sent_at") @db.Timestamptz(3)
+  recipients        Int                 @default(0)
+  opens             Int?
+  clicks            Int?
+  unsubscribes      Int                 @default(0)
+  createdById       String?             @map("created_by_id")
+  isDemo            Boolean             @default(false) @map("is_demo")
+  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime            @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  magazineEdition MagazineEdition?   @relation(fields: [magazineEditionId], references: [id], onDelete: SetNull)
+  createdBy       User?              @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  deliveries      CampaignDelivery[]
+
+  @@index([status, scheduledAt])
+  @@index([magazineEditionId])
+  @@index([sentAt])
+  @@map("campaigns")
+}
+
+/// Envoi individuel d'une campagne à un abonné. `openedAt` / `clickedAt` ne sont renseignés que si la mesure est
+/// activée (mentionnée dans la politique de confidentialité).
+model CampaignDelivery {
+  id           String         @id @default(cuid(2))
+  campaignId   String         @map("campaign_id")
+  subscriberId String         @map("subscriber_id")
+  status       DeliveryStatus @default(PENDING)
+  messageId    String?        @map("message_id")
+  error        String?
+  sentAt       DateTime?      @map("sent_at") @db.Timestamptz(3)
+  openedAt     DateTime?      @map("opened_at") @db.Timestamptz(3)
+  clickedAt    DateTime?      @map("clicked_at") @db.Timestamptz(3)
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  campaign   Campaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  subscriber Subscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, subscriberId])
+  @@index([subscriberId])
+  @@index([campaignId, status])
+  @@map("campaign_deliveries")
+}
+
+// ═══════════════════════════════════════════ Mesure d'audience ═══════════════════════════════════════════
+
+/// Pages vues agrégées par jour (fuseau `Africa/Douala`) et par dimensions. Aucune adresse IP, aucun agent
+/// utilisateur, aucun identifiant : seulement des compteurs. `consented` distingue les vues avec consentement
+/// (taux de consentement). `referrerHost` : domaine d'origine seul ('' = accès direct ou navigation interne).
+model AnalyticsPageViewDaily {
+  day          DateTime @db.Date
+  path         String
+  lang         Language
+  device       Device   @default(UNKNOWN)
+  referrerHost String   @default("") @map("referrer_host")
+  consented    Boolean
+  count        Int      @default(0)
+
+  @@id([day, path, lang, device, referrerHost, consented])
+  @@index([day])
+  @@map("analytics_page_views_daily")
+}
+
+/// Actions mesurées (clics et envois) agrégées par jour, page, action et emplacement. Aucune donnée de formulaire.
+model AnalyticsActionDaily {
+  day       DateTime        @db.Date
+  path      String
+  lang      Language
+  device    Device          @default(UNKNOWN)
+  action    AnalyticsAction
+  step      AnalyticsStep   @default(CLICK)
+  target    String          @default("") /// Slug du contenu concerné.
+  placement String          @default("")
+  consented Boolean
+  count     Int             @default(0)
+
+  @@id([day, path, lang, device, action, step, target, placement, consented])
+  @@index([day, action])
+  @@map("analytics_actions_daily")
+}
+
+/// Présence d'un visiteur ayant consenti, par jour et par page, pour compter les visiteurs uniques. Seul un
+/// condensat HMAC de l'identifiant pseudonyme du navigateur est stocké ; jamais de ligne sans consentement.
+/// Conservation 13 mois au plus (purge quotidienne).
+model AnalyticsVisitorDaily {
+  day         DateTime @db.Date
+  visitorHash String   @map("visitor_hash") @db.Char(64)
+  path        String
+  lang        Language
+
+  @@id([day, visitorHash, path])
+  @@index([day, path])
+  @@map("analytics_visitors_daily")
+}
