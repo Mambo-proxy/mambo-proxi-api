@@ -8,6 +8,12 @@ import { AppConfigModule } from './config/app-config.module.js';
 import { AppConfigService } from './config/app-config.service.js';
 import { HealthModule } from './health/health.module.js';
 import { buildLoggerParams } from './logging/logger.config.js';
+import { CatalogModule } from './modules/catalog/catalog.module.js';
+import { NavigationModule } from './modules/navigation/navigation.module.js';
+import { PagesModule } from './modules/pages/pages.module.js';
+import { SettingsModule } from './modules/settings/settings.module.js';
+import { SitemapModule } from './modules/sitemap/sitemap.module.js';
+import { ZonesModule } from './modules/zones/zones.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
 @Module({
@@ -23,6 +29,12 @@ import { PrismaModule } from './prisma/prisma.module.js';
     }),
     PrismaModule,
     HealthModule,
+    SettingsModule,
+    NavigationModule,
+    PagesModule,
+    ZonesModule,
+    SitemapModule,
+    CatalogModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: ProblemFilter },

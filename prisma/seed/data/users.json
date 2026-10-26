@@ -1,0 +1,42 @@
+{
+  "mockAdminId": "usr_mireille",
+  "adminLastLoginAt": "2026-10-05T07:58:00.000Z",
+  "demoUsers": [
+    {
+      "id": "usr_equipe",
+      "email": "equipe.douala@mamboproxi.com",
+      "name": "Équipe Douala",
+      "role": "EDITOR",
+      "lastLoginAt": "2026-10-04T16:20:00.000Z",
+      "lastActiveAt": "rel:now:-61200000",
+      "createdAt": "2026-06-02T09:00:00.000Z"
+    },
+    {
+      "id": "usr_carine",
+      "email": "carine.eboa@mamboproxi.com",
+      "name": "Carine Eboa",
+      "role": "MANAGER",
+      "lastLoginAt": "2026-10-24T07:45:00.000Z",
+      "lastActiveAt": "rel:now:-54000000",
+      "createdAt": "2026-06-02T09:00:00.000Z"
+    },
+    {
+      "id": "usr_paul",
+      "email": "paul.ngando@mamboproxi.com",
+      "name": "Paul Ngando",
+      "role": "AGENT",
+      "lastLoginAt": "2026-10-25T08:10:00.000Z",
+      "lastActiveAt": "rel:now:-180000",
+      "createdAt": "2026-06-02T09:00:00.000Z"
+    },
+    {
+      "id": "usr_grace",
+      "email": "grace.nkongo@mamboproxi.com",
+      "name": "Grace Nkongo",
+      "role": "WRITER",
+      "lastLoginAt": "2026-10-20T09:30:00.000Z",
+      "lastActiveAt": "rel:now:-432000000",
+      "createdAt": "2026-06-02T09:00:00.000Z"
+    }
+  ]
+}

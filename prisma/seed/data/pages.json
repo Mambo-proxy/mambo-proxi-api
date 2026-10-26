@@ -1,0 +1,3726 @@
+[
+  {
+    "key": "accueil",
+    "title": "Accueil",
+    "path": "/",
+    "group": "principales",
+    "sections": [
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "variant": "home",
+        "tone": "muted",
+        "badge": {
+          "tag": "Douala  ·  Cameroun",
+          "text": "Services du quotidien à domicile"
+        },
+        "title": "Mambo, ce n'est pas qu'un service. ==C'est une expérience pensée pour vous.==",
+        "lead": "Entretien du logement, linge, repas, colis, chef privé, massage, photographe… Nos intervenants de confiance se déplacent chez vous, à Douala et environs.",
+        "leadMobile": "Entretien du logement, linge, repas, colis, chef privé, massage… Nos intervenants de confiance se déplacent chez vous, à Douala.",
+        "primaryCta": {
+          "label": "Demander un devis gratuit",
+          "href": "/devis"
+        },
+        "secondaryCta": {
+          "label": "S’inscrire",
+          "href": "/inscription"
+        },
+        "socialProof": "4,9/5 · plus de 150 projets accompagnés",
+        "visual": {
+          "illustration": "accueil",
+          "image": {
+            "id": "photo-home-hero",
+            "url": "/photos/home-hero.png",
+            "width": 960,
+            "height": 1280,
+            "variants": []
+          },
+          "alt": "Une famille sourit dans son salon pendant qu'une intervenante Mambo Proxi s'occupe du ménage."
+        },
+        "visualSecondary": {
+          "illustration": "chef",
+          "image": {
+            "id": "photo-chef-2",
+            "url": "/photos/chef-2.png",
+            "width": 1536,
+            "height": 1024,
+            "variants": []
+          },
+          "alt": "Un chef privé présente un plat de poisson braisé."
+        },
+        "floatingCards": [
+          {
+            "icon": "Check",
+            "title": "Devis envoyé en 24 h",
+            "text": "Chef privé · samedi 20h"
+          },
+          {
+            "icon": "Key",
+            "title": "Logement trouvé",
+            "text": "Bonapriso, Douala",
+            "progress": 0.83,
+            "footnote": "Installation prévue le 12 nov."
+          }
+        ],
+        "sticker": "Pensé pour vous",
+        "adminLabel": "Section principale"
+      },
+      {
+        "id": "bandeau-services",
+        "type": "marquee",
+        "enabled": true,
+        "items": [
+          "Location de voiture",
+          "Chef privé",
+          "Massage bien-être",
+          "Photographe",
+          "Événementiel",
+          "Livraison de repas",
+          "Courses",
+          "Colis",
+          "Recherche de logement",
+          "Logement temporaire",
+          "Gestion locative",
+          "Découverte du Cameroun",
+          "Sorties culturelles"
+        ],
+        "itemsMobile": ["Chef privé", "Logement", "Massage bien-être", "Courses", "Découverte du Cameroun"],
+        "adminLabel": "Bandeau des services"
+      },
+      {
+        "id": "formules",
+        "type": "dynamic",
+        "enabled": true,
+        "tone": "muted",
+        "source": "formulas",
+        "categorySlug": "services-a-domicile",
+        "eyebrow": "Services à domicile",
+        "title": "Une intervenante chez vous, selon la formule choisie.",
+        "lead": "Tarifs indicatifs sur devis, ajustés selon la surface, l’état du logement et les options. Le pressing est facturé séparément.",
+        "adminLabel": "Formules à domicile"
+      },
+      {
+        "id": "univers",
+        "type": "dynamic",
+        "enabled": true,
+        "source": "categories-bento",
+        "eyebrow": "Nos univers de services",
+        "title": "Tout ce dont vous avez besoin, réuni au même endroit.",
+        "lead": "30 services regroupés en 6 univers. Choisissez, nous intervenons chez vous avec des intervenants sélectionnés et suivis.",
+        "leadMobile": "30 services regroupés en 6 univers.",
+        "link": {
+          "label": "Voir tous les services",
+          "href": "/services"
+        },
+        "adminLabel": "Rubriques de services"
+      },
+      {
+        "id": "comment-ca-marche",
+        "type": "steps",
+        "enabled": true,
+        "tone": "muted",
+        "layout": "cards",
+        "eyebrow": "Comment ça marche",
+        "title": "Simple comme un message.",
+        "lead": "Trois étapes, un seul interlocuteur. Vous restez informé du début à la fin.",
+        "leadMobile": "Trois étapes, un seul interlocuteur.",
+        "items": [
+          {
+            "number": "01",
+            "icon": "FileText",
+            "title": "Vous exprimez votre besoin",
+            "text": "Via le formulaire de devis, sur WhatsApp, par téléphone ou lors d'un rendez-vous.",
+            "textMobile": "Formulaire, WhatsApp ou rendez-vous."
+          },
+          {
+            "number": "02",
+            "icon": "Mail",
+            "title": "Vous recevez un devis sur mesure",
+            "text": "Sous 24 h, une proposition claire et personnalisée, sans engagement de votre part.",
+            "textMobile": "Sous 24 h, sans engagement."
+          },
+          {
+            "number": "03",
+            "icon": "ShieldCheck",
+            "title": "Nous nous occupons de tout",
+            "text": "Nos prestataires sélectionnés interviennent. Vous êtes tenu informé à chaque étape.",
+            "textMobile": "Vous êtes informé à chaque étape."
+          }
+        ],
+        "channelsLabel": "Au choix :",
+        "channels": [
+          {
+            "label": "Formulaire en ligne",
+            "kind": "form"
+          },
+          {
+            "label": "WhatsApp",
+            "kind": "whatsapp"
+          },
+          {
+            "label": "Rendez-vous",
+            "kind": "appointment"
+          }
+        ],
+        "adminLabel": "Comment ça marche"
+      },
+      {
+        "id": "engagements",
+        "type": "featureList",
+        "enabled": true,
+        "eyebrow": "Nos engagements",
+        "title": "La proximité, c'est notre métier.",
+        "lead": "Une équipe présente à Douala, des intervenants choisis avec soin et une seule promesse : vous simplifier la vie.",
+        "leadMobile": "",
+        "visual": {
+          "illustration": "equipe",
+          "image": {
+            "id": "photo-agence-equipe",
+            "url": "/photos/agence-equipe.png",
+            "width": 1024,
+            "height": 1024,
+            "variants": []
+          },
+          "alt": "L'équipe Mambo Proxi réunie autour d'une table à l'agence."
+        },
+        "items": [
+          {
+            "icon": "Users",
+            "title": "Une équipe à vos côtés",
+            "text": "Un interlocuteur unique qui vous accompagne pas à pas, de la demande à l’intervention."
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "Des solutions concrètes et durables",
+            "text": "Des prestataires vérifiés, suivis et évalués après chaque mission."
+          },
+          {
+            "icon": "Globe",
+            "title": "Des intervenants sélectionnés et suivis",
+            "text": "Références vérifiées, tests pratiques et suivi qualité après chaque intervention."
+          }
+        ],
+        "figures": [],
+        "adminLabel": "Nos engagements"
+      },
+      {
+        "id": "zones",
+        "type": "dynamic",
+        "enabled": true,
+        "source": "zones-map",
+        "eyebrow": "Nos zones d’intervention",
+        "title": "Nous intervenons partout à Douala.",
+        "link": {
+          "label": "Voir toutes les zones et les quartiers",
+          "href": "/zones-d-intervention"
+        },
+        "adminLabel": "Zones d’intervention"
+      },
+      {
+        "id": "avis",
+        "type": "dynamic",
+        "enabled": true,
+        "tone": "muted",
+        "source": "reviews-highlight",
+        "eyebrow": "Avis clients",
+        "title": "Ils nous ont fait confiance, ils en parlent.",
+        "titleMobile": "Ils en parlent.",
+        "link": {
+          "label": "Lire tous les avis",
+          "href": "/avis-clients"
+        },
+        "limit": 3,
+        "adminLabel": "Témoignages"
+      },
+      {
+        "id": "partenaires",
+        "type": "dynamic",
+        "enabled": true,
+        "source": "partners-strip",
+        "title": "Ils travaillent à nos côtés",
+        "link": {
+          "label": "Vous êtes prestataire ? Devenez partenaire",
+          "labelMobile": "Devenez partenaire",
+          "href": "/partenaires#devenir-partenaire"
+        },
+        "limit": 6,
+        "adminLabel": "Partenaires et newsletter"
+      },
+      {
+        "id": "cta",
+        "type": "ctaBand",
+        "enabled": true,
+        "title": "Un projet, une question ?\n==Parlons-en.==",
+        "text": "Devis gratuit et sans engagement, réponse sous 24 h. Ou écrivez-nous directement sur WhatsApp.",
+        "textMobile": "Devis gratuit, réponse sous 24 h.",
+        "primaryCta": {
+          "label": "Demander un devis gratuit",
+          "href": "/devis"
+        },
+        "showWhatsapp": true,
+        "adminLabel": "Appel à l’action final"
+      }
+    ],
+    "seo": {
+      "title": null,
+      "description": null,
+      "ogImageUrl": null,
+      "noindex": false
+    },
+    "translations": {
+      "en": {
+        "title": "Home",
+        "sections": [
+          {
+            "id": "hero",
+            "type": "hero",
+            "enabled": true,
+            "variant": "home",
+            "tone": "muted",
+            "badge": {
+              "tag": "Douala  ·  Cameroon",
+              "text": "Everyday services at home"
+            },
+            "title": "Mambo isn't just a service. ==It's an experience designed for you.==",
+            "lead": "Home cleaning, laundry, meals, parcels, private chef, massage, photographer… Our trusted professionals come to your home, in Douala and the surrounding area.",
+            "leadMobile": "Home cleaning, laundry, meals, parcels, private chef, massage… Our trusted professionals come to your home in Douala.",
+            "primaryCta": {
+              "label": "Request a free quote",
+              "href": "/devis"
+            },
+            "secondaryCta": {
+              "label": "Sign up",
+              "href": "/inscription"
+            },
+            "socialProof": "4.9/5 · more than 150 projects supported",
+            "visual": {
+              "illustration": "accueil",
+              "image": {
+                "id": "photo-home-hero",
+                "url": "/photos/home-hero.png",
+                "width": 960,
+                "height": 1280,
+                "variants": []
+              },
+              "alt": "A family smiles in their living room while a Mambo Proxi housekeeper does the cleaning."
+            },
+            "visualSecondary": {
+              "illustration": "chef",
+              "image": {
+                "id": "photo-chef-2",
+                "url": "/photos/chef-2.png",
+                "width": 1536,
+                "height": 1024,
+                "variants": []
+              },
+              "alt": "A private chef presents a grilled fish dish."
+            },
+            "floatingCards": [
+              {
+                "icon": "Check",
+                "title": "Quote sent within 24 hours",
+                "text": "Private chef · Saturday 8pm"
+              },
+              {
+                "icon": "Key",
+                "title": "Home found",
+                "text": "Bonapriso, Douala",
+                "progress": 0.83,
+                "footnote": "Move-in planned on 12 Nov."
+              }
+            ],
+            "sticker": "Designed for you"
+          },
+          {
+            "id": "bandeau-services",
+            "type": "marquee",
+            "enabled": true,
+            "items": [
+              "Car rental",
+              "Private chef",
+              "Wellness massage",
+              "Photographer",
+              "Events",
+              "Meal delivery",
+              "Groceries",
+              "Parcels",
+              "Home search",
+              "Temporary housing",
+              "Property management",
+              "Discover Cameroon",
+              "Cultural outings"
+            ],
+            "itemsMobile": ["Private chef", "Housing", "Wellness massage", "Groceries", "Discover Cameroon"]
+          },
+          {
+            "id": "formules",
+            "type": "dynamic",
+            "enabled": true,
+            "tone": "muted",
+            "source": "formulas",
+            "categorySlug": "services-a-domicile",
+            "eyebrow": "Home services",
+            "title": "A housekeeper at your home, with the package you choose.",
+            "lead": "Indicative rates on quotation, adjusted to the surface area, the condition of the home and the options. Dry cleaning is charged separately."
+          },
+          {
+            "id": "univers",
+            "type": "dynamic",
+            "enabled": true,
+            "source": "categories-bento",
+            "eyebrow": "Our service areas",
+            "title": "Everything you need, all in one place.",
+            "lead": "30 services in 6 areas. Make your choice, we come to your home with selected and supervised professionals.",
+            "leadMobile": "30 services in 6 areas.",
+            "link": {
+              "label": "See all services",
+              "href": "/services"
+            }
+          },
+          {
+            "id": "comment-ca-marche",
+            "type": "steps",
+            "enabled": true,
+            "tone": "muted",
+            "layout": "cards",
+            "eyebrow": "How it works",
+            "title": "As simple as a message.",
+            "lead": "Three steps, a single point of contact. You stay informed from start to finish.",
+            "leadMobile": "Three steps, a single point of contact.",
+            "items": [
+              {
+                "number": "01",
+                "icon": "FileText",
+                "title": "You tell us what you need",
+                "text": "Through the quote form, on WhatsApp, by phone or during an appointment.",
+                "textMobile": "Form, WhatsApp or appointment."
+              },
+              {
+                "number": "02",
+                "icon": "Mail",
+                "title": "You receive a tailored quote",
+                "text": "Within 24 hours, a clear and personalised proposal, with no obligation.",
+                "textMobile": "Within 24 hours, no obligation."
+              },
+              {
+                "number": "03",
+                "icon": "ShieldCheck",
+                "title": "We take care of everything",
+                "text": "Our selected professionals step in. You are kept informed at every stage.",
+                "textMobile": "You are informed at every stage."
+              }
+            ],
+            "channelsLabel": "Your choice:",
+            "channels": [
+              {
+                "label": "Online form",
+                "kind": "form"
+              },
+              {
+                "label": "WhatsApp",
+                "kind": "whatsapp"
+              },
+              {
+                "label": "Appointment",
+                "kind": "appointment"
+              }
+            ]
+          },
+          {
+            "id": "engagements",
+            "type": "featureList",
+            "enabled": true,
+            "eyebrow": "Our commitments",
+            "title": "Being close to you is what we do.",
+            "lead": "A team based in Douala, carefully chosen professionals and a single promise: making your life easier.",
+            "leadMobile": "",
+            "visual": {
+              "illustration": "equipe",
+              "image": {
+                "id": "photo-agence-equipe",
+                "url": "/photos/agence-equipe.png",
+                "width": 1024,
+                "height": 1024,
+                "variants": []
+              },
+              "alt": "The Mambo Proxi team gathered around a table at the agency."
+            },
+            "items": [
+              {
+                "icon": "Users",
+                "title": "A team by your side",
+                "text": "A single point of contact who guides you step by step, from your request to the visit."
+              },
+              {
+                "icon": "ShieldCheck",
+                "title": "Practical and lasting solutions",
+                "text": "Professionals who are vetted, supervised and assessed after every job."
+              },
+              {
+                "icon": "Globe",
+                "title": "Selected and supervised professionals",
+                "text": "Checked references, practical tests and quality follow-up after every visit."
+              }
+            ],
+            "figures": []
+          },
+          {
+            "id": "zones",
+            "type": "dynamic",
+            "enabled": true,
+            "source": "zones-map",
+            "eyebrow": "Where we work",
+            "title": "We cover the whole of Douala.",
+            "link": {
+              "label": "See all areas and neighbourhoods",
+              "href": "/zones-d-intervention"
+            }
+          },
+          {
+            "id": "avis",
+            "type": "dynamic",
+            "enabled": true,
+            "tone": "muted",
+            "source": "reviews-highlight",
+            "eyebrow": "Customer reviews",
+            "title": "They trusted us, here is what they say.",
+            "titleMobile": "What they say.",
+            "link": {
+              "label": "Read all reviews",
+              "href": "/avis-clients"
+            },
+            "limit": 3
+          },
+          {
+            "id": "partenaires",
+            "type": "dynamic",
+            "enabled": true,
+            "source": "partners-strip",
+            "title": "They work alongside us",
+            "link": {
+              "label": "Are you a provider? Become a partner",
+              "labelMobile": "Become a partner",
+              "href": "/partenaires#devenir-partenaire"
+            },
+            "limit": 6
+          },
+          {
+            "id": "cta",
+            "type": "ctaBand",
+            "enabled": true,
+            "title": "A project, a question?\n==Let's talk.==",
+            "text": "Free quote with no obligation, reply within 24 hours. Or message us directly on WhatsApp.",
+            "textMobile": "Free quote, reply within 24 hours.",
+            "primaryCta": {
+              "label": "Request a free quote",
+              "href": "/devis"
+            },
+            "showWhatsapp": true
+          }
+        ]
+      }
+    },
+    "allowedSections": [
+      "hero",
+      "marquee",
+      "steps",
+      "featureList",
+      "cardGrid",
+      "textMedia",
+      "quote",
+      "statsGrid",
+      "team",
+      "faq",
+      "richText",
+      "ctaBand"
+    ],
+    "publishedAt": "2026-10-18T08:00:00.000Z"
+  },
+  {
+    "key": "services",
+    "title": "Nos services",
+    "path": "/services",
+    "group": "principales",
+    "sections": [
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "variant": "page",
+        "tone": "muted",
+        "eyebrow": "Nos services",
+        "title": "30 services, un seul interlocuteur.",
+        "lead": "Expérience, immobilier, services de proximité, culture et événementiel : choisissez votre besoin, nous nous occupons de tout avec des prestataires sélectionnés. Tarifs communiqués sur devis.",
+        "primaryCta": {
+          "label": "Demander un devis gratuit",
+          "href": "/devis"
+        },
+        "showWhatsapp": true,
+        "visual": {
+          "illustration": "accueil",
+          "image": {
+            "id": "photo-douala-ville",
+            "url": "/photos/douala-ville.png",
+            "width": 1536,
+            "height": 1024,
+            "variants": []
+          },
+          "alt": "Douala au coucher du soleil, le pont sur le Wouri."
+        }
+      },
+      {
+        "id": "rubriques",
+        "type": "dynamic",
+        "enabled": true,
+        "source": "categories-list"
+      },
+      {
+        "id": "cta",
+        "type": "ctaBand",
+        "enabled": true,
+        "title": "Vous ne trouvez pas\nvotre besoin ?",
+        "text": "Décrivez-nous votre projet : nous trouvons la bonne solution et vous répondons sous 24 h.",
+        "primaryCta": {
+          "label": "Demander un devis gratuit",
+          "href": "/devis"
+        },
+        "showWhatsapp": true
+      }
+    ],
+    "seo": {
+      "title": "Nos services",
+      "description": "Services à domicile, expérience, immobilier, services de proximité, culture et événementiel : 30 services à Douala, un seul interlocuteur. Devis gratuit sous 24 h.",
+      "ogImageUrl": null,
+      "noindex": false
+    },
+    "translations": {
+      "en": {
+        "title": "Our services",
+        "sections": [
+          {
+            "id": "hero",
+            "type": "hero",
+            "enabled": true,
+            "variant": "page",
+            "tone": "muted",
+            "eyebrow": "Our services",
+            "title": "30 services, a single point of contact.",
+            "lead": "Experience, real estate, local services, culture and events: choose what you need, we take care of everything with selected professionals. Rates provided on quotation.",
+            "primaryCta": {
+              "label": "Request a free quote",
+              "href": "/devis"
+            },
+            "showWhatsapp": true,
+            "visual": {
+              "illustration": "accueil",
+              "image": {
+                "id": "photo-douala-ville",
+                "url": "/photos/douala-ville.png",
+                "width": 1536,
+                "height": 1024,
+                "variants": []
+              },
+              "alt": "Douala at sunset, the bridge over the Wouri."
+            }
+          },
+          {
+            "id": "rubriques",
+            "type": "dynamic",
+            "enabled": true,
+            "source": "categories-list"
+          },
+          {
+            "id": "cta",
+            "type": "ctaBand",
+            "enabled": true,
+            "title": "Can't find\nwhat you need?",
+            "text": "Tell us about your project: we find the right solution and reply within 24 hours.",
+            "primaryCta": {
+              "label": "Request a free quote",
+              "href": "/devis"
+            },
+            "showWhatsapp": true
+          }
+        ],
+        "seo": {
+          "title": "Our services",
+          "description": "Home services, experience, real estate, local services, culture and events: 30 services in Douala, a single point of contact. Free quote within 24 hours.",
+          "ogImageUrl": null,
+          "noindex": false
+        }
+      }
+    },
+    "allowedSections": [
+      "hero",
+      "marquee",
+      "steps",
+      "featureList",
+      "cardGrid",
+      "textMedia",
+      "quote",
+      "statsGrid",
+      "team",
+      "faq",
+      "richText",
+      "ctaBand"
+    ],
+    "publishedAt": "2026-10-18T08:00:00.000Z"
+  },
+  {
+    "key": "zones-d-intervention",
+    "title": "Zones d’intervention",
+    "path": "/zones-d-intervention",
+    "group": "principales",
+    "sections": [
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "variant": "page",
+        "eyebrow": "Zones d’intervention",
+        "title": "Nous intervenons partout à Douala.",
+        "lead": "Quatre zones au départ de Cité SIC. Trouvez votre quartier : les conditions d’intervention et de livraison vous sont confirmées sur devis.",
+        "leadMobile": "Quatre zones au départ de Cité SIC. Conditions confirmées sur devis.",
+        "visual": {
+          "illustration": "livraison",
+          "image": {
+            "id": "photo-prox-scooter",
+            "url": "/photos/prox-scooter.png",
+            "width": 1280,
+            "height": 960,
+            "variants": []
+          },
+          "alt": "Un livreur Mambo Proxi à scooter sur une avenue bordée de palmiers, à Douala."
+        },
+        "showWhatsapp": false,
+        "anchors": [
+          {
+            "label": "La carte",
+            "href": "#la-carte",
+            "external": false
+          },
+          {
+            "label": "Mon quartier",
+            "href": "#trouver-votre-quartier",
+            "external": false
+          },
+          {
+            "label": "Les zones",
+            "href": "#quartiers-par-zone",
+            "external": false
+          },
+          {
+            "label": "Hors zone",
+            "href": "#zone-speciale",
+            "external": false
+          }
+        ]
+      },
+      {
+        "id": "carte",
+        "type": "dynamic",
+        "enabled": true,
+        "anchor": "la-carte",
+        "source": "zones-map",
+        "eyebrow": "La carte",
+        "title": "Quatre zones, une même exigence."
+      },
+      {
+        "id": "cta",
+        "type": "ctaBand",
+        "enabled": true,
+        "title": "Une demande\nà nous confier ?",
+        "text": "Nous l’étudions avec soin et vous répondons sous 24 h.",
+        "primaryCta": {
+          "label": "Demander un devis gratuit",
+          "href": "/devis",
+          "external": false
+        },
+        "showWhatsapp": true
+      }
+    ],
+    "seo": {
+      "title": "Zones d’intervention à Douala — quartiers desservis",
+      "description": "Quatre zones au départ de Cité SIC : trouvez votre quartier à Douala et les conditions d’intervention à domicile et de livraison, confirmées sur devis.",
+      "ogImageUrl": null,
+      "noindex": false
+    },
+    "translations": {
+      "en": {
+        "title": "Service areas",
+        "sections": [
+          {
+            "id": "hero",
+            "type": "hero",
+            "enabled": true,
+            "variant": "page",
+            "eyebrow": "Service areas",
+            "title": "We cover all of Douala.",
+            "lead": "Four areas from our Cité SIC base. Find your neighbourhood: the terms for home visits and delivery are confirmed in your quote.",
+            "leadMobile": "Four areas from our Cité SIC base. Terms confirmed in the quote.",
+            "visual": {
+              "illustration": "livraison",
+              "image": {
+                "id": "photo-prox-scooter",
+                "url": "/photos/prox-scooter.png",
+                "width": 1280,
+                "height": 960,
+                "variants": []
+              },
+              "alt": "A Mambo Proxi delivery rider on a scooter on a palm-lined avenue in Douala."
+            },
+            "showWhatsapp": false,
+            "anchors": [
+              {
+                "label": "The map",
+                "href": "#la-carte",
+                "external": false
+              },
+              {
+                "label": "My area",
+                "href": "#trouver-votre-quartier",
+                "external": false
+              },
+              {
+                "label": "The zones",
+                "href": "#quartiers-par-zone",
+                "external": false
+              },
+              {
+                "label": "Outside the zones",
+                "href": "#zone-speciale",
+                "external": false
+              }
+            ]
+          },
+          {
+            "id": "carte",
+            "type": "dynamic",
+            "enabled": true,
+            "anchor": "la-carte",
+            "source": "zones-map",
+            "eyebrow": "The map",
+            "title": "Four areas, one standard."
+          },
+          {
+            "id": "cta",
+            "type": "ctaBand",
+            "enabled": true,
+            "title": "Something\nwe can help with?",
+            "text": "We look at it carefully and reply within 24 hours.",
+            "primaryCta": {
+              "label": "Request a free quote",
+              "href": "/devis",
+              "external": false
+            },
+            "showWhatsapp": true
+          }
+        ],
+        "seo": {
+          "title": "Service areas in Douala — neighbourhoods we cover",
+          "description": "Four areas from our Cité SIC base: find your neighbourhood in Douala and the terms for home visits and delivery, confirmed in the quote.",
+          "ogImageUrl": null,
+          "noindex": false
+        }
+      }
+    },
+    "allowedSections": [
+      "hero",
+      "marquee",
+      "steps",
+      "featureList",
+      "cardGrid",
+      "textMedia",
+      "quote",
+      "statsGrid",
+      "team",
+      "faq",
+      "richText",
+      "ctaBand"
+    ],
+    "publishedAt": "2026-10-18T08:00:00.000Z"
+  },
+  {
+    "key": "qui-sommes-nous",
+    "title": "Qui sommes-nous ?",
+    "path": "/qui-sommes-nous",
+    "group": "principales",
+    "sections": [
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "variant": "page",
+        "eyebrow": "Qui sommes-nous ?",
+        "title": "Une agence de services de proximité au Cameroun.",
+        "lead": "MAMBO Proxi est une agence de services de proximité née d’un constat : au Cameroun, il est difficile de trouver rapidement des services compétents. Nous intervenons à domicile et dans l’immobilier, les services du quotidien, l’expérience, la culture et l’événementiel.",
+        "visual": {
+          "illustration": "equipe",
+          "image": {
+            "id": "photo-qsn-hero",
+            "url": "/photos/qsn-hero.png",
+            "width": 1280,
+            "height": 960,
+            "variants": []
+          },
+          "alt": "Une conseillère Mambo Proxi accueille un couple au comptoir de l’agence."
+        },
+        "showWhatsapp": false,
+        "anchors": [
+          {
+            "label": "Présentation",
+            "href": "#presentation",
+            "external": false
+          },
+          {
+            "label": "Notre équipe",
+            "href": "#notre-equipe",
+            "external": false
+          },
+          {
+            "label": "Nos valeurs",
+            "href": "#nos-valeurs",
+            "external": false
+          },
+          {
+            "label": "Pourquoi Mambo Proxi ?",
+            "href": "#pourquoi-mambo",
+            "external": false
+          }
+        ]
+      },
+      {
+        "id": "presentation",
+        "type": "textMedia",
+        "reverse": false,
+        "enabled": true,
+        "anchor": "presentation",
+        "tone": "light",
+        "eyebrow": "Présentation",
+        "title": "Mambo, ce n’est pas qu’un service. C’est une expérience pensée pour vous.",
+        "paragraphs": [
+          "Né du constat qu’il est difficile de trouver facilement des services compétents au Cameroun, MAMBO Proxi réunit des intervenants fiables, sélectionnés et suivis, pour simplifier votre quotidien.",
+          "Notre rôle : comprendre votre besoin, trouver la bonne solution, intervenir chez vous avec des personnes de confiance et vous tenir informé à chaque étape. Vous avez un seul interlocuteur."
+        ],
+        "chips": ["Vie", "Expérience", "Culture", "Transmission"],
+        "visual": null,
+        "quote": null,
+        "signature": null
+      },
+      {
+        "id": "fondatrice",
+        "type": "textMedia",
+        "reverse": false,
+        "enabled": true,
+        "tone": "muted",
+        "eyebrow": "Le parcours de la fondatrice",
+        "title": null,
+        "quote": "J’ai voulu créer le service dont chaque famille au Cameroun a besoin : quelqu’un de confiance, sur place, qui s’occupe de tout comme pour les siens.",
+        "paragraphs": [
+          "Fondatrice de MAMBO Proxi, Mireille Bell a fait de la proximité le cœur de son engagement : partager son savoir-faire et accompagner chacun avec attention et exigence."
+        ],
+        "signature": "Mireille Bell — Fondatrice et directrice",
+        "visual": {
+          "illustration": "portrait",
+          "image": {
+            "id": "photo-fondatrice",
+            "url": "/photos/fondatrice.png",
+            "width": 1117,
+            "height": 1185,
+            "variants": []
+          },
+          "alt": "Mireille Bell, fondatrice de Mambo Proxi."
+        },
+        "chips": []
+      },
+      {
+        "id": "equipe",
+        "type": "team",
+        "enabled": true,
+        "anchor": "notre-equipe",
+        "tone": "light",
+        "eyebrow": "Notre équipe",
+        "title": "Des visages derrière chaque service",
+        "lead": "Une équipe présente à Douala, joignable et à l’écoute.",
+        "members": [
+          {
+            "name": "Prénom Nom",
+            "role": "Opérations",
+            "location": "Douala",
+            "visual": {
+              "illustration": "portrait",
+              "image": {
+                "id": "portrait-1",
+                "url": "/illustrations/portraits/portrait-1.svg",
+                "width": 480,
+                "height": 360,
+                "variants": []
+              },
+              "alt": ""
+            }
+          },
+          {
+            "name": "Prénom Nom",
+            "role": "Relation clients",
+            "location": "Douala",
+            "visual": {
+              "illustration": "portrait",
+              "image": {
+                "id": "portrait-2",
+                "url": "/illustrations/portraits/portrait-2.svg",
+                "width": 480,
+                "height": 360,
+                "variants": []
+              },
+              "alt": ""
+            }
+          },
+          {
+            "name": "Prénom Nom",
+            "role": "Immobilier",
+            "location": "Yaoundé",
+            "visual": {
+              "illustration": "portrait",
+              "image": {
+                "id": "portrait-3",
+                "url": "/illustrations/portraits/portrait-3.svg",
+                "width": 480,
+                "height": 360,
+                "variants": []
+              },
+              "alt": ""
+            }
+          },
+          {
+            "name": "Prénom Nom",
+            "role": "Partenariats",
+            "location": "Douala",
+            "visual": {
+              "illustration": "portrait",
+              "image": {
+                "id": "portrait-4",
+                "url": "/illustrations/portraits/portrait-4.svg",
+                "width": 480,
+                "height": 360,
+                "variants": []
+              },
+              "alt": ""
+            }
+          }
+        ]
+      },
+      {
+        "id": "valeurs",
+        "type": "cardGrid",
+        "enabled": true,
+        "anchor": "nos-valeurs",
+        "tone": "dark",
+        "layout": "cards",
+        "columns": 4,
+        "eyebrow": "Nos valeurs",
+        "title": "Ce qui nous guide, chaque jour.",
+        "items": [
+          {
+            "icon": "Users",
+            "title": "Proximité",
+            "text": "Être présents, accessibles et attentifs, au plus près de vous."
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "Confiance",
+            "text": "Des prestataires vérifiés, des engagements tenus."
+          },
+          {
+            "icon": "Sparkles",
+            "title": "Exigence",
+            "text": "Le même niveau de qualité, quel que soit le service."
+          },
+          {
+            "icon": "GraduationCap",
+            "title": "Transmission",
+            "text": "Partager la culture, les savoir-faire et les bonnes pratiques."
+          }
+        ]
+      },
+      {
+        "id": "pourquoi",
+        "type": "featureList",
+        "enabled": true,
+        "anchor": "pourquoi-mambo",
+        "tone": "light",
+        "eyebrow": "Pourquoi Mambo Proxi ?",
+        "title": "Trois engagements, une seule promesse.",
+        "items": [
+          {
+            "icon": "Users",
+            "number": "01",
+            "title": "Une équipe à vos côtés",
+            "text": "Un interlocuteur unique qui vous accompagne pas à pas."
+          },
+          {
+            "icon": "ShieldCheck",
+            "number": "02",
+            "title": "Des solutions concrètes et durables",
+            "text": "Des prestataires vérifiés, suivis et évalués."
+          },
+          {
+            "icon": "Globe",
+            "number": "03",
+            "title": "Des intervenants sélectionnés et suivis",
+            "text": "Une équipe sur place, à Douala."
+          }
+        ],
+        "figures": [
+          {
+            "key": "projects",
+            "value": 150,
+            "prefix": "",
+            "suffix": "+",
+            "decimals": 0,
+            "label": "projets accompagnés"
+          },
+          {
+            "key": "partners",
+            "value": 40,
+            "prefix": "",
+            "suffix": "+",
+            "decimals": 0,
+            "label": "partenaires engagés"
+          },
+          {
+            "key": "universes",
+            "value": 2,
+            "prefix": "",
+            "decimals": 0,
+            "label": "univers de services"
+          },
+          {
+            "key": "services",
+            "value": 19,
+            "prefix": "",
+            "decimals": 0,
+            "label": "services"
+          }
+        ],
+        "visual": null
+      },
+      {
+        "id": "cta",
+        "type": "ctaBand",
+        "enabled": true,
+        "title": "Faisons\nconnaissance.",
+        "text": "Une question, un projet ? Échangeons par téléphone, WhatsApp ou lors d’un rendez-vous.",
+        "primaryCta": {
+          "label": "Demander un devis gratuit",
+          "href": "/devis",
+          "external": false
+        },
+        "showWhatsapp": true
+      }
+    ],
+    "seo": {
+      "title": "Qui sommes-nous ? Une agence de services de proximité au Cameroun",
+      "description": "MAMBO Proxi, agence de services de proximité à Douala : services à domicile, immobilier, services du quotidien, expérience, culture et événementiel, avec des intervenants de confiance.",
+      "ogImageUrl": null,
+      "noindex": false
+    },
+    "translations": {
+      "en": {
+        "title": "About us",
+        "sections": [
+          {
+            "id": "hero",
+            "type": "hero",
+            "enabled": true,
+            "variant": "page",
+            "eyebrow": "About us",
+            "title": "A local services agency in Cameroon.",
+            "lead": "MAMBO Proxi is a local services agency born from a simple observation: in Cameroon, it is hard to find skilled services quickly. We work in your home and in real estate, everyday services, experiences, culture and events.",
+            "visual": {
+              "illustration": "equipe",
+              "image": {
+                "id": "photo-qsn-hero",
+                "url": "/photos/qsn-hero.png",
+                "width": 1280,
+                "height": 960,
+                "variants": []
+              },
+              "alt": "A Mambo Proxi adviser welcomes a couple at the agency’s front desk."
+            },
+            "showWhatsapp": false,
+            "anchors": [
+              {
+                "label": "Who we are",
+                "href": "#presentation",
+                "external": false
+              },
+              {
+                "label": "Our team",
+                "href": "#notre-equipe",
+                "external": false
+              },
+              {
+                "label": "Our values",
+                "href": "#nos-valeurs",
+                "external": false
+              },
+              {
+                "label": "Why Mambo Proxi?",
+                "href": "#pourquoi-mambo",
+                "external": false
+              }
+            ]
+          },
+          {
+            "id": "presentation",
+            "type": "textMedia",
+            "reverse": false,
+            "enabled": true,
+            "anchor": "presentation",
+            "tone": "light",
+            "eyebrow": "Who we are",
+            "title": "Mambo is more than a service. It’s an experience designed for you.",
+            "paragraphs": [
+              "Born from the observation that skilled services are hard to find in Cameroon, MAMBO Proxi brings together reliable people, selected and monitored, to make your everyday life simpler.",
+              "Our role: understand your need, find the right solution, send trusted people to your home and keep you informed at every step. You have a single point of contact."
+            ],
+            "chips": ["Life", "Experience", "Culture", "Sharing"],
+            "visual": null,
+            "quote": null,
+            "signature": null
+          },
+          {
+            "id": "fondatrice",
+            "type": "textMedia",
+            "reverse": false,
+            "enabled": true,
+            "tone": "muted",
+            "eyebrow": "Our founder’s story",
+            "title": null,
+            "quote": "I wanted to create the service every family in Cameroon needs: someone trustworthy, on the spot, who takes care of everything as if for their own.",
+            "paragraphs": [
+              "Founder of MAMBO Proxi, Mireille Bell has made closeness the heart of her commitment: sharing her know-how and supporting everyone with care and high standards."
+            ],
+            "signature": "Mireille Bell — Founder and director",
+            "visual": {
+              "illustration": "portrait",
+              "image": {
+                "id": "photo-fondatrice",
+                "url": "/photos/fondatrice.png",
+                "width": 1117,
+                "height": 1185,
+                "variants": []
+              },
+              "alt": "Mireille Bell, founder of Mambo Proxi."
+            },
+            "chips": []
+          },
+          {
+            "id": "equipe",
+            "type": "team",
+            "enabled": true,
+            "anchor": "notre-equipe",
+            "tone": "light",
+            "eyebrow": "Our team",
+            "title": "The faces behind every service",
+            "lead": "A team based in Douala, easy to reach and ready to listen.",
+            "members": [
+              {
+                "name": "First Last",
+                "role": "Operations",
+                "location": "Douala",
+                "visual": {
+                  "illustration": "portrait",
+                  "image": {
+                    "id": "portrait-1",
+                    "url": "/illustrations/portraits/portrait-1.svg",
+                    "width": 480,
+                    "height": 360,
+                    "variants": []
+                  },
+                  "alt": ""
+                }
+              },
+              {
+                "name": "First Last",
+                "role": "Customer relations",
+                "location": "Douala",
+                "visual": {
+                  "illustration": "portrait",
+                  "image": {
+                    "id": "portrait-2",
+                    "url": "/illustrations/portraits/portrait-2.svg",
+                    "width": 480,
+                    "height": 360,
+                    "variants": []
+                  },
+                  "alt": ""
+                }
+              },
+              {
+                "name": "First Last",
+                "role": "Real estate",
+                "location": "Yaoundé",
+                "visual": {
+                  "illustration": "portrait",
+                  "image": {
+                    "id": "portrait-3",
+                    "url": "/illustrations/portraits/portrait-3.svg",
+                    "width": 480,
+                    "height": 360,
+                    "variants": []
+                  },
+                  "alt": ""
+                }
+              },
+              {
+                "name": "First Last",
+                "role": "Partnerships",
+                "location": "Douala",
+                "visual": {
+                  "illustration": "portrait",
+                  "image": {
+                    "id": "portrait-4",
+                    "url": "/illustrations/portraits/portrait-4.svg",
+                    "width": 480,
+                    "height": 360,
+                    "variants": []
+                  },
+                  "alt": ""
+                }
+              }
+            ]
+          },
+          {
+            "id": "valeurs",
+            "type": "cardGrid",
+            "enabled": true,
+            "anchor": "nos-valeurs",
+            "tone": "dark",
+            "layout": "cards",
+            "columns": 4,
+            "eyebrow": "Our values",
+            "title": "What guides us, every day.",
+            "items": [
+              {
+                "icon": "Users",
+                "title": "Closeness",
+                "text": "Being present, available and attentive, close to you."
+              },
+              {
+                "icon": "ShieldCheck",
+                "title": "Trust",
+                "text": "Vetted providers, commitments kept."
+              },
+              {
+                "icon": "Sparkles",
+                "title": "High standards",
+                "text": "The same level of quality, whatever the service."
+              },
+              {
+                "icon": "GraduationCap",
+                "title": "Sharing",
+                "text": "Passing on culture, know-how and good practice."
+              }
+            ]
+          },
+          {
+            "id": "pourquoi",
+            "type": "featureList",
+            "enabled": true,
+            "anchor": "pourquoi-mambo",
+            "tone": "light",
+            "eyebrow": "Why Mambo Proxi?",
+            "title": "Three commitments, one promise.",
+            "items": [
+              {
+                "icon": "Users",
+                "number": "01",
+                "title": "A team by your side",
+                "text": "A single point of contact who guides you step by step."
+              },
+              {
+                "icon": "ShieldCheck",
+                "number": "02",
+                "title": "Practical, lasting solutions",
+                "text": "Providers who are vetted, monitored and reviewed."
+              },
+              {
+                "icon": "Globe",
+                "number": "03",
+                "title": "Selected, monitored providers",
+                "text": "A team on the ground, in Douala."
+              }
+            ],
+            "figures": [
+              {
+                "key": "projects",
+                "value": 150,
+                "prefix": "",
+                "suffix": "+",
+                "decimals": 0,
+                "label": "projects supported"
+              },
+              {
+                "key": "partners",
+                "value": 40,
+                "prefix": "",
+                "suffix": "+",
+                "decimals": 0,
+                "label": "committed partners"
+              },
+              {
+                "key": "universes",
+                "value": 2,
+                "prefix": "",
+                "decimals": 0,
+                "label": "service areas"
+              },
+              {
+                "key": "services",
+                "value": 19,
+                "prefix": "",
+                "decimals": 0,
+                "label": "services"
+              }
+            ],
+            "visual": null
+          },
+          {
+            "id": "cta",
+            "type": "ctaBand",
+            "enabled": true,
+            "title": "Let’s get\nacquainted.",
+            "text": "A question, a project? Let’s talk by phone, on WhatsApp or at an appointment.",
+            "primaryCta": {
+              "label": "Request a free quote",
+              "href": "/devis",
+              "external": false
+            },
+            "showWhatsapp": true
+          }
+        ],
+        "seo": {
+          "title": "About us: a local services agency in Cameroon",
+          "description": "MAMBO Proxi, a local services agency in Douala: home services, real estate, everyday services, experiences, culture and events, with people you can trust.",
+          "ogImageUrl": null,
+          "noindex": false
+        }
+      }
+    },
+    "allowedSections": [
+      "hero",
+      "marquee",
+      "steps",
+      "featureList",
+      "cardGrid",
+      "textMedia",
+      "quote",
+      "statsGrid",
+      "team",
+      "faq",
+      "richText",
+      "ctaBand"
+    ],
+    "publishedAt": "2026-10-18T08:00:00.000Z"
+  },
+  {
+    "key": "mission",
+    "title": "Mission",
+    "path": "/mission",
+    "group": "principales",
+    "sections": [
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "variant": "page",
+        "eyebrow": "Notre mission",
+        "title": "Simplifier la vie, au plus près de vous.",
+        "lead": "Notre mission, notre vision, nos engagements et la méthode qui nous permet d’organiser chaque service avec rigueur.",
+        "visual": {
+          "illustration": "accueil",
+          "image": {
+            "id": "photo-mission-hero",
+            "url": "/photos/mission-hero.png",
+            "width": 1280,
+            "height": 960,
+            "variants": []
+          },
+          "alt": "Une conseillère Mambo Proxi prend des notes auprès d’une famille, dans son salon."
+        },
+        "showWhatsapp": false,
+        "anchors": [
+          {
+            "label": "Notre mission",
+            "href": "#mission",
+            "external": false
+          },
+          {
+            "label": "Notre vision",
+            "href": "#vision",
+            "external": false
+          },
+          {
+            "label": "Nos engagements",
+            "href": "#engagements",
+            "external": false
+          },
+          {
+            "label": "Notre méthode",
+            "href": "#methode",
+            "external": false
+          }
+        ]
+      },
+      {
+        "id": "mission-vision",
+        "type": "cardGrid",
+        "enabled": true,
+        "tone": "light",
+        "layout": "compact",
+        "columns": 2,
+        "items": [
+          {
+            "icon": "ShieldCheck",
+            "title": "Notre mission",
+            "tone": "orange",
+            "text": "Accompagner les personnes, les familles et les organisations au Cameroun, en leur offrant des services fiables et humains, à domicile et au plus près d’elles, pour se loger, se simplifier le quotidien et vivre des expériences de qualité."
+          },
+          {
+            "icon": "Compass",
+            "title": "Notre vision",
+            "tone": "dark",
+            "text": "Devenir la référence des services de proximité au Cameroun : un lieu unique où chacun trouve un interlocuteur de confiance, quel que soit son besoin."
+          }
+        ]
+      },
+      {
+        "id": "engagements",
+        "type": "cardGrid",
+        "enabled": true,
+        "anchor": "engagements",
+        "tone": "muted",
+        "layout": "numbered",
+        "columns": 2,
+        "eyebrow": "Nos engagements",
+        "title": "Ce que nous vous promettons, à chaque demande.",
+        "items": [
+          {
+            "number": "01",
+            "title": "Écoute",
+            "text": "Comprendre votre besoin réel avant de proposer une solution."
+          },
+          {
+            "number": "02",
+            "title": "Transparence",
+            "text": "Un devis clair, sans frais cachés, avant toute prestation."
+          },
+          {
+            "number": "03",
+            "title": "Fiabilité",
+            "text": "Des prestataires vérifiés, suivis et évalués."
+          },
+          {
+            "number": "04",
+            "title": "Réactivité",
+            "text": "Une réponse sous 24 h, un suivi à chaque étape."
+          },
+          {
+            "number": "05",
+            "title": "Confidentialité",
+            "text": "Vos informations protégées et utilisées avec votre accord."
+          },
+          {
+            "number": "06",
+            "title": "Amélioration continue",
+            "text": "Votre avis après chaque prestation pour progresser."
+          }
+        ]
+      },
+      {
+        "id": "methode",
+        "type": "steps",
+        "enabled": true,
+        "anchor": "methode",
+        "tone": "light",
+        "layout": "rail",
+        "eyebrow": "Notre méthode d’intervention",
+        "title": "Cinq étapes, un seul interlocuteur.",
+        "lead": "De votre premier message jusqu’à votre avis, chaque demande suit le même parcours.",
+        "items": [
+          {
+            "icon": "FileText",
+            "title": "Écoute",
+            "text": "Vous nous décrivez votre besoin par formulaire, WhatsApp ou rendez-vous."
+          },
+          {
+            "icon": "Search",
+            "title": "Analyse",
+            "text": "Nous identifions la solution et les prestataires les plus adaptés."
+          },
+          {
+            "icon": "Mail",
+            "title": "Proposition",
+            "text": "Vous recevez un devis clair et personnalisé sous 24 h."
+          },
+          {
+            "icon": "Users",
+            "title": "Intervention",
+            "text": "Nous organisons et supervisons l’intervention des prestataires."
+          },
+          {
+            "icon": "Sparkles",
+            "title": "Suivi et évaluation",
+            "text": "Un questionnaire de satisfaction clôture chaque prestation."
+          }
+        ]
+      },
+      {
+        "id": "citation",
+        "type": "quote",
+        "enabled": true,
+        "tone": "green",
+        "text": "Mambo, ce n’est pas qu’un service. C’est une expérience pensée pour vous.",
+        "author": "La signature de MAMBO Proxi",
+        "visual": {
+          "illustration": "culture",
+          "image": {
+            "id": "photo-douala-ville",
+            "url": "/photos/douala-ville.png",
+            "width": 1536,
+            "height": 1024,
+            "variants": []
+          },
+          "alt": "Douala au coucher du soleil, le pont sur le Wouri."
+        }
+      },
+      {
+        "id": "cta",
+        "type": "ctaBand",
+        "enabled": true,
+        "title": "Une demande\nà nous confier ?",
+        "text": "Nous l’étudions avec soin et vous répondons sous 24 h.",
+        "primaryCta": {
+          "label": "Demander un devis gratuit",
+          "href": "/devis",
+          "external": false
+        },
+        "showWhatsapp": true
+      }
+    ],
+    "seo": {
+      "title": "Notre mission : simplifier la vie, au plus près de vous",
+      "description": "Notre mission, notre vision, nos engagements et la méthode qui nous permet d’organiser chaque service à domicile, à Douala.",
+      "ogImageUrl": null,
+      "noindex": false
+    },
+    "translations": {
+      "en": {
+        "sections": [
+          {
+            "id": "hero",
+            "type": "hero",
+            "enabled": true,
+            "variant": "page",
+            "eyebrow": "Our mission",
+            "title": "Making life simpler, close to you.",
+            "lead": "Our mission, our vision, our commitments and the method we use to organise every service with care.",
+            "visual": {
+              "illustration": "accueil",
+              "image": {
+                "id": "photo-mission-hero",
+                "url": "/photos/mission-hero.png",
+                "width": 1280,
+                "height": 960,
+                "variants": []
+              },
+              "alt": "A Mambo Proxi adviser takes notes with a family in their living room."
+            },
+            "showWhatsapp": false,
+            "anchors": [
+              {
+                "label": "Our mission",
+                "href": "#mission",
+                "external": false
+              },
+              {
+                "label": "Our vision",
+                "href": "#vision",
+                "external": false
+              },
+              {
+                "label": "Our commitments",
+                "href": "#engagements",
+                "external": false
+              },
+              {
+                "label": "Our method",
+                "href": "#methode",
+                "external": false
+              }
+            ]
+          },
+          {
+            "id": "mission-vision",
+            "type": "cardGrid",
+            "enabled": true,
+            "tone": "light",
+            "layout": "compact",
+            "columns": 2,
+            "items": [
+              {
+                "icon": "ShieldCheck",
+                "title": "Our mission",
+                "tone": "orange",
+                "text": "To support people, families and organisations in Cameroon with reliable, caring services, at home and close to them, to find a place to live, simplify everyday life and enjoy quality experiences."
+              },
+              {
+                "icon": "Compass",
+                "title": "Our vision",
+                "tone": "dark",
+                "text": "To become the benchmark for local services in Cameroon: one place where everyone finds someone they can trust, whatever they need."
+              }
+            ]
+          },
+          {
+            "id": "engagements",
+            "type": "cardGrid",
+            "enabled": true,
+            "anchor": "engagements",
+            "tone": "muted",
+            "layout": "numbered",
+            "columns": 2,
+            "eyebrow": "Our commitments",
+            "title": "What we promise you, with every request.",
+            "items": [
+              {
+                "number": "01",
+                "title": "Listening",
+                "text": "Understanding what you really need before suggesting a solution."
+              },
+              {
+                "number": "02",
+                "title": "Transparency",
+                "text": "A clear quote, with no hidden costs, before any service."
+              },
+              {
+                "number": "03",
+                "title": "Reliability",
+                "text": "Service providers who are vetted, monitored and rated."
+              },
+              {
+                "number": "04",
+                "title": "Responsiveness",
+                "text": "A reply within 24 hours, follow-up at every step."
+              },
+              {
+                "number": "05",
+                "title": "Confidentiality",
+                "text": "Your information protected and used only with your consent."
+              },
+              {
+                "number": "06",
+                "title": "Continuous improvement",
+                "text": "Your feedback after every service, so we keep getting better."
+              }
+            ]
+          },
+          {
+            "id": "methode",
+            "type": "steps",
+            "enabled": true,
+            "anchor": "methode",
+            "tone": "light",
+            "layout": "rail",
+            "eyebrow": "How we work",
+            "title": "Five steps, one point of contact.",
+            "lead": "From your first message to your feedback, every request follows the same path.",
+            "items": [
+              {
+                "icon": "FileText",
+                "title": "Listening",
+                "text": "You describe what you need through the form, on WhatsApp or at an appointment."
+              },
+              {
+                "icon": "Search",
+                "title": "Analysis",
+                "text": "We find the solution and the service providers best suited to it."
+              },
+              {
+                "icon": "Mail",
+                "title": "Proposal",
+                "text": "You receive a clear, tailored quote within 24 hours."
+              },
+              {
+                "icon": "Users",
+                "title": "Service",
+                "text": "We organise and supervise the service providers’ work."
+              },
+              {
+                "icon": "Sparkles",
+                "title": "Follow-up and feedback",
+                "text": "A satisfaction survey closes every service."
+              }
+            ]
+          },
+          {
+            "id": "citation",
+            "type": "quote",
+            "enabled": true,
+            "tone": "green",
+            "text": "Mambo is more than a service. It’s an experience designed for you.",
+            "author": "The MAMBO Proxi signature",
+            "visual": {
+              "illustration": "culture",
+              "image": {
+                "id": "photo-douala-ville",
+                "url": "/photos/douala-ville.png",
+                "width": 1536,
+                "height": 1024,
+                "variants": []
+              },
+              "alt": "Douala at sunset, the bridge over the Wouri."
+            }
+          },
+          {
+            "id": "cta",
+            "type": "ctaBand",
+            "enabled": true,
+            "title": "Something\nwe can help with?",
+            "text": "We look at it carefully and reply within 24 hours.",
+            "primaryCta": {
+              "label": "Request a free quote",
+              "href": "/devis",
+              "external": false
+            },
+            "showWhatsapp": true
+          }
+        ],
+        "seo": {
+          "title": "Our mission: making life simpler, close to you",
+          "description": "Our mission, our vision, our commitments and the method we use to organise every home service in Douala.",
+          "ogImageUrl": null,
+          "noindex": false
+        }
+      }
+    },
+    "allowedSections": [
+      "hero",
+      "marquee",
+      "steps",
+      "featureList",
+      "cardGrid",
+      "textMedia",
+      "quote",
+      "statsGrid",
+      "team",
+      "faq",
+      "richText",
+      "ctaBand"
+    ],
+    "publishedAt": "2026-10-05T08:00:00.000Z"
+  },
+  {
+    "key": "partenaires",
+    "title": "Partenaires",
+    "path": "/partenaires",
+    "group": "principales",
+    "sections": [
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "variant": "page",
+        "eyebrow": "Partenaires",
+        "title": "Construisons ensemble des services ==de confiance.==",
+        "lead": "Chauffeurs, chefs, photographes, propriétaires, agences, entreprises : rejoignez le réseau MAMBO Proxi et recevez des demandes qualifiées.",
+        "visual": {
+          "illustration": "equipe",
+          "image": {
+            "id": "photo-part-hero",
+            "url": "/photos/part-hero.png",
+            "width": 1280,
+            "height": 960,
+            "variants": []
+          },
+          "alt": "Une partenaire et un responsable de Mambo Proxi se serrent la main autour d’un bureau."
+        },
+        "primaryCta": {
+          "label": "Devenir partenaire",
+          "href": "#formulaire",
+          "external": false
+        },
+        "secondaryCta": {
+          "label": "Voir nos partenaires",
+          "href": "#partenaires",
+          "external": false
+        },
+        "showWhatsapp": false
+      },
+      {
+        "id": "partenaires",
+        "type": "dynamic",
+        "enabled": true,
+        "anchor": "partenaires",
+        "tone": "light",
+        "source": "partners-grid",
+        "eyebrow": "Nos partenaires",
+        "title": "Ils travaillent à nos côtés"
+      },
+      {
+        "id": "types",
+        "type": "cardGrid",
+        "enabled": true,
+        "tone": "muted",
+        "layout": "illustrated",
+        "columns": 3,
+        "eyebrow": "Devenir partenaire",
+        "title": "Trois façons de travailler avec nous",
+        "items": [
+          {
+            "title": "Prestataires Expérience",
+            "subtitle": "Chauffeurs, photographes, chefs privés, masseurs, prestataires événementiels.",
+            "text": "Recevez des demandes de prestations près de chez vous.",
+            "visual": {
+              "illustration": "equipe",
+              "image": {
+                "id": "photo-part-exp",
+                "url": "/photos/part-exp.png",
+                "width": 1536,
+                "height": 864,
+                "variants": []
+              },
+              "alt": ""
+            },
+            "cta": {
+              "label": "Je candidate",
+              "href": "/partenaires?type=PRESTATAIRE_EXPERIENCE#formulaire",
+              "external": false
+            }
+          },
+          {
+            "title": "Immobilier",
+            "subtitle": "Propriétaires, agences et acteurs immobiliers.",
+            "text": "Confiez une gestion locative ou proposez vos logements.",
+            "visual": {
+              "illustration": "logement",
+              "image": {
+                "id": "photo-immo-recherche",
+                "url": "/photos/immo-recherche.png",
+                "width": 1536,
+                "height": 1024,
+                "variants": []
+              },
+              "alt": ""
+            },
+            "cta": {
+              "label": "Je candidate",
+              "href": "/partenaires?type=IMMOBILIER#formulaire",
+              "external": false
+            }
+          },
+          {
+            "title": "Entreprises & prestataires",
+            "subtitle": "Livraison, entretien, culture, loisirs, services aux familles.",
+            "text": "Développez votre activité avec un partenaire de confiance.",
+            "visual": {
+              "illustration": "equipe",
+              "image": {
+                "id": "photo-part-entreprise",
+                "url": "/photos/part-entreprise.png",
+                "width": 1536,
+                "height": 864,
+                "variants": []
+              },
+              "alt": ""
+            },
+            "cta": {
+              "label": "Je candidate",
+              "href": "/partenaires?type=ENTREPRISE_PRESTATAIRE#formulaire",
+              "external": false
+            }
+          }
+        ]
+      },
+      {
+        "id": "avantages",
+        "type": "cardGrid",
+        "enabled": true,
+        "tone": "light",
+        "layout": "cards",
+        "columns": 4,
+        "eyebrow": "Pourquoi nous rejoindre ?",
+        "title": "Un réseau qui valorise votre savoir-faire",
+        "items": [
+          {
+            "icon": "Mail",
+            "title": "Des demandes qualifiées",
+            "text": "Des clients dont le besoin est déjà précisé."
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "Une relation claire",
+            "text": "Des engagements écrits, des règles simples."
+          },
+          {
+            "icon": "Users",
+            "title": "Une visibilité nouvelle",
+            "text": "À Douala, auprès des familles, des actifs et des professionnels."
+          },
+          {
+            "icon": "GraduationCap",
+            "title": "Formation et accompagnement",
+            "text": "Ateliers pour progresser et monter en qualité."
+          }
+        ]
+      },
+      {
+        "id": "formulaire",
+        "type": "dynamic",
+        "enabled": true,
+        "anchor": "formulaire",
+        "tone": "muted",
+        "source": "partner-form",
+        "eyebrow": "Formulaire",
+        "title": "Devenir partenaire",
+        "lead": "Présentez votre activité en quelques minutes. Nous vous recontactons sous 72 h pour faire connaissance.",
+        "note": "Et ensuite ?",
+        "items": [
+          {
+            "title": "Étude de votre demande"
+          },
+          {
+            "title": "Échange avec notre équipe"
+          },
+          {
+            "title": "Signature de la charte partenaire"
+          }
+        ]
+      }
+    ],
+    "seo": {
+      "title": "Devenir partenaire de MAMBO Proxi au Cameroun",
+      "description": "Chauffeurs, chefs, photographes, propriétaires, agences, entreprises : rejoignez le réseau MAMBO Proxi et recevez des demandes qualifiées.",
+      "ogImageUrl": null,
+      "noindex": false
+    },
+    "translations": {
+      "en": {
+        "title": "Partners",
+        "sections": [
+          {
+            "id": "hero",
+            "type": "hero",
+            "enabled": true,
+            "variant": "page",
+            "eyebrow": "Partners",
+            "title": "Let’s build services ==you can trust.==",
+            "lead": "Drivers, chefs, photographers, landlords, agencies, businesses: join the MAMBO Proxi network and receive qualified requests.",
+            "visual": {
+              "illustration": "equipe",
+              "image": {
+                "id": "photo-part-hero",
+                "url": "/photos/part-hero.png",
+                "width": 1280,
+                "height": 960,
+                "variants": []
+              },
+              "alt": "A partner and a Mambo Proxi manager shake hands across a desk."
+            },
+            "primaryCta": {
+              "label": "Become a partner",
+              "href": "#formulaire",
+              "external": false
+            },
+            "secondaryCta": {
+              "label": "See our partners",
+              "href": "#partenaires",
+              "external": false
+            },
+            "showWhatsapp": false
+          },
+          {
+            "id": "partenaires",
+            "type": "dynamic",
+            "enabled": true,
+            "anchor": "partenaires",
+            "tone": "light",
+            "source": "partners-grid",
+            "eyebrow": "Our partners",
+            "title": "They work alongside us"
+          },
+          {
+            "id": "types",
+            "type": "cardGrid",
+            "enabled": true,
+            "tone": "muted",
+            "layout": "illustrated",
+            "columns": 3,
+            "eyebrow": "Become a partner",
+            "title": "Three ways to work with us",
+            "items": [
+              {
+                "title": "Experience providers",
+                "subtitle": "Drivers, photographers, private chefs, massage therapists, event providers.",
+                "text": "Receive service requests close to where you are.",
+                "visual": {
+                  "illustration": "equipe",
+                  "image": {
+                    "id": "photo-part-exp",
+                    "url": "/photos/part-exp.png",
+                    "width": 1536,
+                    "height": 864,
+                    "variants": []
+                  },
+                  "alt": ""
+                },
+                "cta": {
+                  "label": "Apply",
+                  "href": "/partenaires?type=PRESTATAIRE_EXPERIENCE#formulaire",
+                  "external": false
+                }
+              },
+              {
+                "title": "Real estate",
+                "subtitle": "Landlords, agencies and property professionals.",
+                "text": "Entrust us with property management or list your homes.",
+                "visual": {
+                  "illustration": "logement",
+                  "image": {
+                    "id": "photo-immo-recherche",
+                    "url": "/photos/immo-recherche.png",
+                    "width": 1536,
+                    "height": 1024,
+                    "variants": []
+                  },
+                  "alt": ""
+                },
+                "cta": {
+                  "label": "Apply",
+                  "href": "/partenaires?type=IMMOBILIER#formulaire",
+                  "external": false
+                }
+              },
+              {
+                "title": "Businesses & providers",
+                "subtitle": "Delivery, cleaning, culture, leisure, family services.",
+                "text": "Grow your business with a partner you can trust.",
+                "visual": {
+                  "illustration": "equipe",
+                  "image": {
+                    "id": "photo-part-entreprise",
+                    "url": "/photos/part-entreprise.png",
+                    "width": 1536,
+                    "height": 864,
+                    "variants": []
+                  },
+                  "alt": ""
+                },
+                "cta": {
+                  "label": "Apply",
+                  "href": "/partenaires?type=ENTREPRISE_PRESTATAIRE#formulaire",
+                  "external": false
+                }
+              }
+            ]
+          },
+          {
+            "id": "avantages",
+            "type": "cardGrid",
+            "enabled": true,
+            "tone": "light",
+            "layout": "cards",
+            "columns": 4,
+            "eyebrow": "Why join us?",
+            "title": "A network that values your skills",
+            "items": [
+              {
+                "icon": "Mail",
+                "title": "Qualified requests",
+                "text": "Clients whose needs are already clearly defined."
+              },
+              {
+                "icon": "ShieldCheck",
+                "title": "A clear relationship",
+                "text": "Written commitments, simple rules."
+              },
+              {
+                "icon": "Users",
+                "title": "New visibility",
+                "text": "In Douala, among families, working people and professionals."
+              },
+              {
+                "icon": "GraduationCap",
+                "title": "Training and support",
+                "text": "Workshops to grow and raise your standards."
+              }
+            ]
+          },
+          {
+            "id": "formulaire",
+            "type": "dynamic",
+            "enabled": true,
+            "anchor": "formulaire",
+            "tone": "muted",
+            "source": "partner-form",
+            "eyebrow": "Application form",
+            "title": "Become a partner",
+            "lead": "Tell us about your business in a few minutes. We will get back to you within 72 hours to get to know you.",
+            "note": "What happens next?",
+            "items": [
+              {
+                "title": "We review your application"
+              },
+              {
+                "title": "A conversation with our team"
+              },
+              {
+                "title": "Signing the partner charter"
+              }
+            ]
+          }
+        ],
+        "seo": {
+          "title": "Become a MAMBO Proxi partner in Douala",
+          "description": "Drivers, chefs, photographers, landlords, agencies, businesses: join the MAMBO Proxi network and receive qualified requests.",
+          "ogImageUrl": null,
+          "noindex": false
+        }
+      }
+    },
+    "allowedSections": [
+      "hero",
+      "marquee",
+      "steps",
+      "featureList",
+      "cardGrid",
+      "textMedia",
+      "quote",
+      "statsGrid",
+      "team",
+      "faq",
+      "richText",
+      "ctaBand"
+    ],
+    "publishedAt": "2026-10-05T08:00:00.000Z"
+  },
+  {
+    "key": "formation",
+    "title": "Formation",
+    "path": "/formation",
+    "group": "principales",
+    "sections": [
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "variant": "page",
+        "eyebrow": "Formation",
+        "title": "Transmettre les savoir-faire ==qui font la qualité.==",
+        "lead": "Formations pour les professionnels, ateliers et sessions de sensibilisation : transmettre le savoir-faire, le savoir-être et les bonnes pratiques.",
+        "visual": {
+          "illustration": "formation",
+          "image": {
+            "id": "photo-formation-hero",
+            "url": "/photos/formation-hero.png",
+            "width": 1280,
+            "height": 960,
+            "variants": []
+          },
+          "alt": "Une formatrice anime une session devant des intervenants en tenue Mambo Proxi."
+        },
+        "primaryCta": {
+          "label": "Demander une formation",
+          "href": "#demande-formation",
+          "external": false
+        },
+        "secondaryCta": {
+          "label": "Voir le catalogue",
+          "href": "#catalogue",
+          "external": false
+        },
+        "showWhatsapp": false
+      },
+      {
+        "id": "offres",
+        "type": "cardGrid",
+        "enabled": true,
+        "tone": "light",
+        "layout": "compact",
+        "columns": 2,
+        "items": [
+          {
+            "icon": "Briefcase",
+            "title": "Formation des professionnels",
+            "tone": "dark",
+            "text": "Pour les prestataires et les entreprises : accueil, qualité de service, hygiène, entretien, gestion locative.",
+            "cta": {
+              "label": "Voir les formations",
+              "href": "/formation?categorie=PROFESSIONNELS#catalogue",
+              "external": false
+            }
+          },
+          {
+            "icon": "Users",
+            "title": "Ateliers & sensibilisation",
+            "tone": "orange",
+            "text": "Pour les particuliers, les familles et les associations : installation, accompagnement des proches, culture locale.",
+            "cta": {
+              "label": "Voir les formations",
+              "href": "/formation?categorie=ATELIERS#catalogue",
+              "external": false
+            }
+          }
+        ]
+      },
+      {
+        "id": "catalogue",
+        "type": "dynamic",
+        "enabled": true,
+        "anchor": "catalogue",
+        "tone": "muted",
+        "source": "trainings-catalog",
+        "eyebrow": "Nos formations",
+        "title": "Le catalogue",
+        "lead": "Chaque formation peut être adaptée à votre structure et à vos équipes."
+      },
+      {
+        "id": "demande",
+        "type": "dynamic",
+        "enabled": true,
+        "anchor": "demande-formation",
+        "tone": "light",
+        "source": "training-form",
+        "eyebrow": "Demande de formation",
+        "title": "Une formation pour votre équipe ?",
+        "lead": "Dites-nous ce dont vous avez besoin : nous vous proposons un programme et un devis adaptés.",
+        "visual": {
+          "illustration": "formation",
+          "image": {
+            "id": "photo-formation-form",
+            "url": "/photos/formation-form.png",
+            "width": 1536,
+            "height": 1024,
+            "variants": []
+          },
+          "alt": "Une formatrice montre à une intervenante comment préparer un lit."
+        }
+      }
+    ],
+    "seo": {
+      "title": "Formations pour les professionnels et ateliers au Cameroun",
+      "description": "Formations pour les professionnels, ateliers et sessions de sensibilisation : transmettre le savoir-faire, le savoir-être et les bonnes pratiques.",
+      "ogImageUrl": null,
+      "noindex": false
+    },
+    "translations": {
+      "en": {
+        "title": "Training",
+        "sections": [
+          {
+            "id": "hero",
+            "type": "hero",
+            "enabled": true,
+            "variant": "page",
+            "eyebrow": "Training",
+            "title": "Passing on the skills ==that make quality.==",
+            "lead": "Training for professionals, workshops and awareness sessions: passing on know-how, people skills and good practice.",
+            "visual": {
+              "illustration": "formation",
+              "image": {
+                "id": "photo-formation-hero",
+                "url": "/photos/formation-hero.png",
+                "width": 1280,
+                "height": 960,
+                "variants": []
+              },
+              "alt": "A trainer leads a session for service providers in Mambo Proxi uniforms."
+            },
+            "primaryCta": {
+              "label": "Request a training course",
+              "href": "#demande-formation",
+              "external": false
+            },
+            "secondaryCta": {
+              "label": "See the catalogue",
+              "href": "#catalogue",
+              "external": false
+            },
+            "showWhatsapp": false
+          },
+          {
+            "id": "offres",
+            "type": "cardGrid",
+            "enabled": true,
+            "tone": "light",
+            "layout": "compact",
+            "columns": 2,
+            "items": [
+              {
+                "icon": "Briefcase",
+                "title": "Training for professionals",
+                "tone": "dark",
+                "text": "For service providers and businesses: customer welcome, service quality, hygiene, cleaning, property management.",
+                "cta": {
+                  "label": "See the courses",
+                  "href": "/formation?categorie=PROFESSIONNELS#catalogue",
+                  "external": false
+                }
+              },
+              {
+                "icon": "Users",
+                "title": "Workshops & awareness",
+                "tone": "orange",
+                "text": "For individuals, families and associations: settling in, caring for loved ones, local culture.",
+                "cta": {
+                  "label": "See the courses",
+                  "href": "/formation?categorie=ATELIERS#catalogue",
+                  "external": false
+                }
+              }
+            ]
+          },
+          {
+            "id": "catalogue",
+            "type": "dynamic",
+            "enabled": true,
+            "anchor": "catalogue",
+            "tone": "muted",
+            "source": "trainings-catalog",
+            "eyebrow": "Our courses",
+            "title": "The catalogue",
+            "lead": "Every course can be tailored to your organisation and your teams."
+          },
+          {
+            "id": "demande",
+            "type": "dynamic",
+            "enabled": true,
+            "anchor": "demande-formation",
+            "tone": "light",
+            "source": "training-form",
+            "eyebrow": "Training request",
+            "title": "Training for your team?",
+            "lead": "Tell us what you need: we will suggest a programme and a quote to match.",
+            "visual": {
+              "illustration": "formation",
+              "image": {
+                "id": "photo-formation-form",
+                "url": "/photos/formation-form.png",
+                "width": 1536,
+                "height": 1024,
+                "variants": []
+              },
+              "alt": "A trainer shows a service provider how to make a bed."
+            }
+          }
+        ],
+        "seo": {
+          "title": "Training for professionals and workshops in Cameroon",
+          "description": "Training for professionals, workshops and awareness sessions: passing on know-how, people skills and good practice.",
+          "ogImageUrl": null,
+          "noindex": false
+        }
+      }
+    },
+    "allowedSections": [
+      "hero",
+      "marquee",
+      "steps",
+      "featureList",
+      "cardGrid",
+      "textMedia",
+      "quote",
+      "statsGrid",
+      "team",
+      "faq",
+      "richText",
+      "ctaBand"
+    ],
+    "publishedAt": "2026-10-05T08:00:00.000Z"
+  },
+  {
+    "key": "recrutement",
+    "title": "Recrutement",
+    "path": "/recrutement",
+    "group": "principales",
+    "sections": [
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "variant": "page",
+        "eyebrow": "Recrutement",
+        "title": "Rejoignez une équipe ==qui prend soin des autres.==",
+        "lead": "Collaborateurs, prestataires, partenaires : nous recherchons à Douala des personnes fiables, attentionnées et exigeantes.",
+        "visual": {
+          "illustration": "equipe",
+          "image": {
+            "id": "photo-recrut-hero",
+            "url": "/photos/recrut-hero.png",
+            "width": 1280,
+            "height": 960,
+            "variants": []
+          },
+          "alt": "Une responsable de l’agence serre la main d’une intervenante en tenue Mambo Proxi."
+        },
+        "primaryCta": {
+          "label": "Voir nos offres",
+          "href": "#offres",
+          "external": false
+        },
+        "secondaryCta": {
+          "label": "Candidature spontanée",
+          "href": "#candidature",
+          "external": false
+        },
+        "showWhatsapp": false
+      },
+      {
+        "id": "atouts",
+        "type": "cardGrid",
+        "enabled": true,
+        "tone": "light",
+        "layout": "horizontal",
+        "columns": 3,
+        "items": [
+          {
+            "icon": "Users",
+            "title": "Une équipe soudée",
+            "text": "À Douala et au Cameroun, on avance ensemble."
+          },
+          {
+            "icon": "GraduationCap",
+            "title": "Formation continue",
+            "text": "Des sessions régulières pour progresser dans votre métier."
+          },
+          {
+            "icon": "Sparkles",
+            "title": "Des missions utiles",
+            "text": "Chaque jour, vous simplifiez la vie de familles."
+          }
+        ]
+      },
+      {
+        "id": "offres",
+        "type": "dynamic",
+        "enabled": true,
+        "anchor": "offres",
+        "tone": "muted",
+        "source": "jobs-list",
+        "eyebrow": "Nos offres",
+        "note": "Les offres sont mises à jour régulièrement par l’agence."
+      },
+      {
+        "id": "prestataire",
+        "type": "ctaBand",
+        "enabled": true,
+        "tone": "dark",
+        "eyebrow": "Devenir prestataire / collaborateur",
+        "title": "Indépendant ou entreprise ? Proposez vos services.",
+        "text": "Chauffeurs, chefs, photographes, masseurs, agents d’entretien : rejoignez notre réseau de prestataires.",
+        "primaryCta": {
+          "label": "Proposer mes services",
+          "href": "/partenaires#formulaire",
+          "external": false
+        },
+        "showWhatsapp": false
+      },
+      {
+        "id": "candidature",
+        "type": "dynamic",
+        "enabled": true,
+        "anchor": "candidature",
+        "tone": "muted",
+        "source": "application-form",
+        "eyebrow": "Candidature",
+        "title": "Postulez ou envoyez une candidature spontanée",
+        "lead": "Nous lisons chaque candidature et revenons vers vous sous 15 jours."
+      }
+    ],
+    "seo": {
+      "title": "Recrutement : rejoignez MAMBO Proxi à Douala",
+      "description": "Collaborateurs, prestataires, partenaires : nous recherchons à Douala des personnes fiables, attentionnées et exigeantes.",
+      "ogImageUrl": null,
+      "noindex": false
+    },
+    "translations": {
+      "en": {
+        "title": "Careers",
+        "sections": [
+          {
+            "id": "hero",
+            "type": "hero",
+            "enabled": true,
+            "variant": "page",
+            "eyebrow": "Careers",
+            "title": "Join a team ==that takes care of others.==",
+            "lead": "Employees, service providers, partners: we are looking for reliable, caring and demanding people in Douala.",
+            "visual": {
+              "illustration": "equipe",
+              "image": {
+                "id": "photo-recrut-hero",
+                "url": "/photos/recrut-hero.png",
+                "width": 1280,
+                "height": 960,
+                "variants": []
+              },
+              "alt": "An agency manager shakes hands with a service provider in a Mambo Proxi uniform."
+            },
+            "primaryCta": {
+              "label": "See our openings",
+              "href": "#offres",
+              "external": false
+            },
+            "secondaryCta": {
+              "label": "Open application",
+              "href": "#candidature",
+              "external": false
+            },
+            "showWhatsapp": false
+          },
+          {
+            "id": "atouts",
+            "type": "cardGrid",
+            "enabled": true,
+            "tone": "light",
+            "layout": "horizontal",
+            "columns": 3,
+            "items": [
+              {
+                "icon": "Users",
+                "title": "A close-knit team",
+                "text": "In Douala and across Cameroon, we move forward together."
+              },
+              {
+                "icon": "GraduationCap",
+                "title": "Ongoing training",
+                "text": "Regular sessions to grow in your profession."
+              },
+              {
+                "icon": "Sparkles",
+                "title": "Meaningful work",
+                "text": "Every day, you make life easier for families."
+              }
+            ]
+          },
+          {
+            "id": "offres",
+            "type": "dynamic",
+            "enabled": true,
+            "anchor": "offres",
+            "tone": "muted",
+            "source": "jobs-list",
+            "eyebrow": "Our openings",
+            "note": "Openings are updated regularly by the agency."
+          },
+          {
+            "id": "prestataire",
+            "type": "ctaBand",
+            "enabled": true,
+            "tone": "dark",
+            "eyebrow": "Become a service provider / partner",
+            "title": "Freelancer or company? Offer your services.",
+            "text": "Drivers, chefs, photographers, massage therapists, cleaners: join our network of service providers.",
+            "primaryCta": {
+              "label": "Offer my services",
+              "href": "/partenaires#formulaire",
+              "external": false
+            },
+            "showWhatsapp": false
+          },
+          {
+            "id": "candidature",
+            "type": "dynamic",
+            "enabled": true,
+            "anchor": "candidature",
+            "tone": "muted",
+            "source": "application-form",
+            "eyebrow": "Apply",
+            "title": "Apply for a position or send an open application",
+            "lead": "We read every application and get back to you within 15 days."
+          }
+        ],
+        "seo": {
+          "title": "Careers: join MAMBO Proxi in Douala",
+          "description": "Employees, service providers, partners: we are looking for reliable, caring and demanding people in Douala.",
+          "ogImageUrl": null,
+          "noindex": false
+        }
+      }
+    },
+    "allowedSections": [
+      "hero",
+      "marquee",
+      "steps",
+      "featureList",
+      "cardGrid",
+      "textMedia",
+      "quote",
+      "statsGrid",
+      "team",
+      "faq",
+      "richText",
+      "ctaBand"
+    ],
+    "publishedAt": "2026-10-05T08:00:00.000Z"
+  },
+  {
+    "key": "avis-clients",
+    "title": "Avis clients",
+    "path": "/avis-clients",
+    "group": "principales",
+    "sections": [
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "variant": "page",
+        "eyebrow": "Avis clients",
+        "title": "Ce que ==nos clients== disent de nous.",
+        "lead": "Chaque avis est recueilli après une prestation réalisée, puis validé par l’agence avant publication.",
+        "showWhatsapp": false
+      },
+      {
+        "id": "avis",
+        "type": "dynamic",
+        "enabled": true,
+        "tone": "light",
+        "source": "reviews-list",
+        "limit": 6
+      },
+      {
+        "id": "votre-avis",
+        "type": "steps",
+        "enabled": true,
+        "tone": "muted",
+        "layout": "timeline",
+        "eyebrow": "Votre avis compte",
+        "title": "Après chaque prestation, un court questionnaire",
+        "lead": "Vous recevez automatiquement un e-mail avec un lien : 5 questions maximum, 2 minutes. Avec votre accord, votre avis peut être publié sur le site.",
+        "items": [
+          {
+            "icon": "CalendarCheck",
+            "title": "Prestation réalisée"
+          },
+          {
+            "icon": "Mail",
+            "title": "E-mail avec le questionnaire"
+          },
+          {
+            "icon": "Star",
+            "title": "Vous notez et commentez"
+          },
+          {
+            "icon": "Check",
+            "title": "Avis publié après validation"
+          }
+        ]
+      },
+      {
+        "id": "cta",
+        "type": "ctaBand",
+        "enabled": true,
+        "title": "À votre tour de vivre\nl’expérience Mambo.",
+        "text": "Demandez votre devis gratuit : réponse sous 24 h.",
+        "primaryCta": {
+          "label": "Demander un devis gratuit",
+          "href": "/devis",
+          "external": false
+        },
+        "showWhatsapp": true
+      }
+    ],
+    "seo": {
+      "title": "Avis clients MAMBO Proxi : ce que nos clients disent de nous",
+      "description": "Chaque avis est recueilli après une prestation réalisée, puis validé par l’agence avant publication.",
+      "ogImageUrl": null,
+      "noindex": false
+    },
+    "translations": {
+      "en": {
+        "title": "Client reviews",
+        "sections": [
+          {
+            "id": "hero",
+            "type": "hero",
+            "enabled": true,
+            "variant": "page",
+            "eyebrow": "Client reviews",
+            "title": "What ==our clients== say about us.",
+            "lead": "Every review is collected after a completed service, then approved by the agency before it is published.",
+            "showWhatsapp": false
+          },
+          {
+            "id": "avis",
+            "type": "dynamic",
+            "enabled": true,
+            "tone": "light",
+            "source": "reviews-list",
+            "limit": 6
+          },
+          {
+            "id": "votre-avis",
+            "type": "steps",
+            "enabled": true,
+            "tone": "muted",
+            "layout": "timeline",
+            "eyebrow": "Your opinion matters",
+            "title": "After every service, a short questionnaire",
+            "lead": "You automatically receive an e-mail with a link: 5 questions at most, 2 minutes. With your consent, your review can be published on the site.",
+            "items": [
+              {
+                "icon": "CalendarCheck",
+                "title": "Service completed"
+              },
+              {
+                "icon": "Mail",
+                "title": "E-mail with the questionnaire"
+              },
+              {
+                "icon": "Star",
+                "title": "You rate and comment"
+              },
+              {
+                "icon": "Check",
+                "title": "Review published after approval"
+              }
+            ]
+          },
+          {
+            "id": "cta",
+            "type": "ctaBand",
+            "enabled": true,
+            "title": "Your turn to enjoy\nthe Mambo experience.",
+            "text": "Request your free quote: we reply within 24 hours.",
+            "primaryCta": {
+              "label": "Request a free quote",
+              "href": "/devis",
+              "external": false
+            },
+            "showWhatsapp": true
+          }
+        ],
+        "seo": {
+          "title": "MAMBO Proxi client reviews: what our clients say about us",
+          "description": "Every review is collected after a completed service, then approved by the agency before it is published.",
+          "ogImageUrl": null,
+          "noindex": false
+        }
+      }
+    },
+    "allowedSections": [
+      "hero",
+      "marquee",
+      "steps",
+      "featureList",
+      "cardGrid",
+      "textMedia",
+      "quote",
+      "statsGrid",
+      "team",
+      "faq",
+      "richText",
+      "ctaBand"
+    ],
+    "publishedAt": "2026-10-05T08:00:00.000Z"
+  },
+  {
+    "key": "contact",
+    "title": "Contact",
+    "path": "/contact",
+    "group": "principales",
+    "sections": [
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "variant": "page",
+        "eyebrow": "Contact",
+        "title": "Parlons de ==votre projet.==",
+        "lead": "Par téléphone, WhatsApp, e-mail ou lors d’un rendez-vous : choisissez ce qui vous convient, nous vous répondons rapidement.",
+        "visual": null,
+        "showWhatsapp": false
+      },
+      {
+        "id": "moyens",
+        "type": "dynamic",
+        "enabled": true,
+        "source": "contact-cards"
+      },
+      {
+        "id": "rendez-vous",
+        "type": "dynamic",
+        "enabled": true,
+        "anchor": "rendez-vous",
+        "source": "appointment-booking",
+        "eyebrow": "Rendez-vous",
+        "title": "Prenez rendez-vous avec ==notre équipe.=="
+      },
+      {
+        "id": "agence",
+        "type": "dynamic",
+        "enabled": true,
+        "source": "agency-map"
+      }
+    ],
+    "seo": {
+      "title": "Contact",
+      "description": "Par téléphone, WhatsApp, e-mail ou lors d’un rendez-vous à l’agence de Douala : choisissez ce qui vous convient, nous vous répondons rapidement.",
+      "ogImageUrl": null,
+      "noindex": false
+    },
+    "translations": null,
+    "allowedSections": [
+      "hero",
+      "marquee",
+      "steps",
+      "featureList",
+      "cardGrid",
+      "textMedia",
+      "quote",
+      "statsGrid",
+      "team",
+      "faq",
+      "richText",
+      "ctaBand"
+    ],
+    "publishedAt": "2026-10-05T08:00:00.000Z"
+  },
+  {
+    "key": "suivi-mambo",
+    "title": "Suivi Mambo",
+    "path": "/suivi-mambo",
+    "group": "principales",
+    "sections": [
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "variant": "page",
+        "badge": {
+          "tag": null,
+          "text": "Bientôt disponible"
+        },
+        "title": "==Suivi Mambo== : votre espace client, bientôt en ligne.",
+        "lead": "Suivre vos demandes, retrouver vos devis et échanger avec votre conseiller depuis un seul espace. En attendant, notre équipe vous tient informé par e-mail et WhatsApp.",
+        "showWhatsapp": false
+      },
+      {
+        "id": "fonctionnalites",
+        "type": "cardGrid",
+        "enabled": true,
+        "tone": "light",
+        "layout": "cards",
+        "columns": 4,
+        "eyebrow": "Ce qui arrive",
+        "title": "Tout votre suivi au même endroit",
+        "items": [
+          {
+            "icon": "FileText",
+            "title": "Vos demandes et devis",
+            "text": "Statut en temps réel, de la demande à la prestation."
+          },
+          {
+            "icon": "MessageSquare",
+            "title": "Messages",
+            "text": "Échangez avec votre conseiller, sans perdre le fil."
+          },
+          {
+            "icon": "Package",
+            "title": "Colis et courriers",
+            "text": "Soyez prévenu à chaque réception à l’agence."
+          },
+          {
+            "icon": "Wallet",
+            "title": "Paiement en ligne",
+            "text": "Carte bancaire et Mobile Money, dans une prochaine étape."
+          }
+        ]
+      },
+      {
+        "id": "cta",
+        "type": "ctaBand",
+        "enabled": true,
+        "title": "Une demande\nen attendant ?",
+        "text": "Notre équipe vous répond sous 24 h, par e-mail ou WhatsApp.",
+        "primaryCta": {
+          "label": "Demander un devis gratuit",
+          "href": "/devis",
+          "external": false
+        },
+        "showWhatsapp": true
+      }
+    ],
+    "seo": {
+      "title": "Suivi Mambo : votre espace client, bientôt en ligne",
+      "description": "Suivre vos demandes, retrouver vos devis et échanger avec votre conseiller depuis un seul espace : soyez prévenu de son ouverture.",
+      "ogImageUrl": null,
+      "noindex": false
+    },
+    "translations": {
+      "en": {
+        "title": "Mambo tracking",
+        "sections": [
+          {
+            "id": "hero",
+            "type": "hero",
+            "enabled": true,
+            "variant": "page",
+            "badge": {
+              "tag": null,
+              "text": "Coming soon"
+            },
+            "title": "==Mambo tracking==: your client area, online soon.",
+            "lead": "Follow your requests, find your quotes and talk to your adviser from a single space. In the meantime, our team keeps you informed by email and WhatsApp.",
+            "showWhatsapp": false
+          },
+          {
+            "id": "fonctionnalites",
+            "type": "cardGrid",
+            "enabled": true,
+            "tone": "light",
+            "layout": "cards",
+            "columns": 4,
+            "eyebrow": "What’s coming",
+            "title": "All your tracking in one place",
+            "items": [
+              {
+                "icon": "FileText",
+                "title": "Your requests and quotes",
+                "text": "Real-time status, from request to service."
+              },
+              {
+                "icon": "MessageSquare",
+                "title": "Messages",
+                "text": "Talk to your adviser without losing track."
+              },
+              {
+                "icon": "Package",
+                "title": "Parcels and mail",
+                "text": "Be notified each time something arrives at the agency."
+              },
+              {
+                "icon": "Wallet",
+                "title": "Online payment",
+                "text": "Bank card and Mobile Money, in a later step."
+              }
+            ]
+          },
+          {
+            "id": "cta",
+            "type": "ctaBand",
+            "enabled": true,
+            "title": "Something to ask\nin the meantime?",
+            "text": "Our team replies within 24 hours, by email or WhatsApp.",
+            "primaryCta": {
+              "label": "Request a free quote",
+              "href": "/devis",
+              "external": false
+            },
+            "showWhatsapp": true
+          }
+        ],
+        "seo": {
+          "title": "Mambo tracking: your client area, coming soon",
+          "description": "Follow your requests, find your quotes and talk to your adviser from a single space: be told when it opens.",
+          "ogImageUrl": null,
+          "noindex": false
+        }
+      }
+    },
+    "allowedSections": [
+      "hero",
+      "marquee",
+      "steps",
+      "featureList",
+      "cardGrid",
+      "textMedia",
+      "quote",
+      "statsGrid",
+      "team",
+      "faq",
+      "richText",
+      "ctaBand"
+    ],
+    "publishedAt": "2026-10-05T08:00:00.000Z"
+  },
+  {
+    "key": "magazine",
+    "title": "Magazine",
+    "path": "/magazine",
+    "group": "principales",
+    "sections": [
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "variant": "page",
+        "eyebrow": "Magazine",
+        "title": "Mambo Proxi — Édition n° 1",
+        "lead": "Le magazine du bien-être global : santé, nutrition, beauté, immobilier, solidarité et culture. Un rendez-vous de partage et de découverte, à lire en ligne et à recevoir par e-mail.",
+        "visual": {
+          "illustration": "portrait",
+          "image": {
+            "id": "photo-magazine-hero",
+            "url": "/photos/magazine-hero.png",
+            "width": 1280,
+            "height": 960,
+            "variants": []
+          },
+          "alt": "Une lectrice feuillette le magazine Mambo Proxi sur une terrasse, devant un petit-déjeuner de fruits."
+        },
+        "showWhatsapp": false,
+        "anchors": [
+          {
+            "label": "Édito",
+            "href": "#edito",
+            "external": false
+          },
+          {
+            "label": "Santé et nutrition",
+            "href": "#sante-et-nutrition",
+            "external": false
+          },
+          {
+            "label": "Beauté et bien-être",
+            "href": "#beaute-et-bien-etre",
+            "external": false
+          },
+          {
+            "label": "Recevoir le magazine",
+            "href": "#recevoir-le-magazine",
+            "external": false
+          }
+        ]
+      },
+      {
+        "id": "edito",
+        "type": "textMedia",
+        "reverse": false,
+        "enabled": true,
+        "anchor": "edito",
+        "tone": "muted",
+        "eyebrow": "Édito · Édition spéciale — Ensemble vers un bien-être global",
+        "title": null,
+        "quote": "Ce premier numéro est bien plus qu’un magazine : c’est une histoire de vie que je partage avec vous.",
+        "paragraphs": [
+          "Chers lecteurs, chères lectrices,",
+          "Ce premier numéro de Mambo Proxi est bien plus qu’un magazine : c’est une histoire de vie que je partage avec vous.",
+          "Pendant 26 ans, mon chemin a été marqué par de nombreux apprentissages, des défis relevés et des expériences qui m’ont façonnée. Ce parcours m’a permis de comprendre une chose essentielle : le bien-être ne se limite pas à la santé, il est global. Il touche à notre alimentation, à notre environnement, à notre beauté intérieure et extérieure, à nos relations sociales, à nos traditions et à nos projets d’avenir.",
+          "Avec Mambo Proxi, mon souhait est de partager avec ma communauté ce que j’ai appris au fil du temps. Pas pour donner des leçons, mais pour inspirer, informer et accompagner chacun et chacune dans sa vie quotidienne.",
+          "Ce magazine sera un rendez-vous de partage et de découverte. Ensemble, nous parlerons de santé, de nutrition, de beauté, de bien-être, d’immobilier, de solidarité et de culture. Parce que chaque aspect de nos vies contribue à ce que nous soyons équilibrés, confiants et tournés vers l’avenir.",
+          "Je vous invite à parcourir ces pages comme on explore un chemin nouveau : avec curiosité, simplicité et ouverture. Ce numéro n’est qu’un début, et je suis heureuse de le vivre avec vous.",
+          "Avec gratitude et sincérité,"
+        ],
+        "signature": "Mireille Bell — Fondatrice de Mambo Proxi",
+        "visual": {
+          "illustration": "portrait",
+          "image": {
+            "id": "photo-fondatrice",
+            "url": "/photos/fondatrice.png",
+            "width": 1117,
+            "height": 1185,
+            "variants": []
+          },
+          "alt": "Mireille Bell, fondatrice de Mambo Proxi."
+        },
+        "chips": []
+      },
+      {
+        "id": "dans-ce-numero",
+        "type": "cardGrid",
+        "enabled": true,
+        "anchor": "dans-ce-numero",
+        "tone": "dark",
+        "layout": "cards",
+        "columns": 4,
+        "eyebrow": "Dans ce numéro",
+        "title": "Le bien-être, sous toutes ses formes.",
+        "items": [
+          {
+            "icon": "Users",
+            "title": "Santé et nutrition",
+            "text": "Bien manger, prendre soin de soi et de sa famille au quotidien."
+          },
+          {
+            "icon": "ShieldCheck",
+            "title": "Beauté et bien-être",
+            "text": "Beauté intérieure et extérieure, rituels et moments pour soi."
+          },
+          {
+            "icon": "Sparkles",
+            "title": "Immobilier et cadre de vie",
+            "text": "Se loger, investir et bâtir ses projets d’avenir au Cameroun."
+          },
+          {
+            "icon": "GraduationCap",
+            "title": "Solidarité et culture",
+            "text": "Traditions, entraide et initiatives qui nous rassemblent."
+          }
+        ]
+      },
+      {
+        "id": "recevoir",
+        "type": "ctaBand",
+        "enabled": true,
+        "anchor": "recevoir-le-magazine",
+        "title": "Recevez chaque\nnuméro par e-mail.",
+        "text": "Inscrivez-vous à la lettre Mambo : le magazine et nos nouveautés, en français ou en anglais. Désinscription en un clic.",
+        "primaryCta": {
+          "label": "S’abonner à la lettre Mambo",
+          "href": "#lettre-mambo",
+          "external": false
+        },
+        "secondaryCta": {
+          "label": "Lire en anglais",
+          "href": "/en/magazine",
+          "external": false
+        },
+        "showWhatsapp": false
+      }
+    ],
+    "seo": {
+      "title": "Magazine Mambo Proxi — Édition n° 1 : ensemble vers un bien-être global",
+      "description": "Le magazine du bien-être global : santé, nutrition, beauté, immobilier, solidarité et culture. À lire en ligne et à recevoir par e-mail.",
+      "ogImageUrl": null,
+      "noindex": false
+    },
+    "translations": {
+      "en": {
+        "sections": [
+          {
+            "id": "hero",
+            "type": "hero",
+            "enabled": true,
+            "variant": "page",
+            "eyebrow": "Magazine",
+            "title": "Mambo Proxi — Issue 1",
+            "lead": "The magazine of overall well-being: health, nutrition, beauty, real estate, solidarity and culture. A place to share and discover, to read online and to receive by email.",
+            "visual": {
+              "illustration": "portrait",
+              "image": {
+                "id": "photo-magazine-hero",
+                "url": "/photos/magazine-hero.png",
+                "width": 1280,
+                "height": 960,
+                "variants": []
+              },
+              "alt": "A reader browses the Mambo Proxi magazine on a terrace, over a fruit breakfast."
+            },
+            "showWhatsapp": false,
+            "anchors": [
+              {
+                "label": "Editorial",
+                "href": "#edito",
+                "external": false
+              },
+              {
+                "label": "Health and nutrition",
+                "href": "#health-and-nutrition",
+                "external": false
+              },
+              {
+                "label": "Beauty and well-being",
+                "href": "#beauty-and-well-being",
+                "external": false
+              },
+              {
+                "label": "Get the magazine",
+                "href": "#recevoir-le-magazine",
+                "external": false
+              }
+            ]
+          },
+          {
+            "id": "edito",
+            "type": "textMedia",
+            "reverse": false,
+            "enabled": true,
+            "anchor": "edito",
+            "tone": "muted",
+            "eyebrow": "Editorial · Special issue — Together towards overall well-being",
+            "title": null,
+            "quote": "This first issue is much more than a magazine: it is a life story that I am sharing with you.",
+            "paragraphs": [
+              "Dear readers,",
+              "This first issue of Mambo Proxi is much more than a magazine: it is a life story that I am sharing with you.",
+              "For 26 years, my path has been shaped by many lessons, challenges overcome and experiences that made me who I am. This journey taught me one essential thing: well-being is not limited to health, it is global. It touches our diet, our environment, our inner and outer beauty, our social relationships, our traditions and our plans for the future.",
+              "With Mambo Proxi, my wish is to share with my community what I have learned over time. Not to lecture, but to inspire, inform and support each and every one of you in your daily life.",
+              "This magazine will be a place to share and discover. Together, we will talk about health, nutrition, beauty, well-being, real estate, solidarity and culture. Because every part of our lives helps us to be balanced, confident and looking to the future.",
+              "I invite you to browse these pages the way you would explore a new path: with curiosity, simplicity and openness. This issue is only a beginning, and I am happy to share it with you.",
+              "With gratitude and sincerity,"
+            ],
+            "signature": "Mireille Bell — Founder of Mambo Proxi",
+            "visual": {
+              "illustration": "portrait",
+              "image": {
+                "id": "photo-fondatrice",
+                "url": "/photos/fondatrice.png",
+                "width": 1117,
+                "height": 1185,
+                "variants": []
+              },
+              "alt": "Mireille Bell, founder of Mambo Proxi."
+            },
+            "chips": []
+          },
+          {
+            "id": "dans-ce-numero",
+            "type": "cardGrid",
+            "enabled": true,
+            "anchor": "dans-ce-numero",
+            "tone": "dark",
+            "layout": "cards",
+            "columns": 4,
+            "eyebrow": "In this issue",
+            "title": "Well-being, in all its forms.",
+            "items": [
+              {
+                "icon": "Users",
+                "title": "Health and nutrition",
+                "text": "Eating well, taking care of yourself and your family every day."
+              },
+              {
+                "icon": "ShieldCheck",
+                "title": "Beauty and well-being",
+                "text": "Inner and outer beauty, rituals and moments for yourself."
+              },
+              {
+                "icon": "Sparkles",
+                "title": "Real estate and living",
+                "text": "Finding a home, investing and building your future in Cameroon."
+              },
+              {
+                "icon": "GraduationCap",
+                "title": "Solidarity and culture",
+                "text": "Traditions, mutual support and initiatives that bring us together."
+              }
+            ]
+          },
+          {
+            "id": "recevoir",
+            "type": "ctaBand",
+            "enabled": true,
+            "anchor": "recevoir-le-magazine",
+            "title": "Get every issue\nby email.",
+            "text": "Sign up for the Mambo newsletter: the magazine and our news, in French or in English. Unsubscribe in one click.",
+            "primaryCta": {
+              "label": "Subscribe to the Mambo newsletter",
+              "href": "#lettre-mambo",
+              "external": false
+            },
+            "secondaryCta": {
+              "label": "Read in French",
+              "href": "/magazine",
+              "external": false
+            },
+            "showWhatsapp": false
+          }
+        ],
+        "seo": {
+          "title": "Mambo Proxi magazine — Issue 1: together towards overall well-being",
+          "description": "The magazine of overall well-being: health, nutrition, beauty, real estate, solidarity and culture. Read online and receive by email.",
+          "ogImageUrl": null,
+          "noindex": false
+        }
+      }
+    },
+    "allowedSections": [
+      "hero",
+      "marquee",
+      "steps",
+      "featureList",
+      "cardGrid",
+      "textMedia",
+      "quote",
+      "statsGrid",
+      "team",
+      "faq",
+      "richText",
+      "ctaBand"
+    ],
+    "publishedAt": "2026-10-02T08:00:00.000Z"
+  },
+  {
+    "key": "mentions-legales",
+    "title": "Mentions légales",
+    "path": "/mentions-legales",
+    "group": "legales",
+    "sections": [
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "variant": "legal",
+        "title": "Mentions légales",
+        "updatedLabel": "Dernière mise à jour : octobre 2026",
+        "showWhatsapp": false
+      },
+      {
+        "id": "contenu",
+        "type": "richText",
+        "enabled": true,
+        "articles": [
+          {
+            "title": "Éditeur du site",
+            "html": "<p>Le site est édité par MAMBO Proxi. Raison sociale, forme juridique, adresse du siège, numéro d’immatriculation et responsable de la publication : informations à compléter par la cliente.</p>"
+          },
+          {
+            "title": "Hébergement",
+            "html": "<p>Le site est hébergé en France. Nom, adresse et coordonnées de l’hébergeur : à compléter à la mise en ligne.</p>"
+          },
+          {
+            "title": "Propriété intellectuelle",
+            "html": "<p>L’ensemble des contenus du site (textes, logos, photographies, éléments graphiques) est la propriété de MAMBO Proxi, sauf mention contraire. Toute reproduction sans autorisation est interdite.</p>"
+          },
+          {
+            "title": "Données personnelles",
+            "html": "<p>Les données collectées par les formulaires sont limitées au nécessaire et utilisées uniquement pour répondre à vos demandes. Vous disposez d’un droit d’accès, de rectification et de suppression. Voir la <a href=\"/confidentialite\">politique de confidentialité</a>.</p>"
+          },
+          {
+            "title": "Contact",
+            "html": "<p>Pour toute question : <a href=\"mailto:contact@mamboproxi.com\">contact@mamboproxi.com</a>.</p>"
+          }
+        ],
+        "toComplete": false
+      }
+    ],
+    "seo": {
+      "title": "Mentions légales",
+      "description": "Mentions légales du site MAMBO Proxi.",
+      "ogImageUrl": null,
+      "noindex": false
+    },
+    "translations": {
+      "en": {
+        "title": "Legal notice",
+        "sections": [
+          {
+            "id": "hero",
+            "type": "hero",
+            "enabled": true,
+            "variant": "legal",
+            "title": "Legal notice",
+            "updatedLabel": "Last updated: October 2026",
+            "showWhatsapp": false
+          },
+          {
+            "id": "contenu",
+            "type": "richText",
+            "enabled": true,
+            "articles": [
+              {
+                "title": "Website publisher",
+                "html": "<p>This website is published by MAMBO Proxi. Company name, legal form, registered office, registration number and publication manager: details to be provided by the client.</p>"
+              },
+              {
+                "title": "Hosting",
+                "html": "<p>Name, address and contact details of the website host: to be provided at launch.</p>"
+              },
+              {
+                "title": "Intellectual property",
+                "html": "<p>All content on this website (text, logos, photographs, graphic elements) is the property of MAMBO Proxi unless otherwise stated. Any reproduction without permission is prohibited.</p>"
+              },
+              {
+                "title": "Personal data",
+                "html": "<p>Data collected through the forms is limited to what is necessary and used only to answer your requests. You have the right to access, correct and delete it. See the <a href=\"/en/privacy-policy\">privacy policy</a>.</p>"
+              },
+              {
+                "title": "Contact",
+                "html": "<p>For any question: <a href=\"mailto:contact@mamboproxi.com\">contact@mamboproxi.com</a>.</p>"
+              }
+            ],
+            "toComplete": false
+          }
+        ],
+        "seo": {
+          "title": "Legal notice",
+          "description": "Legal notice of the MAMBO Proxi website.",
+          "ogImageUrl": null,
+          "noindex": false
+        }
+      }
+    },
+    "allowedSections": ["hero", "richText"],
+    "publishedAt": "2026-10-01T08:00:00.000Z"
+  },
+  {
+    "key": "confidentialite",
+    "title": "Politique de confidentialité",
+    "path": "/confidentialite",
+    "group": "legales",
+    "sections": [
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "variant": "legal",
+        "title": "Politique de confidentialité",
+        "updatedLabel": "Dernière mise à jour : octobre 2026",
+        "showWhatsapp": false
+      },
+      {
+        "id": "contenu",
+        "type": "richText",
+        "enabled": true,
+        "articles": [
+          {
+            "title": "Responsable du traitement",
+            "html": "<p>MAMBO Proxi, dont les coordonnées figurent dans les <a href=\"/mentions-legales\">mentions légales</a>. Informations à compléter par la cliente.</p>"
+          },
+          {
+            "title": "Données collectées",
+            "html": "<p>Nous collectons uniquement les données que vous saisissez dans nos formulaires :</p><ul><li>identité et coordonnées (nom, e-mail, téléphone, pays et ville) ;</li><li>description de votre besoin et préférences de contact ;</li><li>pièces jointes que vous choisissez d’envoyer (CV).</li></ul>"
+          },
+          {
+            "title": "Finalités et bases légales",
+            "html": "<p>Répondre à vos demandes de devis, de contact, de rendez-vous ou de partenariat, sur la base de votre consentement ; envoyer la lettre d’information si vous l’avez demandée. À compléter par la cliente.</p>"
+          },
+          {
+            "title": "Durée de conservation",
+            "html": "<p>Durées de conservation par type de demande : à compléter par la cliente.</p>"
+          },
+          {
+            "title": "Vos droits",
+            "html": "<p>Vous disposez d’un droit d’accès, de rectification, d’effacement, d’opposition et de portabilité. Pour les exercer : <a href=\"mailto:contact@mamboproxi.com\">contact@mamboproxi.com</a>.</p>"
+          }
+        ],
+        "toComplete": true
+      }
+    ],
+    "seo": {
+      "title": "Politique de confidentialité",
+      "description": "Politique de confidentialité du site MAMBO Proxi.",
+      "ogImageUrl": null,
+      "noindex": false
+    },
+    "translations": {
+      "en": {
+        "title": "Privacy policy",
+        "sections": [
+          {
+            "id": "hero",
+            "type": "hero",
+            "enabled": true,
+            "variant": "legal",
+            "title": "Privacy policy",
+            "updatedLabel": "Last updated: October 2026",
+            "showWhatsapp": false
+          },
+          {
+            "id": "contenu",
+            "type": "richText",
+            "enabled": true,
+            "articles": [
+              {
+                "title": "Data controller",
+                "html": "<p>MAMBO Proxi, whose details appear in the <a href=\"/en/legal-notice\">legal notice</a>. Details to be provided by the client.</p>"
+              },
+              {
+                "title": "Data collected",
+                "html": "<p>We only collect the data you enter in our forms:</p><ul><li>identity and contact details (name, email, phone, country and city);</li><li>description of your need and contact preferences;</li><li>attachments you choose to send (CV).</li></ul>"
+              },
+              {
+                "title": "Purposes and legal bases",
+                "html": "<p>Answering your quote, contact, appointment or partnership requests, based on your consent; sending the newsletter if you asked for it. To be completed by the client.</p>"
+              },
+              {
+                "title": "Retention period",
+                "html": "<p>Retention periods by type of request: to be provided by the client.</p>"
+              },
+              {
+                "title": "Your rights",
+                "html": "<p>You have the right to access, correct, erase, object and port your data. To exercise them: <a href=\"mailto:contact@mamboproxi.com\">contact@mamboproxi.com</a>.</p>"
+              }
+            ],
+            "toComplete": true
+          }
+        ],
+        "seo": {
+          "title": "Privacy policy",
+          "description": "Privacy policy of the MAMBO Proxi website.",
+          "ogImageUrl": null,
+          "noindex": false
+        }
+      }
+    },
+    "allowedSections": ["hero", "richText"],
+    "publishedAt": "2026-10-01T08:00:00.000Z"
+  },
+  {
+    "key": "cookies",
+    "title": "Gestion des cookies",
+    "path": "/cookies",
+    "group": "legales",
+    "sections": [
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "variant": "legal",
+        "title": "Gestion des cookies",
+        "updatedLabel": "Dernière mise à jour : octobre 2026",
+        "showWhatsapp": false
+      },
+      {
+        "id": "contenu",
+        "type": "richText",
+        "enabled": true,
+        "articles": [
+          {
+            "title": "Cookies nécessaires",
+            "html": "<p>Ils permettent au site de fonctionner (mémorisation de vos choix de cookies, sécurité des formulaires) et ne peuvent pas être désactivés.</p>"
+          },
+          {
+            "title": "Mesure d’audience",
+            "html": "<p>Sans cookie : pour améliorer le site, nous comptons de façon anonyme et agrégée les pages vues et les clics sur les principaux boutons (devis, WhatsApp, appel, e-mail, inscription…). Ce comptage n’utilise aucun identifiant, aucun cookie ni stockage dans votre navigateur et ne transmet aucune donnée saisie dans les formulaires ; votre adresse IP sert uniquement à écarter les abus et n’est pas conservée avec les mesures.</p><p>Avec votre accord uniquement, nous ajoutons un identifiant pseudonyme aléatoire, conservé dans votre navigateur et renouvelé au moins tous les 6 mois, pour compter les visiteurs uniques, et nous chargeons Google Analytics 4. Aucun script de mesure tiers n’est chargé avant votre choix. Si vous retirez votre accord, l’identifiant est effacé. Les réglages « Ne pas me pister » (Do Not Track) et Global Privacy Control de votre navigateur sont respectés : aucun identifiant n’est alors utilisé.</p>"
+          },
+          {
+            "title": "Durée de vos choix",
+            "html": "<p>Votre choix est conservé 6 mois. Vous pouvez le modifier à tout moment depuis cette page ou le lien « Cookies » du pied de page.</p>"
+          }
+        ],
+        "toComplete": true
+      }
+    ],
+    "seo": {
+      "title": "Gestion des cookies",
+      "description": "Gestion des cookies du site MAMBO Proxi.",
+      "ogImageUrl": null,
+      "noindex": false
+    },
+    "translations": {
+      "en": {
+        "title": "Cookie settings",
+        "sections": [
+          {
+            "id": "hero",
+            "type": "hero",
+            "enabled": true,
+            "variant": "legal",
+            "title": "Cookie settings",
+            "updatedLabel": "Last updated: October 2026",
+            "showWhatsapp": false
+          },
+          {
+            "id": "contenu",
+            "type": "richText",
+            "enabled": true,
+            "articles": [
+              {
+                "title": "Necessary cookies",
+                "html": "<p>They make the website work (remembering your cookie choices, form security) and cannot be switched off.</p>"
+              },
+              {
+                "title": "Audience measurement",
+                "html": "<p>Without cookies: to improve the website, we count page views and clicks on the main buttons (quote, WhatsApp, call, email, sign-up…) anonymously and in aggregate. This count uses no identifier, no cookie or browser storage, and never sends anything you type into a form; your IP address is only used to filter out abuse and is not stored with the measurements.</p><p>Only with your consent, we add a random pseudonymous identifier, kept in your browser and renewed at least every 6 months, to count unique visitors, and we load Google Analytics 4. No third-party measurement script is loaded before you choose. If you withdraw your consent, the identifier is deleted. Your browser’s Do Not Track and Global Privacy Control settings are respected: no identifier is used.</p>"
+              },
+              {
+                "title": "How long your choice lasts",
+                "html": "<p>Your choice is kept for 6 months. You can change it at any time from this page or the “Cookies” link in the footer.</p>"
+              }
+            ],
+            "toComplete": true
+          }
+        ],
+        "seo": {
+          "title": "Cookie settings",
+          "description": "Cookie settings of the MAMBO Proxi website.",
+          "ogImageUrl": null,
+          "noindex": false
+        }
+      }
+    },
+    "allowedSections": ["hero", "richText"],
+    "publishedAt": "2026-10-01T08:00:00.000Z"
+  },
+  {
+    "key": "cgu",
+    "title": "Conditions générales d’utilisation",
+    "path": "/cgu",
+    "group": "legales",
+    "sections": [
+      {
+        "id": "hero",
+        "type": "hero",
+        "enabled": true,
+        "variant": "legal",
+        "title": "Conditions générales d’utilisation",
+        "updatedLabel": "Dernière mise à jour : octobre 2026",
+        "showWhatsapp": false
+      },
+      {
+        "id": "contenu",
+        "type": "richText",
+        "enabled": true,
+        "articles": [
+          {
+            "title": "Objet",
+            "html": "<p>Conditions d’utilisation du site MAMBO Proxi : à compléter par la cliente.</p>"
+          },
+          {
+            "title": "Accès au site",
+            "html": "<p>Le site est accessible gratuitement. MAMBO Proxi peut en suspendre l’accès pour maintenance.</p>"
+          },
+          {
+            "title": "Responsabilité",
+            "html": "<p>Conditions de responsabilité et droit applicable : à compléter par la cliente.</p>"
+          }
+        ],
+        "toComplete": true
+      }
+    ],
+    "seo": {
+      "title": "Conditions générales d’utilisation",
+      "description": "Conditions générales d’utilisation du site MAMBO Proxi.",
+      "ogImageUrl": null,
+      "noindex": false
+    },
+    "translations": {
+      "en": {
+        "title": "Terms of use",
+        "sections": [
+          {
+            "id": "hero",
+            "type": "hero",
+            "enabled": true,
+            "variant": "legal",
+            "title": "Terms of use",
+            "updatedLabel": "Last updated: October 2026",
+            "showWhatsapp": false
+          },
+          {
+            "id": "contenu",
+            "type": "richText",
+            "enabled": true,
+            "articles": [
+              {
+                "title": "Purpose",
+                "html": "<p>Terms of use of the MAMBO Proxi website: to be provided by the client.</p>"
+              },
+              {
+                "title": "Access to the website",
+                "html": "<p>The website is free to access. MAMBO Proxi may suspend access for maintenance.</p>"
+              },
+              {
+                "title": "Liability",
+                "html": "<p>Liability terms and governing law: to be provided by the client.</p>"
+              }
+            ],
+            "toComplete": true
+          }
+        ],
+        "seo": {
+          "title": "Terms of use",
+          "description": "Terms of use of the MAMBO Proxi website.",
+          "ogImageUrl": null,
+          "noindex": false
+        }
+      }
+    },
+    "allowedSections": ["hero", "richText"],
+    "publishedAt": "2026-10-01T08:00:00.000Z"
+  }
+]

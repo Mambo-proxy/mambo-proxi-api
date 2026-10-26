@@ -1,0 +1,200 @@
+[
+  {
+    "key": "quote-ack",
+    "subject": "Nous avons bien reçu votre demande {référence}",
+    "preheader": null,
+    "title": "Merci {prénom}, votre demande est bien arrivée",
+    "paragraphs": [
+      "Votre demande de devis pour « {service} » est enregistrée sous la référence {référence}.",
+      "Un membre de l’équipe vous recontacte sous 24 h ouvrées pour préciser votre besoin."
+    ],
+    "buttonLabel": "Suivre ma demande",
+    "enabled": true
+  },
+  {
+    "key": "contact-ack",
+    "subject": "Votre message est bien arrivé",
+    "preheader": null,
+    "title": "Merci {prénom} pour votre message",
+    "paragraphs": ["Nous vous répondons dans les meilleurs délais, en général dans la journée."],
+    "buttonLabel": null,
+    "enabled": true
+  },
+  {
+    "key": "registration-confirmed",
+    "subject": "Bienvenue chez Mambo Proxi",
+    "preheader": null,
+    "title": "Bienvenue {prénom}",
+    "paragraphs": [
+      "Votre inscription est confirmée. Vous pouvez désormais demander un service en quelques clics."
+    ],
+    "buttonLabel": "Demander un service",
+    "enabled": true
+  },
+  {
+    "key": "application-received",
+    "subject": "Votre candidature est bien arrivée",
+    "preheader": null,
+    "title": "Merci {prénom} pour votre candidature",
+    "paragraphs": ["Nous étudions votre candidature « {offre} » et revenons vers vous sous 15 jours."],
+    "buttonLabel": null,
+    "enabled": true
+  },
+  {
+    "key": "training-request-received",
+    "subject": "Votre demande de formation {référence}",
+    "preheader": null,
+    "title": "Merci {prénom}, nous préparons votre formation",
+    "paragraphs": [
+      "Votre demande pour « {formation} » est enregistrée. Nous vous proposons un programme sous 48 h."
+    ],
+    "buttonLabel": null,
+    "enabled": true
+  },
+  {
+    "key": "partner-request-received",
+    "subject": "Votre demande de partenariat",
+    "preheader": null,
+    "title": "Merci {prénom} pour votre intérêt",
+    "paragraphs": ["Nous étudions votre proposition et revenons vers vous rapidement."],
+    "buttonLabel": null,
+    "enabled": true
+  },
+  {
+    "key": "event-registration",
+    "subject": "Votre inscription à « {événement} »",
+    "preheader": null,
+    "title": "À bientôt {prénom} !",
+    "paragraphs": ["Votre place pour « {événement} » le {date} est réservée."],
+    "buttonLabel": null,
+    "enabled": true
+  },
+  {
+    "key": "appointment-received",
+    "subject": "Votre demande de rendez-vous {référence}",
+    "preheader": null,
+    "title": "Merci {prénom}, nous confirmons votre créneau",
+    "paragraphs": ["Nous revenons vers vous rapidement pour confirmer le rendez-vous du {date}."],
+    "buttonLabel": null,
+    "enabled": true
+  },
+  {
+    "key": "appointment-confirmed",
+    "subject": "Votre rendez-vous du {date} est confirmé",
+    "preheader": null,
+    "title": "C’est confirmé, {prénom}",
+    "paragraphs": ["Rendez-vous le {date} pour « {service} ». Un rappel vous sera envoyé la veille."],
+    "buttonLabel": "Ajouter à mon agenda",
+    "enabled": true
+  },
+  {
+    "key": "appointment-proposed",
+    "subject": "Un nouveau créneau vous est proposé",
+    "preheader": null,
+    "title": "{prénom}, ce créneau vous convient-il ?",
+    "paragraphs": ["Nous vous proposons le {date}. Confirmez-le ou choisissez-en un autre."],
+    "buttonLabel": "Répondre",
+    "enabled": true
+  },
+  {
+    "key": "appointment-cancelled",
+    "subject": "Votre rendez-vous du {date} est annulé",
+    "preheader": null,
+    "title": "Rendez-vous annulé",
+    "paragraphs": ["Votre rendez-vous du {date} est annulé. Vous pouvez en reprendre un à tout moment."],
+    "buttonLabel": null,
+    "enabled": true
+  },
+  {
+    "key": "appointment-reminder",
+    "subject": "Rappel : rendez-vous demain",
+    "preheader": null,
+    "title": "À demain, {prénom}",
+    "paragraphs": ["Nous vous rappelons votre rendez-vous du {date} pour « {service} »."],
+    "buttonLabel": null,
+    "enabled": true
+  },
+  {
+    "key": "survey-invitation",
+    "subject": "Comment s’est passée votre prestation ?",
+    "preheader": null,
+    "title": "Votre avis compte, {prénom}",
+    "paragraphs": ["Deux minutes suffisent pour nous dire comment s’est passée la prestation « {service} »."],
+    "buttonLabel": "Donner mon avis",
+    "enabled": true
+  },
+  {
+    "key": "survey-reminder",
+    "subject": "Il n’est pas trop tard pour donner votre avis",
+    "preheader": null,
+    "title": "Un instant, {prénom} ?",
+    "paragraphs": ["Votre retour sur « {service} » nous aide à progresser."],
+    "buttonLabel": "Donner mon avis",
+    "enabled": true
+  },
+  {
+    "key": "newsletter-confirm",
+    "subject": "Confirmez votre inscription à la newsletter",
+    "preheader": null,
+    "title": "Plus qu’un clic",
+    "paragraphs": ["Confirmez votre adresse pour recevoir la newsletter de Mambo Proxi."],
+    "buttonLabel": "Confirmer mon inscription",
+    "enabled": true
+  },
+  {
+    "key": "newsletter-campaign",
+    "subject": "{objet}",
+    "preheader": null,
+    "title": "Mambo Proxi",
+    "paragraphs": ["Vous recevez cet e-mail car vous êtes inscrit·e à la newsletter de Mambo Proxi."],
+    "buttonLabel": null,
+    "enabled": true
+  },
+  {
+    "key": "team-new-request",
+    "subject": "Nouvelle demande {référence} · {service}",
+    "preheader": null,
+    "title": "Nouvelle demande de {nom}",
+    "paragraphs": ["{nom} demande « {service} » à {quartier}.", "Ouvrez la demande pour la qualifier."],
+    "buttonLabel": "Ouvrir la demande",
+    "enabled": true
+  },
+  {
+    "key": "team-assignment",
+    "subject": "{référence} vous est assignée · {service}",
+    "preheader": null,
+    "title": "Une demande vous est assignée",
+    "paragraphs": ["{nom} demande « {service} ».", "Ouvrez la demande pour la prendre en charge."],
+    "buttonLabel": "Ouvrir la demande",
+    "enabled": true
+  },
+  {
+    "key": "user-invite",
+    "subject": "Votre accès au back-office Mambo Proxi",
+    "preheader": null,
+    "title": "Bienvenue dans l’équipe, {prénom}",
+    "paragraphs": [
+      "Vous êtes invité·e à rejoindre le back-office de Mambo Proxi. Le lien est valable 7 jours."
+    ],
+    "buttonLabel": "Activer mon accès",
+    "enabled": true
+  },
+  {
+    "key": "otp-code",
+    "subject": "Votre code de connexion : {code}",
+    "preheader": null,
+    "title": "Votre code de connexion",
+    "paragraphs": ["Saisissez le code {code}. Il expire dans 10 minutes."],
+    "buttonLabel": null,
+    "enabled": true
+  },
+  {
+    "key": "password-reset",
+    "subject": "Réinitialisez votre mot de passe",
+    "preheader": null,
+    "title": "Nouveau mot de passe",
+    "paragraphs": ["Choisissez un nouveau mot de passe. Le lien est valable 1 heure."],
+    "buttonLabel": "Choisir un mot de passe",
+    "enabled": true
+  }
+]

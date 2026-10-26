@@ -1,0 +1,641 @@
+{
+  "partners": [
+    {
+      "id": "prt_1",
+      "name": "Saveurs de Douala",
+      "category": "EXPERIENCE",
+      "logoImageId": null,
+      "url": null,
+      "visible": true,
+      "sortOrder": 0
+    },
+    {
+      "id": "prt_2",
+      "name": "Immo Bonapriso",
+      "category": "IMMOBILIER",
+      "logoImageId": null,
+      "url": null,
+      "visible": true,
+      "sortOrder": 1
+    },
+    {
+      "id": "prt_3",
+      "name": "Kribi Évasion",
+      "category": "ENTREPRISES",
+      "logoImageId": null,
+      "url": null,
+      "visible": true,
+      "sortOrder": 2
+    },
+    {
+      "id": "prt_4",
+      "name": "Studio Lumière",
+      "category": "EXPERIENCE",
+      "logoImageId": null,
+      "url": null,
+      "visible": true,
+      "sortOrder": 3
+    },
+    {
+      "id": "prt_5",
+      "name": "Résidences Akwa",
+      "category": "IMMOBILIER",
+      "logoImageId": null,
+      "url": null,
+      "visible": true,
+      "sortOrder": 4
+    },
+    {
+      "id": "prt_6",
+      "name": "DLA Transports",
+      "category": "ENTREPRISES",
+      "logoImageId": null,
+      "url": null,
+      "visible": false,
+      "sortOrder": 5
+    },
+    {
+      "id": "prt_7",
+      "name": "Atelier Bamoun",
+      "category": "EXPERIENCE",
+      "logoImageId": null,
+      "url": null,
+      "visible": true,
+      "sortOrder": 6
+    },
+    {
+      "id": "prt_8",
+      "name": "Cabinet Ndoumbe",
+      "category": "IMMOBILIER",
+      "logoImageId": null,
+      "url": null,
+      "visible": true,
+      "sortOrder": 7
+    }
+  ],
+  "trainings": [
+    {
+      "id": "trn_accueil_relation_client",
+      "slug": "accueil-relation-client",
+      "title": "Accueil et relation client",
+      "category": "PROFESSIONNELS",
+      "audienceLabel": "Prestataires et entreprises",
+      "icon": "Users",
+      "duration": "1 jour",
+      "format": "Présentiel",
+      "location": "Douala",
+      "description": null,
+      "status": "PUBLISHED",
+      "sortOrder": 0,
+      "translations": {
+        "en": {
+          "title": "Customer welcome and relations",
+          "audienceLabel": "Service providers and businesses",
+          "duration": "1 day",
+          "format": "In person"
+        }
+      }
+    },
+    {
+      "id": "trn_hygiene_securite_cuisine",
+      "slug": "hygiene-securite-cuisine",
+      "title": "Hygiène et sécurité en cuisine",
+      "category": "PROFESSIONNELS",
+      "audienceLabel": "Prestataires et entreprises",
+      "icon": "Utensils",
+      "duration": "2 jours",
+      "format": "Présentiel",
+      "location": "Douala",
+      "description": null,
+      "status": "PUBLISHED",
+      "sortOrder": 1,
+      "translations": {
+        "en": {
+          "title": "Kitchen hygiene and safety",
+          "audienceLabel": "Service providers and businesses",
+          "duration": "2 days",
+          "format": "In person"
+        }
+      }
+    },
+    {
+      "id": "trn_entretien_logements",
+      "slug": "entretien-logements",
+      "title": "Entretien professionnel des logements",
+      "category": "PROFESSIONNELS",
+      "audienceLabel": "Prestataires et entreprises",
+      "icon": "Wrench",
+      "duration": "1 jour",
+      "format": "Présentiel",
+      "location": "Yaoundé",
+      "description": null,
+      "status": "PUBLISHED",
+      "sortOrder": 2,
+      "translations": {
+        "en": {
+          "title": "Professional home cleaning",
+          "audienceLabel": "Service providers and businesses",
+          "duration": "1 day",
+          "format": "In person"
+        }
+      }
+    },
+    {
+      "id": "trn_gestion_locative_fondamentaux",
+      "slug": "gestion-locative-fondamentaux",
+      "title": "Gestion locative : les fondamentaux",
+      "category": "PROFESSIONNELS",
+      "audienceLabel": "Prestataires et entreprises",
+      "icon": "Building",
+      "duration": "2 jours",
+      "format": "En ligne",
+      "location": null,
+      "description": null,
+      "status": "PUBLISHED",
+      "sortOrder": 3,
+      "translations": {
+        "en": {
+          "title": "Property management: the basics",
+          "audienceLabel": "Service providers and businesses",
+          "duration": "2 days",
+          "format": "Online"
+        }
+      }
+    },
+    {
+      "id": "trn_preparer_installation_cameroun",
+      "slug": "preparer-installation-cameroun",
+      "title": "Bien préparer son installation au Cameroun",
+      "category": "ATELIERS",
+      "audienceLabel": "Particuliers et familles",
+      "icon": "Plane",
+      "duration": "2 heures",
+      "format": "En ligne",
+      "location": null,
+      "description": null,
+      "status": "PUBLISHED",
+      "sortOrder": 4,
+      "translations": {
+        "en": {
+          "title": "Preparing your move to Cameroon",
+          "audienceLabel": "Individuals and families",
+          "duration": "2 hours",
+          "format": "Online"
+        }
+      }
+    },
+    {
+      "id": "trn_accompagner_proche_age",
+      "slug": "accompagner-proche-age",
+      "title": "Accompagner un proche âgé à domicile",
+      "category": "SENSIBILISATION",
+      "audienceLabel": "Familles et associations",
+      "icon": "HouseHeart",
+      "duration": "3 heures",
+      "format": "Présentiel",
+      "location": "Douala",
+      "description": null,
+      "status": "PUBLISHED",
+      "sortOrder": 5,
+      "translations": {
+        "en": {
+          "title": "Caring for an elderly relative at home",
+          "audienceLabel": "Families and associations",
+          "duration": "3 hours",
+          "format": "In person"
+        }
+      }
+    }
+  ],
+  "jobs": [
+    {
+      "id": "job_coordinateur",
+      "slug": "coordinateur-rice-de-services",
+      "title": "Coordinateur·rice de services",
+      "city": "Douala",
+      "country": "CM",
+      "contractType": "CDI",
+      "startDate": "janvier 2027",
+      "workingTime": "temps plein",
+      "locationLabel": "Douala, Cameroun",
+      "sectors": [],
+      "salaryMin": null,
+      "salaryMax": null,
+      "salaryCurrency": null,
+      "salaryPeriod": null,
+      "schedule": null,
+      "summary": "Vous coordonnez les prestations de nos clients et le réseau de prestataires à Douala.",
+      "description": "Au cœur de l’agence de Douala, vous coordonnez les demandes de nos clients, de la réception du besoin jusqu’au suivi de la prestation, avec notre réseau de prestataires.",
+      "missions": [
+        "Analyser les demandes et préparer les devis",
+        "Sélectionner et briefer les prestataires",
+        "Suivre chaque prestation et informer le client",
+        "Mettre à jour les dossiers dans l’outil de gestion"
+      ],
+      "profile": [
+        "Expérience en relation client ou coordination",
+        "Sens de l’organisation et du service",
+        "Aisance à l’écrit et à l’oral en français",
+        "Maîtrise des outils numériques courants"
+      ],
+      "benefits": [
+        "Une équipe bienveillante et engagée",
+        "Des formations régulières",
+        "Des missions utiles, au service des familles"
+      ],
+      "status": "PUBLISHED",
+      "publishedAt": "rel:now:-259200000",
+      "expiresAt": "rel:now:5011200000",
+      "createdAt": "rel:now:-432000000",
+      "translations": {
+        "en": {
+          "title": "Service coordinator",
+          "contractType": "Permanent",
+          "startDate": "January 2027",
+          "workingTime": "full time",
+          "locationLabel": "Douala, Cameroon",
+          "summary": "You coordinate our clients’ services and our network of providers in Douala.",
+          "description": "At the heart of the Douala agency, you coordinate our clients’ requests, from the first enquiry to the follow-up of the service, with our network of providers.",
+          "missions": [
+            "Review requests and prepare quotes",
+            "Select and brief service providers",
+            "Follow up on each service and keep the client informed",
+            "Keep records up to date in the management tool"
+          ],
+          "profile": [
+            "Experience in customer relations or coordination",
+            "Strong organisational skills and a sense of service",
+            "Good written and spoken French",
+            "Comfortable with everyday digital tools"
+          ],
+          "benefits": ["A caring and committed team", "Regular training", "Meaningful work, serving families"]
+        }
+      }
+    },
+    {
+      "id": "job_relation_clients",
+      "slug": "charge-e-relation-clients",
+      "title": "Chargé·e de relation clients",
+      "city": "Douala · sur site",
+      "country": "CM",
+      "contractType": "CDD 12 mois",
+      "startDate": "dès que possible",
+      "workingTime": "temps plein",
+      "locationLabel": "Douala, Cameroun, sur site",
+      "sectors": [],
+      "salaryMin": null,
+      "salaryMax": null,
+      "salaryCurrency": null,
+      "salaryPeriod": null,
+      "schedule": null,
+      "summary": "Vous accompagnez nos clients depuis l’agence de Douala.",
+      "description": "À l’agence de Douala, vous êtes l’interlocuteur de nos clients : vous recueillez leurs besoins, les transmettez à l’équipe de coordination et les tenez informés à chaque étape.",
+      "missions": [
+        "Accueillir les demandes par téléphone, WhatsApp et e-mail",
+        "Qualifier les besoins et les transmettre à la coordination",
+        "Informer les clients de l’avancement de leurs demandes"
+      ],
+      "profile": [
+        "Expérience en relation client",
+        "Bonne connaissance de Douala et de ses quartiers",
+        "Excellente expression écrite et orale"
+      ],
+      "benefits": [
+        "Une équipe bienveillante et engagée",
+        "Des formations régulières",
+        "Des missions utiles, au service des familles"
+      ],
+      "status": "PUBLISHED",
+      "publishedAt": "rel:now:-604800000",
+      "expiresAt": null,
+      "createdAt": "rel:now:-777600000",
+      "translations": {
+        "en": {
+          "title": "Customer relations officer",
+          "city": "Douala · on site",
+          "contractType": "12-month fixed-term",
+          "startDate": "as soon as possible",
+          "workingTime": "full time",
+          "locationLabel": "Douala, Cameroon, on site",
+          "summary": "You look after our clients from the Douala agency.",
+          "description": "At the Douala agency, you are our clients’ point of contact: you gather their needs, pass them on to the coordination team and keep them informed at every step.",
+          "missions": [
+            "Handle requests by phone, WhatsApp and e-mail",
+            "Qualify needs and pass them on to the coordination team",
+            "Keep clients informed of the progress of their requests"
+          ],
+          "profile": [
+            "Experience in customer relations",
+            "Good knowledge of Douala and its neighbourhoods",
+            "Excellent written and spoken communication"
+          ],
+          "benefits": ["A caring and committed team", "Regular training", "Meaningful work, serving families"]
+        }
+      }
+    },
+    {
+      "id": "job_entretien",
+      "slug": "agent-e-entretien-logements",
+      "title": "Agent·e d’entretien des logements",
+      "city": "Yaoundé",
+      "country": "CM",
+      "contractType": "Temps partiel",
+      "startDate": "novembre 2026",
+      "workingTime": "temps partiel",
+      "locationLabel": "Yaoundé, Cameroun",
+      "sectors": [],
+      "salaryMin": null,
+      "salaryMax": null,
+      "salaryCurrency": null,
+      "salaryPeriod": null,
+      "schedule": null,
+      "summary": "Vous assurez l’entretien des logements gérés par l’agence.",
+      "description": "Vous assurez l’entretien régulier des logements gérés par l’agence à Yaoundé, entre deux locations ou à la demande des propriétaires.",
+      "missions": [
+        "Nettoyer et préparer les logements",
+        "Signaler les réparations à prévoir",
+        "Contrôler l’état des lieux avec l’agence"
+      ],
+      "profile": ["Expérience en entretien ou en hôtellerie", "Rigueur et discrétion", "Ponctualité"],
+      "benefits": [
+        "Une équipe bienveillante et engagée",
+        "Des formations régulières",
+        "Des missions utiles, au service des familles"
+      ],
+      "status": "PUBLISHED",
+      "publishedAt": "rel:now:-1209600000",
+      "expiresAt": null,
+      "createdAt": "rel:now:-1382400000",
+      "translations": {
+        "en": {
+          "title": "Home cleaning agent",
+          "contractType": "Part time",
+          "startDate": "November 2026",
+          "workingTime": "part time",
+          "locationLabel": "Yaoundé, Cameroon",
+          "summary": "You clean and look after the homes managed by the agency.",
+          "description": "You carry out regular cleaning of the homes managed by the agency in Yaoundé, between two lets or at the owners’ request.",
+          "missions": [
+            "Clean and prepare the homes",
+            "Report any repairs needed",
+            "Check inventories with the agency"
+          ],
+          "profile": ["Experience in cleaning or hospitality", "Thorough and discreet", "Punctual"],
+          "benefits": ["A caring and committed team", "Regular training", "Meaningful work, serving families"]
+        }
+      }
+    },
+    {
+      "id": "job_intervenant",
+      "slug": "intervenant-e-a-domicile",
+      "title": "Intervenant·e à domicile",
+      "city": "Douala",
+      "country": "CM",
+      "contractType": "CDI",
+      "startDate": "janvier 2027",
+      "workingTime": "temps plein",
+      "locationLabel": "Douala, Cameroun",
+      "sectors": ["Bonamoussadi", "Makèpè", "Cité SIC"],
+      "salaryMin": 90000,
+      "salaryMax": 120000,
+      "salaryCurrency": "XAF",
+      "salaryPeriod": "MONTH",
+      "schedule": "8 h par jour · 5 jours par semaine",
+      "summary": "Vous réalisez les prestations à domicile de nos clients dans les quartiers nord de Douala.",
+      "description": "Au cœur de l’agence de Douala, vous organisez les demandes de nos clients, de la réception du besoin jusqu’au suivi de la prestation, avec notre réseau de prestataires.",
+      "missions": [
+        "Analyser les demandes et préparer les devis",
+        "Sélectionner et briefer les prestataires",
+        "Suivre chaque prestation et informer le client",
+        "Mettre à jour les dossiers dans l’outil de gestion"
+      ],
+      "profile": [
+        "Expérience en entretien de logement ou service à domicile",
+        "Sens de l’organisation et du service",
+        "Aisance à l’écrit et à l’oral en français",
+        "Maîtrise des outils numériques courants"
+      ],
+      "benefits": [
+        "Une équipe bienveillante et engagée",
+        "Des formations régulières",
+        "Des missions utiles, au service des familles"
+      ],
+      "status": "PUBLISHED",
+      "publishedAt": "2026-10-02T08:00:00.000Z",
+      "expiresAt": null,
+      "createdAt": "2026-09-30T08:00:00.000Z",
+      "translations": {
+        "en": {
+          "title": "Home service provider",
+          "contractType": "Permanent",
+          "startDate": "January 2027",
+          "workingTime": "full time",
+          "locationLabel": "Douala, Cameroon",
+          "schedule": "8 hours a day · 5 days a week",
+          "summary": "You carry out home services for our clients in the northern neighbourhoods of Douala.",
+          "description": "At the heart of the Douala agency, you organise our clients’ requests, from the first enquiry to the follow-up of the service, with our network of providers.",
+          "missions": [
+            "Review requests and prepare quotes",
+            "Select and brief service providers",
+            "Follow up on each service and keep the client informed",
+            "Keep records up to date in the management tool"
+          ],
+          "profile": [
+            "Experience in home cleaning or home services",
+            "Strong organisational skills and a sense of service",
+            "Good written and spoken French",
+            "Comfortable with everyday digital tools"
+          ],
+          "benefits": ["A caring and committed team", "Regular training", "Meaningful work, serving families"]
+        }
+      }
+    },
+    {
+      "id": "job_chauffeur",
+      "slug": "chauffeur-euse-partenaire",
+      "title": "Chauffeur·euse partenaire",
+      "city": "Douala",
+      "country": "CM",
+      "contractType": "Freelance",
+      "startDate": null,
+      "workingTime": null,
+      "locationLabel": "Douala, Cameroun",
+      "sectors": [],
+      "salaryMin": null,
+      "salaryMax": null,
+      "salaryCurrency": null,
+      "salaryPeriod": null,
+      "schedule": null,
+      "summary": "Vous réalisez des transferts et mises à disposition pour nos clients.",
+      "description": "Avec votre véhicule ou un véhicule de nos partenaires, vous réalisez les transferts aéroport et les mises à disposition demandés par nos clients.",
+      "missions": [
+        "Accueillir les clients à l’aéroport",
+        "Assurer les trajets et mises à disposition",
+        "Garder un véhicule propre et entretenu"
+      ],
+      "profile": ["Permis B depuis plus de 3 ans", "Bonne connaissance de Douala", "Sens du service"],
+      "benefits": [
+        "Une équipe bienveillante et engagée",
+        "Des formations régulières",
+        "Des missions utiles, au service des familles"
+      ],
+      "status": "PUBLISHED",
+      "publishedAt": "rel:now:-1814400000",
+      "expiresAt": null,
+      "createdAt": "rel:now:-1987200000",
+      "translations": {
+        "en": {
+          "title": "Partner driver",
+          "locationLabel": "Douala, Cameroon",
+          "summary": "You provide transfers and chauffeur services for our clients.",
+          "description": "With your own vehicle or one of our partners’ vehicles, you provide the airport transfers and chauffeur services our clients book.",
+          "missions": [
+            "Welcome clients at the airport",
+            "Drive clients on their trips and bookings",
+            "Keep the vehicle clean and well maintained"
+          ],
+          "profile": [
+            "Driving licence held for more than 3 years",
+            "Good knowledge of Douala",
+            "A sense of service"
+          ],
+          "benefits": ["A caring and committed team", "Regular training", "Meaningful work, serving families"]
+        }
+      }
+    },
+    {
+      "id": "job_assistant_administratif",
+      "slug": "assistant-e-administratif-ve",
+      "title": "Assistant·e administratif·ve",
+      "city": "Douala",
+      "country": "CM",
+      "contractType": "Stage",
+      "startDate": "janvier 2027",
+      "workingTime": "temps plein",
+      "locationLabel": "Douala, Cameroun",
+      "sectors": [],
+      "salaryMin": null,
+      "salaryMax": null,
+      "salaryCurrency": null,
+      "salaryPeriod": null,
+      "schedule": null,
+      "summary": "Vous épaulez l’équipe de l’agence de Douala dans le suivi administratif des dossiers clients et prestataires.",
+      "description": null,
+      "missions": [
+        "Classer et mettre à jour les dossiers clients",
+        "Préparer les documents des prestataires"
+      ],
+      "profile": ["Formation en assistanat ou en gestion", "Rigueur et sens de l’organisation"],
+      "benefits": [],
+      "status": "DRAFT",
+      "publishedAt": null,
+      "expiresAt": null,
+      "createdAt": "rel:now:-172800000",
+      "translations": null
+    }
+  ],
+  "events": [
+    {
+      "id": "evt_saveurs",
+      "slug": "nuit-des-saveurs-camerounaises",
+      "title": "Nuit des saveurs camerounaises",
+      "startsAt": "2026-11-14T18:00:00.000Z",
+      "endsAt": null,
+      "city": "Douala",
+      "place": "Akwa",
+      "tag": "Gastronomie",
+      "illustration": "chef",
+      "imageId": "photo-chef-2",
+      "description": null,
+      "capacity": 40,
+      "limited": true,
+      "status": "PUBLISHED",
+      "publishedAt": "2026-10-01T08:00:00.000Z"
+    },
+    {
+      "id": "evt_lobe",
+      "slug": "randonnee-cascades-lobe",
+      "title": "Randonnée et cascades de la Lobé",
+      "startsAt": "2026-11-22T07:00:00.000Z",
+      "endsAt": null,
+      "city": "Kribi",
+      "place": "journée",
+      "tag": "Nature",
+      "illustration": "culture",
+      "imageId": "photo-culture-randonnee",
+      "description": null,
+      "capacity": 20,
+      "limited": true,
+      "status": "PUBLISHED",
+      "publishedAt": "2026-10-01T08:00:00.000Z"
+    },
+    {
+      "id": "evt_artisans",
+      "slug": "visite-ateliers-artisans",
+      "title": "Visite des ateliers d’artisans",
+      "startsAt": "2026-12-06T08:00:00.000Z",
+      "endsAt": "2026-12-07T17:00:00.000Z",
+      "city": "Foumban",
+      "place": "week-end",
+      "tag": "Artisanat",
+      "illustration": "marche",
+      "imageId": "photo-culture-artisans",
+      "description": null,
+      "capacity": 15,
+      "limited": true,
+      "status": "PUBLISHED",
+      "publishedAt": "2026-10-01T08:00:00.000Z"
+    },
+    {
+      "id": "evt_jazz",
+      "slug": "soiree-jazz-bonapriso",
+      "title": "Soirée jazz à Bonapriso",
+      "startsAt": "2026-12-12T19:00:00.000Z",
+      "endsAt": null,
+      "city": "Douala",
+      "place": "Bonapriso",
+      "tag": "Concert",
+      "illustration": "evenement",
+      "imageId": null,
+      "description": null,
+      "capacity": 60,
+      "limited": false,
+      "status": "PUBLISHED",
+      "publishedAt": "2026-10-01T08:00:00.000Z"
+    },
+    {
+      "id": "evt_marche_noel",
+      "slug": "marche-artisanal-yaounde",
+      "title": "Marché artisanal de fin d’année",
+      "startsAt": "2026-12-19T09:00:00.000Z",
+      "endsAt": null,
+      "city": "Yaoundé",
+      "place": "Bastos",
+      "tag": "Artisanat",
+      "illustration": "marche",
+      "imageId": null,
+      "description": null,
+      "capacity": null,
+      "limited": false,
+      "status": "PUBLISHED",
+      "publishedAt": "2026-10-01T08:00:00.000Z"
+    },
+    {
+      "id": "evt_festival",
+      "slug": "festival-arts-douala",
+      "title": "Festival des arts de Douala",
+      "startsAt": "2027-01-16T15:00:00.000Z",
+      "endsAt": null,
+      "city": "Douala",
+      "place": "Bonanjo",
+      "tag": "Festival",
+      "illustration": "evenement",
+      "imageId": null,
+      "description": null,
+      "capacity": 200,
+      "limited": false,
+      "status": "DRAFT",
+      "publishedAt": null
+    }
+  ]
+}

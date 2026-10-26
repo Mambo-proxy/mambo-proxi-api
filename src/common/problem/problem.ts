@@ -56,6 +56,19 @@ export class ProblemException extends HttpException {
   }
 }
 
+/**
+ * 404 de la réponse `NotFound` du contrat (`not-found`, « Introuvable »), avec un détail propre à la ressource
+ * (ex. « Ce service n'existe pas ou n'est plus disponible. »).
+ */
+export function notFoundException(detail: string): ProblemException {
+  return new ProblemException({
+    status: HttpStatus.NOT_FOUND,
+    type: 'not-found',
+    title: 'Introuvable',
+    detail,
+  });
+}
+
 interface StatusProblem {
   type: string;
   title: string;

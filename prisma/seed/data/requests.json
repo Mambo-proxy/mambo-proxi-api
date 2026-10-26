@@ -1,0 +1,5135 @@
+[
+  {
+    "id": "req_0142",
+    "referenceNumber": 142,
+    "type": "DEVIS",
+    "status": "NOUVELLE",
+    "contactId": "ctc_aurelie_kamga",
+    "categoryId": "cat_experience",
+    "serviceId": "svc_chef_prive",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Chef privé",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "date.souhaitee",
+          "label": "Date souhaitée",
+          "value": "Samedi 14 nov. 2026"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Douala"
+        },
+        {
+          "key": "personnes",
+          "label": "Personnes",
+          "value": "12"
+        },
+        {
+          "key": "occasion",
+          "label": "Occasion",
+          "value": "Anniversaire"
+        }
+      ]
+    },
+    "message": "Dîner pour les 60 ans de ma mère, cuisine camerounaise revisitée, un invité végétarien.",
+    "consentAt": "rel:now:-7200000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:now:79200000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:now:-7200000",
+    "updatedAt": "rel:now:-7200000",
+    "history": [
+      {
+        "id": "req_0142_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-7200000"
+      },
+      {
+        "id": "req_0142_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-7200000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0141",
+    "referenceNumber": 141,
+    "type": "DEVIS",
+    "status": "NOUVELLE",
+    "contactId": "ctc_patrick_essomba",
+    "categoryId": "cat_culture",
+    "serviceId": "svc_decouverte_cameroun",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Découverte du Cameroun",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Culture & événementiel"
+        },
+        {
+          "key": "periode",
+          "label": "Période",
+          "value": "Du 20 au 27 déc. 2026"
+        },
+        {
+          "key": "personnes",
+          "label": "Personnes",
+          "value": "4"
+        }
+      ]
+    },
+    "message": "Nous venons en famille en décembre et souhaitons découvrir Kribi et Limbé pendant une semaine.",
+    "consentAt": "rel:now:-18000000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:now:68400000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:now:-18000000",
+    "updatedAt": "rel:now:-18000000",
+    "history": [
+      {
+        "id": "req_0141_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-18000000"
+      },
+      {
+        "id": "req_0141_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-18000000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0140",
+    "referenceNumber": 140,
+    "type": "DEVIS",
+    "status": "NOUVELLE",
+    "contactId": "ctc_ruth_atangana",
+    "categoryId": "cat_immobilier",
+    "serviceId": "svc_logement_temporaire",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Logement temporaire",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Immobilier"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Douala"
+        },
+        {
+          "key": "arrivee",
+          "label": "Arrivée",
+          "value": "5 janv. 2027"
+        },
+        {
+          "key": "duree",
+          "label": "Durée",
+          "value": "1 mois"
+        }
+      ]
+    },
+    "message": "Appartement meublé à Bonapriso pour un mois, à partir de janvier.",
+    "consentAt": "rel:day:-21300000",
+    "assignedToId": "usr_carine",
+    "assignedAt": "rel:day:-17700000",
+    "dueAt": "rel:day:65100000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-21300000",
+    "updatedAt": "rel:day:-21300000",
+    "history": [
+      {
+        "id": "req_0140_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-21300000"
+      },
+      {
+        "id": "req_0140_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-21300000"
+      },
+      {
+        "id": "req_0140_h3",
+        "kind": "ASSIGNED",
+        "data": {
+          "assignedToId": "usr_carine"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-17700000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0139",
+    "referenceNumber": 139,
+    "type": "DEVIS",
+    "status": "EN_COURS",
+    "contactId": "ctc_sandrine_mballa",
+    "categoryId": "cat_immobilier",
+    "serviceId": "svc_gestion_locative",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "TELEPHONE",
+    "subject": "Gestion locative",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Immobilier"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Yaoundé"
+        },
+        {
+          "key": "type.de.bien",
+          "label": "Type de bien",
+          "value": "Appartement T3"
+        }
+      ]
+    },
+    "message": "Je cherche quelqu’un pour gérer la location de mon appartement à Yaoundé.",
+    "consentAt": "rel:day:-45000000",
+    "assignedToId": "usr_mireille",
+    "assignedAt": "rel:day:-41400000",
+    "dueAt": "rel:day:41400000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-45000000",
+    "updatedAt": "rel:day:-45000000",
+    "history": [
+      {
+        "id": "req_0139_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-45000000"
+      },
+      {
+        "id": "req_0139_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-45000000"
+      },
+      {
+        "id": "req_0139_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-34200000"
+      },
+      {
+        "id": "req_0139_h4",
+        "kind": "ASSIGNED",
+        "data": {
+          "assignedToId": "usr_mireille"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-41400000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0138",
+    "referenceNumber": 138,
+    "type": "DEVIS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_herve_din",
+    "categoryId": "cat_proximite",
+    "serviceId": "svc_collecte_livraison_colis_courrier",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Livraison de colis",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Services de proximité"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Douala"
+        }
+      ]
+    },
+    "message": "Deux colis à récupérer à Akwa et à livrer chez ma mère à Makèpè.",
+    "consentAt": "rel:day:-53880000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:32520000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-53880000",
+    "updatedAt": "rel:day:-53880000",
+    "history": [
+      {
+        "id": "req_0138_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-53880000"
+      },
+      {
+        "id": "req_0138_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-53880000"
+      },
+      {
+        "id": "req_0138_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-43080000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0137",
+    "referenceNumber": 137,
+    "type": "DEVIS",
+    "status": "EN_COURS",
+    "contactId": "ctc_clarisse_ngo",
+    "categoryId": "cat_domicile",
+    "serviceId": "svc_maison_linge",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "TELEPHONE",
+    "subject": "Maison + Linge",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Services à domicile"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Bonapriso, Douala"
+        }
+      ]
+    },
+    "message": "Entretien de l’appartement et collecte du linge chaque semaine, le mardi matin.",
+    "consentAt": "rel:day:-116160000",
+    "assignedToId": "usr_paul",
+    "assignedAt": "rel:day:-112560000",
+    "dueAt": "rel:now:172800000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-116160000",
+    "updatedAt": "rel:day:-116160000",
+    "history": [
+      {
+        "id": "req_0137_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-116160000"
+      },
+      {
+        "id": "req_0137_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-116160000"
+      },
+      {
+        "id": "req_0137_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-105360000"
+      },
+      {
+        "id": "req_0137_h4",
+        "kind": "ASSIGNED",
+        "data": {
+          "assignedToId": "usr_paul"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-112560000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0136",
+    "referenceNumber": 136,
+    "type": "DEVIS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_jean.marc_tchoumi",
+    "categoryId": "cat_experience",
+    "serviceId": "svc_chef_prive",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Chef privé",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Yaoundé"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : chef privé.",
+    "consentAt": "rel:day:-186600000",
+    "assignedToId": "usr_mireille",
+    "assignedAt": "rel:day:-183000000",
+    "dueAt": "rel:day:-100200000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-186600000",
+    "updatedAt": "rel:day:-186600000",
+    "history": [
+      {
+        "id": "req_0136_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-186600000"
+      },
+      {
+        "id": "req_0136_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-186600000"
+      },
+      {
+        "id": "req_0136_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-175800000"
+      },
+      {
+        "id": "req_0136_h4",
+        "kind": "ASSIGNED",
+        "data": {
+          "assignedToId": "usr_mireille"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-183000000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0135",
+    "referenceNumber": 135,
+    "type": "DEVIS",
+    "status": "CLOTUREE",
+    "contactId": "ctc_laure_bekolo",
+    "categoryId": "cat_experience",
+    "serviceId": "svc_services_evenementiels",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Services événementiels",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : services événementiels.",
+    "consentAt": "rel:day:-297300000",
+    "assignedToId": "usr_equipe",
+    "assignedAt": "rel:day:-293700000",
+    "dueAt": "rel:day:-210900000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-297300000",
+    "updatedAt": "rel:day:-297300000",
+    "history": [
+      {
+        "id": "req_0135_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-297300000"
+      },
+      {
+        "id": "req_0135_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-297300000"
+      },
+      {
+        "id": "req_0135_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-286500000"
+      },
+      {
+        "id": "req_0135_h4",
+        "kind": "ASSIGNED",
+        "data": {
+          "assignedToId": "usr_equipe"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-293700000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0134",
+    "referenceNumber": 134,
+    "type": "DEVIS",
+    "status": "NOUVELLE",
+    "contactId": "ctc_marie_fotso",
+    "categoryId": "cat_domicile",
+    "serviceId": "svc_maison_essentiel",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Maison Essentiel",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Services à domicile"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Akwa, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : maison essentiel.",
+    "consentAt": "rel:day:-403200000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-316800000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-403200000",
+    "updatedAt": "rel:day:-403200000",
+    "history": [
+      {
+        "id": "req_0134_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-403200000"
+      },
+      {
+        "id": "req_0134_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-403200000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0131",
+    "referenceNumber": 131,
+    "type": "EVENEMENT",
+    "status": "NOUVELLE",
+    "contactId": "ctc_joel_nana",
+    "categoryId": "cat_culture",
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": "evt_saveurs",
+    "seats": 2,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Nuit des saveurs camerounaises",
+    "payload": {
+      "eventSlug": "nuit-des-saveurs-camerounaises",
+      "seats": 2,
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Culture & événementiel"
+        },
+        {
+          "key": "evenement",
+          "label": "Événement",
+          "value": "Nuit des saveurs camerounaises"
+        },
+        {
+          "key": "places",
+          "label": "Places",
+          "value": "2"
+        }
+      ]
+    },
+    "message": "Inscription pour 2 personnes.",
+    "consentAt": "rel:day:-451200000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-364800000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-451200000",
+    "updatedAt": "rel:day:-451200000",
+    "history": [
+      {
+        "id": "req_0131_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-451200000"
+      },
+      {
+        "id": "req_0131_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-451200000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0127",
+    "referenceNumber": 127,
+    "type": "DEVIS",
+    "status": "NOUVELLE",
+    "contactId": "ctc_yannick_nkoulou",
+    "categoryId": "cat_culture",
+    "serviceId": "svc_decouverte_cameroun",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Découverte du Cameroun",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Culture & événementiel"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Bonamoussadi, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : découverte du cameroun.",
+    "consentAt": "rel:day:-461460000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-375060000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-461460000",
+    "updatedAt": "rel:day:-461460000",
+    "history": [
+      {
+        "id": "req_0127_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-461460000"
+      },
+      {
+        "id": "req_0127_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-461460000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0130",
+    "referenceNumber": 130,
+    "type": "DEVIS",
+    "status": "NOUVELLE",
+    "contactId": "ctc_nadia_abena",
+    "categoryId": "cat_immobilier",
+    "serviceId": "svc_accompagnement_installation",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Suivi de chantier",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Immobilier"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Yaoundé"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : suivi de chantier.",
+    "consentAt": "rel:day:-473520000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-387120000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-473520000",
+    "updatedAt": "rel:day:-473520000",
+    "history": [
+      {
+        "id": "req_0130_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-473520000"
+      },
+      {
+        "id": "req_0130_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-473520000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0132",
+    "referenceNumber": 132,
+    "type": "FORMATION",
+    "status": "NOUVELLE",
+    "contactId": "ctc_mme_ekambi",
+    "categoryId": "cat_experience",
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": "trn_accueil_relation_client",
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": 12,
+    "period": "Janvier 2027",
+    "organization": "Hôtel La Falaise",
+    "partnershipType": null,
+    "contactPreference": "TELEPHONE",
+    "subject": "Accueil et relation client",
+    "payload": {
+      "organization": "Hôtel La Falaise",
+      "trainingSlug": "accueil-relation-client",
+      "participants": 12,
+      "period": "Janvier 2027",
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "structure",
+          "label": "Structure",
+          "value": "Hôtel La Falaise"
+        },
+        {
+          "key": "formation.souhaitee",
+          "label": "Formation souhaitée",
+          "value": "Accueil et relation client"
+        },
+        {
+          "key": "participants",
+          "label": "Participants",
+          "value": "12"
+        },
+        {
+          "key": "periode.souhaitee",
+          "label": "Période souhaitée",
+          "value": "Janvier 2027"
+        }
+      ]
+    },
+    "message": "Formation de notre équipe de réception avant la haute saison.",
+    "consentAt": "rel:day:-481500000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-395100000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-481500000",
+    "updatedAt": "rel:day:-481500000",
+    "history": [
+      {
+        "id": "req_0132_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-481500000"
+      },
+      {
+        "id": "req_0132_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-481500000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0133",
+    "referenceNumber": 133,
+    "type": "DEVIS",
+    "status": "NOUVELLE",
+    "contactId": "ctc_paul_mbarga",
+    "categoryId": "cat_experience",
+    "serviceId": "svc_chef_prive",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Chef privé",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Bonamoussadi, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : chef privé.",
+    "consentAt": "rel:day:-485580000",
+    "assignedToId": "usr_carine",
+    "assignedAt": "rel:day:-481980000",
+    "dueAt": "rel:day:-399180000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-485580000",
+    "updatedAt": "rel:day:-485580000",
+    "history": [
+      {
+        "id": "req_0133_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-485580000"
+      },
+      {
+        "id": "req_0133_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-485580000"
+      },
+      {
+        "id": "req_0133_h3",
+        "kind": "ASSIGNED",
+        "data": {
+          "assignedToId": "usr_carine"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-481980000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0128",
+    "referenceNumber": 128,
+    "type": "EVENEMENT",
+    "status": "NOUVELLE",
+    "contactId": "ctc_grace_kuete",
+    "categoryId": "cat_culture",
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": "evt_saveurs",
+    "seats": 4,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Nuit des saveurs camerounaises",
+    "payload": {
+      "eventSlug": "nuit-des-saveurs-camerounaises",
+      "seats": 4,
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Culture & événementiel"
+        },
+        {
+          "key": "evenement",
+          "label": "Événement",
+          "value": "Nuit des saveurs camerounaises"
+        },
+        {
+          "key": "places",
+          "label": "Places",
+          "value": "4"
+        }
+      ]
+    },
+    "message": "Inscription pour 4 personnes.",
+    "consentAt": "rel:day:-537600000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-451200000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-537600000",
+    "updatedAt": "rel:day:-537600000",
+    "history": [
+      {
+        "id": "req_0128_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-537600000"
+      },
+      {
+        "id": "req_0128_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-537600000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0129",
+    "referenceNumber": 129,
+    "type": "PARTENARIAT",
+    "status": "NOUVELLE",
+    "contactId": "ctc_serge_eyenga",
+    "categoryId": "cat_proximite",
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": "Saveurs du Wouri",
+    "partnershipType": "PRESTATAIRE_EXPERIENCE",
+    "contactPreference": "TELEPHONE",
+    "subject": "Saveurs du Wouri",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Services de proximité"
+        },
+        {
+          "key": "type.de.partenariat",
+          "label": "Type de partenariat",
+          "value": "Prestataire Expérience"
+        },
+        {
+          "key": "structure",
+          "label": "Structure",
+          "value": "Saveurs du Wouri"
+        },
+        {
+          "key": "activite",
+          "label": "Activité",
+          "value": "Traiteur, cuisine camerounaise"
+        }
+      ]
+    },
+    "message": "Traiteur à Bonapriso, nous aimerions proposer nos repas aux clients de Mambo pour leurs réceptions.",
+    "consentAt": "rel:day:-555900000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-469500000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-555900000",
+    "updatedAt": "rel:day:-555900000",
+    "history": [
+      {
+        "id": "req_0129_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-555900000"
+      },
+      {
+        "id": "req_0129_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-555900000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0111",
+    "referenceNumber": 111,
+    "type": "FORMATION",
+    "status": "EN_COURS",
+    "contactId": "ctc_m_tchakounte",
+    "categoryId": "cat_culture",
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": "trn_accompagner_proche_age",
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": 20,
+    "period": "Décembre 2026",
+    "organization": "Association Femmes d’Akwa",
+    "partnershipType": null,
+    "contactPreference": "TELEPHONE",
+    "subject": "Accompagner un proche âgé à domicile",
+    "payload": {
+      "organization": "Association Femmes d’Akwa",
+      "trainingSlug": "accompagner-proche-age",
+      "participants": 20,
+      "period": "Décembre 2026",
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Culture & événementiel"
+        },
+        {
+          "key": "structure",
+          "label": "Structure",
+          "value": "Association Femmes d’Akwa"
+        },
+        {
+          "key": "formation.souhaitee",
+          "label": "Formation souhaitée",
+          "value": "Accompagner un proche âgé à domicile"
+        },
+        {
+          "key": "participants",
+          "label": "Participants",
+          "value": "20"
+        },
+        {
+          "key": "periode.souhaitee",
+          "label": "Période souhaitée",
+          "value": "Décembre 2026"
+        }
+      ]
+    },
+    "message": "Séance de sensibilisation pour les membres de l’association.",
+    "consentAt": "rel:day:-654300000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-567900000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-654300000",
+    "updatedAt": "rel:day:-654300000",
+    "history": [
+      {
+        "id": "req_0111_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-654300000"
+      },
+      {
+        "id": "req_0111_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-654300000"
+      },
+      {
+        "id": "req_0111_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-643500000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0120",
+    "referenceNumber": 120,
+    "type": "EVENEMENT",
+    "status": "EN_COURS",
+    "contactId": "ctc_nadia_abena",
+    "categoryId": "cat_culture",
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": "evt_lobe",
+    "seats": 2,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "TELEPHONE",
+    "subject": "Randonnée et cascades de la Lobé",
+    "payload": {
+      "eventSlug": "randonnee-cascades-lobe",
+      "seats": 2,
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Culture & événementiel"
+        },
+        {
+          "key": "evenement",
+          "label": "Événement",
+          "value": "Randonnée et cascades de la Lobé"
+        },
+        {
+          "key": "places",
+          "label": "Places",
+          "value": "2"
+        }
+      ]
+    },
+    "message": "Inscription pour 2 personnes.",
+    "consentAt": "rel:day:-710400000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-624000000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-710400000",
+    "updatedAt": "rel:day:-710400000",
+    "history": [
+      {
+        "id": "req_0120_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-710400000"
+      },
+      {
+        "id": "req_0120_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-710400000"
+      },
+      {
+        "id": "req_0120_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-699600000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0126",
+    "referenceNumber": 126,
+    "type": "FORMATION",
+    "status": "NOUVELLE",
+    "contactId": "ctc_mme_owona",
+    "categoryId": "cat_domicile",
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": "trn_entretien_logements",
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": 6,
+    "period": "Novembre 2026",
+    "organization": "Résidences Bastos",
+    "partnershipType": null,
+    "contactPreference": "TELEPHONE",
+    "subject": "Entretien professionnel des logements",
+    "payload": {
+      "organization": "Résidences Bastos",
+      "trainingSlug": "entretien-logements",
+      "participants": 6,
+      "period": "Novembre 2026",
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Services à domicile"
+        },
+        {
+          "key": "structure",
+          "label": "Structure",
+          "value": "Résidences Bastos"
+        },
+        {
+          "key": "formation.souhaitee",
+          "label": "Formation souhaitée",
+          "value": "Entretien professionnel des logements"
+        },
+        {
+          "key": "participants",
+          "label": "Participants",
+          "value": "6"
+        },
+        {
+          "key": "periode.souhaitee",
+          "label": "Période souhaitée",
+          "value": "Novembre 2026"
+        }
+      ]
+    },
+    "message": "Formation de nos agents d’entretien pour nos appartements meublés.",
+    "consentAt": "rel:day:-740700000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-654300000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-740700000",
+    "updatedAt": "rel:day:-740700000",
+    "history": [
+      {
+        "id": "req_0126_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-740700000"
+      },
+      {
+        "id": "req_0126_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-740700000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0114",
+    "referenceNumber": 114,
+    "type": "EVENEMENT",
+    "status": "EN_COURS",
+    "contactId": "ctc_marie_fotso",
+    "categoryId": "cat_culture",
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": "evt_artisans",
+    "seats": 3,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "TELEPHONE",
+    "subject": "Visite des ateliers d’artisans",
+    "payload": {
+      "eventSlug": "visite-ateliers-artisans",
+      "seats": 3,
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Culture & événementiel"
+        },
+        {
+          "key": "evenement",
+          "label": "Événement",
+          "value": "Visite des ateliers d’artisans"
+        },
+        {
+          "key": "places",
+          "label": "Places",
+          "value": "3"
+        }
+      ]
+    },
+    "message": "Inscription pour 3 personnes.",
+    "consentAt": "rel:day:-883200000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-796800000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-883200000",
+    "updatedAt": "rel:day:-883200000",
+    "history": [
+      {
+        "id": "req_0114_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-883200000"
+      },
+      {
+        "id": "req_0114_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-883200000"
+      },
+      {
+        "id": "req_0114_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-872400000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0125",
+    "referenceNumber": 125,
+    "type": "DEVIS",
+    "status": "EN_COURS",
+    "contactId": "ctc_boris_owona",
+    "categoryId": "cat_experience",
+    "serviceId": "svc_chef_prive",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Chef privé",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Makèpè, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : chef privé.",
+    "consentAt": "rel:day:-1148220000",
+    "assignedToId": "usr_paul",
+    "assignedAt": "rel:day:-1144620000",
+    "dueAt": "rel:day:-1061820000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-1148220000",
+    "updatedAt": "rel:day:-1148220000",
+    "history": [
+      {
+        "id": "req_0125_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1148220000"
+      },
+      {
+        "id": "req_0125_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1148220000"
+      },
+      {
+        "id": "req_0125_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-1137420000"
+      },
+      {
+        "id": "req_0125_h4",
+        "kind": "ASSIGNED",
+        "data": {
+          "assignedToId": "usr_paul"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-1144620000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0105",
+    "referenceNumber": 105,
+    "type": "FORMATION",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_paul_ngando",
+    "categoryId": "cat_proximite",
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": "trn_hygiene_securite_cuisine",
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": 8,
+    "period": "Octobre 2026",
+    "organization": "Cuisines du Littoral",
+    "partnershipType": null,
+    "contactPreference": "TELEPHONE",
+    "subject": "Hygiène et sécurité en cuisine",
+    "payload": {
+      "organization": "Cuisines du Littoral",
+      "trainingSlug": "hygiene-securite-cuisine",
+      "participants": 8,
+      "period": "Octobre 2026",
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Services de proximité"
+        },
+        {
+          "key": "structure",
+          "label": "Structure",
+          "value": "Cuisines du Littoral"
+        },
+        {
+          "key": "formation.souhaitee",
+          "label": "Formation souhaitée",
+          "value": "Hygiène et sécurité en cuisine"
+        },
+        {
+          "key": "participants",
+          "label": "Participants",
+          "value": "8"
+        },
+        {
+          "key": "periode.souhaitee",
+          "label": "Période souhaitée",
+          "value": "Octobre 2026"
+        }
+      ]
+    },
+    "message": "Mise à niveau hygiène pour nos cuisiniers et commis.",
+    "consentAt": "rel:day:-1172700000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-1086300000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-1172700000",
+    "updatedAt": "rel:day:-1172700000",
+    "history": [
+      {
+        "id": "req_0105_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1172700000"
+      },
+      {
+        "id": "req_0105_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1172700000"
+      },
+      {
+        "id": "req_0105_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-1161900000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0124",
+    "referenceNumber": 124,
+    "type": "DEVIS",
+    "status": "EN_COURS",
+    "contactId": "ctc_marie_fotso",
+    "categoryId": "cat_experience",
+    "serviceId": "svc_location_voiture",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Location de voiture avec chauffeur",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Yaoundé"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : location de voiture avec chauffeur.",
+    "consentAt": "rel:day:-1266600000",
+    "assignedToId": "usr_paul",
+    "assignedAt": "rel:day:-1263000000",
+    "dueAt": "rel:day:-1180200000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-1266600000",
+    "updatedAt": "rel:day:-1266600000",
+    "history": [
+      {
+        "id": "req_0124_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1266600000"
+      },
+      {
+        "id": "req_0124_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1266600000"
+      },
+      {
+        "id": "req_0124_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-1255800000"
+      },
+      {
+        "id": "req_0124_h4",
+        "kind": "ASSIGNED",
+        "data": {
+          "assignedToId": "usr_paul"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-1263000000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0123",
+    "referenceNumber": 123,
+    "type": "PARTENARIAT",
+    "status": "EN_COURS",
+    "contactId": "ctc_paul_mbarga",
+    "categoryId": "cat_immobilier",
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": "Agence Bonanjo Habitat",
+    "partnershipType": "IMMOBILIER",
+    "contactPreference": "TELEPHONE",
+    "subject": "Agence Bonanjo Habitat",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Immobilier"
+        },
+        {
+          "key": "type.de.partenariat",
+          "label": "Type de partenariat",
+          "value": "Immobilier"
+        },
+        {
+          "key": "structure",
+          "label": "Structure",
+          "value": "Agence Bonanjo Habitat"
+        },
+        {
+          "key": "activite",
+          "label": "Activité",
+          "value": "Location et gestion d’appartements meublés"
+        }
+      ]
+    },
+    "message": "Agence immobilière : nous gérons une quarantaine d’appartements meublés à Bonanjo et Akwa.",
+    "consentAt": "rel:day:-1348980000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-1262580000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-1348980000",
+    "updatedAt": "rel:day:-1348980000",
+    "history": [
+      {
+        "id": "req_0123_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1348980000"
+      },
+      {
+        "id": "req_0123_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1348980000"
+      },
+      {
+        "id": "req_0123_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-1338180000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0122",
+    "referenceNumber": 122,
+    "type": "DEVIS",
+    "status": "EN_COURS",
+    "contactId": "ctc_esther_manga",
+    "categoryId": "cat_immobilier",
+    "serviceId": "svc_accompagnement_installation",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Suivi de chantier",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Immobilier"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Akwa, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : suivi de chantier.",
+    "consentAt": "rel:day:-1431360000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-1344960000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-1431360000",
+    "updatedAt": "rel:day:-1431360000",
+    "history": [
+      {
+        "id": "req_0122_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1431360000"
+      },
+      {
+        "id": "req_0122_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1431360000"
+      },
+      {
+        "id": "req_0122_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-1420560000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0121",
+    "referenceNumber": 121,
+    "type": "DEVIS",
+    "status": "EN_COURS",
+    "contactId": "ctc_joel_nana",
+    "categoryId": "cat_proximite",
+    "serviceId": "svc_livraison_courses_commandes",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Courses et livraisons",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Services de proximité"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Bonamoussadi, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : courses et livraisons.",
+    "consentAt": "rel:day:-1513740000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-1427340000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-1513740000",
+    "updatedAt": "rel:day:-1513740000",
+    "history": [
+      {
+        "id": "req_0121_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1513740000"
+      },
+      {
+        "id": "req_0121_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1513740000"
+      },
+      {
+        "id": "req_0121_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-1502940000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0119",
+    "referenceNumber": 119,
+    "type": "DEVIS",
+    "status": "EN_COURS",
+    "contactId": "ctc_serge_eyenga",
+    "categoryId": "cat_culture",
+    "serviceId": "svc_decouverte_cameroun",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Découverte du Cameroun",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Culture & événementiel"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Makèpè, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : découverte du cameroun.",
+    "consentAt": "rel:day:-1678500000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-1592100000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-1678500000",
+    "updatedAt": "rel:day:-1678500000",
+    "history": [
+      {
+        "id": "req_0119_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1678500000"
+      },
+      {
+        "id": "req_0119_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1678500000"
+      },
+      {
+        "id": "req_0119_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-1667700000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0118",
+    "referenceNumber": 118,
+    "type": "DEVIS",
+    "status": "EN_COURS",
+    "contactId": "ctc_grace_kuete",
+    "categoryId": "cat_domicile",
+    "serviceId": "svc_maison_essentiel",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Maison Essentiel",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Services à domicile"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Yaoundé"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : maison essentiel.",
+    "consentAt": "rel:day:-1760880000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-1674480000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-1760880000",
+    "updatedAt": "rel:day:-1760880000",
+    "history": [
+      {
+        "id": "req_0118_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1760880000"
+      },
+      {
+        "id": "req_0118_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1760880000"
+      },
+      {
+        "id": "req_0118_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-1750080000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0117",
+    "referenceNumber": 117,
+    "type": "PARTENARIAT",
+    "status": "EN_COURS",
+    "contactId": "ctc_yannick_nkoulou",
+    "categoryId": "cat_experience",
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": "Express Logistique Douala",
+    "partnershipType": "AUTRE",
+    "contactPreference": "TELEPHONE",
+    "subject": "Express Logistique Douala",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "type.de.partenariat",
+          "label": "Type de partenariat",
+          "value": "Entreprise & prestataire"
+        },
+        {
+          "key": "structure",
+          "label": "Structure",
+          "value": "Express Logistique Douala"
+        },
+        {
+          "key": "activite",
+          "label": "Activité",
+          "value": "Livraison de colis et de courrier"
+        }
+      ]
+    },
+    "message": "Coursiers à moto dans tout Douala, disponibles 7 jours sur 7 pour les livraisons de colis.",
+    "consentAt": "rel:day:-1843260000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-1756860000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-1843260000",
+    "updatedAt": "rel:day:-1843260000",
+    "history": [
+      {
+        "id": "req_0117_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1843260000"
+      },
+      {
+        "id": "req_0117_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1843260000"
+      },
+      {
+        "id": "req_0117_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-1832460000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0116",
+    "referenceNumber": 116,
+    "type": "DEVIS",
+    "status": "EN_COURS",
+    "contactId": "ctc_ines_tchakounte",
+    "categoryId": "cat_experience",
+    "serviceId": "svc_location_voiture",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Location de voiture avec chauffeur",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Akwa, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : location de voiture avec chauffeur.",
+    "consentAt": "rel:day:-1929240000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-1842840000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-1929240000",
+    "updatedAt": "rel:day:-1929240000",
+    "history": [
+      {
+        "id": "req_0116_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1929240000"
+      },
+      {
+        "id": "req_0116_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-1929240000"
+      },
+      {
+        "id": "req_0116_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-1918440000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0115",
+    "referenceNumber": 115,
+    "type": "DEVIS",
+    "status": "EN_COURS",
+    "contactId": "ctc_boris_owona",
+    "categoryId": "cat_immobilier",
+    "serviceId": "svc_gestion_locative",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Gestion locative",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Immobilier"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Bonamoussadi, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : gestion locative.",
+    "consentAt": "rel:day:-2011620000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-1925220000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-2011620000",
+    "updatedAt": "rel:day:-2011620000",
+    "history": [
+      {
+        "id": "req_0115_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2011620000"
+      },
+      {
+        "id": "req_0115_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2011620000"
+      },
+      {
+        "id": "req_0115_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-2000820000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0113",
+    "referenceNumber": 113,
+    "type": "DEVIS",
+    "status": "EN_COURS",
+    "contactId": "ctc_paul_mbarga",
+    "categoryId": "cat_proximite",
+    "serviceId": "svc_livraison_courses_commandes",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Courses et livraisons",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Services de proximité"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Makèpè, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : courses et livraisons.",
+    "consentAt": "rel:day:-2212380000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-2125980000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-2212380000",
+    "updatedAt": "rel:day:-2212380000",
+    "history": [
+      {
+        "id": "req_0113_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2212380000"
+      },
+      {
+        "id": "req_0113_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2212380000"
+      },
+      {
+        "id": "req_0113_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-2201580000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0112",
+    "referenceNumber": 112,
+    "type": "DEVIS",
+    "status": "EN_COURS",
+    "contactId": "ctc_esther_manga",
+    "categoryId": "cat_experience",
+    "serviceId": "svc_massage_bien_etre",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Massage à domicile",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Yaoundé"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : massage à domicile.",
+    "consentAt": "rel:day:-2294760000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-2208360000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-2294760000",
+    "updatedAt": "rel:day:-2294760000",
+    "history": [
+      {
+        "id": "req_0112_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2294760000"
+      },
+      {
+        "id": "req_0112_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2294760000"
+      },
+      {
+        "id": "req_0112_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-2283960000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0110",
+    "referenceNumber": 110,
+    "type": "DEVIS",
+    "status": "EN_COURS",
+    "contactId": "ctc_nadia_abena",
+    "categoryId": "cat_domicile",
+    "serviceId": "svc_maison_essentiel",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Maison Essentiel",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Services à domicile"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Akwa, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : maison essentiel.",
+    "consentAt": "rel:day:-2459520000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-2373120000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-2459520000",
+    "updatedAt": "rel:day:-2459520000",
+    "history": [
+      {
+        "id": "req_0110_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2459520000"
+      },
+      {
+        "id": "req_0110_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2459520000"
+      },
+      {
+        "id": "req_0110_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-2448720000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0108",
+    "referenceNumber": 108,
+    "type": "EVENEMENT",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_grace_kuete",
+    "categoryId": "cat_culture",
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": 2,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "TELEPHONE",
+    "subject": "Soirée contes et musique à Akwa",
+    "payload": {
+      "eventSlug": "soiree-contes-akwa",
+      "seats": 2,
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Culture & événementiel"
+        },
+        {
+          "key": "evenement",
+          "label": "Événement",
+          "value": "Soirée contes et musique à Akwa"
+        },
+        {
+          "key": "places",
+          "label": "Places",
+          "value": "2"
+        }
+      ]
+    },
+    "message": "Inscription pour 2 personnes.",
+    "consentAt": "rel:day:-2524800000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-2438400000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-2524800000",
+    "updatedAt": "rel:day:-2524800000",
+    "history": [
+      {
+        "id": "req_0108_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2524800000"
+      },
+      {
+        "id": "req_0108_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2524800000"
+      },
+      {
+        "id": "req_0108_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-2514000000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0109",
+    "referenceNumber": 109,
+    "type": "DEVIS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_serge_eyenga",
+    "categoryId": "cat_experience",
+    "serviceId": "svc_chef_prive",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Chef privé",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Bonamoussadi, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : chef privé.",
+    "consentAt": "rel:day:-2541900000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-2455500000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-2541900000",
+    "updatedAt": "rel:day:-2541900000",
+    "history": [
+      {
+        "id": "req_0109_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2541900000"
+      },
+      {
+        "id": "req_0109_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2541900000"
+      },
+      {
+        "id": "req_0109_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-2531100000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0107",
+    "referenceNumber": 107,
+    "type": "DEVIS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_yannick_nkoulou",
+    "categoryId": "cat_immobilier",
+    "serviceId": "svc_gestion_locative",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Gestion locative",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Immobilier"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Makèpè, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : gestion locative.",
+    "consentAt": "rel:day:-2710260000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-2623860000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-2710260000",
+    "updatedAt": "rel:day:-2710260000",
+    "history": [
+      {
+        "id": "req_0107_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2710260000"
+      },
+      {
+        "id": "req_0107_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2710260000"
+      },
+      {
+        "id": "req_0107_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-2699460000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0102",
+    "referenceNumber": 102,
+    "type": "EVENEMENT",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_esther_manga",
+    "categoryId": "cat_culture",
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": 1,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "TELEPHONE",
+    "subject": "Soirée contes et musique à Akwa",
+    "payload": {
+      "eventSlug": "soiree-contes-akwa",
+      "seats": 1,
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Culture & événementiel"
+        },
+        {
+          "key": "evenement",
+          "label": "Événement",
+          "value": "Soirée contes et musique à Akwa"
+        },
+        {
+          "key": "places",
+          "label": "Places",
+          "value": "1"
+        }
+      ]
+    },
+    "message": "Inscription pour une personne.",
+    "consentAt": "rel:day:-2784000000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-2697600000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-2784000000",
+    "updatedAt": "rel:day:-2784000000",
+    "history": [
+      {
+        "id": "req_0102_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2784000000"
+      },
+      {
+        "id": "req_0102_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2784000000"
+      },
+      {
+        "id": "req_0102_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-2773200000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0106",
+    "referenceNumber": 106,
+    "type": "DEVIS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_ines_tchakounte",
+    "categoryId": "cat_immobilier",
+    "serviceId": "svc_accompagnement_installation",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Suivi de chantier",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Immobilier"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Yaoundé"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : suivi de chantier.",
+    "consentAt": "rel:day:-2792640000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-2706240000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-2792640000",
+    "updatedAt": "rel:day:-2792640000",
+    "history": [
+      {
+        "id": "req_0106_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2792640000"
+      },
+      {
+        "id": "req_0106_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2792640000"
+      },
+      {
+        "id": "req_0106_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-2781840000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0104",
+    "referenceNumber": 104,
+    "type": "DEVIS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_marie_fotso",
+    "categoryId": "cat_experience",
+    "serviceId": "svc_massage_bien_etre",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Massage à domicile",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Akwa, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : massage à domicile.",
+    "consentAt": "rel:day:-2993400000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-2907000000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-2993400000",
+    "updatedAt": "rel:day:-2993400000",
+    "history": [
+      {
+        "id": "req_0104_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2993400000"
+      },
+      {
+        "id": "req_0104_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-2993400000"
+      },
+      {
+        "id": "req_0104_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-2982600000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0103",
+    "referenceNumber": 103,
+    "type": "DEVIS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_paul_mbarga",
+    "categoryId": "cat_culture",
+    "serviceId": "svc_decouverte_cameroun",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Découverte du Cameroun",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Culture & événementiel"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Bonamoussadi, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : découverte du cameroun.",
+    "consentAt": "rel:day:-3075780000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-2989380000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-3075780000",
+    "updatedAt": "rel:day:-3075780000",
+    "history": [
+      {
+        "id": "req_0103_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3075780000"
+      },
+      {
+        "id": "req_0103_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3075780000"
+      },
+      {
+        "id": "req_0103_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-3064980000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0101",
+    "referenceNumber": 101,
+    "type": "DEVIS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_joel_nana",
+    "categoryId": "cat_experience",
+    "serviceId": "svc_chef_prive",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Chef privé",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Makèpè, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : chef privé.",
+    "consentAt": "rel:day:-3240540000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-3154140000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-3240540000",
+    "updatedAt": "rel:day:-3240540000",
+    "history": [
+      {
+        "id": "req_0101_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3240540000"
+      },
+      {
+        "id": "req_0101_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3240540000"
+      },
+      {
+        "id": "req_0101_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-3229740000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0100",
+    "referenceNumber": 100,
+    "type": "DEVIS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_nadia_abena",
+    "categoryId": "cat_experience",
+    "serviceId": "svc_location_voiture",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Location de voiture avec chauffeur",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Yaoundé"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : location de voiture avec chauffeur.",
+    "consentAt": "rel:day:-3322920000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-3236520000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-3322920000",
+    "updatedAt": "rel:day:-3322920000",
+    "history": [
+      {
+        "id": "req_0100_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3322920000"
+      },
+      {
+        "id": "req_0100_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3322920000"
+      },
+      {
+        "id": "req_0100_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-3312120000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0099",
+    "referenceNumber": 99,
+    "type": "RENDEZ_VOUS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_serge_eyenga",
+    "categoryId": "cat_immobilier",
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "TELEPHONE",
+    "subject": "Rendez-vous à l’agence",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Immobilier"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Deïdo, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : gestion locative.",
+    "consentAt": "rel:day:-3408900000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-3322500000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-3408900000",
+    "updatedAt": "rel:day:-3408900000",
+    "history": [
+      {
+        "id": "req_0099_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3408900000"
+      },
+      {
+        "id": "req_0099_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3408900000"
+      },
+      {
+        "id": "req_0099_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-3398100000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0098",
+    "referenceNumber": 98,
+    "type": "DEVIS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_grace_kuete",
+    "categoryId": "cat_immobilier",
+    "serviceId": "svc_accompagnement_installation",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Suivi de chantier",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Immobilier"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Akwa, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : suivi de chantier.",
+    "consentAt": "rel:day:-3491280000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-3404880000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-3491280000",
+    "updatedAt": "rel:day:-3491280000",
+    "history": [
+      {
+        "id": "req_0098_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3491280000"
+      },
+      {
+        "id": "req_0098_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3491280000"
+      },
+      {
+        "id": "req_0098_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-3480480000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0097",
+    "referenceNumber": 97,
+    "type": "DEVIS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_yannick_nkoulou",
+    "categoryId": "cat_proximite",
+    "serviceId": "svc_livraison_courses_commandes",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Courses et livraisons",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Services de proximité"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Bonamoussadi, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : courses et livraisons.",
+    "consentAt": "rel:day:-3573660000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-3487260000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-3573660000",
+    "updatedAt": "rel:day:-3573660000",
+    "history": [
+      {
+        "id": "req_0097_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3573660000"
+      },
+      {
+        "id": "req_0097_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3573660000"
+      },
+      {
+        "id": "req_0097_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-3562860000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0096",
+    "referenceNumber": 96,
+    "type": "DEVIS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_ines_tchakounte",
+    "categoryId": "cat_experience",
+    "serviceId": "svc_massage_bien_etre",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "TELEPHONE",
+    "subject": "Massage à domicile",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Paris"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : massage à domicile.",
+    "consentAt": "rel:day:-3656040000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-3569640000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-3656040000",
+    "updatedAt": "rel:day:-3656040000",
+    "history": [
+      {
+        "id": "req_0096_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3656040000"
+      },
+      {
+        "id": "req_0096_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3656040000"
+      },
+      {
+        "id": "req_0096_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-3645240000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0095",
+    "referenceNumber": 95,
+    "type": "DEVIS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_boris_owona",
+    "categoryId": "cat_culture",
+    "serviceId": "svc_decouverte_cameroun",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Découverte du Cameroun",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Culture & événementiel"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Makèpè, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : découverte du cameroun.",
+    "consentAt": "rel:day:-3738420000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-3652020000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-3738420000",
+    "updatedAt": "rel:day:-3738420000",
+    "history": [
+      {
+        "id": "req_0095_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3738420000"
+      },
+      {
+        "id": "req_0095_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3738420000"
+      },
+      {
+        "id": "req_0095_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-3727620000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0094",
+    "referenceNumber": 94,
+    "type": "DEVIS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_marie_fotso",
+    "categoryId": "cat_domicile",
+    "serviceId": "svc_maison_essentiel",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Maison Essentiel",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Services à domicile"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Yaoundé"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : maison essentiel.",
+    "consentAt": "rel:day:-3856800000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-3770400000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-3856800000",
+    "updatedAt": "rel:day:-3856800000",
+    "history": [
+      {
+        "id": "req_0094_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3856800000"
+      },
+      {
+        "id": "req_0094_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-3856800000"
+      },
+      {
+        "id": "req_0094_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-3846000000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0092",
+    "referenceNumber": 92,
+    "type": "DEVIS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_esther_manga",
+    "categoryId": "cat_experience",
+    "serviceId": "svc_location_voiture",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Location de voiture avec chauffeur",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Akwa, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : location de voiture avec chauffeur.",
+    "consentAt": "rel:day:-4021560000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-3935160000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-4021560000",
+    "updatedAt": "rel:day:-4021560000",
+    "history": [
+      {
+        "id": "req_0092_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4021560000"
+      },
+      {
+        "id": "req_0092_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4021560000"
+      },
+      {
+        "id": "req_0092_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-4010760000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0093",
+    "referenceNumber": 93,
+    "type": "EVENEMENT",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_paul_mbarga",
+    "categoryId": "cat_culture",
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": 2,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "TELEPHONE",
+    "subject": "Atelier cuisine : le ndolé",
+    "payload": {
+      "eventSlug": "atelier-cuisine-ndole",
+      "seats": 2,
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Culture & événementiel"
+        },
+        {
+          "key": "evenement",
+          "label": "Événement",
+          "value": "Atelier cuisine : le ndolé"
+        },
+        {
+          "key": "places",
+          "label": "Places",
+          "value": "2"
+        }
+      ]
+    },
+    "message": "Inscription pour 2 personnes.",
+    "consentAt": "rel:day:-4080000000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-3993600000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-4080000000",
+    "updatedAt": "rel:day:-4080000000",
+    "history": [
+      {
+        "id": "req_0093_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4080000000"
+      },
+      {
+        "id": "req_0093_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4080000000"
+      },
+      {
+        "id": "req_0093_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-4069200000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0091",
+    "referenceNumber": 91,
+    "type": "DEVIS",
+    "status": "PRESTATION_REALISEE",
+    "contactId": "ctc_joel_nana",
+    "categoryId": "cat_immobilier",
+    "serviceId": "svc_gestion_locative",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Gestion locative",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Immobilier"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Bonamoussadi, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : gestion locative.",
+    "consentAt": "rel:day:-4107540000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-4021140000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-4107540000",
+    "updatedAt": "rel:day:-4107540000",
+    "history": [
+      {
+        "id": "req_0091_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4107540000"
+      },
+      {
+        "id": "req_0091_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4107540000"
+      },
+      {
+        "id": "req_0091_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-4096740000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0090",
+    "referenceNumber": 90,
+    "type": "DEVIS",
+    "status": "CLOTUREE",
+    "contactId": "ctc_nadia_abena",
+    "categoryId": "cat_immobilier",
+    "serviceId": "svc_accompagnement_installation",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "TELEPHONE",
+    "subject": "Suivi de chantier",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Immobilier"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Paris"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : suivi de chantier.",
+    "consentAt": "rel:day:-4189920000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-4103520000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-4189920000",
+    "updatedAt": "rel:day:-4189920000",
+    "history": [
+      {
+        "id": "req_0090_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4189920000"
+      },
+      {
+        "id": "req_0090_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4189920000"
+      },
+      {
+        "id": "req_0090_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-4179120000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0089",
+    "referenceNumber": 89,
+    "type": "DEVIS",
+    "status": "CLOTUREE",
+    "contactId": "ctc_serge_eyenga",
+    "categoryId": "cat_proximite",
+    "serviceId": "svc_livraison_courses_commandes",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Courses et livraisons",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Services de proximité"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Makèpè, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : courses et livraisons.",
+    "consentAt": "rel:day:-4272300000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-4185900000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-4272300000",
+    "updatedAt": "rel:day:-4272300000",
+    "history": [
+      {
+        "id": "req_0089_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4272300000"
+      },
+      {
+        "id": "req_0089_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4272300000"
+      },
+      {
+        "id": "req_0089_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-4261500000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0088",
+    "referenceNumber": 88,
+    "type": "DEVIS",
+    "status": "CLOTUREE",
+    "contactId": "ctc_grace_kuete",
+    "categoryId": "cat_experience",
+    "serviceId": "svc_massage_bien_etre",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Massage à domicile",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Yaoundé"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : massage à domicile.",
+    "consentAt": "rel:day:-4354680000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-4268280000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-4354680000",
+    "updatedAt": "rel:day:-4354680000",
+    "history": [
+      {
+        "id": "req_0088_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4354680000"
+      },
+      {
+        "id": "req_0088_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4354680000"
+      },
+      {
+        "id": "req_0088_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-4343880000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0087",
+    "referenceNumber": 87,
+    "type": "EVENEMENT",
+    "status": "CLOTUREE",
+    "contactId": "ctc_yannick_nkoulou",
+    "categoryId": "cat_culture",
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": 1,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "TELEPHONE",
+    "subject": "Atelier cuisine : le ndolé",
+    "payload": {
+      "eventSlug": "atelier-cuisine-ndole",
+      "seats": 1,
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Culture & événementiel"
+        },
+        {
+          "key": "evenement",
+          "label": "Événement",
+          "value": "Atelier cuisine : le ndolé"
+        },
+        {
+          "key": "places",
+          "label": "Places",
+          "value": "1"
+        }
+      ]
+    },
+    "message": "Inscription pour une personne.",
+    "consentAt": "rel:day:-4425600000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-4339200000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-4425600000",
+    "updatedAt": "rel:day:-4425600000",
+    "history": [
+      {
+        "id": "req_0087_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4425600000"
+      },
+      {
+        "id": "req_0087_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4425600000"
+      },
+      {
+        "id": "req_0087_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-4414800000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0086",
+    "referenceNumber": 86,
+    "type": "DEVIS",
+    "status": "CLOTUREE",
+    "contactId": "ctc_ines_tchakounte",
+    "categoryId": "cat_domicile",
+    "serviceId": "svc_maison_essentiel",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "WHATSAPP",
+    "subject": "Maison Essentiel",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Services à domicile"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Akwa, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : maison essentiel.",
+    "consentAt": "rel:day:-4519440000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-4433040000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-4519440000",
+    "updatedAt": "rel:day:-4519440000",
+    "history": [
+      {
+        "id": "req_0086_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4519440000"
+      },
+      {
+        "id": "req_0086_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4519440000"
+      },
+      {
+        "id": "req_0086_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-4508640000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_0085",
+    "referenceNumber": 85,
+    "type": "DEVIS",
+    "status": "CLOTUREE",
+    "contactId": "ctc_boris_owona",
+    "categoryId": "cat_experience",
+    "serviceId": "svc_chef_prive",
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": "EMAIL",
+    "subject": "Chef privé",
+    "payload": {
+      "fields": [
+        {
+          "key": "rubrique",
+          "label": "Rubrique",
+          "value": "Expérience"
+        },
+        {
+          "key": "ville",
+          "label": "Ville",
+          "value": "Bonamoussadi, Douala"
+        }
+      ]
+    },
+    "message": "Bonjour, je souhaite un devis pour : chef privé.",
+    "consentAt": "rel:day:-4601820000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": "rel:day:-4515420000",
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:day:-4601820000",
+    "updatedAt": "rel:day:-4601820000",
+    "history": [
+      {
+        "id": "req_0085_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4601820000"
+      },
+      {
+        "id": "req_0085_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:day:-4601820000"
+      },
+      {
+        "id": "req_0085_h3",
+        "kind": "STATUS_CHANGED",
+        "data": {
+          "from": "NOUVELLE",
+          "to": "EN_COURS"
+        },
+        "actorId": "usr_mireille",
+        "createdAt": "rel:day:-4591020000"
+      }
+    ],
+    "application": null
+  },
+  {
+    "id": "req_cand_14",
+    "referenceNumber": 155,
+    "type": "CANDIDATURE",
+    "status": "CLOTUREE",
+    "contactId": "ctc_martine-owona",
+    "categoryId": null,
+    "serviceId": null,
+    "jobOfferId": "job_entretien",
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": null,
+    "subject": "Agent·e d’entretien des logements",
+    "payload": {
+      "fields": [
+        {
+          "key": "poste",
+          "label": "Poste",
+          "value": "Agent·e d’entretien des logements"
+        }
+      ]
+    },
+    "message": null,
+    "consentAt": "rel:now:-1393200000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": null,
+    "completedAt": null,
+    "closedAt": "rel:now:-1393200000",
+    "createdAt": "rel:now:-1393200000",
+    "updatedAt": "rel:now:-1393200000",
+    "history": [
+      {
+        "id": "req_cand_14_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-1393200000"
+      },
+      {
+        "id": "req_cand_14_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-1393200000"
+      }
+    ],
+    "application": {
+      "id": "app_14",
+      "status": "REFUSE",
+      "readAt": "rel:now:-1393200000",
+      "attachment": {
+        "id": "file_cv_14",
+        "storageKey": "demo/cv/file_cv_14/CV-Martine-Owona.pdf",
+        "fileName": "CV-Martine-Owona.pdf",
+        "mimeType": "application/pdf",
+        "size": 102000
+      }
+    }
+  },
+  {
+    "id": "req_cand_13",
+    "referenceNumber": 156,
+    "type": "CANDIDATURE",
+    "status": "EN_COURS",
+    "contactId": "ctc_herve-fotso",
+    "categoryId": null,
+    "serviceId": null,
+    "jobOfferId": "job_coordinateur",
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": null,
+    "subject": "Coordinateur·rice de services",
+    "payload": {
+      "fields": [
+        {
+          "key": "poste",
+          "label": "Poste",
+          "value": "Coordinateur·rice de services"
+        }
+      ]
+    },
+    "message": null,
+    "consentAt": "rel:now:-1306800000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": null,
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:now:-1306800000",
+    "updatedAt": "rel:now:-1306800000",
+    "history": [
+      {
+        "id": "req_cand_13_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-1306800000"
+      },
+      {
+        "id": "req_cand_13_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-1306800000"
+      }
+    ],
+    "application": {
+      "id": "app_13",
+      "status": "LU",
+      "readAt": "rel:now:-1306800000",
+      "attachment": {
+        "id": "file_cv_13",
+        "storageKey": "demo/cv/file_cv_13/CV-Herve-Fotso.pdf",
+        "fileName": "CV-Herve-Fotso.pdf",
+        "mimeType": "application/pdf",
+        "size": 187000
+      }
+    }
+  },
+  {
+    "id": "req_cand_12",
+    "referenceNumber": 157,
+    "type": "CANDIDATURE",
+    "status": "CLOTUREE",
+    "contactId": "ctc_laure-dikoume",
+    "categoryId": null,
+    "serviceId": null,
+    "jobOfferId": "job_relation_clients",
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": null,
+    "subject": "Chargé·e de relation clients",
+    "payload": {
+      "fields": [
+        {
+          "key": "poste",
+          "label": "Poste",
+          "value": "Chargé·e de relation clients"
+        }
+      ]
+    },
+    "message": null,
+    "consentAt": "rel:now:-1134000000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": null,
+    "completedAt": null,
+    "closedAt": "rel:now:-1134000000",
+    "createdAt": "rel:now:-1134000000",
+    "updatedAt": "rel:now:-1134000000",
+    "history": [
+      {
+        "id": "req_cand_12_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-1134000000"
+      },
+      {
+        "id": "req_cand_12_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-1134000000"
+      }
+    ],
+    "application": {
+      "id": "app_12",
+      "status": "REFUSE",
+      "readAt": "rel:now:-1134000000",
+      "attachment": {
+        "id": "file_cv_12",
+        "storageKey": "demo/cv/file_cv_12/CV-Laure-Dikoume.pdf",
+        "fileName": "CV-Laure-Dikoume.pdf",
+        "mimeType": "application/pdf",
+        "size": 233000
+      }
+    }
+  },
+  {
+    "id": "req_cand_11",
+    "referenceNumber": 158,
+    "type": "CANDIDATURE",
+    "status": "CLOTUREE",
+    "contactId": "ctc_christelle-ngo",
+    "categoryId": null,
+    "serviceId": null,
+    "jobOfferId": "job_coordinateur",
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": null,
+    "subject": "Coordinateur·rice de services",
+    "payload": {
+      "fields": [
+        {
+          "key": "poste",
+          "label": "Poste",
+          "value": "Coordinateur·rice de services"
+        }
+      ]
+    },
+    "message": null,
+    "consentAt": "rel:now:-1047600000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": null,
+    "completedAt": null,
+    "closedAt": "rel:now:-1047600000",
+    "createdAt": "rel:now:-1047600000",
+    "updatedAt": "rel:now:-1047600000",
+    "history": [
+      {
+        "id": "req_cand_11_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-1047600000"
+      },
+      {
+        "id": "req_cand_11_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-1047600000"
+      }
+    ],
+    "application": {
+      "id": "app_11",
+      "status": "REFUSE",
+      "readAt": "rel:now:-1047600000",
+      "attachment": {
+        "id": "file_cv_11",
+        "storageKey": "demo/cv/file_cv_11/CV-Christelle-Ngo.pdf",
+        "fileName": "CV-Christelle-Ngo.pdf",
+        "mimeType": "application/pdf",
+        "size": 199000
+      }
+    }
+  },
+  {
+    "id": "req_cand_10",
+    "referenceNumber": 159,
+    "type": "CANDIDATURE",
+    "status": "EN_COURS",
+    "contactId": "ctc_josiane-abena",
+    "categoryId": null,
+    "serviceId": null,
+    "jobOfferId": "job_entretien",
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": null,
+    "subject": "Agent·e d’entretien des logements",
+    "payload": {
+      "fields": [
+        {
+          "key": "poste",
+          "label": "Poste",
+          "value": "Agent·e d’entretien des logements"
+        }
+      ]
+    },
+    "message": null,
+    "consentAt": "rel:now:-961200000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": null,
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:now:-961200000",
+    "updatedAt": "rel:now:-961200000",
+    "history": [
+      {
+        "id": "req_cand_10_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-961200000"
+      },
+      {
+        "id": "req_cand_10_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-961200000"
+      }
+    ],
+    "application": {
+      "id": "app_10",
+      "status": "LU",
+      "readAt": "rel:now:-961200000",
+      "attachment": {
+        "id": "file_cv_10",
+        "storageKey": "demo/cv/file_cv_10/CV-Josiane-Abena.pdf",
+        "fileName": "CV-Josiane-Abena.pdf",
+        "mimeType": "application/pdf",
+        "size": 91000
+      }
+    }
+  },
+  {
+    "id": "req_cand_9",
+    "referenceNumber": 160,
+    "type": "CANDIDATURE",
+    "status": "EN_COURS",
+    "contactId": "ctc_patrick-ewane",
+    "categoryId": null,
+    "serviceId": null,
+    "jobOfferId": "job_coordinateur",
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": null,
+    "subject": "Coordinateur·rice de services",
+    "payload": {
+      "fields": [
+        {
+          "key": "poste",
+          "label": "Poste",
+          "value": "Coordinateur·rice de services"
+        }
+      ]
+    },
+    "message": null,
+    "consentAt": "rel:now:-874800000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": null,
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:now:-874800000",
+    "updatedAt": "rel:now:-874800000",
+    "history": [
+      {
+        "id": "req_cand_9_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-874800000"
+      },
+      {
+        "id": "req_cand_9_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-874800000"
+      }
+    ],
+    "application": {
+      "id": "app_09",
+      "status": "RETENU",
+      "readAt": "rel:now:-874800000",
+      "attachment": {
+        "id": "file_cv_9",
+        "storageKey": "demo/cv/file_cv_9/CV-Patrick-Ewane.pdf",
+        "fileName": "CV-Patrick-Ewane.pdf",
+        "mimeType": "application/pdf",
+        "size": 264000
+      }
+    }
+  },
+  {
+    "id": "req_cand_8",
+    "referenceNumber": 143,
+    "type": "CANDIDATURE",
+    "status": "EN_COURS",
+    "contactId": "ctc_samuel-nkodo",
+    "categoryId": null,
+    "serviceId": null,
+    "jobOfferId": "job_chauffeur",
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": null,
+    "subject": "Chauffeur·euse partenaire",
+    "payload": {
+      "fields": [
+        {
+          "key": "poste",
+          "label": "Poste",
+          "value": "Chauffeur·euse partenaire"
+        }
+      ]
+    },
+    "message": "Chauffeur VTC depuis cinq ans, véhicule personnel récent.",
+    "consentAt": "rel:now:-795600000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": null,
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:now:-795600000",
+    "updatedAt": "rel:now:-795600000",
+    "history": [
+      {
+        "id": "req_cand_8_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-795600000"
+      },
+      {
+        "id": "req_cand_8_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-795600000"
+      }
+    ],
+    "application": {
+      "id": "app_08",
+      "status": "LU",
+      "readAt": "rel:now:-795600000",
+      "attachment": {
+        "id": "file_cv_8",
+        "storageKey": "demo/cv/file_cv_8/CV-Samuel-Nkodo.pdf",
+        "fileName": "CV-Samuel-Nkodo.pdf",
+        "mimeType": "application/pdf",
+        "size": 84000
+      }
+    }
+  },
+  {
+    "id": "req_cand_7",
+    "referenceNumber": 144,
+    "type": "CANDIDATURE",
+    "status": "EN_COURS",
+    "contactId": "ctc_olivier-mballa",
+    "categoryId": null,
+    "serviceId": null,
+    "jobOfferId": "job_relation_clients",
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": null,
+    "subject": "Chargé·e de relation clients",
+    "payload": {
+      "fields": [
+        {
+          "key": "poste",
+          "label": "Poste",
+          "value": "Chargé·e de relation clients"
+        }
+      ]
+    },
+    "message": null,
+    "consentAt": "rel:now:-788400000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": null,
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:now:-788400000",
+    "updatedAt": "rel:now:-788400000",
+    "history": [
+      {
+        "id": "req_cand_7_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-788400000"
+      },
+      {
+        "id": "req_cand_7_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-788400000"
+      }
+    ],
+    "application": {
+      "id": "app_07",
+      "status": "LU",
+      "readAt": "rel:now:-788400000",
+      "attachment": {
+        "id": "file_cv_7",
+        "storageKey": "demo/cv/file_cv_7/CV-Olivier-Mballa.pdf",
+        "fileName": "CV-Olivier-Mballa.pdf",
+        "mimeType": "application/pdf",
+        "size": 228000
+      }
+    }
+  },
+  {
+    "id": "req_cand_6",
+    "referenceNumber": 145,
+    "type": "CANDIDATURE",
+    "status": "EN_COURS",
+    "contactId": "ctc_sandrine-mbarga",
+    "categoryId": null,
+    "serviceId": null,
+    "jobOfferId": "job_coordinateur",
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": null,
+    "subject": "Coordinateur·rice de services",
+    "payload": {
+      "fields": [
+        {
+          "key": "poste",
+          "label": "Poste",
+          "value": "Coordinateur·rice de services"
+        }
+      ]
+    },
+    "message": null,
+    "consentAt": "rel:now:-702000000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": null,
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:now:-702000000",
+    "updatedAt": "rel:now:-702000000",
+    "history": [
+      {
+        "id": "req_cand_6_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-702000000"
+      },
+      {
+        "id": "req_cand_6_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-702000000"
+      }
+    ],
+    "application": {
+      "id": "app_06",
+      "status": "LU",
+      "readAt": "rel:now:-702000000",
+      "attachment": {
+        "id": "file_cv_6",
+        "storageKey": "demo/cv/file_cv_6/CV-Sandrine-Mbarga.pdf",
+        "fileName": "CV-Sandrine-Mbarga.pdf",
+        "mimeType": "application/pdf",
+        "size": 176000
+      }
+    }
+  },
+  {
+    "id": "req_cand_5",
+    "referenceNumber": 146,
+    "type": "CANDIDATURE",
+    "status": "EN_COURS",
+    "contactId": "ctc_nadege-kamdem",
+    "categoryId": null,
+    "serviceId": null,
+    "jobOfferId": "job_relation_clients",
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": null,
+    "subject": "Chargé·e de relation clients",
+    "payload": {
+      "fields": [
+        {
+          "key": "poste",
+          "label": "Poste",
+          "value": "Chargé·e de relation clients"
+        }
+      ]
+    },
+    "message": null,
+    "consentAt": "rel:now:-615600000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": null,
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:now:-615600000",
+    "updatedAt": "rel:now:-615600000",
+    "history": [
+      {
+        "id": "req_cand_5_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-615600000"
+      },
+      {
+        "id": "req_cand_5_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-615600000"
+      }
+    ],
+    "application": {
+      "id": "app_05",
+      "status": "LU",
+      "readAt": "rel:now:-615600000",
+      "attachment": {
+        "id": "file_cv_5",
+        "storageKey": "demo/cv/file_cv_5/CV-Nadege-Kamdem.pdf",
+        "fileName": "CV-Nadege-Kamdem.pdf",
+        "mimeType": "application/pdf",
+        "size": 205000
+      }
+    }
+  },
+  {
+    "id": "req_cand_4",
+    "referenceNumber": 147,
+    "type": "CANDIDATURE",
+    "status": "EN_COURS",
+    "contactId": "ctc_boris-essomba",
+    "categoryId": null,
+    "serviceId": null,
+    "jobOfferId": "job_entretien",
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": null,
+    "subject": "Agent·e d’entretien des logements",
+    "payload": {
+      "fields": [
+        {
+          "key": "poste",
+          "label": "Poste",
+          "value": "Agent·e d’entretien des logements"
+        }
+      ]
+    },
+    "message": "J’ai travaillé deux ans dans un hôtel de Yaoundé comme agent d’entretien.",
+    "consentAt": "rel:now:-529200000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": null,
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:now:-529200000",
+    "updatedAt": "rel:now:-529200000",
+    "history": [
+      {
+        "id": "req_cand_4_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-529200000"
+      },
+      {
+        "id": "req_cand_4_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-529200000"
+      }
+    ],
+    "application": {
+      "id": "app_04",
+      "status": "RETENU",
+      "readAt": "rel:now:-529200000",
+      "attachment": {
+        "id": "file_cv_4",
+        "storageKey": "demo/cv/file_cv_4/CV-Boris-Essomba.pdf",
+        "fileName": "CV-Boris-Essomba.pdf",
+        "mimeType": "application/pdf",
+        "size": 98000
+      }
+    }
+  },
+  {
+    "id": "req_cand_3",
+    "referenceNumber": 148,
+    "type": "CANDIDATURE",
+    "status": "EN_COURS",
+    "contactId": "ctc_amelie-moreau",
+    "categoryId": null,
+    "serviceId": null,
+    "jobOfferId": null,
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": null,
+    "subject": "Candidature spontanée",
+    "payload": {
+      "fields": [
+        {
+          "key": "poste",
+          "label": "Poste",
+          "value": "Candidature spontanée"
+        }
+      ]
+    },
+    "message": "Chargée de projets événementiels à Akwa, j’aimerais rejoindre votre équipe, quel que soit le poste.",
+    "consentAt": "rel:now:-270000000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": null,
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:now:-270000000",
+    "updatedAt": "rel:now:-270000000",
+    "history": [
+      {
+        "id": "req_cand_3_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-270000000"
+      },
+      {
+        "id": "req_cand_3_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-270000000"
+      }
+    ],
+    "application": {
+      "id": "app_03",
+      "status": "LU",
+      "readAt": "rel:now:-270000000",
+      "attachment": {
+        "id": "file_cv_3",
+        "storageKey": "demo/cv/file_cv_3/CV-Amelie-Moreau.pdf",
+        "fileName": "CV-Amelie-Moreau.pdf",
+        "mimeType": "application/pdf",
+        "size": 312000
+      }
+    }
+  },
+  {
+    "id": "req_cand_2",
+    "referenceNumber": 149,
+    "type": "CANDIDATURE",
+    "status": "NOUVELLE",
+    "contactId": "ctc_yannick-tchoua",
+    "categoryId": null,
+    "serviceId": null,
+    "jobOfferId": "job_coordinateur",
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": null,
+    "subject": "Coordinateur·rice de services",
+    "payload": {
+      "fields": [
+        {
+          "key": "poste",
+          "label": "Poste",
+          "value": "Coordinateur·rice de services"
+        }
+      ]
+    },
+    "message": "Après trois ans en agence de voyages, je souhaite rejoindre une équipe tournée vers la diaspora. Disponible dès janvier.",
+    "consentAt": "rel:now:-93600000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": null,
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:now:-93600000",
+    "updatedAt": "rel:now:-93600000",
+    "history": [
+      {
+        "id": "req_cand_2_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-93600000"
+      },
+      {
+        "id": "req_cand_2_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-93600000"
+      }
+    ],
+    "application": {
+      "id": "app_02",
+      "status": "NOUVEAU",
+      "readAt": null,
+      "attachment": {
+        "id": "file_cv_2",
+        "storageKey": "demo/cv/file_cv_2/CV-Yannick-Tchoua.pdf",
+        "fileName": "CV-Yannick-Tchoua.pdf",
+        "mimeType": "application/pdf",
+        "size": 241000
+      }
+    }
+  },
+  {
+    "id": "req_cand_1",
+    "referenceNumber": 161,
+    "type": "CANDIDATURE",
+    "status": "NOUVELLE",
+    "contactId": "ctc_grace-nkoulou",
+    "categoryId": null,
+    "serviceId": null,
+    "jobOfferId": "job_coordinateur",
+    "trainingId": null,
+    "otherTraining": null,
+    "eventId": null,
+    "seats": null,
+    "participants": null,
+    "period": null,
+    "organization": null,
+    "partnershipType": null,
+    "contactPreference": null,
+    "subject": "Coordinateur·rice de services",
+    "payload": {
+      "fields": [
+        {
+          "key": "poste",
+          "label": "Poste",
+          "value": "Coordinateur·rice de services"
+        }
+      ]
+    },
+    "message": "Coordinatrice d’événements depuis quatre ans à Douala, je connais bien le réseau de prestataires de la ville. Je serais ravie de mettre cette expérience au service de vos clients.",
+    "consentAt": "rel:now:-3600000",
+    "assignedToId": null,
+    "assignedAt": null,
+    "dueAt": null,
+    "completedAt": null,
+    "closedAt": null,
+    "createdAt": "rel:now:-3600000",
+    "updatedAt": "rel:now:-3600000",
+    "history": [
+      {
+        "id": "req_cand_1_h1",
+        "kind": "RECEIVED",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-3600000"
+      },
+      {
+        "id": "req_cand_1_h2",
+        "kind": "ACK_SENT",
+        "data": null,
+        "actorId": null,
+        "createdAt": "rel:now:-3600000"
+      }
+    ],
+    "application": {
+      "id": "app_01",
+      "status": "NOUVEAU",
+      "readAt": null,
+      "attachment": {
+        "id": "file_cv_1",
+        "storageKey": "demo/cv/file_cv_1/CV-Grace-Nkoulou.pdf",
+        "fileName": "CV-Grace-Nkoulou.pdf",
+        "mimeType": "application/pdf",
+        "size": 186000
+      }
+    }
+  }
+]

@@ -71,6 +71,9 @@ jobs:
       - name: Migrations
         if: hashFiles('prisma/migrations/**/migration.sql') != ''
         run: pnpm db:deploy
+      - name: Données initiales (seed)
+        if: hashFiles('prisma/migrations/**/migration.sql') != ''
+        run: pnpm db:seed
       - name: Tests unitaires
         run: pnpm test
       - name: Tests e2e (PostgreSQL et Redis réels)

@@ -1,0 +1,1234 @@
+[
+  {
+    "mediaId": "photo-formule-maison",
+    "kind": "category.image",
+    "entityId": "cat_domicile",
+    "slot": "",
+    "label": "Rubrique « Services à domicile » (visuel principal)",
+    "href": "/admin/services?rubrique=services-a-domicile"
+  },
+  {
+    "mediaId": "photo-sad-hero",
+    "kind": "category.visual",
+    "entityId": "cat_domicile",
+    "slot": "hero",
+    "label": "Rubrique « Services à domicile » (hero)",
+    "href": "/admin/services?rubrique=services-a-domicile"
+  },
+  {
+    "mediaId": "photo-temoin-sad",
+    "kind": "category.visual",
+    "entityId": "cat_domicile",
+    "slot": "testimonial",
+    "label": "Rubrique « Services à domicile » (testimonial)",
+    "href": "/admin/services?rubrique=services-a-domicile"
+  },
+  {
+    "mediaId": "photo-exp-hero",
+    "kind": "category.image",
+    "entityId": "cat_experience",
+    "slot": "",
+    "label": "Rubrique « Expérience » (visuel principal)",
+    "href": "/admin/services?rubrique=experience"
+  },
+  {
+    "mediaId": "photo-exp-hero",
+    "kind": "category.visual",
+    "entityId": "cat_experience",
+    "slot": "hero",
+    "label": "Rubrique « Expérience » (hero)",
+    "href": "/admin/services?rubrique=experience"
+  },
+  {
+    "mediaId": "photo-offre-tete-a-tete",
+    "kind": "category.visual",
+    "entityId": "cat_experience",
+    "slot": "testimonial",
+    "label": "Rubrique « Expérience » (testimonial)",
+    "href": "/admin/services?rubrique=experience"
+  },
+  {
+    "mediaId": "photo-chef-2",
+    "kind": "category.visual",
+    "entityId": "cat_experience",
+    "slot": "homeCard",
+    "label": "Rubrique « Expérience » (homeCard)",
+    "href": "/admin/services?rubrique=experience"
+  },
+  {
+    "mediaId": "photo-location-voiture",
+    "kind": "offer.image",
+    "entityId": "off_citadine",
+    "slot": "",
+    "label": "Offre « Citadine confort »",
+    "href": "/admin/services?rubrique=experience"
+  },
+  {
+    "mediaId": "photo-offre-berline",
+    "kind": "offer.image",
+    "entityId": "off_berline",
+    "slot": "",
+    "label": "Offre « Berline avec chauffeur »",
+    "href": "/admin/services?rubrique=experience"
+  },
+  {
+    "mediaId": "photo-offre-suv",
+    "kind": "offer.image",
+    "entityId": "off_suv",
+    "slot": "",
+    "label": "Offre « SUV 7 places »",
+    "href": "/admin/services?rubrique=experience"
+  },
+  {
+    "mediaId": "photo-offre-minibus",
+    "kind": "offer.image",
+    "entityId": "off_minibus",
+    "slot": "",
+    "label": "Offre « Minibus 15 places »",
+    "href": "/admin/services?rubrique=experience"
+  },
+  {
+    "mediaId": "photo-photographe",
+    "kind": "offer.image",
+    "entityId": "off_photographe",
+    "slot": "",
+    "label": "Offre « Photographe — portraits et couples »",
+    "href": "/admin/services?rubrique=experience"
+  },
+  {
+    "mediaId": "photo-chef-2",
+    "kind": "offer.image",
+    "entityId": "off_chef_camerounais",
+    "slot": "",
+    "label": "Offre « Chef privé — cuisine camerounaise »",
+    "href": "/admin/services?rubrique=experience"
+  },
+  {
+    "mediaId": "photo-offre-chef-aicha",
+    "kind": "offer.image",
+    "entityId": "off_chef_fusion",
+    "slot": "",
+    "label": "Offre « Chef privé — cuisine fusion »",
+    "href": "/admin/services?rubrique=experience"
+  },
+  {
+    "mediaId": "photo-offre-massage",
+    "kind": "offer.image",
+    "entityId": "off_massage",
+    "slot": "",
+    "label": "Offre « Massage bien-être à domicile »",
+    "href": "/admin/services?rubrique=experience"
+  },
+  {
+    "mediaId": "photo-services-evenementiels",
+    "kind": "offer.image",
+    "entityId": "off_reception",
+    "slot": "",
+    "label": "Offre « Réception privée »",
+    "href": "/admin/services?rubrique=experience"
+  },
+  {
+    "mediaId": "photo-immo-hero",
+    "kind": "category.image",
+    "entityId": "cat_immobilier",
+    "slot": "",
+    "label": "Rubrique « Immobilier » (visuel principal)",
+    "href": "/admin/services?rubrique=immobilier"
+  },
+  {
+    "mediaId": "photo-immo-hero",
+    "kind": "category.visual",
+    "entityId": "cat_immobilier",
+    "slot": "hero",
+    "label": "Rubrique « Immobilier » (hero)",
+    "href": "/admin/services?rubrique=immobilier"
+  },
+  {
+    "mediaId": "photo-temoin-immo",
+    "kind": "category.visual",
+    "entityId": "cat_immobilier",
+    "slot": "testimonial",
+    "label": "Rubrique « Immobilier » (testimonial)",
+    "href": "/admin/services?rubrique=immobilier"
+  },
+  {
+    "mediaId": "photo-logement",
+    "kind": "category.visual",
+    "entityId": "cat_immobilier",
+    "slot": "homeCard",
+    "label": "Rubrique « Immobilier » (homeCard)",
+    "href": "/admin/services?rubrique=immobilier"
+  },
+  {
+    "mediaId": "photo-immo-hero",
+    "kind": "offer.image",
+    "entityId": "off_bonapriso",
+    "slot": "",
+    "label": "Offre « Appartement 3 pièces — Bonapriso »",
+    "href": "/admin/services?rubrique=immobilier"
+  },
+  {
+    "mediaId": "photo-immo-meuble",
+    "kind": "offer.image",
+    "entityId": "off_bonamoussadi",
+    "slot": "",
+    "label": "Offre « Appartement meublé — Bonamoussadi »",
+    "href": "/admin/services?rubrique=immobilier"
+  },
+  {
+    "mediaId": "photo-immo-achat",
+    "kind": "offer.image",
+    "entityId": "off_makepe",
+    "slot": "",
+    "label": "Offre « Villa 5 pièces — Makèpè »",
+    "href": "/admin/services?rubrique=immobilier"
+  },
+  {
+    "mediaId": "photo-logement-temporaire",
+    "kind": "offer.image",
+    "entityId": "off_akwa",
+    "slot": "",
+    "label": "Offre « Studio meublé — Akwa »",
+    "href": "/admin/services?rubrique=immobilier"
+  },
+  {
+    "mediaId": "photo-offre-terrain",
+    "kind": "offer.image",
+    "entityId": "off_lendi",
+    "slot": "",
+    "label": "Offre « Terrain 500 m² — Lendi »",
+    "href": "/admin/services?rubrique=immobilier"
+  },
+  {
+    "mediaId": "photo-immo-recherche",
+    "kind": "offer.image",
+    "entityId": "off_bonanjo",
+    "slot": "",
+    "label": "Offre « Appartement vue Wouri — Bonanjo »",
+    "href": "/admin/services?rubrique=immobilier"
+  },
+  {
+    "mediaId": "photo-prox-hero",
+    "kind": "category.image",
+    "entityId": "cat_proximite",
+    "slot": "",
+    "label": "Rubrique « Services de proximité » (visuel principal)",
+    "href": "/admin/services?rubrique=services-de-proximite"
+  },
+  {
+    "mediaId": "photo-prox-hero",
+    "kind": "category.visual",
+    "entityId": "cat_proximite",
+    "slot": "hero",
+    "label": "Rubrique « Services de proximité » (hero)",
+    "href": "/admin/services?rubrique=services-de-proximite"
+  },
+  {
+    "mediaId": "photo-prox-repas",
+    "kind": "category.visual",
+    "entityId": "cat_proximite",
+    "slot": "testimonial",
+    "label": "Rubrique « Services de proximité » (testimonial)",
+    "href": "/admin/services?rubrique=services-de-proximite"
+  },
+  {
+    "mediaId": "photo-prox-repas",
+    "kind": "offer.image",
+    "entityId": "off_repas_semaine",
+    "slot": "",
+    "label": "Offre « Portage de repas — semaine »",
+    "href": "/admin/services?rubrique=services-de-proximite"
+  },
+  {
+    "mediaId": "photo-prox-courses",
+    "kind": "offer.image",
+    "entityId": "off_courses_semaine",
+    "slot": "",
+    "label": "Offre « Courses de la semaine »",
+    "href": "/admin/services?rubrique=services-de-proximite"
+  },
+  {
+    "mediaId": "photo-collecte-livraison-colis-courrier",
+    "kind": "offer.image",
+    "entityId": "off_colis_express",
+    "slot": "",
+    "label": "Offre « Colis et courrier — express »",
+    "href": "/admin/services?rubrique=services-de-proximite"
+  },
+  {
+    "mediaId": "photo-pressing-laverie",
+    "kind": "offer.image",
+    "entityId": "off_pressing",
+    "slot": "",
+    "label": "Offre « Pressing et laverie »",
+    "href": "/admin/services?rubrique=services-de-proximite"
+  },
+  {
+    "mediaId": "photo-prox-scooter",
+    "kind": "offer.image",
+    "entityId": "off_scooter",
+    "slot": "",
+    "label": "Offre « Livraison à scooter »",
+    "href": "/admin/services?rubrique=services-de-proximite"
+  },
+  {
+    "mediaId": "photo-culture-hero",
+    "kind": "category.image",
+    "entityId": "cat_culture",
+    "slot": "",
+    "label": "Rubrique « Culture & événementiel » (visuel principal)",
+    "href": "/admin/services?rubrique=culture-evenementiel"
+  },
+  {
+    "mediaId": "photo-culture-hero",
+    "kind": "category.visual",
+    "entityId": "cat_culture",
+    "slot": "hero",
+    "label": "Rubrique « Culture & événementiel » (hero)",
+    "href": "/admin/services?rubrique=culture-evenementiel"
+  },
+  {
+    "mediaId": "photo-temoin-culture",
+    "kind": "category.visual",
+    "entityId": "cat_culture",
+    "slot": "testimonial",
+    "label": "Rubrique « Culture & événementiel » (testimonial)",
+    "href": "/admin/services?rubrique=culture-evenementiel"
+  },
+  {
+    "mediaId": "photo-prox-hero",
+    "kind": "category.visual",
+    "entityId": "cat_culture",
+    "slot": "homeCard",
+    "label": "Rubrique « Culture & événementiel » (homeCard)",
+    "href": "/admin/services?rubrique=culture-evenementiel"
+  },
+  {
+    "mediaId": "photo-culture-decouverte",
+    "kind": "offer.image",
+    "entityId": "off_lobe",
+    "slot": "",
+    "label": "Offre « Journée aux chutes de la Lobé — Kribi »",
+    "href": "/admin/services?rubrique=culture-evenementiel"
+  },
+  {
+    "mediaId": "photo-culture-randonnee",
+    "kind": "offer.image",
+    "entityId": "off_randonnee",
+    "slot": "",
+    "label": "Offre « Randonnée en forêt tropicale »",
+    "href": "/admin/services?rubrique=culture-evenementiel"
+  },
+  {
+    "mediaId": "photo-culture-artisans",
+    "kind": "offer.image",
+    "entityId": "off_artisans",
+    "slot": "",
+    "label": "Offre « Visite des ateliers d’artisans »",
+    "href": "/admin/services?rubrique=culture-evenementiel"
+  },
+  {
+    "mediaId": "photo-activites-culturelles-loisirs-sorties",
+    "kind": "offer.image",
+    "entityId": "off_art_contemporain",
+    "slot": "",
+    "label": "Offre « Art contemporain à Douala »",
+    "href": "/admin/services?rubrique=culture-evenementiel"
+  },
+  {
+    "mediaId": "photo-culture-hero",
+    "kind": "offer.image",
+    "entityId": "off_soiree_culturelle",
+    "slot": "",
+    "label": "Offre « Soirée culturelle et danses »",
+    "href": "/admin/services?rubrique=culture-evenementiel"
+  },
+  {
+    "mediaId": "photo-services-evenementiels",
+    "kind": "offer.image",
+    "entityId": "off_reception_culture",
+    "slot": "",
+    "label": "Offre « Réception privée »",
+    "href": "/admin/services?rubrique=culture-evenementiel"
+  },
+  {
+    "mediaId": "photo-formule-maison",
+    "kind": "service.cover",
+    "entityId": "svc_maison_essentiel",
+    "slot": "",
+    "label": "Service « Maison Essentiel » (photo principale)",
+    "href": "/admin/services/svc_maison_essentiel"
+  },
+  {
+    "mediaId": "photo-maison-auto",
+    "kind": "service.cover",
+    "entityId": "svc_maison_auto",
+    "slot": "",
+    "label": "Service « Maison + Auto » (photo principale)",
+    "href": "/admin/services/svc_maison_auto"
+  },
+  {
+    "mediaId": "photo-maison-linge",
+    "kind": "service.cover",
+    "entityId": "svc_maison_linge",
+    "slot": "",
+    "label": "Service « Maison + Linge » (photo principale)",
+    "href": "/admin/services/svc_maison_linge"
+  },
+  {
+    "mediaId": "photo-maison-auto-linge",
+    "kind": "service.cover",
+    "entityId": "svc_maison_auto_linge",
+    "slot": "",
+    "label": "Service « Maison + Auto + Linge » (photo principale)",
+    "href": "/admin/services/svc_maison_auto_linge"
+  },
+  {
+    "mediaId": "photo-fiche-entretien",
+    "kind": "service.cover",
+    "entityId": "svc_entretien_du_logement",
+    "slot": "",
+    "label": "Service « Entretien du logement » (photo principale)",
+    "href": "/admin/services/svc_entretien_du_logement"
+  },
+  {
+    "mediaId": "photo-fiche-entretien",
+    "kind": "service.gallery",
+    "entityId": "svc_entretien_du_logement",
+    "slot": "0",
+    "label": "Service « Entretien du logement » (galerie)",
+    "href": "/admin/services/svc_entretien_du_logement"
+  },
+  {
+    "mediaId": "photo-fiche-cuisine",
+    "kind": "service.gallery",
+    "entityId": "svc_entretien_du_logement",
+    "slot": "1",
+    "label": "Service « Entretien du logement » (galerie)",
+    "href": "/admin/services/svc_entretien_du_logement"
+  },
+  {
+    "mediaId": "photo-fiche-sdb",
+    "kind": "service.gallery",
+    "entityId": "svc_entretien_du_logement",
+    "slot": "2",
+    "label": "Service « Entretien du logement » (galerie)",
+    "href": "/admin/services/svc_entretien_du_logement"
+  },
+  {
+    "mediaId": "photo-offre-regulier",
+    "kind": "offer.image",
+    "entityId": "off_entretien_regulier",
+    "slot": "",
+    "label": "Offre « Entretien régulier » (Entretien du logement)",
+    "href": "/admin/services/svc_entretien_du_logement"
+  },
+  {
+    "mediaId": "photo-offre-grand-nettoyage",
+    "kind": "offer.image",
+    "entityId": "off_grand_nettoyage",
+    "slot": "",
+    "label": "Offre « Grand nettoyage » (Entretien du logement)",
+    "href": "/admin/services/svc_entretien_du_logement"
+  },
+  {
+    "mediaId": "photo-offre-saisonnier",
+    "kind": "offer.image",
+    "entityId": "off_saisonnier",
+    "slot": "",
+    "label": "Offre « Ménage entre deux locations saisonnières » (Entretien du logement)",
+    "href": "/admin/services/svc_entretien_du_logement"
+  },
+  {
+    "mediaId": "photo-offre-travaux",
+    "kind": "offer.image",
+    "entityId": "off_apres_travaux",
+    "slot": "",
+    "label": "Offre « Ménage après travaux » (Entretien du logement)",
+    "href": "/admin/services/svc_entretien_du_logement"
+  },
+  {
+    "mediaId": "photo-offre-evaluation",
+    "kind": "offer.image",
+    "entityId": "off_evaluation",
+    "slot": "",
+    "label": "Offre « Évaluation à domicile » (Entretien du logement)",
+    "href": "/admin/services/svc_entretien_du_logement"
+  },
+  {
+    "mediaId": "photo-maison-auto",
+    "kind": "service.cover",
+    "entityId": "svc_nettoyage_automobile",
+    "slot": "",
+    "label": "Service « Nettoyage automobile » (photo principale)",
+    "href": "/admin/services/svc_nettoyage_automobile"
+  },
+  {
+    "mediaId": "photo-maison-auto",
+    "kind": "service.gallery",
+    "entityId": "svc_nettoyage_automobile",
+    "slot": "0",
+    "label": "Service « Nettoyage automobile » (galerie)",
+    "href": "/admin/services/svc_nettoyage_automobile"
+  },
+  {
+    "mediaId": "photo-chef-2",
+    "kind": "service.cover",
+    "entityId": "svc_chef_prive",
+    "slot": "",
+    "label": "Service « Chef privé » (photo principale)",
+    "href": "/admin/services/svc_chef_prive"
+  },
+  {
+    "mediaId": "photo-chef-2",
+    "kind": "service.gallery",
+    "entityId": "svc_chef_prive",
+    "slot": "0",
+    "label": "Service « Chef privé » (galerie)",
+    "href": "/admin/services/svc_chef_prive"
+  },
+  {
+    "mediaId": "photo-offre-chef-aicha",
+    "kind": "service.gallery",
+    "entityId": "svc_chef_prive",
+    "slot": "1",
+    "label": "Service « Chef privé » (galerie)",
+    "href": "/admin/services/svc_chef_prive"
+  },
+  {
+    "mediaId": "photo-exp-hero",
+    "kind": "service.gallery",
+    "entityId": "svc_chef_prive",
+    "slot": "2",
+    "label": "Service « Chef privé » (galerie)",
+    "href": "/admin/services/svc_chef_prive"
+  },
+  {
+    "mediaId": "photo-chef-2",
+    "kind": "offer.image",
+    "entityId": "off_chef_paul",
+    "slot": "",
+    "label": "Offre « Chef Paul — cuisine camerounaise » (Chef privé)",
+    "href": "/admin/services/svc_chef_prive"
+  },
+  {
+    "mediaId": "photo-offre-chef-aicha",
+    "kind": "offer.image",
+    "entityId": "off_chef_aicha",
+    "slot": "",
+    "label": "Offre « Chef Aïcha — cuisine fusion » (Chef privé)",
+    "href": "/admin/services/svc_chef_prive"
+  },
+  {
+    "mediaId": "photo-exp-hero",
+    "kind": "offer.image",
+    "entityId": "off_diner_terrasse",
+    "slot": "",
+    "label": "Offre « Dîner sur la terrasse » (Chef privé)",
+    "href": "/admin/services/svc_chef_prive"
+  },
+  {
+    "mediaId": "photo-offre-tete-a-tete",
+    "kind": "offer.image",
+    "entityId": "off_tete_a_tete",
+    "slot": "",
+    "label": "Offre « Dîner en tête-à-tête » (Chef privé)",
+    "href": "/admin/services/svc_chef_prive"
+  },
+  {
+    "mediaId": "photo-services-evenementiels",
+    "kind": "offer.image",
+    "entityId": "off_buffet_reception",
+    "slot": "",
+    "label": "Offre « Buffet de réception » (Chef privé)",
+    "href": "/admin/services/svc_chef_prive"
+  },
+  {
+    "mediaId": "photo-location-voiture",
+    "kind": "service.cover",
+    "entityId": "svc_location_voiture",
+    "slot": "",
+    "label": "Service « Location de voiture » (photo principale)",
+    "href": "/admin/services/svc_location_voiture"
+  },
+  {
+    "mediaId": "photo-location-voiture",
+    "kind": "service.gallery",
+    "entityId": "svc_location_voiture",
+    "slot": "0",
+    "label": "Service « Location de voiture » (galerie)",
+    "href": "/admin/services/svc_location_voiture"
+  },
+  {
+    "mediaId": "photo-photographe",
+    "kind": "service.cover",
+    "entityId": "svc_photographe",
+    "slot": "",
+    "label": "Service « Photographe » (photo principale)",
+    "href": "/admin/services/svc_photographe"
+  },
+  {
+    "mediaId": "photo-photographe",
+    "kind": "service.gallery",
+    "entityId": "svc_photographe",
+    "slot": "0",
+    "label": "Service « Photographe » (galerie)",
+    "href": "/admin/services/svc_photographe"
+  },
+  {
+    "mediaId": "photo-offre-massage",
+    "kind": "service.cover",
+    "entityId": "svc_massage_bien_etre",
+    "slot": "",
+    "label": "Service « Massage bien-être » (photo principale)",
+    "href": "/admin/services/svc_massage_bien_etre"
+  },
+  {
+    "mediaId": "photo-offre-massage",
+    "kind": "service.gallery",
+    "entityId": "svc_massage_bien_etre",
+    "slot": "0",
+    "label": "Service « Massage bien-être » (galerie)",
+    "href": "/admin/services/svc_massage_bien_etre"
+  },
+  {
+    "mediaId": "photo-services-evenementiels",
+    "kind": "service.cover",
+    "entityId": "svc_services_evenementiels",
+    "slot": "",
+    "label": "Service « Services événementiels » (photo principale)",
+    "href": "/admin/services/svc_services_evenementiels"
+  },
+  {
+    "mediaId": "photo-services-evenementiels",
+    "kind": "service.gallery",
+    "entityId": "svc_services_evenementiels",
+    "slot": "0",
+    "label": "Service « Services événementiels » (galerie)",
+    "href": "/admin/services/svc_services_evenementiels"
+  },
+  {
+    "mediaId": "photo-immo-achat",
+    "kind": "service.cover",
+    "entityId": "svc_achat_vente_biens",
+    "slot": "",
+    "label": "Service « Achat et vente de biens immobiliers » (photo principale)",
+    "href": "/admin/services/svc_achat_vente_biens"
+  },
+  {
+    "mediaId": "photo-immo-achat",
+    "kind": "service.gallery",
+    "entityId": "svc_achat_vente_biens",
+    "slot": "0",
+    "label": "Service « Achat et vente de biens immobiliers » (galerie)",
+    "href": "/admin/services/svc_achat_vente_biens"
+  },
+  {
+    "mediaId": "photo-immo-recherche",
+    "kind": "service.cover",
+    "entityId": "svc_recherche_logement",
+    "slot": "",
+    "label": "Service « Recherche de logement » (photo principale)",
+    "href": "/admin/services/svc_recherche_logement"
+  },
+  {
+    "mediaId": "photo-immo-recherche",
+    "kind": "service.gallery",
+    "entityId": "svc_recherche_logement",
+    "slot": "0",
+    "label": "Service « Recherche de logement » (galerie)",
+    "href": "/admin/services/svc_recherche_logement"
+  },
+  {
+    "mediaId": "photo-immo-location",
+    "kind": "service.cover",
+    "entityId": "svc_location_sous_location_colocation",
+    "slot": "",
+    "label": "Service « Location, sous-location et colocation » (photo principale)",
+    "href": "/admin/services/svc_location_sous_location_colocation"
+  },
+  {
+    "mediaId": "photo-immo-location",
+    "kind": "service.gallery",
+    "entityId": "svc_location_sous_location_colocation",
+    "slot": "0",
+    "label": "Service « Location, sous-location et colocation » (galerie)",
+    "href": "/admin/services/svc_location_sous_location_colocation"
+  },
+  {
+    "mediaId": "photo-immo-meuble",
+    "kind": "service.cover",
+    "entityId": "svc_logement_adapte_meuble",
+    "slot": "",
+    "label": "Service « Logement adapté et appartement meublé » (photo principale)",
+    "href": "/admin/services/svc_logement_adapte_meuble"
+  },
+  {
+    "mediaId": "photo-immo-meuble",
+    "kind": "service.gallery",
+    "entityId": "svc_logement_adapte_meuble",
+    "slot": "0",
+    "label": "Service « Logement adapté et appartement meublé » (galerie)",
+    "href": "/admin/services/svc_logement_adapte_meuble"
+  },
+  {
+    "mediaId": "photo-gestion-locative",
+    "kind": "service.cover",
+    "entityId": "svc_gestion_locative",
+    "slot": "",
+    "label": "Service « Gestion locative » (photo principale)",
+    "href": "/admin/services/svc_gestion_locative"
+  },
+  {
+    "mediaId": "photo-gestion-locative",
+    "kind": "service.gallery",
+    "entityId": "svc_gestion_locative",
+    "slot": "0",
+    "label": "Service « Gestion locative » (galerie)",
+    "href": "/admin/services/svc_gestion_locative"
+  },
+  {
+    "mediaId": "photo-accompagnement-installation",
+    "kind": "service.cover",
+    "entityId": "svc_accompagnement_installation",
+    "slot": "",
+    "label": "Service « Accompagnement à l'installation » (photo principale)",
+    "href": "/admin/services/svc_accompagnement_installation"
+  },
+  {
+    "mediaId": "photo-accompagnement-installation",
+    "kind": "service.gallery",
+    "entityId": "svc_accompagnement_installation",
+    "slot": "0",
+    "label": "Service « Accompagnement à l'installation » (galerie)",
+    "href": "/admin/services/svc_accompagnement_installation"
+  },
+  {
+    "mediaId": "photo-logement-temporaire",
+    "kind": "service.cover",
+    "entityId": "svc_logement_temporaire",
+    "slot": "",
+    "label": "Service « Solutions de logement temporaire » (photo principale)",
+    "href": "/admin/services/svc_logement_temporaire"
+  },
+  {
+    "mediaId": "photo-logement-temporaire",
+    "kind": "service.gallery",
+    "entityId": "svc_logement_temporaire",
+    "slot": "0",
+    "label": "Service « Solutions de logement temporaire » (galerie)",
+    "href": "/admin/services/svc_logement_temporaire"
+  },
+  {
+    "mediaId": "photo-prox-scooter",
+    "kind": "service.cover",
+    "entityId": "svc_portage_livraison_repas",
+    "slot": "",
+    "label": "Service « Portage et livraison de repas » (photo principale)",
+    "href": "/admin/services/svc_portage_livraison_repas"
+  },
+  {
+    "mediaId": "photo-prox-scooter",
+    "kind": "service.gallery",
+    "entityId": "svc_portage_livraison_repas",
+    "slot": "0",
+    "label": "Service « Portage et livraison de repas » (galerie)",
+    "href": "/admin/services/svc_portage_livraison_repas"
+  },
+  {
+    "mediaId": "photo-prox-courses",
+    "kind": "service.cover",
+    "entityId": "svc_livraison_courses_commandes",
+    "slot": "",
+    "label": "Service « Livraison de courses et de commandes » (photo principale)",
+    "href": "/admin/services/svc_livraison_courses_commandes"
+  },
+  {
+    "mediaId": "photo-prox-courses",
+    "kind": "service.gallery",
+    "entityId": "svc_livraison_courses_commandes",
+    "slot": "0",
+    "label": "Service « Livraison de courses et de commandes » (galerie)",
+    "href": "/admin/services/svc_livraison_courses_commandes"
+  },
+  {
+    "mediaId": "photo-collecte-livraison-colis-courrier",
+    "kind": "service.cover",
+    "entityId": "svc_collecte_livraison_colis_courrier",
+    "slot": "",
+    "label": "Service « Collecte et livraison de colis et de courrier » (photo principale)",
+    "href": "/admin/services/svc_collecte_livraison_colis_courrier"
+  },
+  {
+    "mediaId": "photo-collecte-livraison-colis-courrier",
+    "kind": "service.gallery",
+    "entityId": "svc_collecte_livraison_colis_courrier",
+    "slot": "0",
+    "label": "Service « Collecte et livraison de colis et de courrier » (galerie)",
+    "href": "/admin/services/svc_collecte_livraison_colis_courrier"
+  },
+  {
+    "mediaId": "photo-pressing-laverie",
+    "kind": "service.cover",
+    "entityId": "svc_pressing_laverie",
+    "slot": "",
+    "label": "Service « Pressing et laverie » (photo principale)",
+    "href": "/admin/services/svc_pressing_laverie"
+  },
+  {
+    "mediaId": "photo-pressing-laverie",
+    "kind": "service.gallery",
+    "entityId": "svc_pressing_laverie",
+    "slot": "0",
+    "label": "Service « Pressing et laverie » (galerie)",
+    "href": "/admin/services/svc_pressing_laverie"
+  },
+  {
+    "mediaId": "photo-culture-decouverte",
+    "kind": "service.cover",
+    "entityId": "svc_decouverte_cameroun",
+    "slot": "",
+    "label": "Service « Découverte du Cameroun » (photo principale)",
+    "href": "/admin/services/svc_decouverte_cameroun"
+  },
+  {
+    "mediaId": "photo-culture-decouverte",
+    "kind": "service.gallery",
+    "entityId": "svc_decouverte_cameroun",
+    "slot": "0",
+    "label": "Service « Découverte du Cameroun » (galerie)",
+    "href": "/admin/services/svc_decouverte_cameroun"
+  },
+  {
+    "mediaId": "photo-activites-culturelles-loisirs-sorties",
+    "kind": "service.cover",
+    "entityId": "svc_activites_culturelles_loisirs_sorties",
+    "slot": "",
+    "label": "Service « Activités culturelles, loisirs et sorties » (photo principale)",
+    "href": "/admin/services/svc_activites_culturelles_loisirs_sorties"
+  },
+  {
+    "mediaId": "photo-activites-culturelles-loisirs-sorties",
+    "kind": "service.gallery",
+    "entityId": "svc_activites_culturelles_loisirs_sorties",
+    "slot": "0",
+    "label": "Service « Activités culturelles, loisirs et sorties » (galerie)",
+    "href": "/admin/services/svc_activites_culturelles_loisirs_sorties"
+  },
+  {
+    "mediaId": "photo-services-evenementiels",
+    "kind": "service.cover",
+    "entityId": "svc_organisation_activites_evenements",
+    "slot": "",
+    "label": "Service « Organisation d'activités et d'événements » (photo principale)",
+    "href": "/admin/services/svc_organisation_activites_evenements"
+  },
+  {
+    "mediaId": "photo-services-evenementiels",
+    "kind": "service.gallery",
+    "entityId": "svc_organisation_activites_evenements",
+    "slot": "0",
+    "label": "Service « Organisation d'activités et d'événements » (galerie)",
+    "href": "/admin/services/svc_organisation_activites_evenements"
+  },
+  {
+    "mediaId": "photo-decouverte-integration-locale",
+    "kind": "service.cover",
+    "entityId": "svc_decouverte_integration_locale",
+    "slot": "",
+    "label": "Service « Découverte et intégration locale » (photo principale)",
+    "href": "/admin/services/svc_decouverte_integration_locale"
+  },
+  {
+    "mediaId": "photo-decouverte-integration-locale",
+    "kind": "service.gallery",
+    "entityId": "svc_decouverte_integration_locale",
+    "slot": "0",
+    "label": "Service « Découverte et intégration locale » (galerie)",
+    "href": "/admin/services/svc_decouverte_integration_locale"
+  },
+  {
+    "mediaId": "photo-home-hero",
+    "kind": "page.section",
+    "entityId": "accueil",
+    "slot": "hero",
+    "label": "Page « Accueil » (Section principale)",
+    "href": "/admin/pages/accueil"
+  },
+  {
+    "mediaId": "photo-chef-2",
+    "kind": "page.section",
+    "entityId": "accueil",
+    "slot": "hero",
+    "label": "Page « Accueil » (Section principale)",
+    "href": "/admin/pages/accueil"
+  },
+  {
+    "mediaId": "photo-agence-equipe",
+    "kind": "page.section",
+    "entityId": "accueil",
+    "slot": "engagements",
+    "label": "Page « Accueil » (Nos engagements)",
+    "href": "/admin/pages/accueil"
+  },
+  {
+    "mediaId": "photo-douala-ville",
+    "kind": "page.section",
+    "entityId": "services",
+    "slot": "hero",
+    "label": "Page « Nos services » (hero)",
+    "href": "/admin/pages/services"
+  },
+  {
+    "mediaId": "photo-prox-scooter",
+    "kind": "page.section",
+    "entityId": "zones-d-intervention",
+    "slot": "hero",
+    "label": "Page « Zones d’intervention » (hero)",
+    "href": "/admin/pages/zones-d-intervention"
+  },
+  {
+    "mediaId": "photo-qsn-hero",
+    "kind": "page.section",
+    "entityId": "qui-sommes-nous",
+    "slot": "hero",
+    "label": "Page « Qui sommes-nous ? » (hero)",
+    "href": "/admin/pages/qui-sommes-nous"
+  },
+  {
+    "mediaId": "photo-fondatrice",
+    "kind": "page.section",
+    "entityId": "qui-sommes-nous",
+    "slot": "fondatrice",
+    "label": "Page « Qui sommes-nous ? » (fondatrice)",
+    "href": "/admin/pages/qui-sommes-nous"
+  },
+  {
+    "mediaId": "portrait-1",
+    "kind": "page.section",
+    "entityId": "qui-sommes-nous",
+    "slot": "equipe",
+    "label": "Page « Qui sommes-nous ? » (equipe)",
+    "href": "/admin/pages/qui-sommes-nous"
+  },
+  {
+    "mediaId": "portrait-2",
+    "kind": "page.section",
+    "entityId": "qui-sommes-nous",
+    "slot": "equipe",
+    "label": "Page « Qui sommes-nous ? » (equipe)",
+    "href": "/admin/pages/qui-sommes-nous"
+  },
+  {
+    "mediaId": "portrait-3",
+    "kind": "page.section",
+    "entityId": "qui-sommes-nous",
+    "slot": "equipe",
+    "label": "Page « Qui sommes-nous ? » (equipe)",
+    "href": "/admin/pages/qui-sommes-nous"
+  },
+  {
+    "mediaId": "portrait-4",
+    "kind": "page.section",
+    "entityId": "qui-sommes-nous",
+    "slot": "equipe",
+    "label": "Page « Qui sommes-nous ? » (equipe)",
+    "href": "/admin/pages/qui-sommes-nous"
+  },
+  {
+    "mediaId": "photo-mission-hero",
+    "kind": "page.section",
+    "entityId": "mission",
+    "slot": "hero",
+    "label": "Page « Mission » (hero)",
+    "href": "/admin/pages/mission"
+  },
+  {
+    "mediaId": "photo-douala-ville",
+    "kind": "page.section",
+    "entityId": "mission",
+    "slot": "citation",
+    "label": "Page « Mission » (citation)",
+    "href": "/admin/pages/mission"
+  },
+  {
+    "mediaId": "photo-part-hero",
+    "kind": "page.section",
+    "entityId": "partenaires",
+    "slot": "hero",
+    "label": "Page « Partenaires » (hero)",
+    "href": "/admin/pages/partenaires"
+  },
+  {
+    "mediaId": "photo-part-exp",
+    "kind": "page.section",
+    "entityId": "partenaires",
+    "slot": "types",
+    "label": "Page « Partenaires » (types)",
+    "href": "/admin/pages/partenaires"
+  },
+  {
+    "mediaId": "photo-immo-recherche",
+    "kind": "page.section",
+    "entityId": "partenaires",
+    "slot": "types",
+    "label": "Page « Partenaires » (types)",
+    "href": "/admin/pages/partenaires"
+  },
+  {
+    "mediaId": "photo-part-entreprise",
+    "kind": "page.section",
+    "entityId": "partenaires",
+    "slot": "types",
+    "label": "Page « Partenaires » (types)",
+    "href": "/admin/pages/partenaires"
+  },
+  {
+    "mediaId": "photo-formation-hero",
+    "kind": "page.section",
+    "entityId": "formation",
+    "slot": "hero",
+    "label": "Page « Formation » (hero)",
+    "href": "/admin/pages/formation"
+  },
+  {
+    "mediaId": "photo-formation-form",
+    "kind": "page.section",
+    "entityId": "formation",
+    "slot": "demande",
+    "label": "Page « Formation » (demande)",
+    "href": "/admin/pages/formation"
+  },
+  {
+    "mediaId": "photo-recrut-hero",
+    "kind": "page.section",
+    "entityId": "recrutement",
+    "slot": "hero",
+    "label": "Page « Recrutement » (hero)",
+    "href": "/admin/pages/recrutement"
+  },
+  {
+    "mediaId": "photo-magazine-hero",
+    "kind": "page.section",
+    "entityId": "magazine",
+    "slot": "hero",
+    "label": "Page « Magazine » (hero)",
+    "href": "/admin/pages/magazine"
+  },
+  {
+    "mediaId": "photo-fondatrice",
+    "kind": "page.section",
+    "entityId": "magazine",
+    "slot": "edito",
+    "label": "Page « Magazine » (edito)",
+    "href": "/admin/pages/magazine"
+  },
+  {
+    "mediaId": "photo-accompagnement-installation",
+    "kind": "settings.navigation",
+    "entityId": "navigation",
+    "slot": "promo",
+    "label": "Méga-menu (promotion)",
+    "href": "/admin/pages"
+  },
+  {
+    "mediaId": "photo-chef-2",
+    "kind": "event.image",
+    "entityId": "evt_saveurs",
+    "slot": "",
+    "label": "Événement « Nuit des saveurs camerounaises »",
+    "href": "/admin/evenements"
+  },
+  {
+    "mediaId": "photo-culture-randonnee",
+    "kind": "event.image",
+    "entityId": "evt_lobe",
+    "slot": "",
+    "label": "Événement « Randonnée et cascades de la Lobé »",
+    "href": "/admin/evenements"
+  },
+  {
+    "mediaId": "photo-culture-artisans",
+    "kind": "event.image",
+    "entityId": "evt_artisans",
+    "slot": "",
+    "label": "Événement « Visite des ateliers d’artisans »",
+    "href": "/admin/evenements"
+  },
+  {
+    "mediaId": "photo-magazine-hero",
+    "kind": "magazine.cover",
+    "entityId": "mag_n1",
+    "slot": "",
+    "label": "Magazine « Ensemble vers un bien-être global » (couverture)",
+    "href": "/admin/magazine/mag_n1"
+  },
+  {
+    "mediaId": "photo-prox-courses",
+    "kind": "magazine.cover",
+    "entityId": "mag_n2",
+    "slot": "",
+    "label": "Magazine « Bien manger au quotidien » (couverture)",
+    "href": "/admin/magazine/mag_n2"
+  },
+  {
+    "mediaId": "photo-immo-hero",
+    "kind": "magazine.cover",
+    "entityId": "mag_n3",
+    "slot": "",
+    "label": "Magazine « Se loger à Douala » (couverture)",
+    "href": "/admin/magazine/mag_n3"
+  },
+  {
+    "mediaId": "photo-culture-hero",
+    "kind": "magazine.cover",
+    "entityId": "mag_hs1",
+    "slot": "",
+    "label": "Magazine « Solidarité et culture » (couverture)",
+    "href": "/admin/magazine/mag_hs1"
+  },
+  {
+    "mediaId": "photo-magazine-bien-manger",
+    "kind": "magazine.article",
+    "entityId": "art_1",
+    "slot": "",
+    "label": "Article « Bien manger au quotidien sans se ruiner »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-offre-massage",
+    "kind": "magazine.article",
+    "entityId": "art_2",
+    "slot": "",
+    "label": "Article « Prendre soin de soi : rituels bien-être »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-immo-achat",
+    "kind": "magazine.article",
+    "entityId": "art_3",
+    "slot": "",
+    "label": "Article « Acheter un terrain à Douala : les étapes »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-prox-repas",
+    "kind": "magazine.article",
+    "entityId": "art_4",
+    "slot": "",
+    "label": "Article « L’entraide, une richesse camerounaise »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-culture-decouverte",
+    "kind": "magazine.article",
+    "entityId": "art_5",
+    "slot": "",
+    "label": "Article « Kribi, la nature à deux heures de Douala »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-formule-maison",
+    "kind": "magazine.article",
+    "entityId": "art_6",
+    "slot": "",
+    "label": "Article « Un logement sain, une famille en forme »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-prox-courses",
+    "kind": "magazine.article",
+    "entityId": "art_7",
+    "slot": "",
+    "label": "Article « Le marché, premier allié de la cuisine maison »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-magazine-bien-manger",
+    "kind": "magazine.article",
+    "entityId": "art_8",
+    "slot": "",
+    "label": "Article « Cinq plats du terroir revisités »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-prox-repas",
+    "kind": "magazine.article",
+    "entityId": "art_9",
+    "slot": "",
+    "label": "Article « Bien s’hydrater sous la chaleur »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-prox-repas",
+    "kind": "magazine.article",
+    "entityId": "art_10",
+    "slot": "",
+    "label": "Article « Repas des aînés : nos conseils »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-prox-courses",
+    "kind": "magazine.article",
+    "entityId": "art_11",
+    "slot": "",
+    "label": "Article « Cuisiner pour toute la semaine »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-immo-location",
+    "kind": "magazine.article",
+    "entityId": "art_12",
+    "slot": "",
+    "label": "Article « Louer à Douala depuis l’étranger »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-immo-meuble",
+    "kind": "magazine.article",
+    "entityId": "art_13",
+    "slot": "",
+    "label": "Article « Meublé ou vide : bien choisir »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-immo-hero",
+    "kind": "magazine.article",
+    "entityId": "art_14",
+    "slot": "",
+    "label": "Article « Bonapriso, Akwa, Makèpè : quel quartier ? »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-immo-achat",
+    "kind": "magazine.article",
+    "entityId": "art_15",
+    "slot": "",
+    "label": "Article « Faire suivre un chantier à distance »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-prox-repas",
+    "kind": "magazine.article",
+    "entityId": "art_16",
+    "slot": "",
+    "label": "Article « Les tontines, une épargne solidaire »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-culture-artisans",
+    "kind": "magazine.article",
+    "entityId": "art_17",
+    "slot": "",
+    "label": "Article « Artisans de Douala : portraits »",
+    "href": "/admin/magazine"
+  },
+  {
+    "mediaId": "photo-culture-hero",
+    "kind": "magazine.article",
+    "entityId": "art_18",
+    "slot": "",
+    "label": "Article « Fêtes de quartier : le programme »",
+    "href": "/admin/magazine"
+  }
+]

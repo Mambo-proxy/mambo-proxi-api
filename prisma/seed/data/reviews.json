@@ -1,0 +1,3729 @@
+{
+  "reviews": [
+    {
+      "id": "rev_aurelie_k",
+      "authorName": "Aurélie K.",
+      "city": "Bonapriso",
+      "rating": 5,
+      "text": "Arrivée à Douala sans stress : logement prêt, chauffeur à l'aéroport et même les courses faites. On s'est sentis attendus.",
+      "excerpt": null,
+      "serviceId": "svc_logement_temporaire",
+      "status": "A_VALIDER",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "rel:now:-518400000",
+      "date": "rel:now:-93600000",
+      "reply": null,
+      "publishedAt": null,
+      "createdAt": "rel:now:-93600000",
+      "surveyId": "srv_rev_aurelie_k"
+    },
+    {
+      "id": "rev_herve_d",
+      "authorName": "Hervé D.",
+      "city": "Douala",
+      "rating": 4,
+      "text": "Colis reçu à l’agence, on m’a appelé le jour même et livré le lendemain. Très pro.",
+      "excerpt": null,
+      "serviceId": "svc_collecte_livraison_colis_courrier",
+      "status": "A_VALIDER",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "rel:now:-518400000",
+      "date": "rel:now:-180000000",
+      "reply": null,
+      "publishedAt": null,
+      "createdAt": "rel:now:-180000000",
+      "surveyId": "srv_rev_herve_d"
+    },
+    {
+      "id": "rev_marc_o",
+      "authorName": "Marc O.",
+      "city": "Kotto",
+      "rating": 3,
+      "text": "Bon chauffeur mais 20 minutes de retard à l’aéroport. Le reste était parfait.",
+      "excerpt": null,
+      "serviceId": "svc_location_voiture",
+      "status": "A_VALIDER",
+      "verified": true,
+      "featured": false,
+      "publishConsent": false,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt non"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "7/10"
+        }
+      ],
+      "serviceDate": "rel:now:-518400000",
+      "date": "rel:now:-266400000",
+      "reply": null,
+      "publishedAt": null,
+      "createdAt": "rel:now:-266400000",
+      "surveyId": "srv_rev_marc_o"
+    },
+    {
+      "id": "rev_nadia_f",
+      "authorName": "Nadia F.",
+      "city": "Akwa",
+      "rating": 5,
+      "text": "Un dîner d’anniversaire inoubliable : le chef a tout préparé chez nous et ma famille en parle encore.",
+      "excerpt": null,
+      "serviceId": "svc_chef_prive",
+      "status": "A_VALIDER",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "rel:now:-691200000",
+      "date": "rel:now:-439200000",
+      "reply": null,
+      "publishedAt": null,
+      "createdAt": "rel:now:-439200000",
+      "surveyId": "srv_rev_nadia_f"
+    },
+    {
+      "id": "rev_masque_1",
+      "authorName": "Joël M.",
+      "city": "Yaoundé",
+      "rating": 5,
+      "text": "Repas délicieux, merci à toute l’équipe pour l’organisation.",
+      "excerpt": null,
+      "serviceId": "svc_chef_prive",
+      "status": "MASQUE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": false,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "rel:now:-1036800000",
+      "date": "rel:now:-871200000",
+      "reply": null,
+      "publishedAt": null,
+      "createdAt": "rel:now:-871200000",
+      "surveyId": "srv_rev_masque_1"
+    },
+    {
+      "id": "rev_masque_2",
+      "authorName": "Inès B.",
+      "city": "Bonanjo",
+      "rating": 5,
+      "text": "Des photos magnifiques de notre mariage, livrées en temps et en heure.",
+      "excerpt": null,
+      "serviceId": "svc_photographe",
+      "status": "MASQUE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": false,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "rel:now:-1555200000",
+      "date": "rel:now:-1389600000",
+      "reply": null,
+      "publishedAt": null,
+      "createdAt": "rel:now:-1389600000",
+      "surveyId": "srv_rev_masque_2"
+    },
+    {
+      "id": "rev_masque_3",
+      "authorName": "Boris N.",
+      "city": "Bonamoussadi",
+      "rating": 5,
+      "text": "Suivi sérieux de mon appartement, comptes rendus clairs chaque mois.",
+      "excerpt": null,
+      "serviceId": "svc_gestion_locative",
+      "status": "MASQUE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": false,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "rel:now:-2073600000",
+      "date": "rel:now:-1908000000",
+      "reply": null,
+      "publishedAt": null,
+      "createdAt": "rel:now:-1908000000",
+      "surveyId": "srv_rev_masque_3"
+    },
+    {
+      "id": "rev_masque_4",
+      "authorName": "Grâce E.",
+      "city": "Makepe",
+      "rating": 5,
+      "text": "Courses livrées chez ma tante le jour même. Parfait.",
+      "excerpt": null,
+      "serviceId": "svc_livraison_courses_commandes",
+      "status": "MASQUE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "rel:now:-2592000000",
+      "date": "rel:now:-2426400000",
+      "reply": null,
+      "publishedAt": null,
+      "createdAt": "rel:now:-2426400000",
+      "surveyId": "srv_rev_masque_4"
+    },
+    {
+      "id": "rev_masque_5",
+      "authorName": "Serge A.",
+      "city": "Kribi",
+      "rating": 5,
+      "text": "Très belle journée à Kribi, guide très sympathique.",
+      "excerpt": null,
+      "serviceId": "svc_decouverte_cameroun",
+      "status": "MASQUE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": false,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "rel:now:-3110400000",
+      "date": "rel:now:-2944800000",
+      "reply": null,
+      "publishedAt": null,
+      "createdAt": "rel:now:-2944800000",
+      "surveyId": "srv_rev_masque_5"
+    },
+    {
+      "id": "rev_1",
+      "authorName": "Aurélie K.",
+      "city": "Bonapriso, Douala",
+      "rating": 5,
+      "text": "Arrivée à Douala sans stress : logement prêt, chauffeur à l'aéroport et même les courses faites. On s'est sentis attendus.",
+      "excerpt": "Arrivée à Douala sans stress : logement prêt, chauffeur à l'aéroport et même les courses faites.",
+      "serviceId": "svc_logement_temporaire",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": true,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-09-10T10:00:00.000Z",
+      "date": "2026-09-12T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-09-13T10:00:00.000Z",
+      "createdAt": "2026-09-12T10:00:00.000Z"
+    },
+    {
+      "id": "rev_masque_6",
+      "authorName": "Esther O.",
+      "city": "Logpom",
+      "rating": 4,
+      "text": "Logement trouvé en deux semaines, quelques visites en moins auraient suffi.",
+      "excerpt": null,
+      "serviceId": "svc_recherche_logement",
+      "status": "MASQUE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": false,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "rel:now:-3628800000",
+      "date": "rel:now:-3463200000",
+      "reply": null,
+      "publishedAt": null,
+      "createdAt": "rel:now:-3463200000",
+      "surveyId": "srv_rev_masque_6"
+    },
+    {
+      "id": "rev_masque_7",
+      "authorName": "Paul K.",
+      "city": "Deïdo",
+      "rating": 3,
+      "text": "Ménage correct mais le prestataire est arrivé en retard deux fois.",
+      "excerpt": null,
+      "serviceId": "svc_entretien_du_logement",
+      "status": "MASQUE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt non"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "6/10"
+        }
+      ],
+      "serviceDate": "rel:now:-4147200000",
+      "date": "rel:now:-3981600000",
+      "reply": null,
+      "publishedAt": null,
+      "createdAt": "rel:now:-3981600000",
+      "surveyId": "srv_rev_masque_7"
+    },
+    {
+      "id": "rev_2",
+      "authorName": "Jean-Marc T.",
+      "city": "Yaoundé",
+      "rating": 5,
+      "text": "Le chef privé a régalé nos invités pour l'anniversaire de ma mère. Service impeccable du début à la fin.",
+      "excerpt": "Le chef privé a régalé nos invités. Service impeccable du début à la fin.",
+      "serviceId": "svc_chef_prive",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": true,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2026-09-01T10:00:00.000Z",
+      "date": "2026-09-03T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-09-04T10:00:00.000Z",
+      "createdAt": "2026-09-03T10:00:00.000Z",
+      "surveyId": "srv_rev_2"
+    },
+    {
+      "id": "rev_masque_8",
+      "authorName": "Yannick T.",
+      "city": "Bali",
+      "rating": 3,
+      "text": "Massage agréable, mais le rendez-vous a été décalé au dernier moment.",
+      "excerpt": null,
+      "serviceId": "svc_massage_bien_etre",
+      "status": "MASQUE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": false,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt non"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "5/10"
+        }
+      ],
+      "serviceDate": "rel:now:-4665600000",
+      "date": "rel:now:-4500000000",
+      "reply": null,
+      "publishedAt": null,
+      "createdAt": "rel:now:-4500000000",
+      "surveyId": "srv_rev_masque_8"
+    },
+    {
+      "id": "rev_3",
+      "authorName": "Sandrine M.",
+      "city": "Kotto",
+      "rating": 5,
+      "text": "Mambo gère mon appartement à Bonapriso. Comptes rendus réguliers, locataires suivis : je suis enfin serein.",
+      "excerpt": null,
+      "serviceId": "svc_gestion_locative",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": true,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-08-26T10:00:00.000Z",
+      "date": "2026-08-28T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-08-29T10:00:00.000Z",
+      "createdAt": "2026-08-28T10:00:00.000Z",
+      "surveyId": "srv_rev_3"
+    },
+    {
+      "id": "rev_masque_9",
+      "authorName": "Laure M.",
+      "city": "Bonapriso",
+      "rating": 2,
+      "text": "Voiture propre mais chauffeur injoignable le premier jour.",
+      "excerpt": null,
+      "serviceId": "svc_location_voiture",
+      "status": "MASQUE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt non"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "3/10"
+        }
+      ],
+      "serviceDate": "rel:now:-5184000000",
+      "date": "rel:now:-5018400000",
+      "reply": null,
+      "publishedAt": null,
+      "createdAt": "rel:now:-5018400000",
+      "surveyId": "srv_rev_masque_9"
+    },
+    {
+      "id": "rev_4",
+      "authorName": "Clarisse N.",
+      "city": "Akwa",
+      "rating": 5,
+      "text": "Ma mère reçoit ses repas chaque midi. Je suis rassurée et toujours informée.",
+      "excerpt": null,
+      "serviceId": "svc_portage_livraison_repas",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-08-18T10:00:00.000Z",
+      "date": "2026-08-20T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-08-21T10:00:00.000Z",
+      "createdAt": "2026-08-20T10:00:00.000Z"
+    },
+    {
+      "id": "rev_5",
+      "authorName": "Patrick E.",
+      "city": "Marseille",
+      "rating": 5,
+      "text": "La journée découverte à Kribi était parfaite : guide passionné, repas local, tout était organisé.",
+      "excerpt": null,
+      "serviceId": "svc_decouverte_cameroun",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2026-08-07T10:00:00.000Z",
+      "date": "2026-08-09T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-08-10T10:00:00.000Z",
+      "createdAt": "2026-08-09T10:00:00.000Z",
+      "surveyId": "srv_rev_5"
+    },
+    {
+      "id": "rev_6",
+      "authorName": "Hervé D.",
+      "city": "Douala",
+      "rating": 4,
+      "text": "Colis reçu à l’agence, on m’a appelé le jour même et livré le lendemain. Très pro.",
+      "excerpt": null,
+      "serviceId": "svc_collecte_livraison_colis_courrier",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "8/10"
+        }
+      ],
+      "serviceDate": "2026-07-31T10:00:00.000Z",
+      "date": "2026-08-02T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-08-03T10:00:00.000Z",
+      "createdAt": "2026-08-02T10:00:00.000Z",
+      "surveyId": "srv_rev_6"
+    },
+    {
+      "id": "rev_7",
+      "authorName": "Mireille A.",
+      "city": "Douala",
+      "rating": 5,
+      "text": "Une équipe réactive et à l’écoute : tout a été organisé comme convenu.",
+      "excerpt": null,
+      "serviceId": "svc_maison_essentiel",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-07-27T10:00:00.000Z",
+      "date": "2026-07-29T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-07-30T10:00:00.000Z",
+      "createdAt": "2026-07-29T10:00:00.000Z"
+    },
+    {
+      "id": "rev_8",
+      "authorName": "Paul N.",
+      "city": "Bruxelles",
+      "rating": 5,
+      "text": "Devis reçu rapidement, prestation soignée, je recommande sans hésiter.",
+      "excerpt": null,
+      "serviceId": "svc_nettoyage_automobile",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2026-07-22T10:00:00.000Z",
+      "date": "2026-07-24T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-07-25T10:00:00.000Z",
+      "createdAt": "2026-07-24T10:00:00.000Z",
+      "surveyId": "srv_rev_8"
+    },
+    {
+      "id": "rev_9",
+      "authorName": "Estelle B.",
+      "city": "Montréal",
+      "rating": 5,
+      "text": "Un interlocuteur unique qui nous a tenus informés à chaque étape.",
+      "excerpt": null,
+      "serviceId": "svc_services_evenementiels",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-07-17T10:00:00.000Z",
+      "date": "2026-07-19T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-07-20T10:00:00.000Z",
+      "createdAt": "2026-07-19T10:00:00.000Z",
+      "surveyId": "srv_rev_9"
+    },
+    {
+      "id": "rev_10",
+      "authorName": "Yannick O.",
+      "city": "Yaoundé",
+      "rating": 5,
+      "text": "Très bon accompagnement depuis la France, rien à redire.",
+      "excerpt": null,
+      "serviceId": "svc_gestion_locative",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-07-12T10:00:00.000Z",
+      "date": "2026-07-14T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-07-15T10:00:00.000Z",
+      "createdAt": "2026-07-14T10:00:00.000Z"
+    },
+    {
+      "id": "rev_11",
+      "authorName": "Nadège F.",
+      "city": "Lyon",
+      "rating": 4,
+      "text": "Prestataire ponctuel et professionnel, nous referons appel à Mambo.",
+      "excerpt": null,
+      "serviceId": "svc_collecte_livraison_colis_courrier",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "8/10"
+        }
+      ],
+      "serviceDate": "2026-07-07T10:00:00.000Z",
+      "date": "2026-07-09T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-07-10T10:00:00.000Z",
+      "createdAt": "2026-07-09T10:00:00.000Z"
+    },
+    {
+      "id": "rev_12",
+      "authorName": "Thierry M.",
+      "city": "Lille",
+      "rating": 5,
+      "text": "Service sérieux et humain, on se sent vraiment accompagné.",
+      "excerpt": null,
+      "serviceId": "svc_decouverte_integration_locale",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-07-02T10:00:00.000Z",
+      "date": "2026-07-04T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-07-05T10:00:00.000Z",
+      "createdAt": "2026-07-04T10:00:00.000Z",
+      "surveyId": "srv_rev_12"
+    },
+    {
+      "id": "rev_13",
+      "authorName": "Laure B.",
+      "city": "Paris",
+      "rating": 5,
+      "text": "Une équipe réactive et à l’écoute : tout a été organisé comme convenu.",
+      "excerpt": null,
+      "serviceId": "svc_entretien_du_logement",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-06-27T10:00:00.000Z",
+      "date": "2026-06-29T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-06-30T10:00:00.000Z",
+      "createdAt": "2026-06-29T10:00:00.000Z"
+    },
+    {
+      "id": "rev_14",
+      "authorName": "Serge K.",
+      "city": "Kribi",
+      "rating": 5,
+      "text": "Devis reçu rapidement, prestation soignée, je recommande sans hésiter.",
+      "excerpt": null,
+      "serviceId": "svc_massage_bien_etre",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2026-06-22T10:00:00.000Z",
+      "date": "2026-06-24T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-06-25T10:00:00.000Z",
+      "createdAt": "2026-06-24T10:00:00.000Z"
+    },
+    {
+      "id": "rev_15",
+      "authorName": "Mireille A.",
+      "city": "Douala",
+      "rating": 5,
+      "text": "Un interlocuteur unique qui nous a tenus informés à chaque étape.",
+      "excerpt": null,
+      "serviceId": "svc_logement_adapte_meuble",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-06-17T10:00:00.000Z",
+      "date": "2026-06-19T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-06-20T10:00:00.000Z",
+      "createdAt": "2026-06-19T10:00:00.000Z",
+      "surveyId": "srv_rev_15"
+    },
+    {
+      "id": "rev_16",
+      "authorName": "Paul N.",
+      "city": "Bruxelles",
+      "rating": 5,
+      "text": "Très bon accompagnement depuis la France, rien à redire.",
+      "excerpt": null,
+      "serviceId": "svc_livraison_courses_commandes",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-06-12T10:00:00.000Z",
+      "date": "2026-06-14T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-06-15T10:00:00.000Z",
+      "createdAt": "2026-06-14T10:00:00.000Z"
+    },
+    {
+      "id": "rev_17",
+      "authorName": "Estelle B.",
+      "city": "Montréal",
+      "rating": 5,
+      "text": "Prestataire ponctuel et professionnel, nous referons appel à Mambo.",
+      "excerpt": null,
+      "serviceId": "svc_organisation_activites_evenements",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2026-06-07T10:00:00.000Z",
+      "date": "2026-06-09T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-06-10T10:00:00.000Z",
+      "createdAt": "2026-06-09T10:00:00.000Z"
+    },
+    {
+      "id": "rev_18",
+      "authorName": "Yannick O.",
+      "city": "Yaoundé",
+      "rating": 5,
+      "text": "Service sérieux et humain, on se sent vraiment accompagné.",
+      "excerpt": null,
+      "serviceId": "svc_maison_auto_linge",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-06-02T10:00:00.000Z",
+      "date": "2026-06-04T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-06-05T10:00:00.000Z",
+      "createdAt": "2026-06-04T10:00:00.000Z",
+      "surveyId": "srv_rev_18"
+    },
+    {
+      "id": "rev_19",
+      "authorName": "Nadège F.",
+      "city": "Lyon",
+      "rating": 5,
+      "text": "Une équipe réactive et à l’écoute : tout a été organisé comme convenu.",
+      "excerpt": null,
+      "serviceId": "svc_chef_prive",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-05-28T10:00:00.000Z",
+      "date": "2026-05-30T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-05-31T10:00:00.000Z",
+      "createdAt": "2026-05-30T10:00:00.000Z"
+    },
+    {
+      "id": "rev_20",
+      "authorName": "Thierry M.",
+      "city": "Lille",
+      "rating": 4,
+      "text": "Devis reçu rapidement, prestation soignée, je recommande sans hésiter.",
+      "excerpt": null,
+      "serviceId": "svc_location_sous_location_colocation",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "8/10"
+        }
+      ],
+      "serviceDate": "2026-05-23T10:00:00.000Z",
+      "date": "2026-05-25T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-05-26T10:00:00.000Z",
+      "createdAt": "2026-05-25T10:00:00.000Z"
+    },
+    {
+      "id": "rev_21",
+      "authorName": "Laure B.",
+      "city": "Paris",
+      "rating": 5,
+      "text": "Un interlocuteur unique qui nous a tenus informés à chaque étape.",
+      "excerpt": null,
+      "serviceId": "svc_portage_livraison_repas",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-05-18T10:00:00.000Z",
+      "date": "2026-05-20T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-05-21T10:00:00.000Z",
+      "createdAt": "2026-05-20T10:00:00.000Z",
+      "surveyId": "srv_rev_21"
+    },
+    {
+      "id": "rev_22",
+      "authorName": "Serge K.",
+      "city": "Kribi",
+      "rating": 5,
+      "text": "Très bon accompagnement depuis la France, rien à redire.",
+      "excerpt": null,
+      "serviceId": "svc_activites_culturelles_loisirs_sorties",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-05-13T10:00:00.000Z",
+      "date": "2026-05-15T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-05-16T10:00:00.000Z",
+      "createdAt": "2026-05-15T10:00:00.000Z"
+    },
+    {
+      "id": "rev_23",
+      "authorName": "Mireille A.",
+      "city": "Douala",
+      "rating": 5,
+      "text": "Prestataire ponctuel et professionnel, nous referons appel à Mambo.",
+      "excerpt": null,
+      "serviceId": "svc_maison_linge",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2026-05-08T10:00:00.000Z",
+      "date": "2026-05-10T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-05-11T10:00:00.000Z",
+      "createdAt": "2026-05-10T10:00:00.000Z"
+    },
+    {
+      "id": "rev_24",
+      "authorName": "Paul N.",
+      "city": "Bruxelles",
+      "rating": 5,
+      "text": "Service sérieux et humain, on se sent vraiment accompagné.",
+      "excerpt": null,
+      "serviceId": "svc_photographe",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-05-03T10:00:00.000Z",
+      "date": "2026-05-05T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-05-06T10:00:00.000Z",
+      "createdAt": "2026-05-05T10:00:00.000Z",
+      "surveyId": "srv_rev_24"
+    },
+    {
+      "id": "rev_25",
+      "authorName": "Estelle B.",
+      "city": "Montréal",
+      "rating": 5,
+      "text": "Une équipe réactive et à l’écoute : tout a été organisé comme convenu.",
+      "excerpt": null,
+      "serviceId": "svc_recherche_logement",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-04-28T10:00:00.000Z",
+      "date": "2026-04-30T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-05-01T10:00:00.000Z",
+      "createdAt": "2026-04-30T10:00:00.000Z",
+      "surveyId": "srv_rev_25"
+    },
+    {
+      "id": "rev_26",
+      "authorName": "Yannick O.",
+      "city": "Yaoundé",
+      "rating": 5,
+      "text": "Devis reçu rapidement, prestation soignée, je recommande sans hésiter.",
+      "excerpt": null,
+      "serviceId": "svc_logement_temporaire",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2026-04-23T10:00:00.000Z",
+      "date": "2026-04-25T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-04-26T10:00:00.000Z",
+      "createdAt": "2026-04-25T10:00:00.000Z"
+    },
+    {
+      "id": "rev_27",
+      "authorName": "Nadège F.",
+      "city": "Lyon",
+      "rating": 5,
+      "text": "Un interlocuteur unique qui nous a tenus informés à chaque étape.",
+      "excerpt": null,
+      "serviceId": "svc_decouverte_cameroun",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-04-18T10:00:00.000Z",
+      "date": "2026-04-20T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-04-21T10:00:00.000Z",
+      "createdAt": "2026-04-20T10:00:00.000Z",
+      "surveyId": "srv_rev_27"
+    },
+    {
+      "id": "rev_28",
+      "authorName": "Thierry M.",
+      "city": "Lille",
+      "rating": 5,
+      "text": "Très bon accompagnement depuis la France, rien à redire.",
+      "excerpt": null,
+      "serviceId": "svc_maison_auto",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-04-13T10:00:00.000Z",
+      "date": "2026-04-15T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-04-16T10:00:00.000Z",
+      "createdAt": "2026-04-15T10:00:00.000Z"
+    },
+    {
+      "id": "rev_29",
+      "authorName": "Laure B.",
+      "city": "Paris",
+      "rating": 4,
+      "text": "Prestataire ponctuel et professionnel, nous referons appel à Mambo.",
+      "excerpt": null,
+      "serviceId": "svc_location_voiture",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2026-04-08T10:00:00.000Z",
+      "date": "2026-04-10T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-04-11T10:00:00.000Z",
+      "createdAt": "2026-04-10T10:00:00.000Z"
+    },
+    {
+      "id": "rev_30",
+      "authorName": "Serge K.",
+      "city": "Kribi",
+      "rating": 5,
+      "text": "Service sérieux et humain, on se sent vraiment accompagné.",
+      "excerpt": null,
+      "serviceId": "svc_achat_vente_biens",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-04-03T10:00:00.000Z",
+      "date": "2026-04-05T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-04-06T10:00:00.000Z",
+      "createdAt": "2026-04-05T10:00:00.000Z",
+      "surveyId": "srv_rev_30"
+    },
+    {
+      "id": "rev_31",
+      "authorName": "Mireille A.",
+      "city": "Douala",
+      "rating": 5,
+      "text": "Une équipe réactive et à l’écoute : tout a été organisé comme convenu.",
+      "excerpt": null,
+      "serviceId": "svc_accompagnement_installation",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-03-29T10:00:00.000Z",
+      "date": "2026-03-31T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-04-01T10:00:00.000Z",
+      "createdAt": "2026-03-31T10:00:00.000Z",
+      "surveyId": "srv_rev_31"
+    },
+    {
+      "id": "rev_32",
+      "authorName": "Paul N.",
+      "city": "Bruxelles",
+      "rating": 5,
+      "text": "Devis reçu rapidement, prestation soignée, je recommande sans hésiter.",
+      "excerpt": null,
+      "serviceId": "svc_pressing_laverie",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2026-03-24T10:00:00.000Z",
+      "date": "2026-03-26T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-03-27T10:00:00.000Z",
+      "createdAt": "2026-03-26T10:00:00.000Z"
+    },
+    {
+      "id": "rev_33",
+      "authorName": "Estelle B.",
+      "city": "Montréal",
+      "rating": 5,
+      "text": "Un interlocuteur unique qui nous a tenus informés à chaque étape.",
+      "excerpt": null,
+      "serviceId": "svc_maison_essentiel",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-03-19T10:00:00.000Z",
+      "date": "2026-03-21T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-03-22T10:00:00.000Z",
+      "createdAt": "2026-03-21T10:00:00.000Z",
+      "surveyId": "srv_rev_33"
+    },
+    {
+      "id": "rev_34",
+      "authorName": "Yannick O.",
+      "city": "Yaoundé",
+      "rating": 5,
+      "text": "Très bon accompagnement depuis la France, rien à redire.",
+      "excerpt": null,
+      "serviceId": "svc_nettoyage_automobile",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-03-14T10:00:00.000Z",
+      "date": "2026-03-16T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-03-17T10:00:00.000Z",
+      "createdAt": "2026-03-16T10:00:00.000Z"
+    },
+    {
+      "id": "rev_35",
+      "authorName": "Nadège F.",
+      "city": "Lyon",
+      "rating": 5,
+      "text": "Prestataire ponctuel et professionnel, nous referons appel à Mambo.",
+      "excerpt": null,
+      "serviceId": "svc_services_evenementiels",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2026-03-09T10:00:00.000Z",
+      "date": "2026-03-11T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-03-12T10:00:00.000Z",
+      "createdAt": "2026-03-11T10:00:00.000Z"
+    },
+    {
+      "id": "rev_36",
+      "authorName": "Thierry M.",
+      "city": "Lille",
+      "rating": 5,
+      "text": "Service sérieux et humain, on se sent vraiment accompagné.",
+      "excerpt": null,
+      "serviceId": "svc_gestion_locative",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-03-04T10:00:00.000Z",
+      "date": "2026-03-06T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-03-07T10:00:00.000Z",
+      "createdAt": "2026-03-06T10:00:00.000Z",
+      "surveyId": "srv_rev_36"
+    },
+    {
+      "id": "rev_37",
+      "authorName": "Laure B.",
+      "city": "Paris",
+      "rating": 5,
+      "text": "Une équipe réactive et à l’écoute : tout a été organisé comme convenu.",
+      "excerpt": null,
+      "serviceId": "svc_collecte_livraison_colis_courrier",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-02-27T10:00:00.000Z",
+      "date": "2026-03-01T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-03-02T10:00:00.000Z",
+      "createdAt": "2026-03-01T10:00:00.000Z"
+    },
+    {
+      "id": "rev_38",
+      "authorName": "Serge K.",
+      "city": "Kribi",
+      "rating": 4,
+      "text": "Devis reçu rapidement, prestation soignée, je recommande sans hésiter.",
+      "excerpt": null,
+      "serviceId": "svc_decouverte_integration_locale",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2026-02-22T10:00:00.000Z",
+      "date": "2026-02-24T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-02-25T10:00:00.000Z",
+      "createdAt": "2026-02-24T10:00:00.000Z"
+    },
+    {
+      "id": "rev_39",
+      "authorName": "Mireille A.",
+      "city": "Douala",
+      "rating": 5,
+      "text": "Un interlocuteur unique qui nous a tenus informés à chaque étape.",
+      "excerpt": null,
+      "serviceId": "svc_entretien_du_logement",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-02-17T10:00:00.000Z",
+      "date": "2026-02-19T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-02-20T10:00:00.000Z",
+      "createdAt": "2026-02-19T10:00:00.000Z"
+    },
+    {
+      "id": "rev_40",
+      "authorName": "Paul N.",
+      "city": "Bruxelles",
+      "rating": 5,
+      "text": "Très bon accompagnement depuis la France, rien à redire.",
+      "excerpt": null,
+      "serviceId": "svc_massage_bien_etre",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-02-12T10:00:00.000Z",
+      "date": "2026-02-14T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-02-15T10:00:00.000Z",
+      "createdAt": "2026-02-14T10:00:00.000Z"
+    },
+    {
+      "id": "rev_41",
+      "authorName": "Estelle B.",
+      "city": "Montréal",
+      "rating": 5,
+      "text": "Prestataire ponctuel et professionnel, nous referons appel à Mambo.",
+      "excerpt": null,
+      "serviceId": "svc_logement_adapte_meuble",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2026-02-07T10:00:00.000Z",
+      "date": "2026-02-09T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-02-10T10:00:00.000Z",
+      "createdAt": "2026-02-09T10:00:00.000Z"
+    },
+    {
+      "id": "rev_42",
+      "authorName": "Yannick O.",
+      "city": "Yaoundé",
+      "rating": 5,
+      "text": "Service sérieux et humain, on se sent vraiment accompagné.",
+      "excerpt": null,
+      "serviceId": "svc_livraison_courses_commandes",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-02-02T10:00:00.000Z",
+      "date": "2026-02-04T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-02-05T10:00:00.000Z",
+      "createdAt": "2026-02-04T10:00:00.000Z"
+    },
+    {
+      "id": "rev_43",
+      "authorName": "Nadège F.",
+      "city": "Lyon",
+      "rating": 5,
+      "text": "Une équipe réactive et à l’écoute : tout a été organisé comme convenu.",
+      "excerpt": null,
+      "serviceId": "svc_organisation_activites_evenements",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-01-28T10:00:00.000Z",
+      "date": "2026-01-30T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-01-31T10:00:00.000Z",
+      "createdAt": "2026-01-30T10:00:00.000Z"
+    },
+    {
+      "id": "rev_44",
+      "authorName": "Thierry M.",
+      "city": "Lille",
+      "rating": 5,
+      "text": "Devis reçu rapidement, prestation soignée, je recommande sans hésiter.",
+      "excerpt": null,
+      "serviceId": "svc_maison_auto_linge",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2026-01-23T10:00:00.000Z",
+      "date": "2026-01-25T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-01-26T10:00:00.000Z",
+      "createdAt": "2026-01-25T10:00:00.000Z"
+    },
+    {
+      "id": "rev_45",
+      "authorName": "Laure B.",
+      "city": "Paris",
+      "rating": 5,
+      "text": "Un interlocuteur unique qui nous a tenus informés à chaque étape.",
+      "excerpt": null,
+      "serviceId": "svc_chef_prive",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-01-18T10:00:00.000Z",
+      "date": "2026-01-20T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-01-21T10:00:00.000Z",
+      "createdAt": "2026-01-20T10:00:00.000Z"
+    },
+    {
+      "id": "rev_46",
+      "authorName": "Serge K.",
+      "city": "Kribi",
+      "rating": 5,
+      "text": "Très bon accompagnement depuis la France, rien à redire.",
+      "excerpt": null,
+      "serviceId": "svc_location_sous_location_colocation",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-01-13T10:00:00.000Z",
+      "date": "2026-01-15T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-01-16T10:00:00.000Z",
+      "createdAt": "2026-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "rev_47",
+      "authorName": "Mireille A.",
+      "city": "Douala",
+      "rating": 4,
+      "text": "Prestataire ponctuel et professionnel, nous referons appel à Mambo.",
+      "excerpt": null,
+      "serviceId": "svc_portage_livraison_repas",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2026-01-08T10:00:00.000Z",
+      "date": "2026-01-10T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-01-11T10:00:00.000Z",
+      "createdAt": "2026-01-10T10:00:00.000Z"
+    },
+    {
+      "id": "rev_48",
+      "authorName": "Paul N.",
+      "city": "Bruxelles",
+      "rating": 5,
+      "text": "Service sérieux et humain, on se sent vraiment accompagné.",
+      "excerpt": null,
+      "serviceId": "svc_activites_culturelles_loisirs_sorties",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2026-01-03T10:00:00.000Z",
+      "date": "2026-01-05T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-01-06T10:00:00.000Z",
+      "createdAt": "2026-01-05T10:00:00.000Z"
+    },
+    {
+      "id": "rev_49",
+      "authorName": "Estelle B.",
+      "city": "Montréal",
+      "rating": 5,
+      "text": "Une équipe réactive et à l’écoute : tout a été organisé comme convenu.",
+      "excerpt": null,
+      "serviceId": "svc_maison_linge",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2025-12-29T10:00:00.000Z",
+      "date": "2025-12-31T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-01-01T10:00:00.000Z",
+      "createdAt": "2025-12-31T10:00:00.000Z"
+    },
+    {
+      "id": "rev_50",
+      "authorName": "Yannick O.",
+      "city": "Yaoundé",
+      "rating": 5,
+      "text": "Devis reçu rapidement, prestation soignée, je recommande sans hésiter.",
+      "excerpt": null,
+      "serviceId": "svc_photographe",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2025-12-24T10:00:00.000Z",
+      "date": "2025-12-26T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-12-27T10:00:00.000Z",
+      "createdAt": "2025-12-26T10:00:00.000Z"
+    },
+    {
+      "id": "rev_51",
+      "authorName": "Nadège F.",
+      "city": "Lyon",
+      "rating": 5,
+      "text": "Un interlocuteur unique qui nous a tenus informés à chaque étape.",
+      "excerpt": null,
+      "serviceId": "svc_recherche_logement",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2025-12-19T10:00:00.000Z",
+      "date": "2025-12-21T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-12-22T10:00:00.000Z",
+      "createdAt": "2025-12-21T10:00:00.000Z"
+    },
+    {
+      "id": "rev_52",
+      "authorName": "Thierry M.",
+      "city": "Lille",
+      "rating": 5,
+      "text": "Très bon accompagnement depuis la France, rien à redire.",
+      "excerpt": null,
+      "serviceId": "svc_logement_temporaire",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2025-12-14T10:00:00.000Z",
+      "date": "2025-12-16T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-12-17T10:00:00.000Z",
+      "createdAt": "2025-12-16T10:00:00.000Z"
+    },
+    {
+      "id": "rev_53",
+      "authorName": "Laure B.",
+      "city": "Paris",
+      "rating": 5,
+      "text": "Prestataire ponctuel et professionnel, nous referons appel à Mambo.",
+      "excerpt": null,
+      "serviceId": "svc_decouverte_cameroun",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2025-12-09T10:00:00.000Z",
+      "date": "2025-12-11T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-12-12T10:00:00.000Z",
+      "createdAt": "2025-12-11T10:00:00.000Z"
+    },
+    {
+      "id": "rev_54",
+      "authorName": "Serge K.",
+      "city": "Kribi",
+      "rating": 5,
+      "text": "Service sérieux et humain, on se sent vraiment accompagné.",
+      "excerpt": null,
+      "serviceId": "svc_maison_auto",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2025-12-04T10:00:00.000Z",
+      "date": "2025-12-06T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-12-07T10:00:00.000Z",
+      "createdAt": "2025-12-06T10:00:00.000Z"
+    },
+    {
+      "id": "rev_55",
+      "authorName": "Mireille A.",
+      "city": "Douala",
+      "rating": 5,
+      "text": "Une équipe réactive et à l’écoute : tout a été organisé comme convenu.",
+      "excerpt": null,
+      "serviceId": "svc_location_voiture",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2025-11-29T10:00:00.000Z",
+      "date": "2025-12-01T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-12-02T10:00:00.000Z",
+      "createdAt": "2025-12-01T10:00:00.000Z"
+    },
+    {
+      "id": "rev_56",
+      "authorName": "Paul N.",
+      "city": "Bruxelles",
+      "rating": 4,
+      "text": "Devis reçu rapidement, prestation soignée, je recommande sans hésiter.",
+      "excerpt": null,
+      "serviceId": "svc_achat_vente_biens",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2025-11-24T10:00:00.000Z",
+      "date": "2025-11-26T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-11-27T10:00:00.000Z",
+      "createdAt": "2025-11-26T10:00:00.000Z"
+    },
+    {
+      "id": "rev_57",
+      "authorName": "Estelle B.",
+      "city": "Montréal",
+      "rating": 5,
+      "text": "Un interlocuteur unique qui nous a tenus informés à chaque étape.",
+      "excerpt": null,
+      "serviceId": "svc_accompagnement_installation",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2025-11-19T10:00:00.000Z",
+      "date": "2025-11-21T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-11-22T10:00:00.000Z",
+      "createdAt": "2025-11-21T10:00:00.000Z"
+    },
+    {
+      "id": "rev_58",
+      "authorName": "Yannick O.",
+      "city": "Yaoundé",
+      "rating": 5,
+      "text": "Très bon accompagnement depuis la France, rien à redire.",
+      "excerpt": null,
+      "serviceId": "svc_pressing_laverie",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2025-11-14T10:00:00.000Z",
+      "date": "2025-11-16T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-11-17T10:00:00.000Z",
+      "createdAt": "2025-11-16T10:00:00.000Z"
+    },
+    {
+      "id": "rev_59",
+      "authorName": "Nadège F.",
+      "city": "Lyon",
+      "rating": 5,
+      "text": "Prestataire ponctuel et professionnel, nous referons appel à Mambo.",
+      "excerpt": null,
+      "serviceId": "svc_maison_essentiel",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2025-11-09T10:00:00.000Z",
+      "date": "2025-11-11T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-11-12T10:00:00.000Z",
+      "createdAt": "2025-11-11T10:00:00.000Z"
+    },
+    {
+      "id": "rev_60",
+      "authorName": "Thierry M.",
+      "city": "Lille",
+      "rating": 5,
+      "text": "Service sérieux et humain, on se sent vraiment accompagné.",
+      "excerpt": null,
+      "serviceId": "svc_nettoyage_automobile",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2025-11-04T10:00:00.000Z",
+      "date": "2025-11-06T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-11-07T10:00:00.000Z",
+      "createdAt": "2025-11-06T10:00:00.000Z"
+    },
+    {
+      "id": "rev_61",
+      "authorName": "Laure B.",
+      "city": "Paris",
+      "rating": 5,
+      "text": "Une équipe réactive et à l’écoute : tout a été organisé comme convenu.",
+      "excerpt": null,
+      "serviceId": "svc_services_evenementiels",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2025-10-30T10:00:00.000Z",
+      "date": "2025-11-01T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-11-02T10:00:00.000Z",
+      "createdAt": "2025-11-01T10:00:00.000Z"
+    },
+    {
+      "id": "rev_62",
+      "authorName": "Serge K.",
+      "city": "Kribi",
+      "rating": 5,
+      "text": "Devis reçu rapidement, prestation soignée, je recommande sans hésiter.",
+      "excerpt": null,
+      "serviceId": "svc_gestion_locative",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2025-10-25T10:00:00.000Z",
+      "date": "2025-10-27T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-10-28T10:00:00.000Z",
+      "createdAt": "2025-10-27T10:00:00.000Z"
+    },
+    {
+      "id": "rev_63",
+      "authorName": "Mireille A.",
+      "city": "Douala",
+      "rating": 5,
+      "text": "Un interlocuteur unique qui nous a tenus informés à chaque étape.",
+      "excerpt": null,
+      "serviceId": "svc_collecte_livraison_colis_courrier",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2025-10-20T10:00:00.000Z",
+      "date": "2025-10-22T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-10-23T10:00:00.000Z",
+      "createdAt": "2025-10-22T10:00:00.000Z"
+    },
+    {
+      "id": "rev_64",
+      "authorName": "Paul N.",
+      "city": "Bruxelles",
+      "rating": 5,
+      "text": "Très bon accompagnement depuis la France, rien à redire.",
+      "excerpt": null,
+      "serviceId": "svc_decouverte_integration_locale",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2025-10-15T10:00:00.000Z",
+      "date": "2025-10-17T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-10-18T10:00:00.000Z",
+      "createdAt": "2025-10-17T10:00:00.000Z"
+    },
+    {
+      "id": "rev_65",
+      "authorName": "Estelle B.",
+      "city": "Montréal",
+      "rating": 4,
+      "text": "Prestataire ponctuel et professionnel, nous referons appel à Mambo.",
+      "excerpt": null,
+      "serviceId": "svc_entretien_du_logement",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2025-10-10T10:00:00.000Z",
+      "date": "2025-10-12T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-10-13T10:00:00.000Z",
+      "createdAt": "2025-10-12T10:00:00.000Z"
+    },
+    {
+      "id": "rev_66",
+      "authorName": "Yannick O.",
+      "city": "Yaoundé",
+      "rating": 5,
+      "text": "Service sérieux et humain, on se sent vraiment accompagné.",
+      "excerpt": null,
+      "serviceId": "svc_massage_bien_etre",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2025-10-05T10:00:00.000Z",
+      "date": "2025-10-07T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-10-08T10:00:00.000Z",
+      "createdAt": "2025-10-07T10:00:00.000Z"
+    },
+    {
+      "id": "rev_67",
+      "authorName": "Nadège F.",
+      "city": "Lyon",
+      "rating": 5,
+      "text": "Une équipe réactive et à l’écoute : tout a été organisé comme convenu.",
+      "excerpt": null,
+      "serviceId": "svc_logement_adapte_meuble",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2025-09-30T10:00:00.000Z",
+      "date": "2025-10-02T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-10-03T10:00:00.000Z",
+      "createdAt": "2025-10-02T10:00:00.000Z"
+    },
+    {
+      "id": "rev_68",
+      "authorName": "Thierry M.",
+      "city": "Lille",
+      "rating": 5,
+      "text": "Devis reçu rapidement, prestation soignée, je recommande sans hésiter.",
+      "excerpt": null,
+      "serviceId": "svc_livraison_courses_commandes",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2025-09-25T10:00:00.000Z",
+      "date": "2025-09-27T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-09-28T10:00:00.000Z",
+      "createdAt": "2025-09-27T10:00:00.000Z"
+    },
+    {
+      "id": "rev_69",
+      "authorName": "Laure B.",
+      "city": "Paris",
+      "rating": 5,
+      "text": "Un interlocuteur unique qui nous a tenus informés à chaque étape.",
+      "excerpt": null,
+      "serviceId": "svc_organisation_activites_evenements",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2025-09-20T10:00:00.000Z",
+      "date": "2025-09-22T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-09-23T10:00:00.000Z",
+      "createdAt": "2025-09-22T10:00:00.000Z"
+    },
+    {
+      "id": "rev_70",
+      "authorName": "Serge K.",
+      "city": "Kribi",
+      "rating": 5,
+      "text": "Très bon accompagnement depuis la France, rien à redire.",
+      "excerpt": null,
+      "serviceId": "svc_maison_auto_linge",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2025-09-15T10:00:00.000Z",
+      "date": "2025-09-17T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-09-18T10:00:00.000Z",
+      "createdAt": "2025-09-17T10:00:00.000Z"
+    },
+    {
+      "id": "rev_71",
+      "authorName": "Mireille A.",
+      "city": "Douala",
+      "rating": 5,
+      "text": "Prestataire ponctuel et professionnel, nous referons appel à Mambo.",
+      "excerpt": null,
+      "serviceId": "svc_chef_prive",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "serviceDate": "2025-09-10T10:00:00.000Z",
+      "date": "2025-09-12T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-09-13T10:00:00.000Z",
+      "createdAt": "2025-09-12T10:00:00.000Z"
+    },
+    {
+      "id": "rev_72",
+      "authorName": "Paul N.",
+      "city": "Bruxelles",
+      "rating": 5,
+      "text": "Service sérieux et humain, on se sent vraiment accompagné.",
+      "excerpt": null,
+      "serviceId": "svc_location_sous_location_colocation",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "serviceDate": "2025-09-05T10:00:00.000Z",
+      "date": "2025-09-07T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2025-09-08T10:00:00.000Z",
+      "createdAt": "2025-09-07T10:00:00.000Z"
+    },
+    {
+      "id": "rev_jean_marc_entretien",
+      "authorName": "Jean-Marc T.",
+      "city": "Bonapriso",
+      "rating": 5,
+      "text": "Mon appartement est impeccable chaque vendredi. L’intervenante est ponctuelle et discrète.",
+      "excerpt": null,
+      "serviceId": "svc_entretien_du_logement",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": null,
+      "serviceDate": null,
+      "date": "2026-10-10T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-10-10T10:00:00.000Z",
+      "createdAt": "2026-10-10T10:00:00.000Z"
+    },
+    {
+      "id": "rev_laure_entretien",
+      "authorName": "Laure B.",
+      "city": "Makèpè",
+      "rating": 5,
+      "text": "Ménage après travaux parfait : le logement était prêt le soir même.",
+      "excerpt": null,
+      "serviceId": "svc_entretien_du_logement",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": null,
+      "serviceDate": null,
+      "date": "2026-09-26T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-09-26T10:00:00.000Z",
+      "createdAt": "2026-09-26T10:00:00.000Z"
+    },
+    {
+      "id": "rev_jean_marc_chef",
+      "authorName": "Jean-Marc T.",
+      "city": "Yaoundé",
+      "rating": 5,
+      "text": "Le chef a régalé nos invités pour l'anniversaire de ma mère. Service impeccable, du début à la fin.",
+      "excerpt": null,
+      "serviceId": "svc_chef_prive",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": null,
+      "serviceDate": null,
+      "date": "2026-09-12T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-09-12T10:00:00.000Z",
+      "createdAt": "2026-09-12T10:00:00.000Z"
+    },
+    {
+      "id": "rev_laure_chef",
+      "authorName": "Laure B.",
+      "city": "Douala",
+      "rating": 5,
+      "text": "Dîner de fiançailles parfait : menu revisité, table magnifique, et une cuisine rendue impeccable.",
+      "excerpt": null,
+      "serviceId": "svc_chef_prive",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": null,
+      "serviceDate": null,
+      "date": "2026-08-24T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-08-24T10:00:00.000Z",
+      "createdAt": "2026-08-24T10:00:00.000Z"
+    },
+    {
+      "id": "rev_aicha",
+      "authorName": "Aïcha M.",
+      "city": "Bonamoussadi",
+      "rating": 5,
+      "text": "L’intervenante vient chaque semaine, mon linge revient repassé le lendemain. Je réserve sur WhatsApp, c’est simple et fiable.",
+      "excerpt": null,
+      "serviceId": "svc_maison_linge",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": null,
+      "serviceDate": null,
+      "date": "2026-10-02T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-10-02T10:00:00.000Z",
+      "createdAt": "2026-10-02T10:00:00.000Z"
+    },
+    {
+      "id": "rev_jean_marc",
+      "authorName": "Jean-Marc T.",
+      "city": "Yaoundé",
+      "rating": 5,
+      "text": "Le chef privé a régalé nos invités pour l'anniversaire de ma mère. Service impeccable, équipe aux petits soins du début à la fin.",
+      "excerpt": null,
+      "serviceId": "svc_chef_prive",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": null,
+      "serviceDate": null,
+      "date": "2026-09-12T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-09-12T10:00:00.000Z",
+      "createdAt": "2026-09-12T10:00:00.000Z"
+    },
+    {
+      "id": "rev_serge",
+      "authorName": "Serge M.",
+      "city": "Kotto",
+      "rating": 5,
+      "text": "Mambo gère mon appartement à Bonapriso. Comptes rendus réguliers, locataires suivis : je suis enfin serein.",
+      "excerpt": null,
+      "serviceId": "svc_gestion_locative",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": null,
+      "serviceDate": null,
+      "date": "2026-08-30T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-08-30T10:00:00.000Z",
+      "createdAt": "2026-08-30T10:00:00.000Z"
+    },
+    {
+      "id": "rev_clarisse",
+      "authorName": "Clarisse N.",
+      "city": "Akwa",
+      "rating": 5,
+      "text": "Ma mère reçoit ses repas chaque midi et ses courses le samedi. Je suis rassurée et toujours informée.",
+      "excerpt": null,
+      "serviceId": "svc_portage_livraison_repas",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": null,
+      "serviceDate": null,
+      "date": "2026-09-20T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-09-20T10:00:00.000Z",
+      "createdAt": "2026-09-20T10:00:00.000Z"
+    },
+    {
+      "id": "rev_patrick",
+      "authorName": "Patrick E.",
+      "city": "Marseille",
+      "rating": 5,
+      "text": "La journée découverte à Kribi était parfaite : guide passionné, repas local, tout était organisé. Mes enfants en parlent encore.",
+      "excerpt": null,
+      "serviceId": "svc_decouverte_cameroun",
+      "status": "PUBLIE",
+      "verified": true,
+      "featured": false,
+      "publishConsent": true,
+      "answersSnapshot": null,
+      "serviceDate": null,
+      "date": "2026-09-05T10:00:00.000Z",
+      "reply": null,
+      "publishedAt": "2026-09-05T10:00:00.000Z",
+      "createdAt": "2026-09-05T10:00:00.000Z"
+    }
+  ],
+  "featuredReviews": [
+    {
+      "serviceId": "svc_entretien_du_logement",
+      "reviewId": "rev_jean_marc_entretien",
+      "sortOrder": 0
+    },
+    {
+      "serviceId": "svc_entretien_du_logement",
+      "reviewId": "rev_laure_entretien",
+      "sortOrder": 1
+    },
+    {
+      "serviceId": "svc_chef_prive",
+      "reviewId": "rev_jean_marc_chef",
+      "sortOrder": 0
+    },
+    {
+      "serviceId": "svc_chef_prive",
+      "reviewId": "rev_laure_chef",
+      "sortOrder": 1
+    }
+  ],
+  "surveys": [
+    {
+      "id": "srv_rev_aurelie_k",
+      "requestId": "req_0127",
+      "status": "ANSWERED",
+      "sentAt": "rel:now:-518400000",
+      "completedAt": "rel:now:-93600000",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": true,
+      "displayName": "Aurélie K.",
+      "city": "Bonapriso"
+    },
+    {
+      "id": "srv_rev_herve_d",
+      "requestId": "req_0138",
+      "status": "ANSWERED",
+      "sentAt": "rel:now:-518400000",
+      "completedAt": "rel:now:-180000000",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "rating": 4,
+      "npsScore": 9,
+      "publishConsent": true,
+      "displayName": "Hervé D.",
+      "city": "Douala"
+    },
+    {
+      "id": "srv_rev_marc_o",
+      "requestId": "req_0124",
+      "status": "ANSWERED",
+      "sentAt": "rel:now:-518400000",
+      "completedAt": "rel:now:-266400000",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt non"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "7/10"
+        }
+      ],
+      "rating": 3,
+      "npsScore": 7,
+      "publishConsent": false,
+      "displayName": "Marc O.",
+      "city": "Kotto"
+    },
+    {
+      "id": "srv_rev_nadia_f",
+      "requestId": "req_0122",
+      "status": "ANSWERED",
+      "sentAt": "rel:now:-691200000",
+      "completedAt": "rel:now:-439200000",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": true,
+      "displayName": "Nadia F.",
+      "city": "Akwa"
+    },
+    {
+      "id": "srv_rev_masque_1",
+      "requestId": "req_0110",
+      "status": "ANSWERED",
+      "sentAt": "rel:now:-1036800000",
+      "completedAt": "rel:now:-871200000",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": false,
+      "displayName": "Joël M.",
+      "city": "Yaoundé"
+    },
+    {
+      "id": "srv_rev_masque_2",
+      "requestId": "req_0107",
+      "status": "ANSWERED",
+      "sentAt": "rel:now:-1555200000",
+      "completedAt": "rel:now:-1389600000",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": false,
+      "displayName": "Inès B.",
+      "city": "Bonanjo"
+    },
+    {
+      "id": "srv_rev_masque_3",
+      "requestId": "req_0104",
+      "status": "ANSWERED",
+      "sentAt": "rel:now:-2073600000",
+      "completedAt": "rel:now:-1908000000",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": false,
+      "displayName": "Boris N.",
+      "city": "Bonamoussadi"
+    },
+    {
+      "id": "srv_rev_masque_4",
+      "requestId": "req_0101",
+      "status": "ANSWERED",
+      "sentAt": "rel:now:-2592000000",
+      "completedAt": "rel:now:-2426400000",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": true,
+      "displayName": "Grâce E.",
+      "city": "Makepe"
+    },
+    {
+      "id": "srv_rev_masque_5",
+      "requestId": "req_0098",
+      "status": "ANSWERED",
+      "sentAt": "rel:now:-3110400000",
+      "completedAt": "rel:now:-2944800000",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": false,
+      "displayName": "Serge A.",
+      "city": "Kribi"
+    },
+    {
+      "id": "srv_rev_masque_6",
+      "requestId": "req_0095",
+      "status": "ANSWERED",
+      "sentAt": "rel:now:-3628800000",
+      "completedAt": "rel:now:-3463200000",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "rating": 4,
+      "npsScore": 9,
+      "publishConsent": false,
+      "displayName": "Esther O.",
+      "city": "Logpom"
+    },
+    {
+      "id": "srv_rev_masque_7",
+      "requestId": "req_0092",
+      "status": "ANSWERED",
+      "sentAt": "rel:now:-4147200000",
+      "completedAt": "rel:now:-3981600000",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt non"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "6/10"
+        }
+      ],
+      "rating": 3,
+      "npsScore": 6,
+      "publishConsent": true,
+      "displayName": "Paul K.",
+      "city": "Deïdo"
+    },
+    {
+      "id": "srv_rev_2",
+      "requestId": "req_0119",
+      "status": "ANSWERED",
+      "sentAt": "2026-09-01T10:00:00.000Z",
+      "completedAt": "2026-09-03T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 9,
+      "publishConsent": true,
+      "displayName": "Jean-Marc T.",
+      "city": "Yaoundé"
+    },
+    {
+      "id": "srv_rev_masque_8",
+      "requestId": "req_0089",
+      "status": "ANSWERED",
+      "sentAt": "rel:now:-4665600000",
+      "completedAt": "rel:now:-4500000000",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt non"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "5/10"
+        }
+      ],
+      "rating": 3,
+      "npsScore": 5,
+      "publishConsent": false,
+      "displayName": "Yannick T.",
+      "city": "Bali"
+    },
+    {
+      "id": "srv_rev_3",
+      "requestId": "req_0118",
+      "status": "ANSWERED",
+      "sentAt": "2026-08-26T10:00:00.000Z",
+      "completedAt": "2026-08-28T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": true,
+      "displayName": "Sandrine M.",
+      "city": "Kotto"
+    },
+    {
+      "id": "srv_rev_masque_9",
+      "requestId": "req_0086",
+      "status": "ANSWERED",
+      "sentAt": "rel:now:-5184000000",
+      "completedAt": "rel:now:-5018400000",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt non"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "3/10"
+        }
+      ],
+      "rating": 2,
+      "npsScore": 3,
+      "publishConsent": true,
+      "displayName": "Laure M.",
+      "city": "Bonapriso"
+    },
+    {
+      "id": "srv_rev_5",
+      "requestId": "req_0116",
+      "status": "ANSWERED",
+      "sentAt": "2026-08-07T10:00:00.000Z",
+      "completedAt": "2026-08-09T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 9,
+      "publishConsent": true,
+      "displayName": "Patrick E.",
+      "city": "Marseille"
+    },
+    {
+      "id": "srv_rev_6",
+      "requestId": "req_0115",
+      "status": "ANSWERED",
+      "sentAt": "2026-07-31T10:00:00.000Z",
+      "completedAt": "2026-08-02T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "8/10"
+        }
+      ],
+      "rating": 4,
+      "npsScore": 8,
+      "publishConsent": true,
+      "displayName": "Hervé D.",
+      "city": "Douala"
+    },
+    {
+      "id": "srv_rev_8",
+      "requestId": "req_0113",
+      "status": "ANSWERED",
+      "sentAt": "2026-07-22T10:00:00.000Z",
+      "completedAt": "2026-07-24T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "9/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 9,
+      "publishConsent": true,
+      "displayName": "Paul N.",
+      "city": "Bruxelles"
+    },
+    {
+      "id": "srv_rev_9",
+      "requestId": "req_0112",
+      "status": "ANSWERED",
+      "sentAt": "2026-07-17T10:00:00.000Z",
+      "completedAt": "2026-07-19T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": true,
+      "displayName": "Estelle B.",
+      "city": "Montréal"
+    },
+    {
+      "id": "srv_rev_12",
+      "requestId": "req_0109",
+      "status": "ANSWERED",
+      "sentAt": "2026-07-02T10:00:00.000Z",
+      "completedAt": "2026-07-04T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": true,
+      "displayName": "Thierry M.",
+      "city": "Lille"
+    },
+    {
+      "id": "srv_rev_15",
+      "requestId": "req_0106",
+      "status": "ANSWERED",
+      "sentAt": "2026-06-17T10:00:00.000Z",
+      "completedAt": "2026-06-19T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": true,
+      "displayName": "Mireille A.",
+      "city": "Douala"
+    },
+    {
+      "id": "srv_rev_18",
+      "requestId": "req_0103",
+      "status": "ANSWERED",
+      "sentAt": "2026-06-02T10:00:00.000Z",
+      "completedAt": "2026-06-04T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": true,
+      "displayName": "Yannick O.",
+      "city": "Yaoundé"
+    },
+    {
+      "id": "srv_rev_21",
+      "requestId": "req_0100",
+      "status": "ANSWERED",
+      "sentAt": "2026-05-18T10:00:00.000Z",
+      "completedAt": "2026-05-20T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": true,
+      "displayName": "Laure B.",
+      "city": "Paris"
+    },
+    {
+      "id": "srv_rev_24",
+      "requestId": "req_0097",
+      "status": "ANSWERED",
+      "sentAt": "2026-05-03T10:00:00.000Z",
+      "completedAt": "2026-05-05T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": true,
+      "displayName": "Paul N.",
+      "city": "Bruxelles"
+    },
+    {
+      "id": "srv_rev_25",
+      "requestId": "req_0096",
+      "status": "ANSWERED",
+      "sentAt": "2026-04-28T10:00:00.000Z",
+      "completedAt": "2026-04-30T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": true,
+      "displayName": "Estelle B.",
+      "city": "Montréal"
+    },
+    {
+      "id": "srv_rev_27",
+      "requestId": "req_0094",
+      "status": "ANSWERED",
+      "sentAt": "2026-04-18T10:00:00.000Z",
+      "completedAt": "2026-04-20T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": true,
+      "displayName": "Nadège F.",
+      "city": "Lyon"
+    },
+    {
+      "id": "srv_rev_30",
+      "requestId": "req_0091",
+      "status": "ANSWERED",
+      "sentAt": "2026-04-03T10:00:00.000Z",
+      "completedAt": "2026-04-05T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": true,
+      "displayName": "Serge K.",
+      "city": "Kribi"
+    },
+    {
+      "id": "srv_rev_31",
+      "requestId": "req_0090",
+      "status": "ANSWERED",
+      "sentAt": "2026-03-29T10:00:00.000Z",
+      "completedAt": "2026-03-31T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": true,
+      "displayName": "Mireille A.",
+      "city": "Douala"
+    },
+    {
+      "id": "srv_rev_33",
+      "requestId": "req_0088",
+      "status": "ANSWERED",
+      "sentAt": "2026-03-19T10:00:00.000Z",
+      "completedAt": "2026-03-21T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Plutôt oui"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": true,
+      "displayName": "Estelle B.",
+      "city": "Montréal"
+    },
+    {
+      "id": "srv_rev_36",
+      "requestId": "req_0085",
+      "status": "ANSWERED",
+      "sentAt": "2026-03-04T10:00:00.000Z",
+      "completedAt": "2026-03-06T10:00:00.000Z",
+      "answers": [
+        {
+          "question": "Ponctualité",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Information",
+          "answer": "Oui, tout à fait"
+        },
+        {
+          "question": "Recommandation",
+          "answer": "10/10"
+        }
+      ],
+      "rating": 5,
+      "npsScore": 10,
+      "publishConsent": true,
+      "displayName": "Thierry M.",
+      "city": "Lille"
+    }
+  ]
+}

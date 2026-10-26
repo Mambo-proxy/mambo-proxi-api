@@ -1,6 +1,7 @@
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import { ETAG_MODE } from './common/http-cache/http-cache.js';
 import { mapBodyParserErrors } from './common/problem/body-parser-errors.js';
 import { AppConfigService } from './config/app-config.service.js';
 import { REQUEST_ID_HEADER } from './logging/request-id.js';
@@ -16,6 +17,8 @@ export function configureApp(app: NestExpressApplication): void {
   const config = app.get(AppConfigService);
 
   app.setGlobalPrefix(GLOBAL_PREFIX);
+  // ETag de chaque réponse et 304 sur `If-None-Match` (lectures publiques : voir `common/http-cache`).
+  app.set('etag', ETAG_MODE);
   // Derrière le mandataire inverse (Caddy) en production : adresse IP réelle pour la limitation de débit.
   if (config.isProduction) app.set('trust proxy', 1);
 

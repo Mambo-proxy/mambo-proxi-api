@@ -1,0 +1,932 @@
+[
+  {
+    "key": "site",
+    "value": {
+      "siteName": "MAMBO Proxi",
+      "tagline": "Vos services, au plus près de vous",
+      "signature": "Mambo, ce n'est pas qu'un service. C'est une expérience pensée pour vous."
+    },
+    "translations": {
+      "en": {
+        "tagline": "Your services, close at hand",
+        "signature": "Mambo isn't just a service. It's an experience designed for you."
+      }
+    }
+  },
+  {
+    "key": "coordonnees",
+    "value": {
+      "phoneFrance": null,
+      "phoneCameroon": "+237600000000",
+      "email": "contact@mamboproxi.com",
+      "hoursLabel": "Lun – Sam · 8h – 20h",
+      "agency": {
+        "name": "Agence MAMBO Proxi",
+        "addressLines": ["Adresse de l’agence"],
+        "city": "Douala",
+        "country": "CM",
+        "phone": "+237600000000",
+        "phoneDisplay": "+237 6 00 00 00 00",
+        "latitude": 4.0511,
+        "longitude": 9.7679,
+        "mapsUrl": "https://www.google.com/maps/search/?api=1&query=4.0511,9.7679",
+        "openingHours": [
+          {
+            "label": "Lundi – vendredi",
+            "hours": "8 h – 18 h"
+          },
+          {
+            "label": "Samedi",
+            "hours": "9 h – 13 h"
+          }
+        ],
+        "parcelReceptionNote": "Réception des colis et courriers aux heures d'ouverture."
+      }
+    },
+    "translations": {
+      "en": {
+        "hoursLabel": "Mon – Sat · 8am – 8pm",
+        "agency": {
+          "name": "MAMBO Proxi agency",
+          "addressLines": ["Agency address"],
+          "city": "Douala",
+          "country": "CM",
+          "phone": "+237600000000",
+          "phoneDisplay": "+237 6 00 00 00 00",
+          "latitude": 4.0511,
+          "longitude": 9.7679,
+          "mapsUrl": "https://www.google.com/maps/search/?api=1&query=4.0511,9.7679",
+          "openingHours": [
+            {
+              "label": "Monday – Friday",
+              "hours": "8am – 6pm"
+            },
+            {
+              "label": "Saturday",
+              "hours": "9am – 1pm"
+            }
+          ],
+          "parcelReceptionNote": "Parcels and mail are received during opening hours."
+        }
+      }
+    }
+  },
+  {
+    "key": "whatsapp",
+    "value": {
+      "enabled": true,
+      "number": "+237600000000",
+      "message": "Bonjour Mambo Proxi, je souhaite des informations sur…"
+    },
+    "translations": {
+      "en": {
+        "message": "Hello Mambo Proxi, I would like some information about…"
+      }
+    }
+  },
+  {
+    "key": "reseaux",
+    "value": {
+      "social": [
+        {
+          "network": "instagram",
+          "url": "https://www.instagram.com/mamboproxi"
+        },
+        {
+          "network": "facebook",
+          "url": "https://www.facebook.com/mamboproxi"
+        },
+        {
+          "network": "linkedin",
+          "url": "https://www.linkedin.com/company/mamboproxi"
+        },
+        {
+          "network": "tiktok",
+          "url": "https://www.tiktok.com/@mamboproxi"
+        }
+      ]
+    },
+    "translations": null
+  },
+  {
+    "key": "emails",
+    "value": {
+      "teamRecipients": ["equipe.douala@mamboproxi.com", "mireille@mamboproxi.com"],
+      "senderName": "MAMBO Proxi",
+      "replyTo": "contact@mamboproxi.com",
+      "surveyDelayHours": 24,
+      "surveyReminderDays": 3,
+      "appointmentReminderHour": 9
+    },
+    "translations": null
+  },
+  {
+    "key": "seo",
+    "value": {
+      "defaultTitle": "MAMBO Proxi — Services du quotidien à domicile à Douala",
+      "defaultDescription": "Entretien du logement, linge, repas, colis, chef privé, massage, photographe… Des intervenants de confiance à domicile, à Douala et environs.",
+      "ogImageId": null,
+      "searchConsoleVerification": null
+    },
+    "translations": {
+      "en": {
+        "defaultTitle": "MAMBO Proxi — Home services in Douala, Cameroon",
+        "defaultDescription": "Home cleaning, laundry, meals, parcels, private chef, massage, photographer: trusted professionals at your home, in Douala and the surrounding area."
+      }
+    }
+  },
+  {
+    "key": "analytics",
+    "value": {
+      "ga4MeasurementId": null,
+      "ga4PropertyId": null,
+      "newsletterTracking": false
+    },
+    "translations": null
+  },
+  {
+    "key": "chiffres",
+    "value": {
+      "keyFigures": [
+        {
+          "key": "projects",
+          "value": 150,
+          "prefix": "",
+          "suffix": "+",
+          "decimals": 0,
+          "label": "projets accompagnés",
+          "labelMobile": null
+        },
+        {
+          "key": "partners",
+          "value": 40,
+          "prefix": "",
+          "suffix": "+",
+          "decimals": 0,
+          "label": "partenaires engagés",
+          "labelMobile": null
+        },
+        {
+          "key": "services",
+          "value": 30,
+          "prefix": "",
+          "decimals": 0,
+          "label": "services réunis en 6 univers",
+          "labelMobile": "services, 6 univers"
+        },
+        {
+          "key": "area",
+          "valueText": "Douala",
+          "prefix": "",
+          "decimals": 0,
+          "label": "et environs, au départ de Cité SIC",
+          "labelMobile": "et environs"
+        }
+      ]
+    },
+    "translations": {
+      "en": {
+        "keyFigures": [
+          {
+            "key": "projects",
+            "value": 150,
+            "suffix": "+",
+            "label": "projects supported"
+          },
+          {
+            "key": "partners",
+            "value": 40,
+            "suffix": "+",
+            "label": "committed partners"
+          },
+          {
+            "key": "services",
+            "value": 30,
+            "label": "services across 6 areas",
+            "labelMobile": "services, 6 areas"
+          },
+          {
+            "key": "area",
+            "valueText": "Douala",
+            "label": "and surroundings, starting from Cité SIC",
+            "labelMobile": "and surroundings"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "key": "rgpd",
+    "value": {
+      "inactiveContactsRetentionMonths": 36,
+      "rejectedApplicationsRetentionMonths": 24
+    },
+    "translations": null
+  },
+  {
+    "key": "securite",
+    "value": {
+      "maintenanceMode": false,
+      "trustedDeviceDays": 30
+    },
+    "translations": null
+  },
+  {
+    "key": "navigation",
+    "value": {
+      "main": [
+        {
+          "key": "accueil",
+          "label": "Accueil",
+          "href": "/",
+          "kind": "link"
+        },
+        {
+          "key": "services",
+          "label": "Nos services",
+          "href": "/services",
+          "kind": "mega"
+        },
+        {
+          "key": "partenaires",
+          "label": "Partenaires",
+          "href": "/partenaires",
+          "kind": "dropdown",
+          "children": [
+            {
+              "label": "Devenir partenaire",
+              "href": "/partenaires#devenir-partenaire",
+              "icon": "Handshake"
+            },
+            {
+              "label": "Nos partenaires",
+              "href": "/partenaires#nos-partenaires",
+              "icon": "Users"
+            },
+            {
+              "label": "Prestataires Expérience",
+              "href": "/partenaires?categorie=EXPERIENCE#nos-partenaires",
+              "icon": "Sparkles"
+            },
+            {
+              "label": "Immobilier",
+              "href": "/partenaires?categorie=IMMOBILIER#nos-partenaires",
+              "icon": "Building2"
+            },
+            {
+              "label": "Entreprises & prestataires",
+              "href": "/partenaires?categorie=ENTREPRISES#nos-partenaires",
+              "icon": "Briefcase"
+            }
+          ]
+        },
+        {
+          "key": "formation",
+          "label": "Formation",
+          "href": "/formation",
+          "kind": "dropdown",
+          "children": [
+            {
+              "label": "Nos formations",
+              "href": "/formation#catalogue",
+              "icon": "GraduationCap"
+            },
+            {
+              "label": "Formation des professionnels",
+              "href": "/formation?categorie=PROFESSIONNELS#catalogue",
+              "icon": "Briefcase"
+            },
+            {
+              "label": "Ateliers & sensibilisation",
+              "href": "/formation?categorie=ATELIERS#catalogue",
+              "icon": "Users"
+            },
+            {
+              "label": "Demande de formation",
+              "href": "/formation#demande",
+              "icon": "FileText"
+            }
+          ]
+        },
+        {
+          "key": "mission",
+          "label": "Mission",
+          "href": "/mission",
+          "kind": "dropdown",
+          "children": [
+            {
+              "label": "Notre mission",
+              "href": "/mission#notre-mission"
+            },
+            {
+              "label": "Notre vision",
+              "href": "/mission#notre-vision"
+            },
+            {
+              "label": "Nos engagements",
+              "href": "/mission#nos-engagements"
+            },
+            {
+              "label": "Notre méthode de coordination",
+              "href": "/mission#notre-methode"
+            }
+          ]
+        },
+        {
+          "key": "qui-sommes-nous",
+          "label": "Qui sommes-nous ?",
+          "href": "/qui-sommes-nous",
+          "kind": "dropdown",
+          "children": [
+            {
+              "label": "Présentation",
+              "href": "/qui-sommes-nous#presentation"
+            },
+            {
+              "label": "Notre équipe",
+              "href": "/qui-sommes-nous#notre-equipe"
+            },
+            {
+              "label": "Nos valeurs",
+              "href": "/qui-sommes-nous#nos-valeurs"
+            },
+            {
+              "label": "Pourquoi Mambo Proxi ?",
+              "href": "/qui-sommes-nous#pourquoi-mambo"
+            }
+          ]
+        },
+        {
+          "key": "recrutement",
+          "label": "Recrutement",
+          "href": "/recrutement",
+          "kind": "dropdown",
+          "children": [
+            {
+              "label": "Nos offres",
+              "href": "/recrutement#offres",
+              "icon": "Briefcase"
+            },
+            {
+              "label": "Candidature spontanée",
+              "href": "/recrutement?poste=spontanee#candidature",
+              "icon": "FileText"
+            },
+            {
+              "label": "Devenir prestataire / collaborateur",
+              "href": "/partenaires#devenir-partenaire",
+              "icon": "Handshake"
+            }
+          ]
+        },
+        {
+          "key": "magazine",
+          "label": "Magazine",
+          "href": "/magazine",
+          "kind": "link"
+        },
+        {
+          "key": "zones",
+          "label": "Zones d’intervention",
+          "href": "/zones-d-intervention",
+          "kind": "link",
+          "placement": "mobile"
+        },
+        {
+          "key": "contact",
+          "label": "Contact",
+          "href": "/contact",
+          "kind": "dropdown",
+          "children": [
+            {
+              "label": "Nous contacter",
+              "href": "/contact#formulaire",
+              "icon": "Mail"
+            },
+            {
+              "label": "Prendre rendez-vous",
+              "href": "/contact#rendez-vous",
+              "icon": "CalendarDays"
+            },
+            {
+              "label": "Demande d'information",
+              "href": "/contact?onglet=information#formulaire",
+              "icon": "Info"
+            }
+          ]
+        }
+      ],
+      "signUp": [
+        {
+          "label": "Je suis un particulier",
+          "href": "/inscription",
+          "icon": "User"
+        },
+        {
+          "label": "Je suis un professionnel / partenaire",
+          "href": "/inscription?profil=professionnel",
+          "icon": "Briefcase"
+        }
+      ],
+      "footer": {
+        "about": "Votre agence de services du quotidien à domicile, à Douala. Des services pensés pour vous, des personnes de confiance pour les réaliser.",
+        "copyright": "© 2026 Mambo Proxi · Douala — Cameroun",
+        "newsletter": {
+          "eyebrow": "La lettre Mambo",
+          "title": "Restez au plus près de nos nouveautés",
+          "text": "Nouveaux services, magazine et conseils pour votre quotidien au Cameroun. Désinscription en un clic."
+        },
+        "columns": [
+          {
+            "title": "Nos services",
+            "links": [
+              {
+                "label": "Services à domicile",
+                "href": "/services/services-a-domicile"
+              },
+              {
+                "label": "Expérience",
+                "href": "/services/experience"
+              },
+              {
+                "label": "Immobilier",
+                "href": "/services/immobilier"
+              },
+              {
+                "label": "Services de proximité",
+                "href": "/services/services-de-proximite"
+              },
+              {
+                "label": "Culture & événementiel",
+                "href": "/services/culture-evenementiel"
+              },
+              {
+                "label": "Devis gratuit",
+                "href": "/devis"
+              }
+            ]
+          },
+          {
+            "title": "Mambo Proxi",
+            "links": [
+              {
+                "label": "Qui sommes-nous ?",
+                "href": "/qui-sommes-nous"
+              },
+              {
+                "label": "Magazine",
+                "href": "/magazine"
+              },
+              {
+                "label": "Mission",
+                "href": "/mission"
+              },
+              {
+                "label": "Partenaires",
+                "href": "/partenaires"
+              },
+              {
+                "label": "Avis clients",
+                "href": "/avis-clients"
+              },
+              {
+                "label": "Zones d’intervention",
+                "href": "/zones-d-intervention"
+              },
+              {
+                "label": "Contact",
+                "href": "/contact"
+              }
+            ]
+          },
+          {
+            "title": "Nous rejoindre",
+            "links": [
+              {
+                "label": "S'inscrire",
+                "href": "/inscription"
+              },
+              {
+                "label": "Devenir partenaire",
+                "href": "/partenaires#devenir-partenaire"
+              },
+              {
+                "label": "Recrutement",
+                "href": "/recrutement"
+              },
+              {
+                "label": "Formation",
+                "href": "/formation"
+              }
+            ]
+          }
+        ]
+      },
+      "legal": [
+        {
+          "label": "Mentions légales",
+          "href": "/mentions-legales"
+        },
+        {
+          "label": "CGU",
+          "href": "/cgu"
+        },
+        {
+          "label": "Politique de confidentialité",
+          "href": "/confidentialite"
+        },
+        {
+          "label": "Cookies",
+          "href": "/cookies"
+        }
+      ],
+      "megaMenuPromo": {
+        "title": "Un besoin précis ?",
+        "text": "Devis gratuit, réponse sous 24 h.",
+        "cta": {
+          "label": "Devis gratuit",
+          "href": "/devis"
+        },
+        "visual": {
+          "illustration": "accueil",
+          "image": {
+            "id": "photo-accompagnement-installation",
+            "url": "/photos/accueil.png",
+            "width": 1448,
+            "height": 1086,
+            "variants": []
+          },
+          "alt": ""
+        }
+      }
+    },
+    "translations": {
+      "en": {
+        "main": [
+          {
+            "key": "accueil",
+            "label": "Home",
+            "href": "/",
+            "kind": "link"
+          },
+          {
+            "key": "services",
+            "label": "Our services",
+            "href": "/services",
+            "kind": "mega"
+          },
+          {
+            "key": "partenaires",
+            "label": "Partners",
+            "href": "/partenaires",
+            "kind": "dropdown",
+            "children": [
+              {
+                "label": "Become a partner",
+                "href": "/partenaires#devenir-partenaire",
+                "icon": "Handshake"
+              },
+              {
+                "label": "Our partners",
+                "href": "/partenaires#nos-partenaires",
+                "icon": "Users"
+              },
+              {
+                "label": "Experience providers",
+                "href": "/partenaires?categorie=EXPERIENCE#nos-partenaires",
+                "icon": "Sparkles"
+              },
+              {
+                "label": "Real estate",
+                "href": "/partenaires?categorie=IMMOBILIER#nos-partenaires",
+                "icon": "Building2"
+              },
+              {
+                "label": "Companies & providers",
+                "href": "/partenaires?categorie=ENTREPRISES#nos-partenaires",
+                "icon": "Briefcase"
+              }
+            ]
+          },
+          {
+            "key": "formation",
+            "label": "Training",
+            "href": "/formation",
+            "kind": "dropdown",
+            "children": [
+              {
+                "label": "Our training courses",
+                "href": "/formation#catalogue",
+                "icon": "GraduationCap"
+              },
+              {
+                "label": "Training for professionals",
+                "href": "/formation?categorie=PROFESSIONNELS#catalogue",
+                "icon": "Briefcase"
+              },
+              {
+                "label": "Workshops & awareness",
+                "href": "/formation?categorie=ATELIERS#catalogue",
+                "icon": "Users"
+              },
+              {
+                "label": "Training request",
+                "href": "/formation#demande",
+                "icon": "FileText"
+              }
+            ]
+          },
+          {
+            "key": "mission",
+            "label": "Mission",
+            "href": "/mission",
+            "kind": "dropdown",
+            "children": [
+              {
+                "label": "Our mission",
+                "href": "/mission#notre-mission"
+              },
+              {
+                "label": "Our vision",
+                "href": "/mission#notre-vision"
+              },
+              {
+                "label": "Our commitments",
+                "href": "/mission#nos-engagements"
+              },
+              {
+                "label": "Our coordination method",
+                "href": "/mission#notre-methode"
+              }
+            ]
+          },
+          {
+            "key": "qui-sommes-nous",
+            "label": "About us",
+            "href": "/qui-sommes-nous",
+            "kind": "dropdown",
+            "children": [
+              {
+                "label": "Overview",
+                "href": "/qui-sommes-nous#presentation"
+              },
+              {
+                "label": "Our team",
+                "href": "/qui-sommes-nous#notre-equipe"
+              },
+              {
+                "label": "Our values",
+                "href": "/qui-sommes-nous#nos-valeurs"
+              },
+              {
+                "label": "Why Mambo Proxi?",
+                "href": "/qui-sommes-nous#pourquoi-mambo"
+              }
+            ]
+          },
+          {
+            "key": "recrutement",
+            "label": "Careers",
+            "href": "/recrutement",
+            "kind": "dropdown",
+            "children": [
+              {
+                "label": "Job offers",
+                "href": "/recrutement#offres",
+                "icon": "Briefcase"
+              },
+              {
+                "label": "Spontaneous application",
+                "href": "/recrutement?poste=spontanee#candidature",
+                "icon": "FileText"
+              },
+              {
+                "label": "Become a provider / collaborator",
+                "href": "/partenaires#devenir-partenaire",
+                "icon": "Handshake"
+              }
+            ]
+          },
+          {
+            "key": "magazine",
+            "label": "Magazine",
+            "href": "/magazine",
+            "kind": "link"
+          },
+          {
+            "key": "zones",
+            "label": "Service areas",
+            "href": "/zones-d-intervention",
+            "kind": "link",
+            "placement": "mobile"
+          },
+          {
+            "key": "contact",
+            "label": "Contact",
+            "href": "/contact",
+            "kind": "dropdown",
+            "children": [
+              {
+                "label": "Contact us",
+                "href": "/contact#formulaire",
+                "icon": "Mail"
+              },
+              {
+                "label": "Book an appointment",
+                "href": "/contact#rendez-vous",
+                "icon": "CalendarDays"
+              },
+              {
+                "label": "Information request",
+                "href": "/contact?onglet=information#formulaire",
+                "icon": "Info"
+              }
+            ]
+          }
+        ],
+        "signUp": [
+          {
+            "label": "I'm an individual",
+            "href": "/inscription",
+            "icon": "User"
+          },
+          {
+            "label": "I'm a professional / partner",
+            "href": "/inscription?profil=professionnel",
+            "icon": "Briefcase"
+          }
+        ],
+        "footer": {
+          "about": "Your everyday home services agency in Douala. Services designed for you, trusted people to deliver them.",
+          "copyright": "© 2026 Mambo Proxi · Douala — Cameroon",
+          "newsletter": {
+            "eyebrow": "The Mambo letter",
+            "title": "Stay close to what's new",
+            "text": "New services, magazine and tips for everyday life in Cameroon. Unsubscribe in one click."
+          },
+          "columns": [
+            {
+              "title": "Our services",
+              "links": [
+                {
+                  "label": "Home services",
+                  "href": "/services/services-a-domicile"
+                },
+                {
+                  "label": "Experience",
+                  "href": "/services/experience"
+                },
+                {
+                  "label": "Real estate",
+                  "href": "/services/immobilier"
+                },
+                {
+                  "label": "Local services",
+                  "href": "/services/services-de-proximite"
+                },
+                {
+                  "label": "Culture & events",
+                  "href": "/services/culture-evenementiel"
+                },
+                {
+                  "label": "Free quote",
+                  "href": "/devis"
+                }
+              ]
+            },
+            {
+              "title": "Mambo Proxi",
+              "links": [
+                {
+                  "label": "About us",
+                  "href": "/qui-sommes-nous"
+                },
+                {
+                  "label": "Magazine",
+                  "href": "/magazine"
+                },
+                {
+                  "label": "Mission",
+                  "href": "/mission"
+                },
+                {
+                  "label": "Partners",
+                  "href": "/partenaires"
+                },
+                {
+                  "label": "Customer reviews",
+                  "href": "/avis-clients"
+                },
+                {
+                  "label": "Service areas",
+                  "href": "/zones-d-intervention"
+                },
+                {
+                  "label": "Contact",
+                  "href": "/contact"
+                }
+              ]
+            },
+            {
+              "title": "Join us",
+              "links": [
+                {
+                  "label": "Sign up",
+                  "href": "/inscription"
+                },
+                {
+                  "label": "Become a partner",
+                  "href": "/partenaires#devenir-partenaire"
+                },
+                {
+                  "label": "Careers",
+                  "href": "/recrutement"
+                },
+                {
+                  "label": "Training",
+                  "href": "/formation"
+                }
+              ]
+            }
+          ]
+        },
+        "legal": [
+          {
+            "label": "Legal notice",
+            "href": "/mentions-legales"
+          },
+          {
+            "label": "Terms of use",
+            "href": "/cgu"
+          },
+          {
+            "label": "Privacy policy",
+            "href": "/confidentialite"
+          },
+          {
+            "label": "Cookies",
+            "href": "/cookies"
+          }
+        ],
+        "megaMenuPromo": {
+          "title": "Need something specific?",
+          "text": "Free quote, reply within 24 hours.",
+          "cta": {
+            "label": "Free quote",
+            "href": "/devis"
+          },
+          "visual": {
+            "illustration": "accueil",
+            "image": {
+              "id": "photo-accompagnement-installation",
+              "url": "/photos/accueil.png",
+              "width": 1448,
+              "height": 1086,
+              "variants": []
+            },
+            "alt": ""
+          }
+        }
+      }
+    }
+  },
+  {
+    "key": "zones",
+    "value": {
+      "showFees": false,
+      "note": "Votre quartier n’apparaît pas ? Contactez-nous : nous étudions chaque demande. Délai moyen de livraison : 30 à 60 minutes selon le trafic.",
+      "map": {
+        "center": {
+          "lat": 4.0565,
+          "lng": 9.7285
+        },
+        "zoom": 12,
+        "bounds": [
+          {
+            "lat": 3.998,
+            "lng": 9.632
+          },
+          {
+            "lat": 4.115,
+            "lng": 9.825
+          }
+        ]
+      }
+    },
+    "translations": {
+      "en": {
+        "note": "Can’t find your neighbourhood? Contact us: we look at every request. Average delivery time: 30 to 60 minutes depending on traffic."
+      }
+    }
+  },
+  {
+    "key": "availability",
+    "value": {
+      "minNoticeHours": 24,
+      "maxAdvanceDays": 60,
+      "agencyAddress": "Agence Douala",
+      "defaultVideoLink": null
+    },
+    "translations": null
+  }
+]

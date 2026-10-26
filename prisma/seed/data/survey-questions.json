@@ -1,0 +1,52 @@
+[
+  {
+    "id": "q1",
+    "order": 1,
+    "kind": "STARS",
+    "label": "Note globale (1 à 5 étoiles)",
+    "helpText": null,
+    "options": ["Très décevant", "Décevant", "Correct", "Très bien", "Excellent"],
+    "required": true,
+    "active": true
+  },
+  {
+    "id": "q2",
+    "order": 2,
+    "kind": "CHOICE",
+    "label": "Ponctualité et professionnalisme",
+    "helpText": null,
+    "options": ["Oui, tout à fait", "Plutôt oui", "Plutôt non", "Non, pas du tout"],
+    "required": false,
+    "active": true
+  },
+  {
+    "id": "q3",
+    "order": 3,
+    "kind": "CHOICE",
+    "label": "Qualité de l’information",
+    "helpText": null,
+    "options": ["Oui, tout à fait", "Plutôt oui", "Plutôt non", "Non, pas du tout"],
+    "required": false,
+    "active": true
+  },
+  {
+    "id": "q4",
+    "order": 4,
+    "kind": "NPS",
+    "label": "Recommandation (0 à 10)",
+    "helpText": null,
+    "options": ["Pas du tout probable", "Très probable"],
+    "required": false,
+    "active": true
+  },
+  {
+    "id": "q5",
+    "order": 5,
+    "kind": "TEXT",
+    "label": "Commentaire libre",
+    "helpText": null,
+    "options": [],
+    "required": false,
+    "active": true
+  }
+]

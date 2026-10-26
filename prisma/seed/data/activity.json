@@ -1,0 +1,1021 @@
+{
+  "notifications": [
+    {
+      "id": "ntf_1",
+      "userId": "usr_mireille",
+      "kind": "REQUEST",
+      "title": "Nouvelle demande de devis — Chef privé (MP-2026-0142)",
+      "link": "/admin/demandes?id=req_0142",
+      "entityType": "Request",
+      "entityId": "req_0142",
+      "readAt": null,
+      "createdAt": "rel:now:-7200000"
+    },
+    {
+      "id": "ntf_2",
+      "userId": "usr_mireille",
+      "kind": "REQUEST",
+      "title": "Nouvelle demande de devis — Découverte du Cameroun (MP-2026-0141)",
+      "link": "/admin/demandes?id=req_0141",
+      "entityType": "Request",
+      "entityId": "req_0141",
+      "readAt": null,
+      "createdAt": "rel:now:-18000000"
+    },
+    {
+      "id": "ntf_3",
+      "userId": "usr_mireille",
+      "kind": "REVIEW",
+      "title": "Nouvel avis à valider — 5 étoiles pour Chef privé",
+      "link": "/admin/avis",
+      "entityType": null,
+      "entityId": null,
+      "readAt": null,
+      "createdAt": "rel:now:-72000000"
+    },
+    {
+      "id": "ntf_4",
+      "userId": "usr_mireille",
+      "kind": "APPOINTMENT",
+      "title": "Rendez-vous à confirmer — Sandrine M., jeudi 14:00",
+      "link": "/admin/rendez-vous",
+      "entityType": null,
+      "entityId": null,
+      "readAt": "rel:now:-36000000",
+      "createdAt": "rel:now:-93600000"
+    },
+    {
+      "id": "ntf_5",
+      "userId": "usr_mireille",
+      "kind": "APPLICATION",
+      "title": "Nouvelle candidature — Coordinateur·rice de services",
+      "link": "/admin/recrutement",
+      "entityType": null,
+      "entityId": null,
+      "readAt": "rel:now:-108000000",
+      "createdAt": "rel:now:-180000000"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "aud_002",
+      "actorId": "usr_mireille",
+      "action": "settings.update",
+      "entity": "Paramètres",
+      "entityId": null,
+      "label": "A modifié les coordonnées de l’agence",
+      "before": {
+        "horaires": "Lun – Sam · 8h – 19h"
+      },
+      "after": {
+        "horaires": "Lun – Sam · 8h – 20h"
+      },
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:33180000"
+    },
+    {
+      "id": "aud_001",
+      "actorId": "usr_equipe",
+      "action": "request.status",
+      "entity": "Demande",
+      "entityId": "req_0142",
+      "label": "A passé la demande MP-2026-0142 (Chef privé) en « Devis envoyé »",
+      "before": {
+        "statut": "Nouvelle"
+      },
+      "after": {
+        "statut": "Devis envoyé"
+      },
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:28800000"
+    },
+    {
+      "id": "aud_004",
+      "actorId": "usr_equipe",
+      "action": "appointment.confirm",
+      "entity": "Rendez-vous",
+      "entityId": null,
+      "label": "A confirmé le rendez-vous d’Aurélie K. (jeudi 10 h)",
+      "before": {
+        "statut": "Demandé"
+      },
+      "after": {
+        "statut": "Confirmé"
+      },
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-44460000"
+    },
+    {
+      "id": "aud_003",
+      "actorId": "usr_mireille",
+      "action": "user.login",
+      "entity": "Utilisateur",
+      "entityId": null,
+      "label": "S’est connectée (code vérifié)",
+      "before": null,
+      "after": null,
+      "ip": "41.202.219.71",
+      "createdAt": "rel:day:-48840000"
+    },
+    {
+      "id": "aud_005",
+      "actorId": "usr_mireille",
+      "action": "campaign.schedule",
+      "entity": "Newsletter",
+      "entityId": "cmp_novembre",
+      "label": "A programmé l’envoi « Novembre : sorties culturelles et nouveaux services »",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-119280000"
+    },
+    {
+      "id": "aud_007",
+      "actorId": "usr_equipe",
+      "action": "request.note",
+      "entity": "Demande",
+      "entityId": "req_0139",
+      "label": "A ajouté une note interne à la demande MP-2026-0139",
+      "before": null,
+      "after": null,
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-200520000"
+    },
+    {
+      "id": "aud_006",
+      "actorId": "usr_mireille",
+      "action": "magazine.publish",
+      "entity": "Magazine",
+      "entityId": null,
+      "label": "A publié l’édition n° 12 du magazine",
+      "before": null,
+      "after": null,
+      "ip": "41.202.219.71",
+      "createdAt": "rel:day:-204900000"
+    },
+    {
+      "id": "aud_008",
+      "actorId": "usr_mireille",
+      "action": "training.publish",
+      "entity": "Formation",
+      "entityId": null,
+      "label": "A publié la formation « Hygiène et sécurité à domicile »",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-282540000"
+    },
+    {
+      "id": "aud_009",
+      "actorId": null,
+      "action": "survey.send",
+      "entity": "Avis",
+      "entityId": null,
+      "label": "Questionnaire de satisfaction envoyé automatiquement (MP-2026-0131)",
+      "before": null,
+      "after": null,
+      "ip": null,
+      "createdAt": "rel:day:-364560000"
+    },
+    {
+      "id": "aud_010",
+      "actorId": "usr_equipe",
+      "action": "application.status",
+      "entity": "Candidature",
+      "entityId": null,
+      "label": "A présélectionné la candidature de Brice N. (Assistant·e de vie)",
+      "before": {
+        "statut": "Reçue"
+      },
+      "after": {
+        "statut": "Présélectionnée"
+      },
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-399780000"
+    },
+    {
+      "id": "aud_012",
+      "actorId": "usr_mireille",
+      "action": "page.update",
+      "entity": "Page",
+      "entityId": "page_qui_sommes_nous",
+      "label": "A modifié la page « Qui sommes-nous »",
+      "before": {
+        "sections": "Équipe"
+      },
+      "after": {
+        "sections": "Équipe (2 portraits ajoutés)"
+      },
+      "ip": "41.202.219.71",
+      "createdAt": "rel:day:-481020000"
+    },
+    {
+      "id": "aud_011",
+      "actorId": "usr_mireille",
+      "action": "media.upload",
+      "entity": "Média",
+      "entityId": null,
+      "label": "A ajouté l’image « Plage de Kribi »",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-485400000"
+    },
+    {
+      "id": "aud_013",
+      "actorId": "usr_equipe",
+      "action": "request.status",
+      "entity": "Demande",
+      "entityId": "req_0128",
+      "label": "A passé la demande MP-2026-0128 (Entretien du logement) en « Prestation réalisée »",
+      "before": {
+        "statut": "En cours"
+      },
+      "after": {
+        "statut": "Prestation réalisée"
+      },
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-563040000"
+    },
+    {
+      "id": "aud_015",
+      "actorId": null,
+      "action": "backup.done",
+      "entity": "Système",
+      "entityId": null,
+      "label": "Sauvegarde automatique de la nuit (46 Mo)",
+      "before": null,
+      "after": null,
+      "ip": null,
+      "createdAt": "rel:day:-637080000"
+    },
+    {
+      "id": "aud_014",
+      "actorId": "usr_mireille",
+      "action": "service.publish",
+      "entity": "Service",
+      "entityId": "svc_chef_prive",
+      "label": "A publié le service « Chef privé »",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-637860000"
+    },
+    {
+      "id": "aud_016",
+      "actorId": "usr_equipe",
+      "action": "user.login",
+      "entity": "Utilisateur",
+      "entityId": null,
+      "label": "S’est connectée (appareil de confiance)",
+      "before": null,
+      "after": null,
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-719100000"
+    },
+    {
+      "id": "aud_018",
+      "actorId": "usr_mireille",
+      "action": "partner.update",
+      "entity": "Partenaire",
+      "entityId": null,
+      "label": "A réordonné les logos des partenaires (Immobilier)",
+      "before": null,
+      "after": null,
+      "ip": "41.202.219.71",
+      "createdAt": "rel:day:-796740000"
+    },
+    {
+      "id": "aud_017",
+      "actorId": "usr_mireille",
+      "action": "review.publish",
+      "entity": "Avis",
+      "entityId": null,
+      "label": "A publié l’avis de Patrick E. (5 / 5)",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-801120000"
+    },
+    {
+      "id": "aud_020",
+      "actorId": "usr_mireille",
+      "action": "settings.update",
+      "entity": "Paramètres",
+      "entityId": null,
+      "label": "A modifié les coordonnées de l’agence",
+      "before": {
+        "horaires": "Lun – Sam · 8h – 19h"
+      },
+      "after": {
+        "horaires": "Lun – Sam · 8h – 20h"
+      },
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-917580000"
+    },
+    {
+      "id": "aud_019",
+      "actorId": "usr_equipe",
+      "action": "request.status",
+      "entity": "Demande",
+      "entityId": "req_0142",
+      "label": "A passé la demande MP-2026-0142 (Chef privé) en « Devis envoyé »",
+      "before": {
+        "statut": "Nouvelle"
+      },
+      "after": {
+        "statut": "Devis envoyé"
+      },
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-918360000"
+    },
+    {
+      "id": "aud_021",
+      "actorId": "usr_mireille",
+      "action": "user.login",
+      "entity": "Utilisateur",
+      "entityId": null,
+      "label": "S’est connectée (code vérifié)",
+      "before": null,
+      "after": null,
+      "ip": "41.202.219.71",
+      "createdAt": "rel:day:-999600000"
+    },
+    {
+      "id": "aud_023",
+      "actorId": "usr_mireille",
+      "action": "campaign.schedule",
+      "entity": "Newsletter",
+      "entityId": "cmp_novembre",
+      "label": "A programmé l’envoi « Novembre : sorties culturelles et nouveaux services »",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-1070040000"
+    },
+    {
+      "id": "aud_022",
+      "actorId": "usr_equipe",
+      "action": "appointment.confirm",
+      "entity": "Rendez-vous",
+      "entityId": null,
+      "label": "A confirmé le rendez-vous d’Aurélie K. (jeudi 10 h)",
+      "before": {
+        "statut": "Demandé"
+      },
+      "after": {
+        "statut": "Confirmé"
+      },
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-1081620000"
+    },
+    {
+      "id": "aud_024",
+      "actorId": "usr_mireille",
+      "action": "magazine.publish",
+      "entity": "Magazine",
+      "entityId": null,
+      "label": "A publié l’édition n° 12 du magazine",
+      "before": null,
+      "after": null,
+      "ip": "41.202.219.71",
+      "createdAt": "rel:day:-1152060000"
+    },
+    {
+      "id": "aud_026",
+      "actorId": "usr_mireille",
+      "action": "training.publish",
+      "entity": "Formation",
+      "entityId": null,
+      "label": "A publié la formation « Hygiène et sécurité à domicile »",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-1233300000"
+    },
+    {
+      "id": "aud_025",
+      "actorId": "usr_equipe",
+      "action": "request.note",
+      "entity": "Demande",
+      "entityId": "req_0139",
+      "label": "A ajouté une note interne à la demande MP-2026-0139",
+      "before": null,
+      "after": null,
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-1237680000"
+    },
+    {
+      "id": "aud_027",
+      "actorId": null,
+      "action": "survey.send",
+      "entity": "Avis",
+      "entityId": null,
+      "label": "Questionnaire de satisfaction envoyé automatiquement (MP-2026-0131)",
+      "before": null,
+      "after": null,
+      "ip": null,
+      "createdAt": "rel:day:-1315320000"
+    },
+    {
+      "id": "aud_028",
+      "actorId": "usr_equipe",
+      "action": "application.status",
+      "entity": "Candidature",
+      "entityId": null,
+      "label": "A présélectionné la candidature de Brice N. (Assistant·e de vie)",
+      "before": {
+        "statut": "Reçue"
+      },
+      "after": {
+        "statut": "Présélectionnée"
+      },
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-1350540000"
+    },
+    {
+      "id": "aud_029",
+      "actorId": "usr_mireille",
+      "action": "media.upload",
+      "entity": "Média",
+      "entityId": null,
+      "label": "A ajouté l’image « Plage de Kribi »",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-1436160000"
+    },
+    {
+      "id": "aud_031",
+      "actorId": "usr_equipe",
+      "action": "request.status",
+      "entity": "Demande",
+      "entityId": "req_0128",
+      "label": "A passé la demande MP-2026-0128 (Entretien du logement) en « Prestation réalisée »",
+      "before": {
+        "statut": "En cours"
+      },
+      "after": {
+        "statut": "Prestation réalisée"
+      },
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-1513800000"
+    },
+    {
+      "id": "aud_030",
+      "actorId": "usr_mireille",
+      "action": "page.update",
+      "entity": "Page",
+      "entityId": "page_qui_sommes_nous",
+      "label": "A modifié la page « Qui sommes-nous »",
+      "before": {
+        "sections": "Équipe"
+      },
+      "after": {
+        "sections": "Équipe (2 portraits ajoutés)"
+      },
+      "ip": "41.202.219.71",
+      "createdAt": "rel:day:-1518180000"
+    },
+    {
+      "id": "aud_032",
+      "actorId": "usr_mireille",
+      "action": "service.publish",
+      "entity": "Service",
+      "entityId": "svc_chef_prive",
+      "label": "A publié le service « Chef privé »",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-1588620000"
+    },
+    {
+      "id": "aud_034",
+      "actorId": "usr_equipe",
+      "action": "user.login",
+      "entity": "Utilisateur",
+      "entityId": null,
+      "label": "S’est connectée (appareil de confiance)",
+      "before": null,
+      "after": null,
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-1669860000"
+    },
+    {
+      "id": "aud_033",
+      "actorId": null,
+      "action": "backup.done",
+      "entity": "Système",
+      "entityId": null,
+      "label": "Sauvegarde automatique de la nuit (46 Mo)",
+      "before": null,
+      "after": null,
+      "ip": null,
+      "createdAt": "rel:day:-1670640000"
+    },
+    {
+      "id": "aud_036",
+      "actorId": "usr_mireille",
+      "action": "partner.update",
+      "entity": "Partenaire",
+      "entityId": null,
+      "label": "A réordonné les logos des partenaires (Immobilier)",
+      "before": null,
+      "after": null,
+      "ip": "41.202.219.71",
+      "createdAt": "rel:day:-1747500000"
+    },
+    {
+      "id": "aud_035",
+      "actorId": "usr_mireille",
+      "action": "review.publish",
+      "entity": "Avis",
+      "entityId": null,
+      "label": "A publié l’avis de Patrick E. (5 / 5)",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-1751880000"
+    },
+    {
+      "id": "aud_037",
+      "actorId": "usr_equipe",
+      "action": "request.status",
+      "entity": "Demande",
+      "entityId": "req_0142",
+      "label": "A passé la demande MP-2026-0142 (Chef privé) en « Devis envoyé »",
+      "before": {
+        "statut": "Nouvelle"
+      },
+      "after": {
+        "statut": "Devis envoyé"
+      },
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-1869120000"
+    },
+    {
+      "id": "aud_039",
+      "actorId": "usr_mireille",
+      "action": "user.login",
+      "entity": "Utilisateur",
+      "entityId": null,
+      "label": "S’est connectée (code vérifié)",
+      "before": null,
+      "after": null,
+      "ip": "41.202.219.71",
+      "createdAt": "rel:day:-1950360000"
+    },
+    {
+      "id": "aud_038",
+      "actorId": "usr_mireille",
+      "action": "settings.update",
+      "entity": "Paramètres",
+      "entityId": null,
+      "label": "A modifié les coordonnées de l’agence",
+      "before": {
+        "horaires": "Lun – Sam · 8h – 19h"
+      },
+      "after": {
+        "horaires": "Lun – Sam · 8h – 20h"
+      },
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-1954740000"
+    },
+    {
+      "id": "aud_040",
+      "actorId": "usr_equipe",
+      "action": "appointment.confirm",
+      "entity": "Rendez-vous",
+      "entityId": null,
+      "label": "A confirmé le rendez-vous d’Aurélie K. (jeudi 10 h)",
+      "before": {
+        "statut": "Demandé"
+      },
+      "after": {
+        "statut": "Confirmé"
+      },
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-2032380000"
+    },
+    {
+      "id": "aud_042",
+      "actorId": "usr_mireille",
+      "action": "magazine.publish",
+      "entity": "Magazine",
+      "entityId": null,
+      "label": "A publié l’édition n° 12 du magazine",
+      "before": null,
+      "after": null,
+      "ip": "41.202.219.71",
+      "createdAt": "rel:day:-2102820000"
+    },
+    {
+      "id": "aud_041",
+      "actorId": "usr_mireille",
+      "action": "campaign.schedule",
+      "entity": "Newsletter",
+      "entityId": "cmp_novembre",
+      "label": "A programmé l’envoi « Novembre : sorties culturelles et nouveaux services »",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-2107200000"
+    },
+    {
+      "id": "aud_044",
+      "actorId": "usr_mireille",
+      "action": "training.publish",
+      "entity": "Formation",
+      "entityId": null,
+      "label": "A publié la formation « Hygiène et sécurité à domicile »",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-2184060000"
+    },
+    {
+      "id": "aud_043",
+      "actorId": "usr_equipe",
+      "action": "request.note",
+      "entity": "Demande",
+      "entityId": "req_0139",
+      "label": "A ajouté une note interne à la demande MP-2026-0139",
+      "before": null,
+      "after": null,
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-2188440000"
+    },
+    {
+      "id": "aud_045",
+      "actorId": null,
+      "action": "survey.send",
+      "entity": "Avis",
+      "entityId": null,
+      "label": "Questionnaire de satisfaction envoyé automatiquement (MP-2026-0131)",
+      "before": null,
+      "after": null,
+      "ip": null,
+      "createdAt": "rel:day:-2266080000"
+    },
+    {
+      "id": "aud_047",
+      "actorId": "usr_mireille",
+      "action": "media.upload",
+      "entity": "Média",
+      "entityId": null,
+      "label": "A ajouté l’image « Plage de Kribi »",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-2383320000"
+    },
+    {
+      "id": "aud_046",
+      "actorId": "usr_equipe",
+      "action": "application.status",
+      "entity": "Candidature",
+      "entityId": null,
+      "label": "A présélectionné la candidature de Brice N. (Assistant·e de vie)",
+      "before": {
+        "statut": "Reçue"
+      },
+      "after": {
+        "statut": "Présélectionnée"
+      },
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-2387700000"
+    },
+    {
+      "id": "aud_048",
+      "actorId": "usr_mireille",
+      "action": "page.update",
+      "entity": "Page",
+      "entityId": "page_qui_sommes_nous",
+      "label": "A modifié la page « Qui sommes-nous »",
+      "before": {
+        "sections": "Équipe"
+      },
+      "after": {
+        "sections": "Équipe (2 portraits ajoutés)"
+      },
+      "ip": "41.202.219.71",
+      "createdAt": "rel:day:-2468940000"
+    },
+    {
+      "id": "aud_050",
+      "actorId": "usr_mireille",
+      "action": "service.publish",
+      "entity": "Service",
+      "entityId": "svc_chef_prive",
+      "label": "A publié le service « Chef privé »",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-2539380000"
+    },
+    {
+      "id": "aud_049",
+      "actorId": "usr_equipe",
+      "action": "request.status",
+      "entity": "Demande",
+      "entityId": "req_0128",
+      "label": "A passé la demande MP-2026-0128 (Entretien du logement) en « Prestation réalisée »",
+      "before": {
+        "statut": "En cours"
+      },
+      "after": {
+        "statut": "Prestation réalisée"
+      },
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-2550960000"
+    },
+    {
+      "id": "aud_052",
+      "actorId": "usr_equipe",
+      "action": "user.login",
+      "entity": "Utilisateur",
+      "entityId": null,
+      "label": "S’est connectée (appareil de confiance)",
+      "before": null,
+      "after": null,
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-2620620000"
+    },
+    {
+      "id": "aud_051",
+      "actorId": null,
+      "action": "backup.done",
+      "entity": "Système",
+      "entityId": null,
+      "label": "Sauvegarde automatique de la nuit (46 Mo)",
+      "before": null,
+      "after": null,
+      "ip": null,
+      "createdAt": "rel:day:-2621400000"
+    },
+    {
+      "id": "aud_053",
+      "actorId": "usr_mireille",
+      "action": "review.publish",
+      "entity": "Avis",
+      "entityId": null,
+      "label": "A publié l’avis de Patrick E. (5 / 5)",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-2702640000"
+    },
+    {
+      "id": "aud_054",
+      "actorId": "usr_mireille",
+      "action": "partner.update",
+      "entity": "Partenaire",
+      "entityId": null,
+      "label": "A réordonné les logos des partenaires (Immobilier)",
+      "before": null,
+      "after": null,
+      "ip": "41.202.219.71",
+      "createdAt": "rel:day:-2784660000"
+    },
+    {
+      "id": "aud_055",
+      "actorId": "usr_equipe",
+      "action": "request.status",
+      "entity": "Demande",
+      "entityId": "req_0142",
+      "label": "A passé la demande MP-2026-0142 (Chef privé) en « Devis envoyé »",
+      "before": {
+        "statut": "Nouvelle"
+      },
+      "after": {
+        "statut": "Devis envoyé"
+      },
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-2819880000"
+    },
+    {
+      "id": "aud_056",
+      "actorId": "usr_mireille",
+      "action": "settings.update",
+      "entity": "Paramètres",
+      "entityId": null,
+      "label": "A modifié les coordonnées de l’agence",
+      "before": {
+        "horaires": "Lun – Sam · 8h – 19h"
+      },
+      "after": {
+        "horaires": "Lun – Sam · 8h – 20h"
+      },
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-2901900000"
+    },
+    {
+      "id": "aud_058",
+      "actorId": "usr_equipe",
+      "action": "appointment.confirm",
+      "entity": "Rendez-vous",
+      "entityId": null,
+      "label": "A confirmé le rendez-vous d’Aurélie K. (jeudi 10 h)",
+      "before": {
+        "statut": "Demandé"
+      },
+      "after": {
+        "statut": "Confirmé"
+      },
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-2983140000"
+    },
+    {
+      "id": "aud_057",
+      "actorId": "usr_mireille",
+      "action": "user.login",
+      "entity": "Utilisateur",
+      "entityId": null,
+      "label": "S’est connectée (code vérifié)",
+      "before": null,
+      "after": null,
+      "ip": "41.202.219.71",
+      "createdAt": "rel:day:-2987520000"
+    },
+    {
+      "id": "aud_060",
+      "actorId": "usr_mireille",
+      "action": "magazine.publish",
+      "entity": "Magazine",
+      "entityId": null,
+      "label": "A publié l’édition n° 12 du magazine",
+      "before": null,
+      "after": null,
+      "ip": "41.202.219.71",
+      "createdAt": "rel:day:-3053580000"
+    },
+    {
+      "id": "aud_059",
+      "actorId": "usr_mireille",
+      "action": "campaign.schedule",
+      "entity": "Newsletter",
+      "entityId": "cmp_novembre",
+      "label": "A programmé l’envoi « Novembre : sorties culturelles et nouveaux services »",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-3057960000"
+    },
+    {
+      "id": "aud_061",
+      "actorId": "usr_equipe",
+      "action": "request.note",
+      "entity": "Demande",
+      "entityId": "req_0139",
+      "label": "A ajouté une note interne à la demande MP-2026-0139",
+      "before": null,
+      "after": null,
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-3139200000"
+    },
+    {
+      "id": "aud_063",
+      "actorId": null,
+      "action": "survey.send",
+      "entity": "Avis",
+      "entityId": null,
+      "label": "Questionnaire de satisfaction envoyé automatiquement (MP-2026-0131)",
+      "before": null,
+      "after": null,
+      "ip": null,
+      "createdAt": "rel:day:-3216840000"
+    },
+    {
+      "id": "aud_062",
+      "actorId": "usr_mireille",
+      "action": "training.publish",
+      "entity": "Formation",
+      "entityId": null,
+      "label": "A publié la formation « Hygiène et sécurité à domicile »",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-3221220000"
+    },
+    {
+      "id": "aud_064",
+      "actorId": "usr_equipe",
+      "action": "application.status",
+      "entity": "Candidature",
+      "entityId": null,
+      "label": "A présélectionné la candidature de Brice N. (Assistant·e de vie)",
+      "before": {
+        "statut": "Reçue"
+      },
+      "after": {
+        "statut": "Présélectionnée"
+      },
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-3338460000"
+    },
+    {
+      "id": "aud_066",
+      "actorId": "usr_mireille",
+      "action": "page.update",
+      "entity": "Page",
+      "entityId": "page_qui_sommes_nous",
+      "label": "A modifié la page « Qui sommes-nous »",
+      "before": {
+        "sections": "Équipe"
+      },
+      "after": {
+        "sections": "Équipe (2 portraits ajoutés)"
+      },
+      "ip": "41.202.219.71",
+      "createdAt": "rel:day:-3419700000"
+    },
+    {
+      "id": "aud_065",
+      "actorId": "usr_mireille",
+      "action": "media.upload",
+      "entity": "Média",
+      "entityId": null,
+      "label": "A ajouté l’image « Plage de Kribi »",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-3420480000"
+    },
+    {
+      "id": "aud_068",
+      "actorId": "usr_mireille",
+      "action": "service.publish",
+      "entity": "Service",
+      "entityId": "svc_chef_prive",
+      "label": "A publié le service « Chef privé »",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-3490140000"
+    },
+    {
+      "id": "aud_067",
+      "actorId": "usr_equipe",
+      "action": "request.status",
+      "entity": "Demande",
+      "entityId": "req_0128",
+      "label": "A passé la demande MP-2026-0128 (Entretien du logement) en « Prestation réalisée »",
+      "before": {
+        "statut": "En cours"
+      },
+      "after": {
+        "statut": "Prestation réalisée"
+      },
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-3501720000"
+    },
+    {
+      "id": "aud_069",
+      "actorId": null,
+      "action": "backup.done",
+      "entity": "Système",
+      "entityId": null,
+      "label": "Sauvegarde automatique de la nuit (46 Mo)",
+      "before": null,
+      "after": null,
+      "ip": null,
+      "createdAt": "rel:day:-3572160000"
+    },
+    {
+      "id": "aud_071",
+      "actorId": "usr_mireille",
+      "action": "review.publish",
+      "entity": "Avis",
+      "entityId": null,
+      "label": "A publié l’avis de Patrick E. (5 / 5)",
+      "before": null,
+      "after": null,
+      "ip": "154.72.160.33",
+      "createdAt": "rel:day:-3653400000"
+    },
+    {
+      "id": "aud_070",
+      "actorId": "usr_equipe",
+      "action": "user.login",
+      "entity": "Utilisateur",
+      "entityId": null,
+      "label": "S’est connectée (appareil de confiance)",
+      "before": null,
+      "after": null,
+      "ip": "102.244.18.7",
+      "createdAt": "rel:day:-3654180000"
+    },
+    {
+      "id": "aud_072",
+      "actorId": "usr_mireille",
+      "action": "partner.update",
+      "entity": "Partenaire",
+      "entityId": null,
+      "label": "A réordonné les logos des partenaires (Immobilier)",
+      "before": null,
+      "after": null,
+      "ip": "41.202.219.71",
+      "createdAt": "rel:day:-3735420000"
+    }
+  ]
+}

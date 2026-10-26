@@ -1,0 +1,68 @@
+{
+  "campaigns": [
+    {
+      "id": "cmp_novembre",
+      "subject": "Novembre : sorties culturelles et nouveaux services",
+      "preheader": null,
+      "html": "<p>Bonjour {prénom},</p><p>Ce mois-ci, découvrez nos nouvelles sorties culturelles à Douala et Kribi, et notre nouveau service de visites guidées…</p>",
+      "segmentKind": "ALL",
+      "segmentTags": [],
+      "status": "PROGRAMMEE",
+      "scheduledAt": "2026-11-02T08:00:00.000Z",
+      "sentAt": null,
+      "recipients": 1248,
+      "opens": null,
+      "clicks": null,
+      "unsubscribes": 0,
+      "createdAt": "rel:now:-259200000"
+    },
+    {
+      "id": "cmp_octobre",
+      "subject": "Octobre : préparer son installation au Cameroun",
+      "preheader": null,
+      "html": "<p>Bonjour {prénom},</p><p>Vous préparez votre arrivée à Douala ? Logement, démarches, premiers jours : notre atelier en ligne vous accompagne.</p>",
+      "segmentKind": "ALL",
+      "segmentTags": [],
+      "status": "ENVOYEE",
+      "scheduledAt": null,
+      "sentAt": "2026-10-05T08:00:00.000Z",
+      "recipients": 1192,
+      "opens": 548,
+      "clicks": 107,
+      "unsubscribes": 5,
+      "createdAt": "2026-10-01T09:00:00.000Z"
+    },
+    {
+      "id": "cmp_septembre",
+      "subject": "Septembre : la rentrée avec Mambo",
+      "preheader": null,
+      "html": "<p>Bonjour {prénom},</p><p>Nouvelle saison, nouveaux services : entretien du logement, pressing, courses livrées dans tout Douala.</p>",
+      "segmentKind": "ALL",
+      "segmentTags": [],
+      "status": "ENVOYEE",
+      "scheduledAt": null,
+      "sentAt": "2026-09-07T08:00:00.000Z",
+      "recipients": 1130,
+      "opens": 475,
+      "clicks": 90,
+      "unsubscribes": 4,
+      "createdAt": "2026-09-02T09:00:00.000Z"
+    },
+    {
+      "id": "cmp_brouillon",
+      "subject": "Brouillon sans titre",
+      "preheader": null,
+      "html": "",
+      "segmentKind": "ALL",
+      "segmentTags": [],
+      "status": "BROUILLON",
+      "scheduledAt": null,
+      "sentAt": null,
+      "recipients": 0,
+      "opens": null,
+      "clicks": null,
+      "unsubscribes": 0,
+      "createdAt": "rel:now:-86400000"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "rules": [
+    {
+      "id": "rul_1_am",
+      "weekday": 1,
+      "startTime": "08:00",
+      "endTime": "12:00",
+      "slotMinutes": 60,
+      "formats": ["AGENCE", "TELEPHONE", "VISIO"]
+    },
+    {
+      "id": "rul_1_pm",
+      "weekday": 1,
+      "startTime": "13:00",
+      "endTime": "17:00",
+      "slotMinutes": 60,
+      "formats": ["AGENCE", "TELEPHONE", "VISIO"]
+    },
+    {
+      "id": "rul_2_am",
+      "weekday": 2,
+      "startTime": "08:00",
+      "endTime": "12:00",
+      "slotMinutes": 60,
+      "formats": ["AGENCE", "TELEPHONE", "VISIO"]
+    },
+    {
+      "id": "rul_2_pm",
+      "weekday": 2,
+      "startTime": "13:00",
+      "endTime": "17:00",
+      "slotMinutes": 60,
+      "formats": ["AGENCE", "TELEPHONE", "VISIO"]
+    },
+    {
+      "id": "rul_3_am",
+      "weekday": 3,
+      "startTime": "08:00",
+      "endTime": "12:00",
+      "slotMinutes": 60,
+      "formats": ["AGENCE", "TELEPHONE", "VISIO"]
+    },
+    {
+      "id": "rul_3_pm",
+      "weekday": 3,
+      "startTime": "13:00",
+      "endTime": "17:00",
+      "slotMinutes": 60,
+      "formats": ["AGENCE", "TELEPHONE", "VISIO"]
+    },
+    {
+      "id": "rul_4_am",
+      "weekday": 4,
+      "startTime": "08:00",
+      "endTime": "12:00",
+      "slotMinutes": 60,
+      "formats": ["AGENCE", "TELEPHONE", "VISIO"]
+    },
+    {
+      "id": "rul_4_pm",
+      "weekday": 4,
+      "startTime": "13:00",
+      "endTime": "17:00",
+      "slotMinutes": 60,
+      "formats": ["AGENCE", "TELEPHONE", "VISIO"]
+    },
+    {
+      "id": "rul_5_am",
+      "weekday": 5,
+      "startTime": "08:00",
+      "endTime": "12:00",
+      "slotMinutes": 60,
+      "formats": ["AGENCE", "TELEPHONE", "VISIO"]
+    },
+    {
+      "id": "rul_5_pm",
+      "weekday": 5,
+      "startTime": "13:00",
+      "endTime": "17:00",
+      "slotMinutes": 60,
+      "formats": ["AGENCE", "TELEPHONE", "VISIO"]
+    },
+    {
+      "id": "rul_6_am",
+      "weekday": 6,
+      "startTime": "09:00",
+      "endTime": "13:00",
+      "slotMinutes": 60,
+      "formats": ["TELEPHONE", "VISIO"]
+    }
+  ],
+  "exceptions": [
+    {
+      "id": "exc_noel",
+      "date": "2026-12-25",
+      "closed": true,
+      "startTime": null,
+      "endTime": null,
+      "label": "Noël"
+    },
+    {
+      "id": "exc_nouvel_an",
+      "date": "2027-01-01",
+      "closed": true,
+      "startTime": null,
+      "endTime": null,
+      "label": "Jour de l’an"
+    }
+  ]
+}

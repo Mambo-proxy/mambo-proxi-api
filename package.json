@@ -24,6 +24,7 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
+    "db:purge-demo": "tsx prisma/purge-demo.ts",
     "postinstall": "prisma generate",
     "contract:lint": "redocly lint",
     "contract:bundle": "redocly bundle contracts/openapi.yaml --output dist/openapi.json",

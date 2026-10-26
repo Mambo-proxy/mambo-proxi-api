@@ -29,7 +29,13 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
 
 ### Modules (ordre docs/08)
 
-- [ ] settings · navigation · pages · categories · services (lecture publique, cache, preview ; offres en carrousel des fiches, `ServiceOffer`)
+- [~] settings · navigation · pages · categories · services (lecture publique, cache, preview ; offres en carrousel des fiches, `ServiceOffer`)
+  - [x] `GET /v1/site/settings`, `/site/navigation`, `/site/redirects`, `/pages/{key}`, `/zones`, `/sitemap`, `/categories`, `/categories/{slug}`, `/services`, `/services/{slug}` (`src/modules/*`)
+  - [x] Langue (`?lang=fr|en`, fusion `translations` / colonnes `…En`, repli champ par champ : `src/common/i18n`), cache HTTP (`public, no-cache` + `ETag` → 304 : `src/common/http-cache`)
+  - [x] Publication : statuts, `publishedAt`, rubrique publiée, zones actives, sections désactivées masquées ; aucun tarif ni prix exposé
+  - [x] Tests unitaires des mappers et de la fusion des langues ; e2e `test/public-content.e2e-spec.ts` (double de Prisma, et base remplie par le seed en CI) ; `pnpm db:seed` en CI
+  - [ ] Prévisualisation (`?preview=` : jetons signés du back-office, brouillons) avec les modules admin
+  - [ ] Premier passage des tests en local et en CI (non lancés sur la machine de développement)
 - [ ] Formulaires publics : quote-requests, contact-messages, registrations, training-requests, partner-requests, event-registrations (anti-spam Turnstile + piège + délai, limitation de débit)
 - [ ] contacts · requests (références `MP-AAAA-NNNN`, historique, notes, export CSV, anonymisation)
 - [ ] mail (React Email, texte brut, gabarits Figma) + queue (BullMQ, réessais)

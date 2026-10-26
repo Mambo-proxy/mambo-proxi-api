@@ -24,6 +24,28 @@ pnpm start:dev          # API sur http://localhost:4000
 
 La configuration est validée au démarrage : en développement, les variables absentes prennent les valeurs de `.env.example` ; en production, elles sont toutes obligatoires et l'API refuse de démarrer en indiquant chaque variable à corriger.
 
+## Données de départ
+
+```bash
+pnpm db:seed            # remplir la base (relançable sans doublon)
+SEED_DEMO=false pnpm db:seed   # données de référence seulement (production)
+pnpm db:purge-demo      # supprimer toutes les données de démonstration (isDemo)
+```
+
+- **Données de référence** (contenus des maquettes) : paramètres et coordonnées provisoires, navigation, 16 pages en
+  français et en anglais, 5 rubriques, 22 services et 4 formules, offres, zones et quartiers de Douala, médias,
+  modèles d'e-mails, questions du questionnaire, disponibilités. Créées si elles manquent, jamais écrasées.
+- **Données de démonstration** (marquées `isDemo`, dates relatives au jour du lancement) : avis, demandes et
+  historique, rendez-vous, contacts et inscrits, candidatures, événements, formations, partenaires, offres
+  d'emploi, magazine, campagnes, notifications et journal, service en brouillon « Visites guidées ». Remises à l'état des maquettes à chaque lancement.
+- **Comptes** : administrateur `SEED_ADMIN_EMAIL` / `SEED_ADMIN_NAME` (créé s'il n'existe pas) et, avec les
+  données de démonstration, Carine Eboa (MANAGER), Paul Ngando (AGENT), Équipe Douala (EDITOR) et Grace Nkongo
+  (WRITER). Aucun mot de passe n'est enregistré par le seed : il est défini à l'invitation ou à la première
+  connexion (lien « Mot de passe oublié »).
+- Les images sont celles livrées avec le site (`/photos/…`, `/illustrations/…`) : leur adresse relative est
+  enregistrée telle quelle, sans téléversement dans le stockage S3.
+- Les fichiers `prisma/seed/data/*.json` reprennent les mocks du site (`mambo-proxi-web/src/mocks`).
+
 ## Vérifications
 
 ```bash
