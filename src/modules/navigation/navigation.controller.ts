@@ -5,8 +5,10 @@ import { langQuerySchema, type LangQuery } from '../../common/i18n/lang.js';
 import { ZodValidationPipe } from '../../common/validation/zod-validation.pipe.js';
 import type { Navigation } from './navigation.mapper.js';
 import { NavigationService, type RedirectEntry } from './navigation.service.js';
+import { Public } from '../auth/auth.decorators.js';
 
 @ApiTags('Site')
+@Public()
 @Controller('site')
 export class NavigationController {
   constructor(@Inject(NavigationService) private readonly navigation: NavigationService) {}

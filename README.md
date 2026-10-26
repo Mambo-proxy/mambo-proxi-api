@@ -40,11 +40,32 @@ pnpm db:purge-demo      # supprimer toutes les données de démonstration (isDem
   d'emploi, magazine, campagnes, notifications et journal, service en brouillon « Visites guidées ». Remises à l'état des maquettes à chaque lancement.
 - **Comptes** : administrateur `SEED_ADMIN_EMAIL` / `SEED_ADMIN_NAME` (créé s'il n'existe pas) et, avec les
   données de démonstration, Carine Eboa (MANAGER), Paul Ngando (AGENT), Équipe Douala (EDITOR) et Grace Nkongo
-  (WRITER). Aucun mot de passe n'est enregistré par le seed : il est défini à l'invitation ou à la première
-  connexion (lien « Mot de passe oublié »).
+  (WRITER). Mots de passe hachés en argon2id, jamais écrits en clair :
+  - administrateur : `SEED_ADMIN_PASSWORD`, appliqué à la création (ou si le compte n'a pas encore de mot de passe) ;
+    en production, une valeur longue et aléatoire (la valeur d'exemple `change-me…` est ignorée), à changer ensuite
+    par « Mot de passe oublié » ;
+  - comptes de démonstration : `SEED_DEMO_PASSWORD` (développement et tests uniquement ; ignorée par le seed et
+    refusée au démarrage de l'API en production) ;
+  - sans variable, le compte est créé sans mot de passe : « Mot de passe oublié » sur la page de connexion envoie le
+    lien qui le définit.
 - Les images sont celles livrées avec le site (`/photos/…`, `/illustrations/…`) : leur adresse relative est
   enregistrée telle quelle, sans téléversement dans le stockage S3.
 - Les fichiers `prisma/seed/data/*.json` reprennent les mocks du site (`mambo-proxi-web/src/mocks`).
+
+## Authentification du back-office
+
+Connexion par e-mail et mot de passe (argon2id), puis code à 6 chiffres envoyé par e-mail (10 min, 5 essais, renvoi
+après 60 s), sauf sur un appareil de confiance (cookie `mp_td`, 30 jours, paramètre `securite.trustedDeviceDays`).
+
+- Cookies `httpOnly`, `SameSite=Lax`, `Secure` dès que `API_URL` est en https, domaine `COOKIE_DOMAIN` : `mp_at`
+  (jeton d'accès JWT de 15 min, `JWT_ACCESS_SECRET`), `mp_rt` (jeton de rafraîchissement rotatif, session de 7 jours
+  ou 30 avec « Rester connecté »), `mp_csrf` (lisible, à recopier dans l'en-tête `X-CSRF-Token` de toute mutation).
+- Rotation à chaque `POST /v1/auth/refresh` ; la réutilisation d'un jeton déjà remplacé révoque toutes les sessions
+  de l'utilisateur. Verrouillage progressif après 5 erreurs de mot de passe (15 min, puis 30, 60…).
+- Toutes les routes exigent une session, sauf celles marquées `@Public()` (site public, connexion, santé) ; sous
+  `/v1/admin`, chaque route déclare ses permissions (`@RequirePermissions`, `x-permissions` du contrat), sinon elle
+  est refusée à tous. Matrice rôle → permissions : `src/modules/auth/permissions.ts` (schéma `Role` du contrat).
+- En local, les codes et les liens (invitation, réinitialisation) arrivent dans Mailpit.
 
 ## E-mails
 

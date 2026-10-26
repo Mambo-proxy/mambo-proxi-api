@@ -19,6 +19,7 @@ import {
   type TrainingRequestInput,
 } from './forms.schemas.js';
 import { FormsService, type SubmissionAccepted, type SubmissionMeta } from './forms.service.js';
+import { Public } from '../auth/auth.decorators.js';
 
 function metaOf(request: Request): SubmissionMeta {
   return {
@@ -33,6 +34,7 @@ function metaOf(request: Request): SubmissionMeta {
  * 422 `validation-error`, 429 `rate-limited` (limite resserrée : 5 envois par minute et par adresse IP et par formulaire).
  */
 @ApiTags('Formulaires')
+@Public()
 @Controller()
 @Throttle({ default: PUBLIC_FORM_THROTTLE })
 export class FormsController {

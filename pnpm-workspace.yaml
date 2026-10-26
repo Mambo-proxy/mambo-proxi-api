@@ -10,5 +10,8 @@ allowBuilds:
   esbuild: false
   # Accélérateur facultatif de BullMQ (sérialisation) : binaire fourni par @msgpackr-extract/*.
   msgpackr-extract: false
+  # argon2 : binaires précompilés fournis par le paquet (prebuilds glibc et musl, Windows, macOS) ; le script
+  # `node-gyp-build` ne compile qu'en l'absence de binaire pour la plateforme.
+  argon2: false
   # Mesure d'installation d'un paquet tiers : refusée.
   '@scarf/scarf': false

@@ -5,8 +5,10 @@ import { langQuerySchema, type LangQuery } from '../../common/i18n/lang.js';
 import { ZodValidationPipe } from '../../common/validation/zod-validation.pipe.js';
 import type { ServiceAreas } from './zones.mapper.js';
 import { ZonesService } from './zones.service.js';
+import { Public } from '../auth/auth.decorators.js';
 
 @ApiTags('Site')
+@Public()
 @Controller('zones')
 export class ZonesController {
   constructor(@Inject(ZonesService) private readonly zones: ZonesService) {}

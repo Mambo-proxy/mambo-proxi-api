@@ -54,6 +54,11 @@ jobs:
       NODE_ENV: test
       DATABASE_URL: postgresql://mambo:mambo@localhost:5432/mambo_proxi?schema=public
       REDIS_URL: redis://localhost:6379
+      # Comptes du seed (base jetable de la CI) : administratrice et comptes de démonstration avec mot de passe.
+      SEED_ADMIN_EMAIL: mireille@mamboproxi.com
+      SEED_ADMIN_NAME: Mireille Bell
+      SEED_ADMIN_PASSWORD: ci-mot-de-passe-administratrice
+      SEED_DEMO_PASSWORD: ci-mot-de-passe-demonstration
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6

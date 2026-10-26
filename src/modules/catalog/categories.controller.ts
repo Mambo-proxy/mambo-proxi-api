@@ -10,8 +10,10 @@ import {
 } from './catalog.schemas.js';
 import { CatalogService } from './catalog.service.js';
 import type { CategoryDetail, CategorySummary } from './catalog.types.js';
+import { Public } from '../auth/auth.decorators.js';
 
 @ApiTags('Catalogue')
+@Public()
 @Controller('categories')
 export class CategoriesController {
   constructor(@Inject(CatalogService) private readonly catalog: CatalogService) {}

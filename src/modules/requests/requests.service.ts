@@ -8,13 +8,16 @@ import type {
   RequestType,
   Role,
 } from '../../generated/prisma/client.js';
+import { ROLES, hasAnyPermission } from '../auth/permissions.js';
 import { nextReference } from './reference.js';
 
 /** Échéance de traitement d'une nouvelle demande : réception + 24 h (comme les données simulées du site). */
 export const REQUEST_DUE_DELAY_MS = 24 * 60 * 60 * 1000;
 
 /** Rôles qui voient toutes les demandes (`requests:read`) et reçoivent les notifications « nouvelle demande ». */
-export const TEAM_NOTIFIED_ROLES: readonly Role[] = ['ADMIN', 'MANAGER', 'EDITOR'];
+export const TEAM_NOTIFIED_ROLES: readonly Role[] = ROLES.filter((role) =>
+  hasAnyPermission(role, ['requests:read']),
+);
 
 /** Champ affiché dans le panneau de détail du back-office (schéma `RequestField` du contrat). */
 export interface RequestField {

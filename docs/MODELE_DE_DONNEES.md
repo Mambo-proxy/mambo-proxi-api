@@ -52,6 +52,13 @@ colonnes dédiées (`trainingId`, `participants`, `eventId`, `seats`, `partnersh
 - **Aucun prix des prestations.** Seuls figurent la rémunération des offres d'emploi (`JobSalary`) et le tarif
   indicatif de déplacement des zones (`ZoneFee`), donnée interne prévue par le contrat et masquée sur le site tant que
   « Afficher les tarifs » est désactivé.
+- **Authentification.** Aucun secret en clair : mots de passe en argon2id (`users.password_hash`, format PHC) ; jetons
+  de rafraîchissement, d'appareil de confiance, de réinitialisation, d'invitation et codes à 6 chiffres conservés
+  sous forme de condensat HMAC-SHA256 (clé `JWT_REFRESH_SECRET` ou `TOKEN_SIGNING_SECRET`). Chaque rotation du jeton
+  de rafraîchissement crée une ligne `sessions` (l'ancienne est révoquée et pointe sur la suivante par
+  `replaced_by_id`). Le jeton CSRF est signé et sans état (aucune colonne). Statut affiché d'un utilisateur :
+  `DESACTIVE` si `is_active = false`, `INVITE` tant que `activated_at` est vide (mot de passe jamais défini), sinon
+  `ACTIF`.
 - **Données de démonstration** : `isDemo` sur les utilisateurs, rubriques, services, offres, avis, partenaires,
   formations, offres d'emploi, événements, éditions et articles, zones, contacts, demandes, rendez-vous, abonnés,
   campagnes et médias (`pnpm db:purge-demo`).

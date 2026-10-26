@@ -158,3 +158,95 @@
 
 - **`pnpm exec prettier` bloqué sous ce Windows** (processus qui ne se terminent pas) : Prettier et ESLint lancés directement par `node node_modules/...`.
 - **Nom affiché des inscriptions** : le prénom et le nom saisis séparément étaient recollés puis recoupés au premier espace (« Marie C. » pour « Marie Claire Ndongo ») ; `shortName` reprend désormais le prénom et le nom tels quels (« Marie Claire N. »).
+
+## Phase 2 — Authentification et utilisateurs du back-office (26 octobre 2026)
+
+### Fait
+
+- Module `auth` (`src/modules/auth`) : les neuf opérations `/v1/auth/*` du contrat (connexion, code par e-mail,
+  renvoi, rafraîchissement, déconnexion, utilisateur connecté, mot de passe oublié, réinitialisation, acceptation
+  d'invitation).
+- Garde globale `AuthGuard` (après la limitation de débit) : session obligatoire sauf `@Public()`, jeton CSRF sur les
+  mutations, permissions `@RequirePermissions(...)` obligatoires sous `/v1/admin`. Les contrôleurs publics existants
+  (site, catalogue, formulaires, santé) sont marqués `@Public()`.
+- Matrice rôle → permissions (`permissions.ts`) reprise du schéma `Role` du contrat ; `TEAM_NOTIFIED_ROLES` des
+  demandes en est désormais déduit.
+- Module `users` (`src/modules/users`) : `GET /v1/admin/users`, `/users/presence`, `/roles`, `POST /users/invite`,
+  `PATCH` et `DELETE /users/{id}`, `POST /users/{id}/reset-password`, avec journal d'activité (`audit_logs`).
+- E-mails `otp-code`, `user-invite`, `password-reset` : gabarits, textes par défaut (fr/en) et seed existaient déjà,
+  identiques aux modèles du back-office simulé ; liens vers `/admin/nouveau-mot-de-passe?token=` et
+  `/admin/invitation?token=` du site.
+- Seed : `SEED_ADMIN_PASSWORD` (jusqu'ici ignorée) et nouvelle `SEED_DEMO_PASSWORD` hachées en argon2id.
+- Dépendance : `argon2` 0.45.1 (binaires précompilés glibc, musl, Windows ; script d'installation refusé dans
+  `allowBuilds`).
+- Tests : unitaires (`permissions.spec.ts` contre l'énumération, la matrice et l'exemple de `GET /v1/admin/roles` du
+  contrat ; `tokens.spec.ts` : JWT, jetons, mots de passe compromis, identité, verrouillage) ; e2e
+  `test/auth.e2e-spec.ts` et `test/admin-users.e2e-spec.ts` (outils communs `test/support/auth.ts`), dont un test qui
+  parcourt toutes les routes déclarées et compare publique / session / `x-permissions` au contrat. Le double de
+  Prisma gagne `updateMany`, `delete`, les tables de l'authentification, et traite une colonne absente comme `null`
+  dans les filtres.
+- CI : comptes du seed avec mot de passe (`SEED_ADMIN_*`, `SEED_DEMO_PASSWORD` de test) pour le job « API ».
+
+### Décisions
+
+- **Jeton d'accès** : JWT HS256 de 15 min (`{ sub, sid, iat, exp }`) écrit sans bibliothèque (signature HMAC, en-tête
+  fixe comparé octet par octet : `alg: none` et autres algorithmes refusés). La session et l'utilisateur sont relus à
+  chaque requête : déconnexion, désactivation et changement de rôle prennent effet aussitôt.
+- **Jetons opaques** (rafraîchissement, appareil de confiance, réinitialisation, invitation) : 256 bits aléatoires,
+  seul un condensat HMAC-SHA256 est stocké. Code à 6 chiffres : condensat HMAC lié à l'utilisateur (une copie de la
+  base ne permet pas de le retrouver par force brute).
+- **Rotation** : nouvelle ligne `sessions` à chaque rafraîchissement, réservation atomique (`updateMany` sur
+  `revokedAt: null`), durée de session fixée à la connexion. Jeton remplacé présenté de nouveau : moins de 10 s après
+  la rotation (deux onglets) → 204 sans nouveaux cookies ; au-delà → toutes les sessions de l'utilisateur révoquées, 401. Session révoquée sans remplaçante (déconnexion, désactivation) : 401, sans délai de grâce.
+- **CSRF** : double-submit signé `<aléa>.<HMAC(utilisateur, aléa)>` — un cookie planté par un tiers ou celui d'un
+  autre compte est refusé ; lié à l'utilisateur, il reste valable après une rotation. Contrôlé sur toute mutation
+  authentifiée (403 `csrf-token-invalid`), y compris la déconnexion.
+- **Déconnexion** : marquée `@Public()` pour la garde, la route identifie la session par le jeton d'accès ou, s'il a
+  expiré, par le jeton de rafraîchissement ; le cookie d'appareil de confiance est conservé.
+- **Verrouillage** : toutes les 5 erreurs consécutives, 15 min puis 30, 60… (plafond 24 h) ; 423 dès la 5e erreur ;
+  compteur remis à zéro par un mot de passe correct ou une réinitialisation. Adresse inconnue, invitation en cours
+  ou compte désactivé : même 401, après un calcul argon2 factice (temps de réponse égalisé).
+- **Code par e-mail** : un nouveau défi clôt les précédents ; le renvoi garde le défi et ses essais (5 au total,
+  renvois compris) et prolonge sa validité de 10 min ; trop tôt → 429 avec `Retry-After`.
+- **Appareil de confiance** : `trustedDeviceDays` du paramètre `securite` (0 = toujours un code) ; un appareil plus
+  ancien que la durée actuelle n'est plus reconnu, même si son expiration initiale était plus lointaine.
+- **Cookies** : `mp_at` 15 min ; `mp_rt` et `mp_csrf` persistants seulement avec « Rester connecté » (sinon cookies de
+  session du navigateur, comme le back-office simulé) ; `Secure` dès que `API_URL` est en https.
+- **Statut affiché** : `ACTIF` si `activatedAt` est renseigné (premier mot de passe défini), `INVITE` sinon,
+  `DESACTIVE` si `isActive = false`. Présence et personnes assignables : membres `ACTIF` seulement.
+- **Mot de passe oublié** : réponse identique et immédiate (lien créé sans attendre) ; tout compte actif reçoit un
+  lien, y compris sans mot de passe (administratrice initiale du seed) ; compte désactivé : rien.
+- **Politique des mots de passe** : 12 à 256 caractères, liste embarquée de mots de passe courants (12 caractères et
+  plus, variantes françaises), suites triviales, identique à l'adresse e-mail → 422 `compromised_password`.
+- **Utilisateurs** : on ne peut ni désactiver ni supprimer son propre compte ; le dernier administrateur actif ne
+  peut être ni rétrogradé, ni désactivé, ni supprimé (409) ; un auteur de notes (clé étrangère `Restrict`) ne peut
+  pas être supprimé (409 : le désactiver). Désactivation et réinitialisation par un administrateur révoquent
+  sessions, appareils de confiance et codes. Réinitialisation d'un compte jamais activé : nouvelle invitation
+  (« Invitation renvoyée à … », comme le back-office simulé).
+- **Limitation de débit** des routes d'authentification, par IP : connexion et code 10/min, renvoi et mot de passe
+  oublié 5/min, liens 10/min, rafraîchissement 30/min ; s'ajoute au verrouillage par compte.
+- **Schéma** : aucune migration ; les tables `users`, `sessions`, `trusted_devices`, `otp_challenges`,
+  `password_resets`, `invitations` et `audit_logs` de la migration initiale suffisent.
+
+### Difficultés et solutions
+
+- **argon2 et pnpm** : le script d'installation (`node-gyp-build`) est bloqué par `allowBuilds` ; le paquet livre ses
+  binaires précompilés pour toutes les plateformes visées (Linux glibc et musl, Windows) : script refusé
+  explicitement, le module se charge sans compilation.
+- **Double de Prisma** : les lignes créées n'ont pas les colonnes facultatives (`undefined` au lieu de `null`). Les
+  créations passent désormais les `null` explicitement, et le double traite une colonne absente comme `null` dans
+  les filtres.
+- **Contrôles du contrat** : plusieurs réponses nécessaires ne sont pas documentées (voir ci-dessous) ; les tests les
+  valident contre le schéma `Problem` et le signalent.
+
+### Points ouverts (contrat et site)
+
+- Ajouter au contrat : 422 sur `login`, `verify-otp`, `resend-otp`, `forgot-password` et `PATCH /admin/users/{id}` ;
+  401 sur `resend-otp` (défi inconnu ou clos) ; 404 sur `DELETE /admin/users/{id}` et
+  `POST /admin/users/{id}/reset-password` ; 409 sur ce dernier (compte désactivé) ; le type `csrf-token-invalid` du 403.
+- Le site n'appelle jamais `POST /v1/auth/refresh` : avec l'API réelle, la session tombera au bout de 15 min. À
+  ajouter au client du back-office (sur un 401, rafraîchir puis rejouer la requête une fois).
+- Les tâches d'e-mails gardent les données du gabarit dans Redis (code, lien) jusqu'à la purge (7 jours) : sans effet
+  une fois le code (10 min) ou le lien (1 h) expiré, mais à savoir pour l'exploitation de Redis.
+- Liste des mots de passe compromis embarquée et courte : une vérification « Have I Been Pwned » (k-anonymat) est
+  possible plus tard, si un appel sortant est acceptable.

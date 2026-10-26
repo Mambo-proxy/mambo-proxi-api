@@ -133,6 +133,16 @@ describe('parseEnv', () => {
     });
   });
 
+  it('refuse en production le mot de passe des comptes de démonstration, accepté ailleurs', () => {
+    expect(issuesOf({ ...PRODUCTION_ENV, SEED_DEMO_PASSWORD: 'mot-de-passe-de-demo' })).toEqual({
+      SEED_DEMO_PASSWORD:
+        'Les comptes de démonstration sont interdits en production : retirez cette variable.',
+    });
+    expect(
+      parseEnv({ NODE_ENV: 'test', SEED_DEMO_PASSWORD: 'mot-de-passe-de-demo' }).SEED_DEMO_PASSWORD,
+    ).toBe('mot-de-passe-de-demo');
+  });
+
   it('exige https et des secrets distincts en production', () => {
     const issues = issuesOf({
       ...PRODUCTION_ENV,

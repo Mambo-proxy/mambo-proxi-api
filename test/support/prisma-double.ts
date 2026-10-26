@@ -5,9 +5,11 @@
  * sélectionnées). Les enregistrements portent leurs relations sous forme d'objets (graphe en mémoire) ; les colonnes
  * simples sont toutes renvoyées, les relations seulement si elles sont sélectionnées.
  *
- * Écritures (formulaires publics) : `create`, `createMany`, `update`, `upsert` (avec `{ increment }`), `deleteMany`,
- * `aggregate` (`_sum`), `count` ; `$transaction(fn)` exécute `fn` sur le double lui-même (pas d'annulation). Les
- * enregistrements créés reçoivent un identifiant `<table>_<n>` et des dates `createdAt`/`updatedAt` si absentes.
+ * Écritures (formulaires publics, authentification) : `create`, `createMany`, `update`, `updateMany`, `upsert` (avec
+ * `{ increment }`), `delete`, `deleteMany`, `aggregate` (`_sum`), `count` ; `$transaction(fn)` exécute `fn` sur le
+ * double lui-même (pas d'annulation). Les enregistrements créés reçoivent un identifiant `<table>_<n>` et des dates
+ * `createdAt`/`updatedAt` si absentes. Une colonne absente vaut `null` pour les filtres (`revokedAt: null`,
+ * `{ not: null }`), comme une colonne facultative jamais renseignée.
  */
 import { vi } from 'vitest';
 
@@ -68,6 +70,7 @@ function matchesOperators(actual: unknown, filter: Row): boolean {
       case 'notIn':
         return !(expected as unknown[]).map(comparable).includes(value);
       case 'not':
+        if (expected === null) return value !== null && value !== undefined;
         return isObject(expected) ? !matchesOperators(actual, expected) : value !== target;
       case 'lt':
         return value !== null && value !== undefined && (value as number) < (target as number);
@@ -90,6 +93,7 @@ export function matchesWhere(record: Row, where: Row | undefined): boolean {
     if (key === 'OR') return (filter as Row[]).some((part) => matchesWhere(record, part));
     if (key === 'NOT') return !matchesWhere(record, filter as Row);
     const actual = record[key];
+    if (filter === null) return actual === null || actual === undefined;
     if (isObject(filter)) {
       if (RELATIONS.has(key)) return isObject(actual) && matchesWhere(actual, filter);
       if (isOperatorObject(filter)) return matchesOperators(actual, filter);
@@ -211,6 +215,19 @@ function delegate(name: string, rows: () => Row[]) {
         return Promise.reject(new Error(`Double Prisma : ${name} introuvable pour la mise à jour.`));
       return Promise.resolve(project(update(record, args.data as Row), args.select ?? args.include));
     }),
+    updateMany: vi.fn((args: WriteArgs) => {
+      const matching = rows().filter((row) => matchesWhere(row, args.where));
+      matching.forEach((record) => update(record, args.data as Row));
+      return Promise.resolve({ count: matching.length });
+    }),
+    delete: vi.fn((args: WriteArgs) => {
+      const table = rows();
+      const index = table.findIndex((row) => matchesWhere(row, args.where));
+      if (index < 0)
+        return Promise.reject(new Error(`Double Prisma : ${name} introuvable pour la suppression.`));
+      const [removed] = table.splice(index, 1);
+      return Promise.resolve(project(removed, args.select ?? args.include));
+    }),
     upsert: vi.fn((args: WriteArgs) => {
       const existing = rows().find((row) => matchesWhere(row, args.where));
       const record = existing ? update(existing, args.update ?? {}) : insert(args.create ?? {});
@@ -258,6 +275,15 @@ export interface PrismaTables {
   request?: Row[];
   requestEvent?: Row[];
   notification?: Row[];
+  // Tables de l'authentification et des utilisateurs (facultatives : vides par défaut).
+  session?: Row[];
+  trustedDevice?: Row[];
+  otpChallenge?: Row[];
+  passwordReset?: Row[];
+  invitation?: Row[];
+  auditLog?: Row[];
+  appointment?: Row[];
+  requestNote?: Row[];
 }
 
 const OPTIONAL_TABLES = [
@@ -271,6 +297,14 @@ const OPTIONAL_TABLES = [
   'request',
   'requestEvent',
   'notification',
+  'session',
+  'trustedDevice',
+  'otpChallenge',
+  'passwordReset',
+  'invitation',
+  'auditLog',
+  'appointment',
+  'requestNote',
 ] as const;
 
 /** Double à passer à `overrideProvider(PrismaService).useValue(…)`. */
@@ -297,6 +331,14 @@ export function createPrismaDouble(tables: PrismaTables) {
     request: delegate('request', table('request')),
     requestEvent: delegate('requestEvent', table('requestEvent')),
     notification: delegate('notification', table('notification')),
+    session: delegate('session', table('session')),
+    trustedDevice: delegate('trustedDevice', table('trustedDevice')),
+    otpChallenge: delegate('otpChallenge', table('otpChallenge')),
+    passwordReset: delegate('passwordReset', table('passwordReset')),
+    invitation: delegate('invitation', table('invitation')),
+    auditLog: delegate('auditLog', table('auditLog')),
+    appointment: delegate('appointment', table('appointment')),
+    requestNote: delegate('requestNote', table('requestNote')),
     $queryRaw: vi.fn().mockResolvedValue([{ '?column?': 1 }]),
     $disconnect: vi.fn().mockResolvedValue(undefined),
     $transaction: vi.fn((operation: unknown): Promise<unknown> => {

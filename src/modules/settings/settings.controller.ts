@@ -5,8 +5,10 @@ import { langQuerySchema, type LangQuery } from '../../common/i18n/lang.js';
 import { ZodValidationPipe } from '../../common/validation/zod-validation.pipe.js';
 import { SettingsService } from './settings.service.js';
 import type { SiteSettings } from './site-settings.mapper.js';
+import { Public } from '../auth/auth.decorators.js';
 
 @ApiTags('Site')
+@Public()
 @Controller('site')
 export class SettingsController {
   constructor(@Inject(SettingsService) private readonly settings: SettingsService) {}

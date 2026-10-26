@@ -6,11 +6,13 @@ import { langSchema, previewSchema } from '../../common/i18n/lang.js';
 import { ZodValidationPipe } from '../../common/validation/zod-validation.pipe.js';
 import type { Page } from './pages.mapper.js';
 import { PagesService } from './pages.service.js';
+import { Public } from '../auth/auth.decorators.js';
 
 const pageQuerySchema = z.object({ lang: langSchema, preview: previewSchema });
 type PageQuery = z.output<typeof pageQuerySchema>;
 
 @ApiTags('Site')
+@Public()
 @Controller('pages')
 export class PagesController {
   constructor(@Inject(PagesService) private readonly pages: PagesService) {}

@@ -49,7 +49,14 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
   - [x] Création des demandes (`src/modules/requests`) : référence atomique (`ReferenceCounter`, année de Douala), statut `NOUVELLE`, échéance + 24 h, consentement horodaté (IP, agent utilisateur), historique `RECEIVED`, notifications de l'équipe (rôles `requests:read`)
   - [ ] Opérations du back-office : liste, détail, statut, assignation, notes, export CSV, anonymisation ; `ACK_SENT` / `TEAM_ALERT_SENT` à l'envoi effectif des e-mails (module mail)
 - [x] mail (React Email, texte brut, gabarits Figma) + queue (BullMQ, réessais) — 21 gabarits, textes modifiables en base, 4 e-mails maquettés alignés, logo PNG, `pnpm mail:preview`
-- [ ] auth (argon2id, OTP e-mail, appareils de confiance, rotation des jetons, CSRF, verrouillage) · users (invitation, rôles)
+- [x] auth (argon2id, OTP e-mail, appareils de confiance, rotation des jetons, CSRF, verrouillage) · users (invitation, rôles)
+  - [x] `/v1/auth/*` (9 opérations) : mot de passe argon2id, code à 6 chiffres (10 min, 5 essais, renvoi après 60 s), appareil de confiance `mp_td` (paramètre `trustedDeviceDays`), cookies `mp_at`/`mp_rt`/`mp_csrf`, rotation avec détection de réutilisation, verrouillage progressif, mot de passe oublié (réponse identique), réinitialisation et invitation à usage unique
+  - [x] Garde globale fermée par défaut (`@Public()`), CSRF double-submit signé sur les mutations, permissions `@RequirePermissions` obligatoires sous `/v1/admin` (matrice du schéma `Role`) ; test qui compare chaque route aux `x-permissions` du contrat
+  - [x] `/v1/admin/users*` et `/v1/admin/roles` : liste, présence (activité au plus une écriture par minute), invitation, modification, désactivation (sessions révoquées), suppression, réinitialisation ; journal d'activité
+  - [x] Seed : mots de passe `SEED_ADMIN_PASSWORD` et `SEED_DEMO_PASSWORD` (développement) hachés en argon2id
+  - [x] Tests : unitaires (permissions contre le contrat, JWT, politique des mots de passe) ; e2e `test/auth.e2e-spec.ts`, `test/admin-users.e2e-spec.ts` (doubles ; bloc base réelle)
+  - [ ] Contrat : ajouter 422 (login, verify-otp, resend-otp, forgot-password, PATCH users), 401 (resend-otp), 404 (DELETE et reset-password d'un utilisateur), 409 (reset-password d'un compte désactivé)
+  - [ ] Site : appeler `POST /v1/auth/refresh` sur un 401 (jeton d'accès de 15 min) avant de rediriger vers la connexion
 - [ ] appointments + availability (créneaux, 409, confirmation `.ics`, proposition, rappel J-1 9 h Douala)
 - [ ] surveys + reviews (invitation après « Prestation réalisée », relance J+3, jeton unique 30 j, consentement de publication)
 - [ ] jobs + applications + storage (CV : signature de fichier, 5 Mo, stockage privé, URL signées, ClamAV optionnel)

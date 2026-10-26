@@ -127,6 +127,11 @@ const envSchema = z
       .string()
       .min(12, { error: invalid('Le mot de passe doit contenir au moins 12 caractères.') })
       .optional(),
+    // Mot de passe commun des comptes de démonstration (développement et tests seulement, interdit en production).
+    SEED_DEMO_PASSWORD: z
+      .string()
+      .min(12, { error: invalid('Le mot de passe doit contenir au moins 12 caractères.') })
+      .optional(),
     SENTRY_DSN: z.url({ error: invalid('Saisissez une adresse Sentry (DSN) valide.') }).optional(),
     LOG_LEVEL: z.enum(LOG_LEVELS, { error: invalid(`Valeur attendue : ${LOG_LEVELS.join(', ')}.`) }),
   })
@@ -154,6 +159,12 @@ const envSchema = z
     }
     if (env.SEED_ADMIN_PASSWORD?.includes('change-me')) {
       addIssue('SEED_ADMIN_PASSWORD', "Remplacez le mot de passe d'exemple.");
+    }
+    if (env.SEED_DEMO_PASSWORD !== undefined) {
+      addIssue(
+        'SEED_DEMO_PASSWORD',
+        'Les comptes de démonstration sont interdits en production : retirez cette variable.',
+      );
     }
     if (env.JWT_ACCESS_SECRET === env.JWT_REFRESH_SECRET) {
       addIssue(

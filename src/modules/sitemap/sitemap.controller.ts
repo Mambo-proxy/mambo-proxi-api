@@ -3,8 +3,10 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PublicCache } from '../../common/http-cache/http-cache.js';
 import type { SitemapEntry } from './sitemap.mapper.js';
 import { SitemapService } from './sitemap.service.js';
+import { Public } from '../auth/auth.decorators.js';
 
 @ApiTags('Site')
+@Public()
 @Controller('sitemap')
 export class SitemapController {
   constructor(@Inject(SitemapService) private readonly sitemap: SitemapService) {}

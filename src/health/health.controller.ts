@@ -3,8 +3,10 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { HealthService } from './health.service.js';
 import type { HealthReport } from './health.types.js';
+import { Public } from '../modules/auth/auth.decorators.js';
 
 @ApiTags('Santé')
+@Public()
 @Controller('health')
 export class HealthController {
   constructor(@Inject(HealthService) private readonly health: HealthService) {}

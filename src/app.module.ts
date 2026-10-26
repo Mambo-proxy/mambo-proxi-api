@@ -8,6 +8,8 @@ import { AppConfigModule } from './config/app-config.module.js';
 import { AppConfigService } from './config/app-config.service.js';
 import { HealthModule } from './health/health.module.js';
 import { buildLoggerParams } from './logging/logger.config.js';
+import { AuthGuard } from './modules/auth/auth.guard.js';
+import { AuthModule } from './modules/auth/auth.module.js';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
 import { FormsModule } from './modules/forms/forms.module.js';
 import { MailModule } from './modules/mail/mail.module.js';
@@ -15,6 +17,7 @@ import { NavigationModule } from './modules/navigation/navigation.module.js';
 import { PagesModule } from './modules/pages/pages.module.js';
 import { SettingsModule } from './modules/settings/settings.module.js';
 import { SitemapModule } from './modules/sitemap/sitemap.module.js';
+import { UsersModule } from './modules/users/users.module.js';
 import { ZonesModule } from './modules/zones/zones.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 
@@ -39,10 +42,14 @@ import { PrismaModule } from './prisma/prisma.module.js';
     CatalogModule,
     MailModule,
     FormsModule,
+    AuthModule,
+    UsersModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: ProblemFilter },
+    // Ordre d'exécution : limitation de débit, puis session, CSRF et permissions (routes `@Public()` exceptées).
     { provide: APP_GUARD, useClass: AppThrottlerGuard },
+    { provide: APP_GUARD, useExisting: AuthGuard },
   ],
 })
 export class AppModule {}
