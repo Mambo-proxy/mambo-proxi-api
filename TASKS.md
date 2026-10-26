@@ -36,9 +36,19 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
   - [x] Tests unitaires des mappers et de la fusion des langues ; e2e `test/public-content.e2e-spec.ts` (double de Prisma, et base remplie par le seed en CI) ; `pnpm db:seed` en CI
   - [ ] Prévisualisation (`?preview=` : jetons signés du back-office, brouillons) avec les modules admin
   - [ ] Premier passage des tests en local et en CI (non lancés sur la machine de développement)
-- [ ] Formulaires publics : quote-requests, contact-messages, registrations, training-requests, partner-requests, event-registrations (anti-spam Turnstile + piège + délai, limitation de débit)
-- [ ] contacts · requests (références `MP-AAAA-NNNN`, historique, notes, export CSV, anonymisation)
-- [ ] mail (React Email, texte brut, gabarits Figma) + queue (BullMQ, réessais)
+- [~] Formulaires publics : quote-requests, contact-messages, registrations, training-requests, partner-requests, event-registrations (anti-spam Turnstile + piège + délai, limitation de débit)
+  - [x] Six opérations du contrat (`src/modules/forms`) : `201 { reference, message }`, 400 `spam-check-failed`, 409 `event-full`, 422 `validation-error` (chemins et messages en français), 429 `rate-limited`
+  - [x] Anti-spam partagé `src/common/anti-spam` : Turnstile côté serveur (`fetch`, 5 s, fermeture par défaut ; jeton vide et clé d'essai acceptés hors production), champ piège (succès factice sans enregistrement), délai minimal de 3 s
+  - [x] Limitation de débit resserrée : 5 envois par minute, par IP et par formulaire (`PUBLIC_FORM_THROTTLE`)
+  - [x] E-mails mis en file après l'enregistrement (`MailQueueService.enqueueMany`) : accusé de réception du type et alerte `team-new-request` à chaque destinataire du paramètre `emails` ; échec journalisé sans faire échouer l'envoi
+  - [x] Tests : unitaires (anti-spam, références, mappers, schémas) ; e2e `test/public-forms.e2e-spec.ts` (doubles de Prisma, de Turnstile et de la file ; bloc base réelle `E2E_REAL_SERVICES=true`)
+  - [ ] Limite journalière (30 envois par jour et par IP, docs/05 §3) : second limiteur nommé à ajouter
+  - [ ] Premier passage des tests en local et en CI (non lancés sur la machine de développement)
+- [~] contacts · requests (références `MP-AAAA-NNNN`, historique, notes, export CSV, anonymisation)
+  - [x] Fiche contact créée ou mise à jour par e-mail normalisé (`src/modules/contacts`) : profil, structure, activité, ville et quartier, préférence de contact, langue, centres d'intérêt (inscription), abonnement newsletter préparé « en attente » (double opt-in)
+  - [x] Création des demandes (`src/modules/requests`) : référence atomique (`ReferenceCounter`, année de Douala), statut `NOUVELLE`, échéance + 24 h, consentement horodaté (IP, agent utilisateur), historique `RECEIVED`, notifications de l'équipe (rôles `requests:read`)
+  - [ ] Opérations du back-office : liste, détail, statut, assignation, notes, export CSV, anonymisation ; `ACK_SENT` / `TEAM_ALERT_SENT` à l'envoi effectif des e-mails (module mail)
+- [x] mail (React Email, texte brut, gabarits Figma) + queue (BullMQ, réessais) — 21 gabarits, textes modifiables en base, 4 e-mails maquettés alignés, logo PNG, `pnpm mail:preview`
 - [ ] auth (argon2id, OTP e-mail, appareils de confiance, rotation des jetons, CSRF, verrouillage) · users (invitation, rôles)
 - [ ] appointments + availability (créneaux, 409, confirmation `.ics`, proposition, rappel J-1 9 h Douala)
 - [ ] surveys + reviews (invitation après « Prestation réalisée », relance J+3, jeton unique 30 j, consentement de publication)

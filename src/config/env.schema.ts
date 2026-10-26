@@ -7,7 +7,7 @@ export type NodeEnv = (typeof NODE_ENVS)[number];
 export const LOG_LEVELS = ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'] as const;
 
 /** Clé d'essai Cloudflare Turnstile (valide toujours) : interdite en production. */
-const TURNSTILE_TEST_SECRET = '1x0000000000000000000000000000000AA';
+export const TURNSTILE_TEST_SECRET = '1x0000000000000000000000000000000AA';
 
 /** Valeurs par défaut communes à tous les environnements. */
 const COMMON_DEFAULTS: Record<string, string> = {
@@ -15,6 +15,7 @@ const COMMON_DEFAULTS: Record<string, string> = {
   LOG_LEVEL: 'info',
   S3_FORCE_PATH_STYLE: 'false',
   SMTP_SECURE: 'false',
+  MAIL_WORKER: 'on',
 };
 
 /** Valeurs par défaut de développement et de test : celles de `.env.example` (services de docker-compose.yml). */
@@ -45,7 +46,8 @@ const LOCAL_DEFAULTS: Record<string, string> = {
   SEED_ADMIN_PASSWORD: 'change-me-on-first-login',
 };
 
-const TEST_DEFAULTS: Record<string, string> = { ...LOCAL_DEFAULTS, LOG_LEVEL: 'silent' };
+// En test, aucun worker ne consomme la file des e-mails (les tests qui en ont besoin l'activent explicitement).
+const TEST_DEFAULTS: Record<string, string> = { ...LOCAL_DEFAULTS, LOG_LEVEL: 'silent', MAIL_WORKER: 'off' };
 
 /**
  * Message d'une valeur invalide. Une variable absente garde le message « Variable obligatoire manquante. »
@@ -108,6 +110,8 @@ const envSchema = z
     SMTP_USER: text.optional(),
     SMTP_PASSWORD: text.optional(),
     MAIL_FROM: text,
+    // Démarrage du worker qui consomme la file `mail` dans ce processus (`off` : l'API ne fait que produire).
+    MAIL_WORKER: z.enum(['on', 'off'], { error: invalid('Valeur attendue : on ou off.') }),
     JWT_ACCESS_SECRET: secret,
     JWT_REFRESH_SECRET: secret,
     TOKEN_SIGNING_SECRET: secret,

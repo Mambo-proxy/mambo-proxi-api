@@ -8,5 +8,7 @@ allowBuilds:
   # Binaires natifs fournis par des dépendances facultatives (@swc/core-*, @esbuild/*) : le script n'est qu'un repli.
   '@swc/core': false
   esbuild: false
+  # Accélérateur facultatif de BullMQ (sérialisation) : binaire fourni par @msgpackr-extract/*.
+  msgpackr-extract: false
   # Mesure d'installation d'un paquet tiers : refusée.
   '@scarf/scarf': false

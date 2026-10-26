@@ -3,12 +3,11 @@
     "key": "quote-ack",
     "subject": "Nous avons bien reçu votre demande {référence}",
     "preheader": null,
-    "title": "Merci {prénom}, votre demande est bien arrivée",
+    "title": "Bonjour {prénom}, nous avons bien reçu votre demande.",
     "paragraphs": [
-      "Votre demande de devis pour « {service} » est enregistrée sous la référence {référence}.",
-      "Un membre de l’équipe vous recontacte sous 24 h ouvrées pour préciser votre besoin."
+      "Merci pour votre confiance. Un conseiller étudie votre besoin et vous envoie un devis personnalisé sous 24 h."
     ],
-    "buttonLabel": "Suivre ma demande",
+    "buttonLabel": "Écrire à mon conseiller sur WhatsApp",
     "enabled": true
   },
   {
@@ -24,11 +23,12 @@
     "key": "registration-confirmed",
     "subject": "Bienvenue chez Mambo Proxi",
     "preheader": null,
-    "title": "Bienvenue {prénom}",
+    "title": "Bienvenue chez Mambo Proxi !",
     "paragraphs": [
-      "Votre inscription est confirmée. Vous pouvez désormais demander un service en quelques clics."
+      "Votre inscription est enregistrée. Vos prochaines demandes seront plus rapides et mieux suivies.",
+      "Découvrez dès maintenant nos services, à Douala et environs."
     ],
-    "buttonLabel": "Demander un service",
+    "buttonLabel": "Découvrir nos services",
     "enabled": true
   },
   {
@@ -82,8 +82,8 @@
     "key": "appointment-confirmed",
     "subject": "Votre rendez-vous du {date} est confirmé",
     "preheader": null,
-    "title": "C’est confirmé, {prénom}",
-    "paragraphs": ["Rendez-vous le {date} pour « {service} ». Un rappel vous sera envoyé la veille."],
+    "title": "Votre rendez-vous est confirmé.",
+    "paragraphs": ["Nous avons hâte d’échanger avec vous. Vous recevrez un rappel la veille."],
     "buttonLabel": "Ajouter à mon agenda",
     "enabled": true
   },
@@ -118,8 +118,10 @@
     "key": "survey-invitation",
     "subject": "Comment s’est passée votre prestation ?",
     "preheader": null,
-    "title": "Votre avis compte, {prénom}",
-    "paragraphs": ["Deux minutes suffisent pour nous dire comment s’est passée la prestation « {service} »."],
+    "title": "Votre avis compte, {prénom}.",
+    "paragraphs": [
+      "Votre prestation « {service} » du {date} est terminée. Pouvez-vous nous dire comment elle s’est passée ? 5 questions, 2 minutes."
+    ],
     "buttonLabel": "Donner mon avis",
     "enabled": true
   },

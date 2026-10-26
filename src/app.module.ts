@@ -9,6 +9,8 @@ import { AppConfigService } from './config/app-config.service.js';
 import { HealthModule } from './health/health.module.js';
 import { buildLoggerParams } from './logging/logger.config.js';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
+import { FormsModule } from './modules/forms/forms.module.js';
+import { MailModule } from './modules/mail/mail.module.js';
 import { NavigationModule } from './modules/navigation/navigation.module.js';
 import { PagesModule } from './modules/pages/pages.module.js';
 import { SettingsModule } from './modules/settings/settings.module.js';
@@ -35,6 +37,8 @@ import { PrismaModule } from './prisma/prisma.module.js';
     ZonesModule,
     SitemapModule,
     CatalogModule,
+    MailModule,
+    FormsModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: ProblemFilter },

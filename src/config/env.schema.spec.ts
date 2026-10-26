@@ -64,6 +64,16 @@ describe('parseEnv', () => {
     expect(env.SMTP_USER).toBeUndefined();
   });
 
+  it("active le worker des e-mails sauf en test, et n'accepte que on ou off", () => {
+    expect(parseEnv({ NODE_ENV: 'development' }).MAIL_WORKER).toBe('on');
+    expect(parseEnv({ NODE_ENV: 'test' }).MAIL_WORKER).toBe('off');
+    expect(parseEnv({ NODE_ENV: 'test', MAIL_WORKER: 'on' }).MAIL_WORKER).toBe('on');
+    expect(parseEnv(PRODUCTION_ENV).MAIL_WORKER).toBe('on');
+    expect(issuesOf({ NODE_ENV: 'development', MAIL_WORKER: 'yes' })).toEqual({
+      MAIL_WORKER: 'Valeur attendue : on ou off.',
+    });
+  });
+
   it('considère le développement comme environnement par défaut', () => {
     expect(parseEnv({}).NODE_ENV).toBe('development');
   });

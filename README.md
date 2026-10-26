@@ -46,6 +46,24 @@ pnpm db:purge-demo      # supprimer toutes les données de démonstration (isDem
   enregistrée telle quelle, sans téléversement dans le stockage S3.
 - Les fichiers `prisma/seed/data/*.json` reprennent les mocks du site (`mambo-proxi-web/src/mocks`).
 
+## E-mails
+
+Les e-mails partent en arrière-plan par la file BullMQ `mail` (Redis) : `MailQueueService.enqueue(...)` ajoute une
+tâche, le worker la rend (gabarit React Email + textes du modèle modifiable dans le back-office) et l'envoie par SMTP
+avec une version texte brut. 5 tentatives à attente exponentielle (1, 2, 4, 8 min) ; tâches terminées purgées
+(7 jours pour les réussies, 30 jours pour les échecs).
+
+- En local, les e-mails arrivent dans **Mailpit** : http://localhost:8025 (`pnpm services:up`).
+- `MAIL_WORKER=on|off` : démarre ou non le worker dans le processus (`off` par défaut en test).
+- Données attendues par chaque gabarit : `src/modules/mail/templates/README.md`.
+
+```bash
+pnpm mail:preview   # rend les 21 gabarits (FR et EN) dans tmp/mail-preview/ — ouvrir index.html
+```
+
+La prévisualisation utilise les textes par défaut et des données d'exemple, sans base ni Redis ; le logo est chargé
+depuis `WEB_URL` (site local par défaut, `WEB_URL=https://mamboproxi.com pnpm mail:preview` pour le site en ligne).
+
 ## Vérifications
 
 ```bash

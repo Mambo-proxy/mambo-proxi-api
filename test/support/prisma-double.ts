@@ -4,11 +4,22 @@
  * `OR`, filtres sur une relation, `orderBy` y compris sur une relation, `take`, `where`/`orderBy`/`take` des listes
  * sélectionnées). Les enregistrements portent leurs relations sous forme d'objets (graphe en mémoire) ; les colonnes
  * simples sont toutes renvoyées, les relations seulement si elles sont sélectionnées.
+ *
+ * Écritures (formulaires publics) : `create`, `createMany`, `update`, `upsert` (avec `{ increment }`), `deleteMany`,
+ * `aggregate` (`_sum`), `count` ; `$transaction(fn)` exécute `fn` sur le double lui-même (pas d'annulation). Les
+ * enregistrements créés reçoivent un identifiant `<table>_<n>` et des dates `createdAt`/`updatedAt` si absentes.
  */
 import { vi } from 'vitest';
 
 type Row = Record<string, unknown>;
 type Args = { where?: Row; orderBy?: unknown; take?: number; select?: Row; include?: Row };
+type WriteArgs = Args & {
+  data?: Row | Row[];
+  create?: Row;
+  update?: Row;
+  skipDuplicates?: boolean;
+  _sum?: Row;
+};
 
 /** Champs des enregistrements du double qui sont des relations (les autres, JSON compris, sont des colonnes). */
 const RELATIONS = new Set([
@@ -149,11 +160,80 @@ function findRows(rows: readonly Row[], args: Args = {}): Row[] {
   return limited.map((row) => project(row, args.select ?? args.include));
 }
 
-function delegate(rows: () => readonly Row[]) {
+let idSequence = 0;
+
+/** Applique les valeurs d'une écriture (`{ increment }`, `{ set }` ou valeur simple) à un enregistrement. */
+function applyData(record: Row, data: Row): void {
+  for (const [key, value] of Object.entries(data)) {
+    if (value === undefined) continue;
+    if (isObject(value) && Object.keys(value).length === 1 && 'increment' in value) {
+      record[key] = ((record[key] as number | null | undefined) ?? 0) + (value['increment'] as number);
+    } else if (isObject(value) && Object.keys(value).length === 1 && 'set' in value) {
+      record[key] = value['set'];
+    } else {
+      record[key] = value;
+    }
+  }
+}
+
+function delegate(name: string, rows: () => Row[]) {
+  const insert = (data: Row): Row => {
+    idSequence += 1;
+    const now = new Date();
+    const record: Row = { id: `${name}_${String(idSequence)}`, createdAt: now, updatedAt: now };
+    applyData(record, data);
+    rows().push(record);
+    return record;
+  };
+  const update = (record: Row, data: Row): Row => {
+    applyData(record, data);
+    if (!('updatedAt' in data)) record['updatedAt'] = new Date();
+    return record;
+  };
   return {
     findMany: vi.fn((args?: Args) => Promise.resolve(findRows(rows(), args))),
     findFirst: vi.fn((args?: Args) => Promise.resolve(findRows(rows(), args)[0] ?? null)),
     findUnique: vi.fn((args?: Args) => Promise.resolve(findRows(rows(), args)[0] ?? null)),
+    count: vi.fn((args?: Args) =>
+      Promise.resolve(rows().filter((row) => matchesWhere(row, args?.where)).length),
+    ),
+    create: vi.fn((args: WriteArgs) =>
+      Promise.resolve(project(insert(args.data as Row), args.select ?? args.include)),
+    ),
+    createMany: vi.fn((args: WriteArgs) => {
+      const data = Array.isArray(args.data) ? args.data : [args.data as Row];
+      data.forEach((item) => insert(item));
+      return Promise.resolve({ count: data.length });
+    }),
+    update: vi.fn((args: WriteArgs) => {
+      const record = rows().find((row) => matchesWhere(row, args.where));
+      if (!record)
+        return Promise.reject(new Error(`Double Prisma : ${name} introuvable pour la mise à jour.`));
+      return Promise.resolve(project(update(record, args.data as Row), args.select ?? args.include));
+    }),
+    upsert: vi.fn((args: WriteArgs) => {
+      const existing = rows().find((row) => matchesWhere(row, args.where));
+      const record = existing ? update(existing, args.update ?? {}) : insert(args.create ?? {});
+      return Promise.resolve(project(record, args.select ?? args.include));
+    }),
+    deleteMany: vi.fn((args?: Args) => {
+      const table = rows();
+      const kept = table.filter((row) => !matchesWhere(row, args?.where));
+      const count = table.length - kept.length;
+      table.splice(0, table.length, ...kept);
+      return Promise.resolve({ count });
+    }),
+    aggregate: vi.fn((args: WriteArgs) => {
+      const matching = rows().filter((row) => matchesWhere(row, args.where));
+      const sums: Row = {};
+      for (const field of Object.keys(args._sum ?? {})) {
+        const values = matching
+          .map((row) => row[field])
+          .filter((value): value is number => typeof value === 'number');
+        sums[field] = values.length > 0 ? values.reduce((total, value) => total + value, 0) : null;
+      }
+      return Promise.resolve({ _sum: sums });
+    }),
   };
 }
 
@@ -167,21 +247,63 @@ export interface PrismaTables {
   zone: Row[];
   redirect: Row[];
   jobOffer: Row[];
+  // Tables des formulaires publics (facultatives : vides par défaut).
+  user?: Row[];
+  training?: Row[];
+  event?: Row[];
+  contact?: Row[];
+  contactInterest?: Row[];
+  subscriber?: Row[];
+  referenceCounter?: Row[];
+  request?: Row[];
+  requestEvent?: Row[];
+  notification?: Row[];
 }
+
+const OPTIONAL_TABLES = [
+  'user',
+  'training',
+  'event',
+  'contact',
+  'contactInterest',
+  'subscriber',
+  'referenceCounter',
+  'request',
+  'requestEvent',
+  'notification',
+] as const;
 
 /** Double à passer à `overrideProvider(PrismaService).useValue(…)`. */
 export function createPrismaDouble(tables: PrismaTables) {
-  return {
-    setting: delegate(() => tables.setting),
-    media: delegate(() => tables.media),
-    category: delegate(() => tables.category),
-    service: delegate(() => tables.service),
-    review: delegate(() => tables.review),
-    page: delegate(() => tables.page),
-    zone: delegate(() => tables.zone),
-    redirect: delegate(() => tables.redirect),
-    jobOffer: delegate(() => tables.jobOffer),
+  for (const name of OPTIONAL_TABLES) tables[name] ??= [];
+  const table = (name: keyof PrismaTables) => (): Row[] => tables[name] ?? [];
+  const double = {
+    setting: delegate('setting', table('setting')),
+    media: delegate('media', table('media')),
+    category: delegate('category', table('category')),
+    service: delegate('service', table('service')),
+    review: delegate('review', table('review')),
+    page: delegate('page', table('page')),
+    zone: delegate('zone', table('zone')),
+    redirect: delegate('redirect', table('redirect')),
+    jobOffer: delegate('jobOffer', table('jobOffer')),
+    user: delegate('user', table('user')),
+    training: delegate('training', table('training')),
+    event: delegate('event', table('event')),
+    contact: delegate('contact', table('contact')),
+    contactInterest: delegate('contactInterest', table('contactInterest')),
+    subscriber: delegate('subscriber', table('subscriber')),
+    referenceCounter: delegate('referenceCounter', table('referenceCounter')),
+    request: delegate('request', table('request')),
+    requestEvent: delegate('requestEvent', table('requestEvent')),
+    notification: delegate('notification', table('notification')),
     $queryRaw: vi.fn().mockResolvedValue([{ '?column?': 1 }]),
     $disconnect: vi.fn().mockResolvedValue(undefined),
+    $transaction: vi.fn((operation: unknown): Promise<unknown> => {
+      if (typeof operation === 'function')
+        return Promise.resolve((operation as (tx: unknown) => unknown)(double));
+      return Promise.all(operation as Promise<unknown>[]);
+    }),
   };
+  return double;
 }

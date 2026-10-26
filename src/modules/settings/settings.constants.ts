@@ -11,7 +11,9 @@
  * - `chiffres` : `{ keyFigures: KeyFigure[] }` ;
  * - `securite` : `{ maintenanceMode, trustedDeviceDays }` ;
  * - `navigation` : `{ main, signUp, footer, legal, megaMenuPromo }` (formes du schéma `Navigation`) ;
- * - `zones` : `{ showFees, note }`.
+ * - `zones` : `{ showFees, note }` ;
+ * - `emails` : `{ teamRecipients, senderName, replyTo, surveyDelayHours, surveyReminderDays, appointmentReminderHour }`
+ *   (`SettingsEmails`, destinataires des alertes « nouvelle demande »).
  */
 export const SETTING_KEYS = {
   site: 'site',
@@ -24,6 +26,7 @@ export const SETTING_KEYS = {
   securite: 'securite',
   navigation: 'navigation',
   zones: 'zones',
+  emails: 'emails',
 } as const;
 
 export type SettingKey = (typeof SETTING_KEYS)[keyof typeof SETTING_KEYS];

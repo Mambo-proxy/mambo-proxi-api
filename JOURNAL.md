@@ -102,3 +102,59 @@
 - `slugEn` existe dans le schéma mais pas dans le contrat : le site ne peut pas construire les adresses anglaises (`/en/services/experience/private-chef`).
 - `preview` accepté mais non traité (jetons signés à venir avec le back-office).
 - Le modèle `Service` n'a pas de `offersTitleMobile` (`ServiceOffers.titleMobile`) : propriété omise pour les fiches.
+
+## Phase 2 — Formulaires publics, contacts et demandes (26 octobre 2026)
+
+### Fait
+
+- Six opérations publiques du contrat : `POST /v1/quote-requests`, `/v1/contact-messages`, `/v1/registrations`, `/v1/training-requests`, `/v1/partner-requests`, `/v1/event-registrations` (module `src/modules/forms` : contrôleur, schémas zod, service, mappers, données des e-mails).
+- Anti-spam partagé `src/common/anti-spam` (schéma `AntiSpam`, `TurnstileService`, `AntiSpamService`), réutilisable par les rendez-vous, candidatures et la newsletter.
+- Modules `contacts` (fiche par e-mail, centres d'intérêt, abonnement en attente) et `requests` (référence, création, historique, notifications).
+- `MailModule` (écrit en parallèle) importé dans `AppModule` ; les formulaires n'utilisent que `MailQueueService.enqueueMany`.
+- Tests : unitaires (`anti-spam.spec.ts`, `reference.spec.ts`, `contact.mapper.spec.ts`, `forms.mapper.spec.ts`) ; e2e `test/public-forms.e2e-spec.ts`. Le double de Prisma gagne les écritures (`create`, `createMany`, `update`, `upsert`, `deleteMany`, `aggregate`, `count`, `$transaction`) sans changer les lectures.
+
+### Décisions
+
+- **Ordre des contrôles** : validation du corps (422) → champ piège → délai minimal → Turnstile (400) → existence de la rubrique, du service, de la formation ou de l'événement (422 sur le champ, aucune réponse 404 n'étant prévue par le contrat) → transaction → e-mails.
+- **Champ piège** : rempli → `201` avec une référence vraisemblable et le message habituel, sans enregistrement, sans e-mail, sans appel à Cloudflare (le contrat fixe `maxLength: 0`, qui donnerait un 422 révélateur).
+- **Délai minimal** : moins de 3 s entre `startedAt` et la réception → 400 `spam-check-failed` (seule réponse anti-spam du contrat). Une date d'ouverture dans le futur (horloge du visiteur en avance) est tolérée.
+- **Turnstile** : `fetch` natif, délai de 5 s, refus en cas d'erreur réseau. Jeton vide accepté hors production (le site l'envoie sans clé publique) ; clé d'essai `1x0000…AA` hors production : aucun appel réseau. Journaux : codes d'erreur de Cloudflare seulement.
+- **Références** : `upsert` de la ligne de l'année (`INSERT … ON CONFLICT DO UPDATE … + 1`) dans la transaction de création ; année à l'heure de Douala ; compteur partagé avec les rendez-vous ; un échec de la transaction ne consomme aucun numéro.
+- **Contacts** : une fiche par e-mail normalisé (minuscules, sans espaces) ; seules les informations fournies remplacent l'existant ; source retenue à la création ; prénom = premier mot du nom complet (sauf inscription) ; quartier déduit de « Quartier, Ville » ; partenariat → profil professionnel.
+- **Consentements** : horodatage, IP et agent utilisateur portés par chaque demande (`consentAt`, `ip`, `userAgent`) ; newsletter cochée à l'inscription → abonné `EN_ATTENTE` avec `consentAt` (un abonné confirmé le reste, un désinscrit redevient en attente). L'e-mail de confirmation (jeton) sera envoyé par le module newsletter.
+- **Demandes** : statut `NOUVELLE`, échéance réception + 24 h, `payload` = valeurs du formulaire + `fields` (libellé, valeur formatée) comme le seed ; historique `RECEIVED` ; une notification par membre actif des rôles qui voient toutes les demandes (ADMIN, MANAGER, EDITOR) : `REQUEST`, `REGISTRATION` (inscription) ou `PARTNERSHIP`, lien `/admin/demandes?id=…`.
+- **Événements** : places restantes calculées (jauge − places des inscriptions) sous verrou de la ligne de l'événement (`SELECT … FOR UPDATE`) → 409 `event-full` ; événement terminé → 422.
+- **E-mails** : après la transaction, accusé de réception (gabarit du formulaire, langue de l'envoi) et une alerte `team-new-request` en français par destinataire du paramètre `emails.teamRecipients` (à défaut `coordonnees.email`) ; erreur de mise en file journalisée avec la seule référence.
+- **Langue** : `lang` facultatif dans le corps (absent du contrat), sinon `Accept-Language`, sinon `fr` ; message de confirmation en français ou en anglais, erreurs en français.
+- **Limitation de débit** : 5 envois par minute, par IP et par formulaire (`@Throttle`), réponse 429 du socle.
+
+### Difficultés et solutions
+
+- **Module des e-mails écrit en parallèle** : interface convenue (`MailJob`, `MailQueueService`) importée telle quelle ; les tests remplacent `MailQueueService` par un double.
+- **Limitation de débit dans les tests** : un stockage remis à zéro entre les tests remplace `ThrottlerStorage` (vider la table interne ne suffit pas : les dates d'expiration des coups sont gardées à part).
+- **Machine limitée** : ni compilation ni tests lancés ; ESLint et Prettier passés sur les fichiers ajoutés.
+
+### Points ouverts (contrat et schéma)
+
+- Ajouter `lang` aux schémas `…Input` des formulaires (langue des e-mails), et préciser que le champ piège rempli reçoit un succès factice.
+- Réponse 404 absente des formulaires : une rubrique, un service, une formation ou un événement inconnu donne un 422 sur le champ.
+- Limite journalière (30 envois par jour et par IP) non encore en place.
+- `ACK_SENT` / `TEAM_ALERT_SENT` : à écrire dans l'historique par le module mail lors de l'envoi effectif (la référence est transmise dans `MailJob.reference`).
+- Clé publique Turnstile en production : toujours vide tant que `TURNSTILE_SITE_KEY` n'existe pas ; le site enverrait alors des jetons vides, refusés en production.
+
+### E-mails et file d'attente (26 octobre 2026)
+
+- File BullMQ `mail` sur une connexion ioredis partagée (ouverte à la première utilisation) : 5 tentatives, attente exponentielle à partir d'une minute ; historique limité (7 jours ou 1 000 envois, 30 jours ou 5 000 échecs). Tâche invalide : échec immédiat, sans réessai. Identifiant de tâche stable quand une référence est fournie (empreinte sha256, aucune adresse en clair dans Redis).
+- Worker Nodemailer (SMTP de la configuration, Mailpit en local), démarré si `MAIL_WORKER=on` (désactivé en test), 4 envois à la fois ; texte brut toujours joint ; `List-Unsubscribe` pour la newsletter ; envois tracés dans l'historique des demandes (`ACK_SENT`, `TEAM_ALERT_SENT`) et dans les envois de campagne.
+- 21 gabarits React Email sur un gabarit commun fidèle aux maquettes (carte 600 px, ruban dégradé, récapitulatif, bouton orange, pied de page lu dans les paramètres) ; textes lus dans les modèles d'e-mails en base (modifiables dans le back-office), version anglaise champ par champ, textes par défaut si le modèle manque.
+- `pnpm mail:preview` : rendu HTML et texte de chaque gabarit dans `tmp/mail-preview/`.
+
+### Décisions
+
+- **Textes des 4 e-mails maquettés alignés sur les maquettes** (accusé de réception du devis, rendez-vous confirmé, inscription confirmée, invitation au questionnaire) dans le seed, les textes par défaut et les modèles du back-office du site. Écart volontaire : « nos 30 services » de la maquette devient « nos services » (22 services au catalogue).
+- **Logo en PNG** (`mambo-proxi-web/public/brand/logo-horizontal.png`, 576 × 160, rendu depuis le SVG) : Gmail et Outlook n'affichent pas les SVG.
+
+### Difficultés et solutions
+
+- **`pnpm exec prettier` bloqué sous ce Windows** (processus qui ne se terminent pas) : Prettier et ESLint lancés directement par `node node_modules/...`.
+- **Nom affiché des inscriptions** : le prénom et le nom saisis séparément étaient recollés puis recoupés au premier espace (« Marie C. » pour « Marie Claire Ndongo ») ; `shortName` reprend désormais le prénom et le nom tels quels (« Marie Claire N. »).
