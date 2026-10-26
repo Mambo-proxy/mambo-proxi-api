@@ -22,3 +22,58 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm contract:lint
+
+  api:
+    name: API (lint, types, build, tests)
+    runs-on: ubuntu-latest
+    services:
+      # Mêmes images et identifiants que docker-compose.yml.
+      postgres:
+        image: postgres:18.4-alpine
+        env:
+          POSTGRES_USER: mambo
+          POSTGRES_PASSWORD: mambo
+          POSTGRES_DB: mambo_proxi
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mambo -d mambo_proxi"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+      redis:
+        image: redis:8.10.2-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://mambo:mambo@localhost:5432/mambo_proxi?schema=public
+      REDIS_URL: redis://localhost:6379
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Client Prisma
+        run: pnpm prisma:generate
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm typecheck
+      - run: pnpm build
+      - name: Migrations
+        if: hashFiles('prisma/migrations/**/migration.sql') != ''
+        run: pnpm db:deploy
+      - name: Tests unitaires
+        run: pnpm test
+      - name: Tests e2e (PostgreSQL et Redis réels)
+        run: pnpm test:e2e
+        env:
+          E2E_REAL_SERVICES: 'true'

@@ -1,0 +1,7 @@
+dist/
+coverage/
+node_modules/
+src/generated/
+pnpm-lock.yaml
+# Contrat rédigé à la main (objets YAML sur une ligne) : mise en forme conservée telle quelle.
+contracts/openapi.yaml

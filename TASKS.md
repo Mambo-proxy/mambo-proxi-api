@@ -3,6 +3,7 @@
 Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site et du back-office sont dans `../mambo-proxi-web/TASKS.md`.
 
 ## Phase 0 — Préparation
+
 - [x] Contrat `contracts/openapi.yaml` (OpenAPI 3.1) : 116 routes, schémas, exemples tirés des maquettes
 - [x] Validation Redocly sans erreur ni avertissement (`pnpm contract:lint`)
 - [x] `docker-compose.yml` de développement (PostgreSQL 18, Redis 8, S3 SeaweedFS, Mailpit)
@@ -10,12 +11,24 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
 - [ ] Relecture finale du contrat formulaire par formulaire et écran par écran (après inventaire des cadres restants : questionnaire, 404, e-mails)
 
 ## Phase 2 — Backend complet
+
 ### Socle
-- [ ] Projet NestJS (TypeScript strict), configuration validée (zod), journaux pino sans données personnelles, Helmet, CORS strict, throttler, filtre d'erreurs RFC 9457, `/v1/health`
+
+- [~] Projet NestJS (TypeScript strict), configuration validée (zod), journaux pino sans données personnelles, Helmet, CORS strict, throttler, filtre d'erreurs RFC 9457, `/v1/health`
+  - [x] Outillage : TypeScript 6 strict (ESM, `nodenext`), ESLint avec types, Prettier, Vitest + SWC (projets `unit` et `e2e`), scripts `package.json`
+  - [x] Configuration validée par zod au démarrage (`src/config`), messages en français, obligatoire en production
+  - [x] Journaux nestjs-pino (JSON / pino-pretty, masquage, `X-Request-Id`), Helmet, CORS limité au site, cookie-parser, arrêt propre, Swagger `/docs` hors production
+  - [x] Filtre global RFC 9457 (`ProblemFilter`, `ProblemException`), `ZodValidationPipe` (422 corps / 400 paramètres), JSON illisible → `invalid-body`
+  - [x] Limitation de débit globale (120 requêtes/min par IP, en-têtes `RateLimit-*` et `Retry-After`)
+  - [x] `PrismaModule` global (adaptateur `pg`, connexion à la première requête)
+  - [x] `GET /v1/health` (base de données + Redis ; 503 si une dépendance est indisponible)
+  - [x] CI : job « API » (PostgreSQL et Redis en services, lint, format, types, build, migrations, tests)
+  - [ ] Premier passage complet en local et en CI (lint, types, tests) ; vérification du stockage S3 dans `/v1/health` avec le module storage
 - [ ] Prisma : schéma complet (docs/05 §2), migrations, seed (4 rubriques, 19 services, contenus de toutes les pages, démo marquée `demo` + `pnpm db:purge-demo`, admin initial, questions, modèles d'e-mails, paramètres)
-- [ ] Tests de contrat : validation de chaque réponse contre `openapi.yaml` ; diff du document `@nestjs/swagger` en CI
+- [~] Tests de contrat : validation de chaque réponse contre `openapi.yaml` (`test/contract.ts`, ajv 2020-12 : fait) ; diff du document `@nestjs/swagger` en CI (à faire)
 
 ### Modules (ordre docs/08)
+
 - [ ] settings · navigation · pages · categories · services (lecture publique, cache, preview ; offres en carrousel des fiches, `ServiceOffer`)
 - [ ] Formulaires publics : quote-requests, contact-messages, registrations, training-requests, partner-requests, event-registrations (anti-spam Turnstile + piège + délai, limitation de débit)
 - [ ] contacts · requests (références `MP-AAAA-NNNN`, historique, notes, export CSV, anonymisation)
@@ -32,9 +45,11 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
 - [ ] Tâches planifiées : nettoyage RGPD quotidien, sauvegarde `pg_dump` vers S3 (rotation 30 jours)
 
 ## Phase 3 — Intégration
+
 - [ ] E2E sur la pile Docker complète avec le site
 
 ## Phase 4 — Production
+
 - [ ] Dockerfile multi-étapes (non-root, HEALTHCHECK), `docker-compose.prod.yml` + Caddy
 - [ ] CI/CD : lint, types, tests, conformité au contrat, image GHCR, `prisma migrate deploy`, déploiement sur étiquette `v*`
 - [ ] Tests de charge k6 (50 utilisateurs simultanés), `pnpm audit` sans vulnérabilité haute

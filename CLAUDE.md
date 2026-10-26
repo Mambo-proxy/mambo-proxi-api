@@ -11,14 +11,25 @@ Le site et le back-office (dépôt `mambo-proxi-web`) consomment cette API.
 
 ## Commandes
 
-| Commande | Rôle |
-|---|---|
-| `pnpm install` | Installer les dépendances (pnpm 12, Node 24 — voir `.nvmrc`) |
-| `pnpm services:up` | Démarrer PostgreSQL, Redis, S3 (SeaweedFS) et Mailpit (`docker compose up -d`) |
-| `pnpm contract:lint` | Valider le contrat OpenAPI (Redocly) |
-| `pnpm contract:docs` | Générer la documentation HTML du contrat dans `dist/` |
+| Commande                            | Rôle                                                                                                                     |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `pnpm install`                      | Installer les dépendances (pnpm 12, Node 24 — voir `.nvmrc`)                                                             |
+| `pnpm services:up`                  | Démarrer PostgreSQL, Redis, S3 (SeaweedFS) et Mailpit (`docker compose up -d`)                                           |
+| `pnpm contract:lint`                | Valider le contrat OpenAPI (Redocly)                                                                                     |
+| `pnpm contract:docs`                | Générer la documentation HTML du contrat dans `dist/`                                                                    |
+| `pnpm start:dev`                    | Compiler puis relancer l'API à chaque modification (http://localhost:4000, documentation générée sur `/docs`)            |
+| `pnpm build` / `pnpm start`         | Compiler dans `dist/` / démarrer la version compilée                                                                     |
+| `pnpm lint`                         | ESLint (typescript-eslint avec vérification des types)                                                                   |
+| `pnpm format` / `pnpm format:check` | Mettre en forme / vérifier la mise en forme (Prettier)                                                                   |
+| `pnpm typecheck`                    | Vérifier les types (`tsc --noEmit`)                                                                                      |
+| `pnpm test`                         | Tests unitaires (`src/**/*.spec.ts`, Vitest + SWC)                                                                       |
+| `pnpm test:e2e`                     | Tests e2e (`test/**/*.e2e-spec.ts`, supertest) ; `E2E_REAL_SERVICES=true` ajoute les tests sur PostgreSQL et Redis réels |
+| `pnpm prisma:generate`              | Générer le client Prisma dans `src/generated/prisma` (aussi lancé après `pnpm install`)                                  |
+| `pnpm db:migrate`                   | Créer et appliquer une migration en développement (`prisma migrate dev`)                                                 |
+| `pnpm db:deploy`                    | Appliquer les migrations existantes (`prisma migrate deploy`, CI et production)                                          |
+| `pnpm db:seed`                      | Remplir la base (`prisma/seed.ts`)                                                                                       |
 
-(Les commandes de développement, de test et de base de données sont ajoutées en phase 2.)
+Socle technique : modules ESM (`"type": "module"`, imports relatifs suffixés `.js`), NestJS 12, Prisma 7 (client généré, adaptateur `pg`), validation par zod (`ZodValidationPipe`), erreurs levées avec `ProblemException` (`src/common/problem`), tests de contrat avec `expectToMatchContract` (`test/contract.ts`). Les dépendances injectées sont déclarées avec `@Inject(...)` explicite.
 
 ## Conventions
 
