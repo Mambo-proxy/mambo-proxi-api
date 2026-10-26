@@ -250,3 +250,29 @@
   une fois le code (10 min) ou le lien (1 h) expiré, mais à savoir pour l'exploitation de Redis.
 - Liste des mots de passe compromis embarquée et courte : une vérification « Have I Been Pwned » (k-anonymat) est
   possible plus tard, si un appel sortant est acceptable.
+
+## Contrat — réponses d'erreur de l'authentification et des utilisateurs (26 octobre 2026)
+
+### Fait
+
+- `contracts/openapi.yaml` : 422 `ValidationError` sur `login`, `verify-otp`, `resend-otp`, `forgot-password` et
+  `PATCH /v1/admin/users/{id}` ; 401 `invalid-otp` sur `resend-otp` (défi inconnu, expiré, utilisé ou épuisé) ;
+  423 sur `verify-otp` (compte verrouillé entre le mot de passe et le code, cas déjà levé par le code) ; 404
+  `NotFound` sur `DELETE /v1/admin/users/{id}` et `POST /v1/admin/users/{id}/reset-password` ; 409 sur ce dernier
+  (compte désactivé) ; 409 de `DELETE` décrit (son propre compte, dernier administrateur actif, auteur de notes) ;
+  403 `Forbidden` sur `logout` ; 429 sur `refresh` (limite de 30/min) et description du délai de grâce de 10 s.
+- Réponse `Forbidden` : deux exemples nommés (`forbidden`, `csrfTokenInvalid`), description des deux types.
+- Tests e2e : les réponses validées « contre `Problem` faute de contrat » passent sur `expectContract` ; ajout des
+  422 de `verify-otp`, `resend-otp` et `forgot-password`, du 423 de `verify-otp`, du 404 de `reset-password`.
+
+### Décisions
+
+- 403 `csrf-token-invalid` : documenté une fois dans la réponse commune `Forbidden` (et le schéma de sécurité
+  `csrfToken`) plutôt que par route ; les routes d'utilisateurs déclaraient déjà `403`, `logout` l'ajoute.
+- `refresh` reste public (seul `mp_rt` est lu, pas de jeton CSRF), comme l'implémentation : le test qui compare les
+  routes publiques au contrat reste valable.
+
+### Points ouverts
+
+- Environ 70 mutations à cookie hors authentification et utilisateurs ne déclarent pas `403` (modules pas encore
+  implémentés) : à compléter avec chaque module.

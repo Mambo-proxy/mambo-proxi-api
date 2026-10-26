@@ -55,7 +55,8 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
   - [x] `/v1/admin/users*` et `/v1/admin/roles` : liste, présence (activité au plus une écriture par minute), invitation, modification, désactivation (sessions révoquées), suppression, réinitialisation ; journal d'activité
   - [x] Seed : mots de passe `SEED_ADMIN_PASSWORD` et `SEED_DEMO_PASSWORD` (développement) hachés en argon2id
   - [x] Tests : unitaires (permissions contre le contrat, JWT, politique des mots de passe) ; e2e `test/auth.e2e-spec.ts`, `test/admin-users.e2e-spec.ts` (doubles ; bloc base réelle)
-  - [ ] Contrat : ajouter 422 (login, verify-otp, resend-otp, forgot-password, PATCH users), 401 (resend-otp), 404 (DELETE et reset-password d'un utilisateur), 409 (reset-password d'un compte désactivé)
+  - [x] Contrat : 422 (login, verify-otp, resend-otp, forgot-password, PATCH users), 401 (resend-otp), 423 (verify-otp), 404 et 409 (DELETE et reset-password d'un utilisateur), 403 (logout), 429 (refresh), exemple `csrf-token-invalid` de `Forbidden` ; tests passés sur `expectContract`
+  - [ ] Contrat : 403 `Forbidden` absent de ~70 mutations à cookie hors auth/utilisateurs (services, pages, avis, médias…), à ajouter avec leurs modules
   - [ ] Site : appeler `POST /v1/auth/refresh` sur un 401 (jeton d'accès de 15 min) avant de rediriger vers la connexion
 - [ ] appointments + availability (créneaux, 409, confirmation `.ics`, proposition, rappel J-1 9 h Douala)
 - [ ] surveys + reviews (invitation après « Prestation réalisée », relance J+3, jeton unique 30 j, consentement de publication)

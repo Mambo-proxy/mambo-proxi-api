@@ -1117,6 +1117,7 @@ paths:
             application/problem+json:
               schema: { $ref: '#/components/schemas/Problem' }
               example: { type: https://api.mamboproxi.com/problems/account-locked, title: Compte verrouillé, status: 423, detail: Trop de tentatives. Réessayez dans 15 minutes ou réinitialisez votre mot de passe. }
+        '422': { $ref: '#/components/responses/ValidationError' }
         '429': { $ref: '#/components/responses/TooManyRequests' }
 
   /v1/auth/verify-otp:
@@ -1148,6 +1149,13 @@ paths:
             application/problem+json:
               schema: { $ref: '#/components/schemas/Problem' }
               example: { type: https://api.mamboproxi.com/problems/invalid-otp, title: Code incorrect, status: 401, detail: Ce code est incorrect. Il vous reste 3 essais. }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '423':
+          description: Compte verrouillé entre la saisie du mot de passe et celle du code.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+              example: { type: https://api.mamboproxi.com/problems/account-locked, title: Compte verrouillé, status: 423, detail: Trop de tentatives. Réessayez dans 15 minutes ou réinitialisez votre mot de passe. }
         '429': { $ref: '#/components/responses/TooManyRequests' }
 
   /v1/auth/resend-otp:
@@ -1170,6 +1178,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/LoginResult' }
+        '401':
+          description: Défi inconnu, expiré, déjà utilisé ou épuisé (se reconnecter).
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+              example: { type: https://api.mamboproxi.com/problems/invalid-otp, title: Code incorrect, status: 401, detail: Ce code a expiré. Reconnectez-vous pour en recevoir un nouveau. }
+        '422': { $ref: '#/components/responses/ValidationError' }
         '429': { $ref: '#/components/responses/TooManyRequests' }
 
   /v1/auth/refresh:
@@ -1177,9 +1192,15 @@ paths:
       tags: [Authentification]
       operationId: refreshSession
       summary: Rotation des jetons (cookie `mp_rt`)
+      description: |
+        Seul le cookie `mp_rt` est lu : ni jeton d'accès ni jeton CSRF exigés (le jeton d'accès a pu expirer).
+        À appeler quand une requête authentifiée reçoit `401`, puis rejouer la requête une fois.
+        Jeton déjà remplacé il y a moins de 10 s (plusieurs onglets en même temps) : `204` sans nouveaux cookies,
+        ceux de la première rotation restent valables. Refus : `401` et cookies de session effacés.
       responses:
-        '204': { description: Nouveaux cookies déposés. }
+        '204': { description: Nouveaux cookies déposés (ou déjà déposés par une rotation de moins de 10 s). }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
 
   /v1/auth/logout:
     post:
@@ -1189,6 +1210,7 @@ paths:
       security: [{ cookieAuth: [], csrfToken: [] }]
       responses:
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '204': { description: 'Session révoquée, cookies effacés.' }
 
   /v1/auth/me:
@@ -1235,6 +1257,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/MessageResponse' }
               example: { message: 'Si un compte correspond à cette adresse, vous allez recevoir un lien de réinitialisation.' }
+        '422': { $ref: '#/components/responses/ValidationError' }
         '429': { $ref: '#/components/responses/TooManyRequests' }
 
   /v1/auth/reset-password:
@@ -4014,22 +4037,33 @@ paths:
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409':
-          description: Impossible de retirer le dernier administrateur actif.
+          description: Impossible de retirer (rétrograder ou désactiver) le dernier administrateur actif, ou de désactiver son propre compte.
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/Problem' }
+              example: { type: https://api.mamboproxi.com/problems/conflict, title: Conflit, status: 409, detail: Impossible de retirer le dernier administrateur actif. }
+        '422': { $ref: '#/components/responses/ValidationError' }
     delete:
       tags: [Admin — Utilisateurs]
       operationId: adminDeleteUser
       x-permissions: [users:manage]
       summary: Supprimer un utilisateur
+      description: |
+        Refus (`409`) : son propre compte, le dernier administrateur actif, ou un utilisateur auteur de notes sur des
+        demandes (historique conservé : le désactiver plutôt que le supprimer).
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       responses:
         '204': { $ref: '#/components/responses/NoContent' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
-        '409': { $ref: '#/components/responses/Conflict' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Son propre compte, dernier administrateur actif, ou utilisateur ayant un historique dans les demandes.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+              example: { type: https://api.mamboproxi.com/problems/conflict, title: Conflit, status: 409, detail: 'Cet utilisateur a un historique dans les demandes : désactivez-le plutôt que de le supprimer.' }
 
   /v1/admin/users/{id}/reset-password:
     post:
@@ -4037,6 +4071,9 @@ paths:
       operationId: adminResetUserPassword
       x-permissions: [users:manage]
       summary: Envoyer un lien de réinitialisation et révoquer les sessions
+      description: |
+        Lien valable 1 heure, sessions du compte révoquées. Invitation pas encore acceptée : nouvelle invitation
+        (7 jours) à la place.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       responses:
@@ -4047,6 +4084,13 @@ paths:
               schema: { $ref: '#/components/schemas/MessageResponse' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Compte désactivé (le réactiver d'abord).
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+              example: { type: https://api.mamboproxi.com/problems/conflict, title: Conflit, status: 409, detail: 'Ce compte est désactivé : réactivez-le avant de lui envoyer un lien.' }
 
   # ──────────────────────────── Admin — Médias ────────────────────
   /v1/admin/media:
@@ -4330,15 +4374,27 @@ components:
             status: 401
             detail: Veuillez vous reconnecter.
     Forbidden:
-      description: Droits insuffisants ou jeton CSRF invalide.
+      description: |
+        Droits insuffisants (`forbidden`) ou, pour une mutation, jeton CSRF absent ou invalide (`csrf-token-invalid` :
+        en-tête `X-CSRF-Token` différent du cookie `mp_csrf` ou émis pour un autre compte).
       content:
         application/problem+json:
           schema: { $ref: '#/components/schemas/Problem' }
-          example:
-            type: https://api.mamboproxi.com/problems/forbidden
-            title: Action non autorisée
-            status: 403
-            detail: Votre rôle ne permet pas d'effectuer cette action.
+          examples:
+            forbidden:
+              summary: Rôle insuffisant
+              value:
+                type: https://api.mamboproxi.com/problems/forbidden
+                title: Action non autorisée
+                status: 403
+                detail: Votre rôle ne permet pas d'effectuer cette action.
+            csrfTokenInvalid:
+              summary: Jeton CSRF absent ou invalide
+              value:
+                type: https://api.mamboproxi.com/problems/csrf-token-invalid
+                title: Action non autorisée
+                status: 403
+                detail: Le jeton de sécurité est absent ou invalide. Rechargez la page puis réessayez.
     NotFound:
       description: Ressource introuvable.
       content:

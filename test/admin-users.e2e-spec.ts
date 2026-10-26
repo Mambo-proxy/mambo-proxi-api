@@ -1,8 +1,7 @@
 /**
  * Tests e2e des utilisateurs du back-office (`/v1/admin/users*`, `/v1/admin/roles`) avec le double de Prisma :
  * permissions par rôle, présence de l'équipe, invitation, modification, désactivation, suppression,
- * réinitialisation par un administrateur. Chaque réponse documentée est validée contre le contrat (les réponses
- * absentes du contrat, signalées, le sont contre le schéma `Problem`).
+ * réinitialisation par un administrateur. Chaque réponse est validée contre le contrat.
  */
 import type { Server } from 'node:http';
 import type { NestExpressApplication } from '@nestjs/platform-express';
@@ -10,7 +9,7 @@ import request from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { PasswordService } from '../src/modules/auth/password.service.js';
 import { roleDefinitions } from '../src/modules/auth/permissions.js';
-import { CONTRACT_WARM_UP_TIMEOUT, expectToMatchSchema, prepareContract } from './contract.js';
+import { CONTRACT_WARM_UP_TIMEOUT, prepareContract } from './contract.js';
 import {
   ACCOUNTS,
   MailQueueDouble,
@@ -291,7 +290,7 @@ describe('utilisateurs du back-office (avec des doubles)', () => {
       expectContract('patch', '/v1/admin/users/{id}', 200, allowed);
     });
 
-    it('répond 404 pour un utilisateur inconnu ; un corps vide est refusé (422, à ajouter au contrat)', async () => {
+    it('répond 404 pour un utilisateur inconnu ; un corps vide est refusé (422)', async () => {
       const admin = await as(ACCOUNTS.admin.email);
       const unknown = await admin.agent
         .patch(path('usr_inconnu'))
@@ -300,8 +299,7 @@ describe('utilisateurs du back-office (avec des doubles)', () => {
       expectContract('patch', '/v1/admin/users/{id}', 404, unknown);
 
       const empty = await admin.agent.patch(path(ACCOUNTS.agent.id)).set('X-CSRF-Token', admin.csrf).send({});
-      expect(empty.status).toBe(422);
-      expectToMatchSchema('Problem', empty.body);
+      expectContract('patch', '/v1/admin/users/{id}', 422, empty);
     });
   });
 
@@ -330,12 +328,11 @@ describe('utilisateurs du back-office (avec des doubles)', () => {
       expect(user(ACCOUNTS.editor.id)).toBeDefined();
     });
 
-    it('répond 404 pour un utilisateur inconnu (réponse à ajouter au contrat)', async () => {
+    it('répond 404 pour un utilisateur inconnu', async () => {
       const admin = await as(ACCOUNTS.admin.email);
       const response = await admin.agent.delete(path('usr_inconnu')).set('X-CSRF-Token', admin.csrf);
 
-      expect(response.status).toBe(404);
-      expectToMatchSchema('Problem', response.body);
+      expectContract('delete', '/v1/admin/users/{id}', 404, response);
     });
   });
 
@@ -368,11 +365,16 @@ describe('utilisateurs du back-office (avec des doubles)', () => {
       expect(mail.last('user-invite', ACCOUNTS.invited.email)).toBeDefined();
     });
 
-    it('refuse un compte désactivé (409) et un rôle sans `users:manage` (403)', async () => {
+    it('refuse un compte désactivé (409), un utilisateur inconnu (404) et un rôle sans `users:manage` (403)', async () => {
       const admin = await as(ACCOUNTS.admin.email);
       const disabled = await admin.agent.post(path(ACCOUNTS.disabled.id)).set('X-CSRF-Token', admin.csrf);
-      expect(disabled.status).toBe(409);
-      expectToMatchSchema('Problem', disabled.body);
+      expectContract('post', '/v1/admin/users/{id}/reset-password', 409, disabled);
+      expect((disabled.body as Row)['detail']).toBe(
+        'Ce compte est désactivé : réactivez-le avant de lui envoyer un lien.',
+      );
+
+      const unknown = await admin.agent.post(path('usr_inconnu')).set('X-CSRF-Token', admin.csrf);
+      expectContract('post', '/v1/admin/users/{id}/reset-password', 404, unknown);
 
       const editor = await as(ACCOUNTS.editor.email);
       expectContract(

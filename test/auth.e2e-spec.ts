@@ -21,7 +21,7 @@ import { IS_PUBLIC_KEY, PERMISSIONS_KEY } from '../src/modules/auth/auth.decorat
 import { PasswordService } from '../src/modules/auth/password.service.js';
 import { permissionsOf } from '../src/modules/auth/permissions.js';
 import { PrismaService } from '../src/prisma/prisma.service.js';
-import { CONTRACT_WARM_UP_TIMEOUT, expectToMatchSchema, prepareContract } from './contract.js';
+import { CONTRACT_WARM_UP_TIMEOUT, prepareContract } from './contract.js';
 import {
   ACCOUNTS,
   MailQueueDouble,
@@ -151,13 +151,12 @@ describe('authentification (avec des doubles)', () => {
       expect(user).toMatchObject({ failedLoginCount: 0, lockedUntil: null });
     });
 
-    it('refuse un corps invalide (422, réponse à ajouter au contrat)', async () => {
+    it('refuse un corps invalide (422)', async () => {
       const response = await request(server)
         .post('/v1/auth/login')
         .send({ email: 'pas-une-adresse', password: '' });
 
-      expect(response.status).toBe(422);
-      expectToMatchSchema('Problem', response.body);
+      expectContract('post', '/v1/auth/login', 422, response);
       expect((response.body as { errors: Row[] }).errors.map((error) => error['path']).sort()).toEqual([
         'email',
         'password',
@@ -275,6 +274,30 @@ describe('authentification (avec des doubles)', () => {
       expectContract('post', '/v1/auth/verify-otp', 401, unknown);
     });
 
+    it('refuse un corps invalide (422)', async () => {
+      const response = await request(server)
+        .post('/v1/auth/verify-otp')
+        .send({ challengeId: '', code: '12ab' });
+
+      expectContract('post', '/v1/auth/verify-otp', 422, response);
+      expect((response.body as { errors: Row[] }).errors.map((error) => error['path']).sort()).toEqual([
+        'challengeId',
+        'code',
+      ]);
+    });
+
+    it('refuse le code d’un compte verrouillé entre-temps (423)', async () => {
+      const challengeId = await challenge();
+      const admin = rows(tables, 'user').find((row) => row['id'] === ACCOUNTS.admin.id)!;
+      admin['lockedUntil'] = new Date(Date.now() + 15 * MINUTE);
+      const response = await request(server)
+        .post('/v1/auth/verify-otp')
+        .send({ challengeId, code: mail.code(ACCOUNTS.admin.email) });
+
+      expectContract('post', '/v1/auth/verify-otp', 423, response);
+      expect((response.body as Row)['type']).toBe(`${PROBLEMS}account-locked`);
+    });
+
     it('mémorise l’appareil 30 jours : connexion suivante sans code (200 dès le mot de passe)', async () => {
       const agent = request.agent(server);
       const session = await signIn(server, mail, ACCOUNTS.admin.email, { agent, trustDevice: true });
@@ -352,12 +375,14 @@ describe('authentification (avec des doubles)', () => {
       expect(ok.status).toBe(200);
     });
 
-    it('refuse un défi inconnu ou clos (401, réponse à ajouter au contrat)', async () => {
+    it('refuse un défi inconnu ou clos (401) et un corps invalide (422)', async () => {
       const response = await request(server).post('/v1/auth/resend-otp').send({ challengeId: 'inconnu' });
 
-      expect(response.status).toBe(401);
-      expectToMatchSchema('Problem', response.body);
+      expectContract('post', '/v1/auth/resend-otp', 401, response);
       expect((response.body as Row)['type']).toBe(`${PROBLEMS}invalid-otp`);
+
+      const invalid = await request(server).post('/v1/auth/resend-otp').send({});
+      expectContract('post', '/v1/auth/resend-otp', 422, invalid);
     });
   });
 
@@ -490,7 +515,7 @@ describe('authentification (avec des doubles)', () => {
       const { agent, csrf } = await signIn(server, mail, ACCOUNTS.writer.email, { trustDevice: true });
 
       const withoutCsrf = await agent.post('/v1/auth/logout');
-      expect(withoutCsrf.status).toBe(403);
+      expectContract('post', '/v1/auth/logout', 403, withoutCsrf);
       expect((withoutCsrf.body as Row)['type']).toBe(`${PROBLEMS}csrf-token-invalid`);
 
       const response = await agent.post('/v1/auth/logout').set('X-CSRF-Token', csrf);
@@ -542,6 +567,14 @@ describe('authentification (avec des doubles)', () => {
       expect(rows(tables, 'passwordReset')[0]?.['tokenHash']).not.toBe(
         mail.token('password-reset', ACCOUNTS.manager.email),
       );
+    });
+
+    it('refuse une adresse invalide sans envoyer d’e-mail (422)', async () => {
+      const response = await forgot('pas-une-adresse');
+
+      expectContract('post', '/v1/auth/forgot-password', 422, response);
+      expect((response.body as { errors: Row[] }).errors.map((error) => error['path'])).toEqual(['email']);
+      expect(mail.jobs).toEqual([]);
     });
 
     it('change le mot de passe, révoque sessions et appareils, puis le lien ne sert plus (204, 410)', async () => {
