@@ -1,9 +1,26 @@
 name: CI
 
+# Lancée à la demande seulement (onglet Actions ou `gh workflow run ci.yml -f …`), job par job : la suite complète
+# est longue. Un job en échec se relance seul avec `gh run rerun <id> --failed`.
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_dispatch:
+    inputs:
+      contrat:
+        description: 'Contrat OpenAPI (lint)'
+        type: boolean
+        default: true
+      api:
+        description: 'API (lint, types, build, tests)'
+        type: boolean
+        default: true
+      tests_seuls:
+        description: 'API : sauter lint, format, types, build et tests unitaires (garder migrations, seed et e2e sur base réelle)'
+        type: boolean
+        default: false
+      e2e_filtre:
+        description: 'Fichiers ou motifs Vitest des tests e2e (ex. « test/admin-catalog ») ; vide = tous'
+        type: string
+        default: ''
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -12,6 +29,7 @@ concurrency:
 jobs:
   contract:
     name: Contrat OpenAPI
+    if: inputs.contrat
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -25,6 +43,7 @@ jobs:
 
   api:
     name: API (lint, types, build, tests)
+    if: inputs.api
     runs-on: ubuntu-latest
     services:
       # Mêmes images et identifiants que docker-compose.yml.
@@ -70,9 +89,13 @@ jobs:
       - name: Client Prisma
         run: pnpm prisma:generate
       - run: pnpm lint
+        if: ${{ !inputs.tests_seuls }}
       - run: pnpm format:check
+        if: ${{ !inputs.tests_seuls }}
       - run: pnpm typecheck
+        if: ${{ !inputs.tests_seuls }}
       - run: pnpm build
+        if: ${{ !inputs.tests_seuls }}
       - name: Migrations
         if: hashFiles('prisma/migrations/**/migration.sql') != ''
         run: pnpm db:deploy
@@ -80,8 +103,11 @@ jobs:
         if: hashFiles('prisma/migrations/**/migration.sql') != ''
         run: pnpm db:seed
       - name: Tests unitaires
+        if: ${{ !inputs.tests_seuls }}
         run: pnpm test
+      # Filtre passé par l'environnement (pas d'interpolation dans le script) ; découpé en arguments à dessein.
       - name: Tests e2e (PostgreSQL et Redis réels)
-        run: pnpm test:e2e
+        run: pnpm test:e2e $E2E_FILTRE
         env:
           E2E_REAL_SERVICES: 'true'
+          E2E_FILTRE: ${{ inputs.e2e_filtre }}
