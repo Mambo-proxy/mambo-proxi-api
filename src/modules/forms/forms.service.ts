@@ -16,6 +16,8 @@ import { AvailabilityService } from '../appointments/availability.service.js';
 import { publishedServiceWhere } from '../catalog/catalog.selects.js';
 import { shortName, type ContactSubmission } from '../contacts/contact.mapper.js';
 import { ContactsService, type SavedContact } from '../contacts/contacts.service.js';
+import { adminApplicationPath, visibleJobWhere } from '../jobs/job.mapper.js';
+import type { JobApplicationInput } from '../jobs/job.schemas.js';
 import { MailQueueService } from '../mail/mail-queue.service.js';
 import { decoyReference } from '../requests/reference.js';
 import {
@@ -26,9 +28,11 @@ import {
   type RequestField,
 } from '../requests/requests.service.js';
 import { SETTING_KEYS } from '../settings/settings.constants.js';
+import { StorageService } from '../storage/storage.service.js';
 import {
   submissionMailJobs,
   type AcknowledgementMail,
+  type ApplicationReceivedData,
   type AppointmentReceivedData,
   type ContactAckData,
   type EventRegistrationData,
@@ -82,6 +86,8 @@ export const SERVICE_UNKNOWN = "Ce service n'existe pas ou n'est plus disponible
 export const TRAINING_UNKNOWN = "Cette formation n'existe pas ou n'est plus proposée.";
 export const EVENT_UNKNOWN = "Cet événement n'existe pas ou n'est plus disponible.";
 export const EVENT_CLOSED = 'Les inscriptions à cet événement sont closes.';
+export const JOB_UNAVAILABLE =
+  'Cette offre n’est plus disponible. Choisissez un autre poste ou une candidature spontanée.';
 
 /** 409 `event-full` de `POST /v1/event-registrations`. */
 export function eventFullException(): ProblemException {
@@ -161,6 +167,7 @@ export class FormsService {
     @Inject(MailQueueService) private readonly mailQueue: MailQueueService,
     @Inject(AppConfigService) private readonly config: AppConfigService,
     @Inject(AvailabilityService) private readonly availability: AvailabilityService,
+    @Inject(StorageService) private readonly storage: StorageService,
   ) {}
 
   /** `POST /v1/quote-requests`. */
@@ -681,6 +688,102 @@ export class FormsService {
       });
     } catch (error) {
       if (isSlotTakenError(error)) throw slotTakenException();
+      throw error;
+    }
+  }
+
+  /**
+   * `POST /v1/job-applications` : candidature à une offre publiée et non expirée (`jobSlug`, sinon 422) ou
+   * spontanée. Le CV est contrôlé (5 Mo → 413, type réel PDF/DOC/DOCX → 415) puis enregistré sous une clé aléatoire
+   * avant la transaction ; il est supprimé si l'enregistrement échoue. Demande `CANDIDATURE`, pièce jointe `CV` et
+   * candidature `NOUVEAU` sont créées ensemble ; l'équipe est notifiée vers l'écran Recrutement.
+   */
+  async createJobApplication(input: JobApplicationInput, meta: SubmissionMeta): Promise<SubmissionAccepted> {
+    const lang = resolveLang(input.lang, meta.acceptLanguage);
+    const now = new Date();
+    if (await this.isTrapped(input.antiSpam, meta, now)) return this.decoy('application', lang, now);
+
+    const job = input.jobSlug
+      ? await this.prisma.jobOffer.findFirst({
+          where: { AND: [{ slug: input.jobSlug }, visibleJobWhere(now)] },
+          select: { id: true, slug: true, title: true, translations: true },
+        })
+      : null;
+    if (input.jobSlug && !job)
+      throw validationException([{ path: 'jobSlug', code: 'unavailable', message: JOB_UNAVAILABLE }]);
+
+    const stored = await this.storage.storeDocument(input.cv, 'cv', now);
+    const spontaneous = lang === 'en' ? 'Unsolicited application' : 'Candidature spontanée';
+    const subject = job?.title ?? 'Candidature spontanée';
+    const fields: RequestField[] = [];
+    pushField(fields, 'poste', 'Poste visé', subject);
+    pushField(fields, 'ville', 'Ville', input.city);
+    pushField(fields, 'cv', 'CV', stored.fileName);
+    try {
+      return await this.submit('application', lang, now, meta, {
+        serviceName: subject,
+        contact: {
+          fullName: input.fullName,
+          email: input.email,
+          phone: input.phone,
+          city: input.city,
+          source: 'candidature',
+          language: toLanguage(lang),
+        },
+        draft: {
+          type: 'CANDIDATURE',
+          jobOfferId: job?.id ?? null,
+          subject,
+          payload: { jobSlug: job?.slug ?? null, fields: toJsonFields(fields) },
+          message: input.message,
+        },
+        notification: { kind: 'APPLICATION', title: `Nouvelle candidature — ${subject}` },
+        afterRequest: async (tx, _contact, request) => {
+          const attachment = await tx.attachment.create({
+            data: {
+              requestId: request.id,
+              kind: 'CV',
+              storageKey: stored.storageKey,
+              fileName: stored.fileName,
+              mimeType: stored.mimeType,
+              size: stored.size,
+              checksum: stored.checksum,
+              scanStatus: stored.scanStatus,
+              createdAt: now,
+            },
+            select: { id: true },
+          });
+          const application = await tx.jobApplication.create({
+            data: {
+              requestId: request.id,
+              jobOfferId: job?.id ?? null,
+              status: 'NOUVEAU',
+              cvAttachmentId: attachment.id,
+              notes: null,
+              readAt: null,
+              createdAt: now,
+              updatedAt: now,
+            },
+            select: { id: true },
+          });
+          const adminPath = adminApplicationPath(application.id);
+          await tx.notification.updateMany({
+            where: { entityType: 'Request', entityId: request.id },
+            data: { link: adminPath, entityType: 'JobApplication', entityId: application.id },
+          });
+          return { adminPath };
+        },
+        acknowledgement: (contact, request) => ({
+          template: 'application-received',
+          data: {
+            ...acknowledgementBase(contact, request),
+            jobTitle: job ? localizedText(job.title, job.translations, 'title', lang) : spontaneous,
+            jobSlug: job?.slug ?? null,
+          } satisfies ApplicationReceivedData,
+        }),
+      });
+    } catch (error) {
+      await this.storage.deleteQuietly([stored.storageKey]);
       throw error;
     }
   }

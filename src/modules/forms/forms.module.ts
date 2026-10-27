@@ -14,5 +14,7 @@ import { FormsService } from './forms.service.js';
   imports: [AntiSpamModule, ContactsModule, RequestsModule, AppointmentsModule],
   controllers: [FormsController],
   providers: [FormsService],
+  // Candidatures (`POST /v1/job-applications`, module des offres d'emploi) : même enregistrement que les formulaires.
+  exports: [FormsService],
 })
 export class FormsModule {}

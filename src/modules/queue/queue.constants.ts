@@ -13,6 +13,7 @@ export const DEFAULT_QUEUE_PREFIX = 'mambo';
 export const QUEUE_NAMES = {
   mail: 'mail',
   appointmentReminders: 'appointment-reminders',
+  surveyInvitations: 'survey-invitations',
 } as const;
 
 const MINUTE_MS = 60_000;

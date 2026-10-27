@@ -16,6 +16,8 @@ const COMMON_DEFAULTS: Record<string, string> = {
   S3_FORCE_PATH_STYLE: 'false',
   SMTP_SECURE: 'false',
   MAIL_WORKER: 'on',
+  STORAGE_DRIVER: 'local',
+  STORAGE_DIR: 'var/storage',
 };
 
 /** Valeurs par défaut de développement et de test : celles de `.env.example` (services de docker-compose.yml). */
@@ -104,6 +106,10 @@ const envSchema = z
     S3_BUCKET_PRIVATE: text,
     S3_FORCE_PATH_STYLE: flag,
     MEDIA_PUBLIC_URL: httpUrl,
+    // Fichiers privés (CV, pièces jointes) : pilote `local` (disque) seulement pour l'instant ; répertoire hors de
+    // tout dossier servi, monté en volume sur le serveur (relatif au répertoire de lancement de l'API).
+    STORAGE_DRIVER: z.enum(['local'], { error: invalid('Valeur attendue : local.') }),
+    STORAGE_DIR: text,
     SMTP_HOST: text,
     SMTP_PORT: port,
     SMTP_SECURE: flag,

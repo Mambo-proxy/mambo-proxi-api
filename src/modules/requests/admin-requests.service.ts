@@ -12,7 +12,11 @@ import { forbiddenException } from '../auth/auth.errors.js';
 import type { AuthContext } from '../auth/auth.types.js';
 import { isAssignableRole, type Permission } from '../auth/permissions.js';
 import { MailQueueService } from '../mail/mail-queue.service.js';
+import { anonymizeReviewsOfRequests } from '../reviews/review-erasure.js';
 import { SETTING_KEYS } from '../settings/settings.constants.js';
+import { StorageService, type SignedUrl } from '../storage/storage.service.js';
+import { ANONYMIZED_FILE_NAME } from '../storage/storage.types.js';
+import { SurveyInvitationsService } from '../surveys/survey-invitations.service.js';
 import { nextReference } from './reference.js';
 import { requestFiltersWhere, requestViewer, visibleRequestsWhere } from './request-filters.js';
 import {
@@ -60,11 +64,12 @@ const SURVEY_VALIDITY_MS = 30 * DAY_MS;
 
 /** Fiche commune des demandes anonymisées une à une : la demande n'est plus rattachée à la personne. */
 export const ANONYMOUS_CONTACT_EMAIL = 'anonyme@mamboproxi.invalid';
-/** Nom de fichier des pièces jointes d'une demande anonymisée (objets à purger par le module de stockage). */
-export const ANONYMIZED_FILE_NAME = 'fichier-anonymise';
+/** Nom de fichier des pièces jointes d'une demande anonymisée (le fichier est supprimé du stockage). */
+export { ANONYMIZED_FILE_NAME };
 
 export const REQUEST_NOT_FOUND = 'Cette demande n’existe pas ou a été anonymisée.';
 const requestNotFound = (): ProblemException => notFoundException(REQUEST_NOT_FOUND);
+export const ATTACHMENT_NOT_FOUND = 'Cette pièce jointe n’existe pas ou n’est plus disponible.';
 
 /** 422 de l'assignation : personne inconnue, désactivée ou qui ne traite pas de demandes. */
 function notAssignable(): ProblemException {
@@ -118,6 +123,8 @@ export class AdminRequestsService {
     @Inject(PrismaService) private readonly prisma: PrismaService,
     @Inject(MailQueueService) private readonly mailQueue: MailQueueService,
     @Inject(AppConfigService) private readonly config: AppConfigService,
+    @Inject(SurveyInvitationsService) private readonly surveys: SurveyInvitationsService,
+    @Inject(StorageService) private readonly storage: StorageService,
   ) {}
 
   /** `assignee` autre que soi-même avec la seule permission `requests:read-assigned` : 403. */
@@ -256,6 +263,26 @@ export class AdminRequestsService {
     return row;
   }
 
+  /**
+   * `GET /v1/admin/requests/{id}/attachments/{attachmentId}` : lien signé de 5 minutes vers une pièce jointe d'une
+   * demande visible (même périmètre que le détail) ; pièce jointe d'une autre demande ou anonymisée → 404.
+   */
+  async attachmentUrl(id: string, attachmentId: string, auth: AuthContext, now: Date): Promise<SignedUrl> {
+    const request = await this.findVisible(id, auth);
+    const attachment = await this.prisma.attachment.findFirst({
+      where: { id: attachmentId, requestId: request.id },
+      select: { id: true, fileName: true },
+    });
+    if (!attachment || attachment.fileName === ANONYMIZED_FILE_NAME)
+      throw notFoundException(ATTACHMENT_NOT_FOUND);
+    return this.storage.signedUrl(attachment, now);
+  }
+
+  /** Supprime du stockage les fichiers des demandes anonymisées (après validation de la transaction). */
+  async purgeFiles(storageKeys: readonly string[]): Promise<void> {
+    await this.storage.deleteQuietly(storageKeys);
+  }
+
   /** Membre actif (mot de passe défini) dont le rôle traite des demandes (`assignable` de la présence). */
   private async findAssignable(userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -311,7 +338,8 @@ export class AdminRequestsService {
     const delayHours = scheduleSurvey ? await this.surveyDelayHours() : 0;
     const notified = assignmentChange && assignee !== null && assignee.id !== auth.user.id ? assignee : null;
 
-    await this.prisma.$transaction(async (tx) => {
+    const scheduled = await this.prisma.$transaction(async (tx) => {
+      let survey: { id: string; scheduledFor: Date | null } | null = null;
       const data: Prisma.RequestUncheckedUpdateInput = { updatedAt: now };
       if (statusChange) {
         data.status = statusChange;
@@ -341,7 +369,7 @@ export class AdminRequestsService {
         });
       if (scheduleSurvey) {
         const scheduledFor = new Date(now.getTime() + delayHours * 60 * 60 * 1000);
-        await tx.survey.create({
+        survey = await tx.survey.create({
           data: {
             requestId: id,
             // Jeton remplacé à l'envoi par le module des questionnaires (seul son condensat est conservé).
@@ -355,7 +383,7 @@ export class AdminRequestsService {
             rating: null,
             npsScore: null,
           },
-          select: { id: true },
+          select: { id: true, scheduledFor: true },
         });
         await tx.requestEvent.create({
           data: {
@@ -422,8 +450,11 @@ export class AdminRequestsService {
                 : new Date(input.dueAt).toISOString(),
         },
       });
+      return survey;
     });
 
+    // Invitation au questionnaire : tâche différée de la file `survey-invitations` (après l'enregistrement).
+    if (scheduled) await this.surveys.scheduleInvitation(scheduled, now);
     if (notified) await this.sendAssignmentMail(current, notified, auth.user.name, now);
     return this.detail(id, auth, now);
   }
@@ -604,16 +635,18 @@ export class AdminRequestsService {
    */
   async anonymize(id: string, actor: RequestActor, now: Date): Promise<void> {
     const request = await this.findVisible(id, actor.auth);
-    await this.prisma.$transaction(async (tx) => {
+    const storageKeys = await this.prisma.$transaction(async (tx) => {
       const anonymousId = await this.anonymousContactId(tx, now);
-      await this.anonymizeInTx(tx, [id], actor.auth.user.id, now, anonymousId);
+      const keys = await this.anonymizeInTx(tx, [id], actor.auth.user.id, now, anonymousId);
       await recordAudit(tx, auditActor(actor), {
         action: 'request.anonymize',
         entity: 'Request',
         entityId: id,
         label: `A anonymisé la demande ${request.reference}`,
       });
+      return keys;
     });
+    await this.purgeFiles(storageKeys);
   }
 
   /** Fiche commune « Contact anonymisé » (créée à la première anonymisation, jamais affichée). */
@@ -647,10 +680,12 @@ export class AdminRequestsService {
   /**
    * Anonymise des demandes (une demande, ou toutes celles d'un contact effacé) : message, valeurs du formulaire,
    * structure, preuve technique du consentement (IP, agent utilisateur), sujet libre des messages de contact,
-   * notes internes, noms des pièces jointes (fichiers à purger avec le module de stockage), réponses libres du
+   * notes internes, noms des pièces jointes (`fichier-anonymise`), réponses libres du
    * questionnaire ; message et notes du rendez-vous lié. L'horodatage du consentement, le type, le service, le
    * statut et les dates restent pour les statistiques. `relinkContactId` : fiche à laquelle rattacher la demande
-   * (fiche commune anonyme) ; absent, la demande reste sur sa fiche (effacée par l'appelant).
+   * (fiche commune anonyme) ; absent, la demande reste sur sa fiche (effacée par l'appelant). Renvoie les clés de
+   * stockage des fichiers à supprimer, par `purgeFiles`, une fois la transaction validée (un fichier supprimé ne
+   * se restaure pas si la transaction est annulée).
    */
   async anonymizeInTx(
     tx: Prisma.TransactionClient,
@@ -658,8 +693,8 @@ export class AdminRequestsService {
     actorId: string,
     now: Date,
     relinkContactId?: string,
-  ): Promise<void> {
-    if (ids.length === 0) return;
+  ): Promise<string[]> {
+    if (ids.length === 0) return [];
     const rows = await tx.request.findMany({
       where: { id: { in: [...ids] } },
       select: { id: true, reference: true, type: true, subject: true, service: { select: { name: true } } },
@@ -686,12 +721,17 @@ export class AdminRequestsService {
       });
     }
     const requestIds = { in: rows.map((row) => row.id) };
+    const files = await tx.attachment.findMany({
+      where: { requestId: requestIds, fileName: { not: ANONYMIZED_FILE_NAME } },
+      select: { storageKey: true },
+    });
     await tx.requestNote.deleteMany({ where: { requestId: requestIds } });
     await tx.attachment.updateMany({
       where: { requestId: requestIds },
       data: { fileName: ANONYMIZED_FILE_NAME },
     });
     await tx.jobApplication.updateMany({ where: { requestId: requestIds }, data: { notes: null } });
+    await anonymizeReviewsOfRequests(tx, ids);
     await tx.survey.updateMany({
       where: { requestId: requestIds },
       data: { answers: Prisma.DbNull, displayName: null, city: null },
@@ -703,5 +743,6 @@ export class AdminRequestsService {
     await tx.requestEvent.createMany({
       data: rows.map((row) => ({ requestId: row.id, kind: 'ANONYMIZED' as const, actorId, createdAt: now })),
     });
+    return files.map((file) => file.storageKey);
   }
 }

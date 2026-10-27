@@ -28,3 +28,6 @@ src/generated/
 
 # Couverture des tests
 coverage/
+
+# Fichiers privés du pilote de stockage local (STORAGE_DIR par défaut)
+/var/

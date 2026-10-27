@@ -661,3 +661,138 @@
 - La demande `RENDEZ_VOUS` reliée n'est pas mise à jour quand le rendez-vous est confirmé, annulé ou terminé (statuts
   indépendants) ; à décider avec la cliente.
 - Invitation `.ics` d'annulation (`METHOD:CANCEL`) : non envoyée (le gabarit d'annulation n'en joint pas).
+
+## Phase 2 — Questionnaires de satisfaction et avis clients (27 octobre 2026)
+
+### Fait
+
+- **Modules** `src/modules/surveys` (page publique par jeton, questions du back-office, file `survey-invitations`) et
+  `src/modules/reviews` (avis publiés, modération, indicateurs) ; branchés sur les demandes (`AdminRequestsService`
+  programme l'invitation après la transaction du passage à « Prestation réalisée ») et sur l'anonymisation
+  (`anonymizeReviewsOfRequests` dans `anonymizeInTx`, donc aussi l'effacement d'un contact).
+- **Routes** : `GET /v1/reviews`, `GET /v1/reviews/summary`, `GET /v1/surveys/{token}`,
+  `POST /v1/surveys/{token}/responses`, `/v1/admin/reviews` (GET, POST), `/v1/admin/reviews/stats`,
+  `/v1/admin/reviews/{id}` (PATCH, DELETE), `/v1/admin/reviews/{id}/reply`, `/v1/admin/survey-questions` (GET, PUT),
+  toutes sous `reviews:moderate` côté back-office.
+- **Aucune migration** : les colonnes de `surveys`, `survey_questions` et `reviews` existaient.
+- **Contrat** : 400 `InvalidQuery` (listes publiques et du back-office), 403 `Forbidden`, 409 (mise en avant d'un avis
+  non publié, suppression d'un avis vérifié), 422 (PATCH, réponse), règles décrites ; pas de nouvelle route.
+- Tests non écrits (priorité au branchement du site) ; la file des questionnaires est remplacée par un double dans
+  l'application de test (`test/support/auth.ts`) pour que les tests existants n'ouvrent pas Redis.
+
+### Décisions
+
+- **Lien du questionnaire** : jeton de 256 bits dérivé par HMAC de l'identifiant du questionnaire et de l'instant
+  d'envoi (`TOKEN_SIGNING_SECRET`, usage `survey-link`) ; seul son condensat HMAC (`survey`) est stocké. La relance
+  recalcule le même lien : aucun jeton en clair ni en base ni dans Redis. Le jeton provisoire posé à la programmation
+  est remplacé à l'envoi. Changer le secret invalide les liens en cours.
+- **File `survey-invitations`** (comme les rappels de rendez-vous) : tâches
+  `questionnaire-<id>-invitation`, `-relance`, `-expiration` ; invitation réservée par `updateMany` `SCHEDULED → SENT` (une seule exécution envoie), relance
+  `SENT → REMINDED` si toujours sans réponse et ouvert, expiration `SENT|REMINDED → EXPIRED`. Rien n'est envoyé pour
+  une demande ou une fiche anonymisée, ni pour une demande revenue avant « Prestation réalisée » (ligne supprimée).
+  Au démarrage du worker (`MAIL_WORKER=on`), reprise des questionnaires en attente (Redis perdu ou indisponible au
+  moment de la programmation), au plus 500 de chaque sorte. `surveyReminderDays: null` → pas de relance.
+- **Réponse** : question active connue et unique, STARS 1–5, NPS 0–10, CHOICE parmi les choix (français ou anglais,
+  enregistré en français), TEXT ; obligatoires renseignées ; toutes les erreurs d'un coup (422). Lien inconnu au POST →
+  410 (seule erreur de lien du contrat). Avis créé « À valider », vérifié, seulement avec consentement **et** note
+  STARS ; texte = commentaire libre (vide sinon) ; nom affiché fourni ou « Prénom N. » de la fiche ; ville fournie ou
+  celle de la fiche ; réponses lisibles (« 5/5 — Excellent ») dans `answersSnapshot`. Événement `SURVEY_ANSWERED`,
+  notification `REVIEW` aux rôles `reviews:moderate`.
+- **Modération** : publication sans consentement → 409 `no-publish-consent` ; mise en avant d'un avis non publié →
+  409 ; masquer ou remettre « À valider » retire la mise en avant. Les liens des fiches (`featuredReviewIds`) et des
+  rubriques (témoignage) sont conservés : les lectures publiques filtrent déjà sur « Publié ». Toute modification
+  d'un avis publié, ou qui cesse de l'être, inscrit `reviews` + `service:<slug>` (service et fiches qui le mettent en
+  avant) + `category:<slug>` (témoignage). Suppression réservée aux témoignages saisis à la main (409 sinon).
+- **Public** : service d'un avis cité seulement s'il est visible sur le site ; synthèse vide → `average: 0`.
+- **Anonymisation** : avis issus des questionnaires des demandes anonymisées : nom « Client anonymisé », ville et
+  réponses retirées, masqué, consentement retiré (il ne peut plus être republié).
+- **Statistiques** : moyenne et répartition des avis publiés ; écarts sur 30 jours (date de l'avis, date de réponse
+  pour la recommandation) ; taux de réponse = questionnaires remplis / envoyés.
+
+### Écarts avec le back-office simulé du site (le contrat prime)
+
+- Lien inconnu au POST : 410 (mock : 201 pour tout jeton) ; GET : 404 / 410 avec les `type` du contrat.
+- PUT des questions : erreurs aux chemins `0.label`, `0.options` comme le mock ; règles STARS (5 libellés) et NPS
+  (2 bornes) en plus.
+- Témoignage manuel : `serviceDate` et date affichée = `date` (mock : `createdAt` = `date`).
+
+### Points ouverts
+
+- Liste, détail et relance manuelle des questionnaires dans le back-office : pas de route au contrat (le suivi est
+  dans `RequestDetail.survey` et l'historique).
+- Compteur « Avis » des pastilles (`sidebar-counts`) et carte « questionnaires » du tableau de bord : module du
+  tableau de bord.
+- Tests unitaires et e2e du lot (file, réponses, modération, contrat) : après le branchement du site.
+
+## Phase 2 — Offres d'emploi, candidatures et stockage des fichiers (27 octobre 2026)
+
+### Fait
+
+- **Stockage** (`src/modules/storage`, module global) : interface `StorageDriver` (`put`, `get` en flux avec taille,
+  `delete` idempotent, `check`) et pilote disque local (`STORAGE_DRIVER=local`, répertoire `STORAGE_DIR`, `var/storage`
+  par défaut, ignoré par git) : clés `cv/AAAA/MM/<128 bits aléatoires>.<ext>`, jamais tirées du nom envoyé ; chemin
+  confiné au répertoire ; écriture atomique (fichier temporaire puis renommage), droits `0600`. Aucun fichier n'est
+  servi statiquement.
+- **Contrôle des documents** : type réel par signature, écrite à la main (PDF `%PDF-` dans le premier Ko ; DOC : en-tête
+  OLE2 et flux `WordDocument` ; DOCX : archive ZIP avec `[Content_Types].xml` et `word/`) ; ODT, XLS, ZIP quelconque,
+  exécutable ou fichier vide → 415 `unsupported-file`. 5 Mo : limite de multer (413 `file-too-large` avant toute autre
+  vérification) et contrôle du service. Nom affiché assaini (sans chemin ni caractère de contrôle ou réservé, 120
+  caractères, extension du type réel). Empreinte SHA-256 conservée. ClamAV : interface `VirusScanner`, implémentation
+  désactivée (`SKIPPED`) ; un fichier `INFECTED` serait refusé (415) avant tout enregistrement.
+- **Liens signés** : `SignedUrl` de 5 minutes, jeton `{ a, exp }` signé HMAC-SHA256 (`TOKEN_SIGNING_SECRET`, usage
+  `file-download`, même forme que les jetons d'aperçu), servi par `GET /v1/files/{token}` (route publique ajoutée au
+  contrat : le jeton tient lieu de session). La pièce jointe est relue à chaque téléchargement : anonymisée, demande
+  anonymisée ou fichier absent → 404 ; lien périmé → 410 `link-expired`. Réponse `private, no-store`,
+  `Content-Disposition: attachment` (nom ASCII de repli + `filename*` UTF-8), CSP `sandbox`.
+- **Offres (site)** : `GET /v1/jobs` (publiées, date de publication passée, non expirées, plus récentes d'abord ;
+  `city` / `contract` sur le début du libellé, `q` sur titre et accroche, sans accents ni casse, dans la langue
+  demandée) ; `GET /v1/jobs/{slug}` (brouillon ou inconnue → 404, archivée ou expirée → 410 `job-closed`). Badge
+  `isNew` < 7 jours. Traductions par la colonne `translations.en`.
+- **Candidature** (`POST /v1/job-applications`, `multipart/form-data`) : multer en mémoire (un fichier `cv`, champs
+  limités), champs et fichier validés ensemble (422 avec `cv` si le CV manque), anti-spam des formulaires (piège →
+  succès factice sans fichier enregistré, délai, Turnstile), 5 envois par minute. Offre visée publiée et non expirée,
+  sinon 422 `jobSlug`. Le CV est enregistré avant la transaction et supprimé si elle échoue ; la transaction crée
+  contact, demande `CANDIDATURE` (`jobOfferId`, champs « Poste visé », « Ville », « CV »), pièce jointe `CV` reliée à
+  la demande, candidature `NOUVEAU` ; notifications `APPLICATION` vers `/admin/recrutement?candidature=<id>`. E-mails :
+  `application-received` (modèle du seed, fr/en, `jobTitle` traduit ou « Candidature spontanée ») et
+  `team-new-request`. Enregistrement par `FormsService` (même chemin que les autres formulaires).
+- **Back-office** : `/v1/admin/jobs*` (`content:read` / `content:write`) : liste (publiées, brouillons, archivées ;
+  compteurs de candidatures et de nouvelles, demandes anonymisées exclues), création (brouillon par défaut, slug libre
+  tiré du titre, 422 `slug_taken`), modification partielle dont publication (date de première publication posée) et
+  archivage, suppression (candidatures conservées sans offre) ; publication exige au moins une mission (comme le
+  mock). Revalidation `jobs`, `job:<slug>`, `sitemap` (et `redirects`) ; changement d'adresse d'une offre déjà
+  publiée → redirection 301 `/recrutement/<ancien>` → `/recrutement/<nouveau>`. `/v1/admin/applications*`
+  (`applications:read` / `applications:write`) : liste paginée (statut, offre ou `spontaneous`), détail (« Nouveau » →
+  « Lu » par mise à jour conditionnelle, `readAt`), statut, lien signé du CV (téléchargement journalisé).
+- **Pièces jointes des demandes** : `GET /v1/admin/requests/{id}/attachments/{attachmentId}` (même périmètre que le
+  détail, `requests:read` / `requests:read-assigned`).
+- **RGPD** : `anonymizeInTx` renvoie les clés des fichiers ; ils sont supprimés du stockage après la validation de la
+  transaction (anonymisation d'une demande, effacement d'un contact), les lignes restent avec le nom
+  `fichier-anonymise`. Journal d'activité : références, intitulés d'offre et statuts seulement.
+- **Contrat** : `GET /v1/files/{token}` ; 400 `InvalidQuery`, 403, 422 manquants des routes du lot.
+- **Configuration** : `STORAGE_DRIVER`, `STORAGE_DIR` (`env.schema.ts`, `.env.example`).
+- **Aucune migration** : colonnes existantes (`attachments.storage_key`, `checksum`, `scan_status`,
+  `job_applications.read_at`…).
+
+### Décisions
+
+- Pas de dépendance ajoutée : multer est celui de `@nestjs/platform-express` (intercepteur `FileInterceptor` dérivé
+  pour traduire ses erreurs en problèmes du contrat) ; aucun SDK S3 installé, donc pas de pilote S3 (point
+  d'extension documenté dans `storage.types.ts`).
+- Le paramètre `preview` de `GET /v1/jobs/{slug}` est accepté sans effet : aucune route n'émet de jeton d'aperçu
+  d'offre.
+- Pas de nouveaux tests (priorité au branchement du site) ; tests existants passés.
+
+### Écarts avec le back-office simulé du site (le contrat prime)
+
+- CV : URL signée vers l'API (`/v1/files/…`) au lieu de `https://fichiers.mamboproxi.com/cv/…` ; lien périmé → 410.
+- Offre supprimée : `job: null` sur ses candidatures (le mock garde l'intitulé) ; l'intitulé reste dans la demande
+  liée (`subject`).
+- Modification sans champ : 422 (mock : 400).
+
+### Points ouverts
+
+- Pilote S3 et `checks.storage` de `/v1/health` ; ClamAV à brancher (`VirusScanner`).
+- Suppression automatique des candidatures refusées après la durée de conservation (24 mois) : tâche à écrire.
+- CV du seed : clés sans fichier sur le disque (téléchargement → 404).
+- Tests unitaires et e2e du lot : après le branchement du site.

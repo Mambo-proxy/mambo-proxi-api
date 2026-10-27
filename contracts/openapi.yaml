@@ -364,6 +364,47 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Health' }
 
+  /v1/files/{token}:
+    get:
+      tags: [Site]
+      operationId: downloadFile
+      summary: Télécharger un fichier privé (lien signé de 5 min)
+      description: |
+        Adresse des `SignedUrl` (CV d'une candidature, pièce jointe d'une demande) : le jeton signé (HMAC, 5 minutes)
+        tient lieu de session. Fichier envoyé en pièce jointe sous son nom assaini, jamais mis en cache
+        (`Cache-Control: private, no-store`). Fichier anonymisé ou supprimé → 404.
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema: { type: string, maxLength: 1024 }
+      responses:
+        '200':
+          description: Contenu du fichier (type réel contrôlé à l'envoi).
+          headers:
+            Content-Disposition:
+              description: '`attachment; filename="…"; filename*=UTF-8''''…`'
+              schema: { type: string }
+          content:
+            application/pdf:
+              schema: { type: string, format: binary }
+            application/msword:
+              schema: { type: string, format: binary }
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+              schema: { type: string, format: binary }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '410':
+          description: Lien expiré.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+              example:
+                type: https://api.mamboproxi.com/problems/link-expired
+                title: Lien expiré
+                status: 410
+                detail: Ce lien de téléchargement a expiré. Relancez le téléchargement depuis le back-office.
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
   # ─────────────────────────── Catalogue ──────────────────────────
   /v1/categories:
     get:
@@ -479,6 +520,7 @@ paths:
           in: query
           schema: { type: integer, minimum: 1, maximum: 50, default: 12 }
       responses:
+        '400': { $ref: '#/components/responses/InvalidQuery' }
         '429': { $ref: '#/components/responses/TooManyRequests' }
         '200':
           description: Page d'avis.
@@ -507,6 +549,7 @@ paths:
           in: query
           schema: { $ref: '#/components/schemas/Slug' }
       responses:
+        '400': { $ref: '#/components/responses/InvalidQuery' }
         '429': { $ref: '#/components/responses/TooManyRequests' }
         '200':
           description: Synthèse.
@@ -571,6 +614,7 @@ paths:
           schema: { type: string }
         - $ref: '#/components/parameters/Q'
       responses:
+        '400': { $ref: '#/components/responses/InvalidQuery' }
         '429': { $ref: '#/components/responses/TooManyRequests' }
         '200':
           description: Offres.
@@ -597,6 +641,7 @@ paths:
               schema: { $ref: '#/components/schemas/JobOfferDetail' }
               examples:
                 default: { $ref: '#/components/examples/JobDetail' }
+        '400': { $ref: '#/components/responses/InvalidQuery' }
         '404': { $ref: '#/components/responses/NotFound' }
         '410':
           description: Offre pourvue ou expirée.
@@ -1025,6 +1070,11 @@ paths:
       tags: [Questionnaire]
       operationId: getSurvey
       summary: Questionnaire de satisfaction (lien reçu par e-mail)
+      description: |
+        Lien à usage unique envoyé après le délai `surveyDelayHours` du paramètre `emails` (relance unique après
+        `surveyReminderDays`), valable 30 jours après l'envoi. Questions actives dans la langue demandée ; réponse
+        `Cache-Control: no-store`. Lien inconnu : 404 ; déjà rempli : 410 `survey-completed` ; expiré : 410
+        `survey-expired`.
       parameters:
         - $ref: '#/components/parameters/Lang'
         - name: token
@@ -1056,6 +1106,12 @@ paths:
       tags: [Questionnaire]
       operationId: submitSurvey
       summary: Envoi des réponses
+      description: |
+        Chaque réponse porte sur une question active (une seule fois) : STARS 1–5, NPS 0–10, CHOICE parmi les choix
+        proposés (français ou traduction), TEXT ; questions obligatoires renseignées (422 sinon, toutes les erreurs
+        d'un coup). Un avis « À valider », vérifié, n'est créé que si `publishConsent` est vrai et qu'une note STARS
+        est donnée ; sinon les réponses restent consultables dans le suivi de la demande. Lien inconnu, déjà utilisé
+        ou expiré : 410. Limité à 5 envois par minute et par adresse, comme les formulaires.
       parameters:
         - name: token
           in: path
@@ -1767,6 +1823,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/SignedUrl' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   # ─────────────────────────── Admin — Services ───────────────────
@@ -2311,12 +2368,18 @@ paths:
                       MASQUE: { type: integer }
               examples:
                 default: { $ref: '#/components/examples/AdminReviewsPage' }
+        '400': { $ref: '#/components/responses/InvalidQuery' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
     post:
       tags: [Admin — Avis]
       operationId: adminCreateReview
       x-permissions: [reviews:moderate]
       summary: Ajout manuel d'un témoignage (marqué « non vérifié »)
+      description: |
+        Témoignage transmis à l'agence hors questionnaire : `verified: false`, `publishConsent: true`, statut
+        « À valider » par défaut. `date` : date affichée et date de prestation (maintenant si absente). Service
+        inconnu : 422 sur `serviceId`.
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
         required: true
@@ -2330,6 +2393,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminReview' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
   /v1/admin/reviews/stats:
@@ -2346,6 +2410,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ReviewStats' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
 
   /v1/admin/reviews/{id}:
     patch:
@@ -2353,7 +2418,11 @@ paths:
       operationId: adminUpdateReview
       x-permissions: [reviews:moderate]
       summary: Publier, masquer, mettre en avant
-      description: La publication est refusée (`409`) si le client n'a pas consenti à la publication.
+      description: |
+        La publication est refusée (`409` `no-publish-consent`) si le client n'a pas consenti à la publication. Seul
+        un avis publié peut être mis en avant (`409` `conflict`) ; masqué ou remis « À valider », il cesse de l'être.
+        Service inconnu : 422 sur `serviceId`. Toute modification d'un avis publié, ou qui cesse de l'être, demande
+        la revalidation du site (`reviews`, fiches de services et rubriques qui le citent).
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       requestBody:
@@ -2374,24 +2443,38 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminReview' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409':
-          description: Publication impossible sans consentement.
+          description: Publication impossible sans consentement, ou mise en avant d'un avis non publié.
           content:
             application/problem+json:
               schema: { $ref: '#/components/schemas/Problem' }
-              example: { type: https://api.mamboproxi.com/problems/no-publish-consent, title: Publication impossible, status: 409, detail: Le client n'a pas autorisé la publication de cet avis. Il reste consultable en suivi interne. }
+              examples:
+                noPublishConsent:
+                  value: { type: https://api.mamboproxi.com/problems/no-publish-consent, title: Publication impossible, status: 409, detail: Le client n'a pas autorisé la publication de cet avis. Il reste consultable en suivi interne. }
+                notPublished:
+                  value: { type: https://api.mamboproxi.com/problems/conflict, title: Conflit, status: 409, detail: Seul un avis publié peut être mis en avant sur l’accueil. }
+        '422': { $ref: '#/components/responses/ValidationError' }
     delete:
       tags: [Admin — Avis]
       operationId: adminDeleteReview
       x-permissions: [reviews:moderate]
       summary: Supprimer un avis ajouté manuellement
+      description: Un avis vérifié (issu du questionnaire) ne se supprime pas, il se masque (`409`).
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       responses:
         '204': { $ref: '#/components/responses/NoContent' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Avis vérifié.
+          content:
+            application/problem+json:
+              schema: { $ref: '#/components/schemas/Problem' }
+              example: { type: https://api.mamboproxi.com/problems/conflict, title: Conflit, status: 409, detail: Seuls les avis ajoutés manuellement peuvent être supprimés. Masquez cet avis. }
 
   /v1/admin/reviews/{id}/reply:
     post:
@@ -2417,7 +2500,9 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminReview' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
 
   /v1/admin/survey-questions:
     get:
@@ -2433,11 +2518,16 @@ paths:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/AdminSurveyQuestion' } }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
     put:
       tags: [Admin — Avis]
       operationId: adminReplaceSurveyQuestions
       x-permissions: [reviews:moderate]
       summary: Enregistrer la liste des questions (5 maximum actives)
+      description: |
+        Remplace la liste dans l'ordre du corps : identifiant connu → question mise à jour, sinon créée ; les questions
+        absentes sont supprimées (les réponses déjà reçues gardent leur instantané). CHOICE : 2 choix au moins ;
+        STARS : 5 libellés ou aucun ; NPS : 2 bornes ou aucune ; TEXT : aucun choix.
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
         required: true
@@ -2454,6 +2544,7 @@ paths:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/AdminSurveyQuestion' } }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
   # ─────────────────────────── Admin — Rendez-vous ────────────────
@@ -2703,7 +2794,9 @@ paths:
           content:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/AdminJobOffer' } }
+        '400': { $ref: '#/components/responses/InvalidQuery' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
     post:
       tags: [Admin — Recrutement]
       operationId: adminCreateJob
@@ -2722,6 +2815,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminJobOffer' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
   /v1/admin/jobs/{id}:
@@ -2739,6 +2833,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminJobOffer' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
     patch:
       tags: [Admin — Recrutement]
@@ -2759,6 +2854,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminJobOffer' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '422': { $ref: '#/components/responses/ValidationError' }
     delete:
@@ -2771,6 +2867,7 @@ paths:
       responses:
         '204': { $ref: '#/components/responses/NoContent' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   /v1/admin/applications:
@@ -2801,7 +2898,9 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: '#/components/schemas/AdminApplication' } }
                   meta: { $ref: '#/components/schemas/PaginationMeta' }
+        '400': { $ref: '#/components/responses/InvalidQuery' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
 
   /v1/admin/applications/{id}:
     get:
@@ -2818,6 +2917,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminApplication' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
     patch:
       tags: [Admin — Recrutement]
@@ -2842,7 +2942,9 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminApplication' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
 
   /v1/admin/applications/{id}/cv:
     get:
@@ -2859,6 +2961,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/SignedUrl' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   # ─────────────────────────── Admin — Partenaires ────────────────

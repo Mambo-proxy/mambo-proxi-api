@@ -14,12 +14,16 @@ import { AuthModule } from './modules/auth/auth.module.js';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
 import { ContactsModule } from './modules/contacts/contacts.module.js';
 import { FormsModule } from './modules/forms/forms.module.js';
+import { JobsModule } from './modules/jobs/jobs.module.js';
 import { MailModule } from './modules/mail/mail.module.js';
 import { NavigationModule } from './modules/navigation/navigation.module.js';
 import { PagesModule } from './modules/pages/pages.module.js';
 import { RequestsModule } from './modules/requests/requests.module.js';
+import { ReviewsModule } from './modules/reviews/reviews.module.js';
 import { SettingsModule } from './modules/settings/settings.module.js';
 import { SitemapModule } from './modules/sitemap/sitemap.module.js';
+import { StorageModule } from './modules/storage/storage.module.js';
+import { SurveysModule } from './modules/surveys/surveys.module.js';
 import { UsersModule } from './modules/users/users.module.js';
 import { ZonesModule } from './modules/zones/zones.module.js';
 import { PrismaModule } from './prisma/prisma.module.js';
@@ -44,12 +48,16 @@ import { PrismaModule } from './prisma/prisma.module.js';
     SitemapModule,
     CatalogModule,
     MailModule,
+    StorageModule,
     FormsModule,
     AuthModule,
     UsersModule,
     RequestsModule,
     ContactsModule,
     AppointmentsModule,
+    JobsModule,
+    SurveysModule,
+    ReviewsModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: ProblemFilter },

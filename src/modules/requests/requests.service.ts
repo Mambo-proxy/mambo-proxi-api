@@ -33,6 +33,7 @@ export interface ReceivedRequestDraft {
   contactId: string;
   categoryId?: string | null;
   serviceId?: string | null;
+  jobOfferId?: string | null;
   trainingId?: string | null;
   otherTraining?: string | null;
   eventId?: string | null;

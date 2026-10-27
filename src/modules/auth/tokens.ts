@@ -38,4 +38,7 @@ export const TOKEN_PURPOSES = {
   invitation: 'invitation',
   csrf: 'csrf',
   appointmentProposal: 'appointment-proposal',
+  /** Lien du questionnaire de satisfaction (dérivé de l'invitation) et son condensat. */
+  surveyLink: 'survey-link',
+  survey: 'survey',
 } as const;

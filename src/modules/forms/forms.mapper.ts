@@ -22,7 +22,7 @@ export type NeedValue = string | number | string[] | null;
 
 /** Message de confirmation (`SubmissionAccepted.message`), dans la langue de l'envoi. */
 export type SubmissionKind =
-  'quote' | 'contact' | 'registration' | 'training' | 'partner' | 'event' | 'appointment';
+  'quote' | 'contact' | 'registration' | 'training' | 'partner' | 'event' | 'appointment' | 'application';
 
 const ACCEPTED_MESSAGES: Record<SubmissionKind, Record<Lang, string>> = {
   quote: {
@@ -52,6 +52,10 @@ const ACCEPTED_MESSAGES: Record<SubmissionKind, Record<Lang, string>> = {
   appointment: {
     fr: 'Votre demande de rendez-vous est enregistrée. Nous la confirmons par e-mail très rapidement.',
     en: 'Your appointment request has been recorded. We will confirm it by e-mail very shortly.',
+  },
+  application: {
+    fr: 'Merci, votre candidature est bien envoyée ! Vous recevrez un e-mail de confirmation dans quelques instants.',
+    en: 'Thank you, your application has been sent! You will receive a confirmation email in a few moments.',
   },
 };
 

@@ -19,6 +19,10 @@ import {
   type ReminderQueueClient,
 } from '../../src/modules/appointments/appointment-reminders.service.js';
 import { MailQueueService } from '../../src/modules/mail/mail-queue.service.js';
+import {
+  SURVEY_QUEUE_FACTORY,
+  type SurveyQueueClient,
+} from '../../src/modules/surveys/survey-invitations.service.js';
 import type { MailJob } from '../../src/modules/mail/mail.types.js';
 import { PrismaService } from '../../src/prisma/prisma.service.js';
 import { expectToMatchContract } from '../contract.js';
@@ -131,7 +135,9 @@ export async function createApp(doubles: Doubles): Promise<NestExpressApplicatio
     .overrideProvider(ThrottlerStorage)
     .useValue(doubles.throttler)
     .overrideProvider(REMINDER_QUEUE_FACTORY)
-    .useValue(() => doubles.reminders ?? new ReminderQueueDouble());
+    .useValue(() => doubles.reminders ?? new ReminderQueueDouble())
+    .overrideProvider(SURVEY_QUEUE_FACTORY)
+    .useValue((): SurveyQueueClient => ({ add: () => Promise.resolve(), close: () => Promise.resolve() }));
   if (doubles.tables)
     builder = builder.overrideProvider(PrismaService).useValue(createPrismaDouble(doubles.tables));
   const moduleRef = await builder.compile();

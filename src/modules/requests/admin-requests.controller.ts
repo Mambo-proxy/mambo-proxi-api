@@ -20,6 +20,7 @@ import { CSV_CONTENT_TYPE, attachmentDisposition } from '../../common/csv/csv.js
 import { ZodValidationPipe } from '../../common/validation/zod-validation.pipe.js';
 import { CurrentAuth, RequirePermissions } from '../auth/auth.decorators.js';
 import type { AuthContext } from '../auth/auth.types.js';
+import type { SignedUrl } from '../storage/storage.service.js';
 import { AdminRequestsService, type RequestActor, type RequestsPage } from './admin-requests.service.js';
 import { MyTasksService, type MyTasks } from './my-tasks.service.js';
 import type { RequestDetail, RequestNote } from './request.mapper.js';
@@ -76,6 +77,21 @@ export class AdminRequestsController {
   @ApiOperation({ operationId: 'adminGetRequest', summary: "Détail d'une demande" })
   detail(@Param('id') id: string, @CurrentAuth() auth: AuthContext): Promise<RequestDetail> {
     return this.requests.detail(id, auth, new Date());
+  }
+
+  @Get(':id/attachments/:attachmentId')
+  @RequirePermissions('requests:read', 'requests:read-assigned')
+  @Header('Cache-Control', 'no-store')
+  @ApiOperation({
+    operationId: 'adminGetRequestAttachment',
+    summary: "URL signée (5 min) d'une pièce jointe",
+  })
+  attachment(
+    @Param('id') id: string,
+    @Param('attachmentId') attachmentId: string,
+    @CurrentAuth() auth: AuthContext,
+  ): Promise<SignedUrl> {
+    return this.requests.attachmentUrl(id, attachmentId, auth, new Date());
   }
 
   @Patch(':id')

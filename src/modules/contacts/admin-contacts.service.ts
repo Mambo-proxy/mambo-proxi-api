@@ -364,12 +364,12 @@ export class AdminContactsService {
       select: { id: true, email: true },
     });
     if (!contact) throw contactNotFound();
-    await this.prisma.$transaction(async (tx) => {
+    const storageKeys = await this.prisma.$transaction(async (tx) => {
       const requests = await tx.request.findMany({
         where: { contactId: id, anonymizedAt: null },
         select: { id: true },
       });
-      await this.requests.anonymizeInTx(
+      const keys = await this.requests.anonymizeInTx(
         tx,
         requests.map((request) => request.id),
         actor.auth.user.id,
@@ -424,6 +424,9 @@ export class AdminContactsService {
         label: 'A effacé les données d’un contact (droit à l’effacement)',
         after: { anonymizedRequests: requests.length },
       });
+      return keys;
     });
+    // Fichiers (CV, pièces jointes) supprimés du stockage une fois l'effacement enregistré.
+    await this.requests.purgeFiles(storageKeys);
   }
 }

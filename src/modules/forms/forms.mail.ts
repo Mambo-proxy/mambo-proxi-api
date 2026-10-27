@@ -90,6 +90,13 @@ export interface EventRegistrationData extends AcknowledgementData {
   seats: number;
 }
 
+export interface ApplicationReceivedData extends AcknowledgementData {
+  /** Intitulé du poste dans la langue de l'envoi, ou « Candidature spontanée ». */
+  jobTitle: string;
+  /** Slug de l'offre, `null` pour une candidature spontanée. */
+  jobSlug: string | null;
+}
+
 /** Alerte de l'équipe (`team-new-request`), toujours en français. */
 export interface TeamNewRequestData {
   [key: string]: unknown;
@@ -129,6 +136,7 @@ export interface AcknowledgementMail {
     | 'partner-request-received'
     | 'event-registration'
     | 'appointment-received'
+    | 'application-received'
   >;
   to: string;
   lang: Lang;

@@ -16,9 +16,12 @@ export const CACHE_TAGS = {
   categories: 'categories',
   services: 'services',
   zones: 'zones',
+  reviews: 'reviews',
   page: (key: string) => `page:${key}`,
   category: (slug: string) => `category:${slug}`,
   service: (slug: string) => `service:${slug}`,
+  jobs: 'jobs',
+  job: (slug: string) => `job:${slug}`,
 } as const;
 
 export async function requestRevalidation(

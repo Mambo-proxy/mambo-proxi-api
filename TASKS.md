@@ -58,7 +58,7 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
   - [x] Tests : unitaires (CSV, clés de recherche, journée de Douala, libellés de l'historique, filtres) ; e2e `test/admin-requests.e2e-spec.ts`, `test/admin-contacts.e2e-spec.ts` (double de Prisma avec relations par clé ; bloc base réelle)
   - [x] `ACK_SENT` / `TEAM_ALERT_SENT` à l'envoi effectif des e-mails (module mail, `MailRecorder`)
   - [ ] `GET /v1/admin/requests/{id}/attachments/{attachmentId}` (URL signée) : avec le module de stockage ; purge des fichiers des demandes anonymisées
-  - [ ] Avis publiés d'un contact effacé (nom affiché, ville) : à traiter avec le module des avis
+  - [x] Avis d'une demande anonymisée ou d'un contact effacé : nom affiché, ville et réponses retirés, avis masqué sans consentement, revalidation s'il était publié
 - [x] mail (React Email, texte brut, gabarits Figma) + queue (BullMQ, réessais) — 21 gabarits, textes modifiables en base, 4 e-mails maquettés alignés, logo PNG, `pnpm mail:preview`
 - [x] auth (argon2id, OTP e-mail, appareils de confiance, rotation des jetons, CSRF, verrouillage) · users (invitation, rôles)
   - [x] `/v1/auth/*` (9 opérations) : mot de passe argon2id, code à 6 chiffres (10 min, 5 essais, renvoi après 60 s), appareil de confiance `mp_td` (paramètre `trustedDeviceDays`), cookies `mp_at`/`mp_rt`/`mp_csrf`, rotation avec détection de réutilisation, verrouillage progressif, mot de passe oublié (réponse identique), réinitialisation et invitation à usage unique
@@ -67,7 +67,7 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
   - [x] Seed : mots de passe `SEED_ADMIN_PASSWORD` et `SEED_DEMO_PASSWORD` (développement) hachés en argon2id
   - [x] Tests : unitaires (permissions contre le contrat, JWT, politique des mots de passe) ; e2e `test/auth.e2e-spec.ts`, `test/admin-users.e2e-spec.ts` (doubles ; bloc base réelle)
   - [x] Contrat : 422 (login, verify-otp, resend-otp, forgot-password, PATCH users), 401 (resend-otp), 423 (verify-otp), 404 et 409 (DELETE et reset-password d'un utilisateur), 403 (logout), 429 (refresh), exemple `csrf-token-invalid` de `Forbidden` ; tests passés sur `expectContract`
-  - [~] Contrat : 403 `Forbidden` absent des mutations à cookie hors auth/utilisateurs/demandes/contacts : ajouté pour services, rubriques, pages, zones, paramètres, e-mails et rendez-vous ; reste avis, médias, magazine… avec leurs modules
+  - [~] Contrat : 403 `Forbidden` absent des mutations à cookie hors auth/utilisateurs/demandes/contacts : ajouté pour services, rubriques, pages, zones, paramètres, e-mails, rendez-vous et avis ; reste médias, magazine… avec leurs modules
   - [ ] Site : appeler `POST /v1/auth/refresh` sur un 401 (jeton d'accès de 15 min) avant de rediriger vers la connexion
 - [x] appointments + availability (créneaux, 409, confirmation `.ics`, proposition, rappel J-1 9 h Douala)
   - [x] Site (`src/modules/appointments`, `src/modules/forms`) : `GET /v1/appointments/availability` (plages, fermetures et horaires exceptionnels, rendez-vous qui occupent un créneau, délai minimal, horizon, format ; 62 jours au plus, `no-store`), `POST /v1/appointments` (anti-spam des formulaires, créneau proposé exigé → 422, pris → 409 `slot-taken`, demande `RENDEZ_VOUS` de même référence, e-mail « demande reçue », alerte de l'équipe), `POST /v1/appointments/{reference}/accept-proposal` (jeton HMAC, 410 expiré, 409 clos ou pris)
@@ -79,8 +79,21 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
   - [x] Tests : unitaires (créneaux et changement d'heure européen, schémas, rappel, `.ics`, erreur P2002 de l'adaptateur `pg`, seed des disponibilités) ; e2e `test/appointments.e2e-spec.ts` (double de Prisma avec annulation des transactions et index uniques, permissions par rôle, CSRF, double réservation, rappel programmé et retiré ; bloc base réelle : réservations simultanées, index unique) et `test/appointment-reminders.e2e-spec.ts` (Redis réel)
   - [ ] Base réelle et Redis réel : non lancés sur la machine de développement (pas de Docker), à passer en CI
   - [ ] Compteur `appointments` des pastilles (`sidebar-counts`) et tableau de bord : avec le module du tableau de bord
-- [ ] surveys + reviews (invitation après « Prestation réalisée », relance J+3, jeton unique 30 j, consentement de publication)
-- [ ] jobs + applications + storage (CV : signature de fichier, 5 Mo, stockage privé, URL signées, ClamAV optionnel)
+- [~] surveys + reviews (invitation après « Prestation réalisée », relance J+3, jeton unique 30 j, consentement de publication)
+  - [x] Site : `GET /v1/surveys/{token}` (questions actives localisées, 404 / 410 `survey-completed` / 410 `survey-expired`, `no-store`), `POST /v1/surveys/{token}/responses` (réponses contrôlées, réservation atomique, avis « À valider » vérifié seulement avec consentement et note, notification `REVIEW`), `GET /v1/reviews` et `/v1/reviews/summary`
+  - [x] Back-office : `/v1/admin/reviews*` (liste et compteurs, ajout manuel non vérifié, statistiques, publication refusée sans consentement, mise en avant d'un avis publié seulement, service, suppression des seuls témoignages manuels, réponse), `GET|PUT /v1/admin/survey-questions` ; journal d'activité sans nom de client ; revalidation `reviews` / `service:*` / `category:*`
+  - [x] File BullMQ `survey-invitations` : invitation après `emails.surveyDelayHours`, relance après `emails.surveyReminderDays`, expiration à 30 jours ; tâches à identifiant stable, réservation atomique ; reprise au démarrage du worker
+  - [x] Contrat : 400 (listes), 403, 409 (mise en avant, suppression d'un avis vérifié), 422 ; règles décrites
+  - [ ] Tests (unitaires, e2e) : après le branchement du site
+  - [ ] Relance manuelle et liste des questionnaires du back-office : absentes du contrat (suivi dans le détail des demandes)
+- [~] jobs + applications + storage (CV : signature de fichier, 5 Mo, stockage privé, URL signées, ClamAV optionnel)
+  - [x] Stockage `src/modules/storage` (global) : interface `StorageDriver` (`put`, `get` en flux, `delete`, `check`), pilote disque local (`STORAGE_DRIVER=local`, `STORAGE_DIR`), clés aléatoires, écriture atomique `0600` ; type réel par signature (PDF, DOC, DOCX), 5 Mo, nom assaini ; liens signés HMAC de 5 min servis par `GET /v1/files/{token}` ; point d'accroche ClamAV désactivé (`SKIPPED`)
+  - [x] Site : `GET /v1/jobs` (filtres `city`, `contract`, `q`, `lang`), `GET /v1/jobs/{slug}` (404 brouillon, 410 `job-closed` archivée ou expirée), `POST /v1/job-applications` (multipart, anti-spam des formulaires, 413 / 415 / 422, demande `CANDIDATURE` + pièce jointe `CV` + candidature, e-mails `application-received` et `team-new-request`)
+  - [x] Back-office : `/v1/admin/jobs*` (liste avec compteurs, création, modification et publication, suppression ; revalidation `jobs` / `job:*` / `sitemap`, redirection 301 au changement d'adresse), `/v1/admin/applications*` (liste paginée, détail → « Lu », statut, lien signé du CV), `GET /v1/admin/requests/{id}/attachments/{attachmentId}`
+  - [x] RGPD : fichiers supprimés du stockage à l'anonymisation d'une demande et à l'effacement d'un contact (noms `fichier-anonymise`)
+  - [x] Contrat : `GET /v1/files/{token}` ajouté ; 400 / 403 / 422 manquants des routes du lot
+  - [ ] Tests (unitaires, e2e) : après le branchement du site
+  - [ ] Pilote S3 (aucune dépendance S3 installée), `checks.storage` de `/v1/health`, suppression des candidatures refusées après la durée de conservation, duplication / ordre / notes des offres et candidatures (absents du contrat)
 - [ ] partners · trainings · events
 - [ ] newsletter (double opt-in, segments, campagnes par lots, `List-Unsubscribe`, export, mesure optionnelle)
 - [ ] media (sharp : AVIF/WebP 480/960/1600, SVG assaini, point focal)
