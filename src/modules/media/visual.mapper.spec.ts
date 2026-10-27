@@ -97,4 +97,17 @@ describe('références de visuels dans les JSON', () => {
     expect(asVisual(resolved.hero)?.image?.id).toBe('photo-chef-2');
     expect(asVisual({ illustration: 'inconnue' })).toBeNull();
   });
+
+  it('relit dans la médiathèque une image copiée sous la forme du contrat (forme complète partout)', () => {
+    const copied = {
+      illustration: 'chef',
+      image: { id: chef.id, url: '/photos/chef-2.png', width: 1536, height: 1024, variants: [] },
+      alt: 'Plat braisé',
+    };
+    expect([...collectImageIds({ visual: copied })]).toEqual([chef.id]);
+    const resolved = resolveJsonVisuals({ visual: copied }, new Map([[chef.id, chef]]), BASE);
+    expect(resolved.visual).toEqual(toVisual('chef', chef, BASE, 'Plat braisé'));
+    // Média absent de la médiathèque : copie gardée telle quelle.
+    expect(resolveJsonVisuals({ visual: copied }, new Map(), BASE).visual).toEqual(copied);
+  });
 });

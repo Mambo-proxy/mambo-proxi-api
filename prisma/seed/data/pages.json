@@ -29,24 +29,12 @@
         "socialProof": "4,9/5 · plus de 150 projets accompagnés",
         "visual": {
           "illustration": "accueil",
-          "image": {
-            "id": "photo-home-hero",
-            "url": "/photos/home-hero.png",
-            "width": 960,
-            "height": 1280,
-            "variants": []
-          },
+          "imageId": "photo-home-hero",
           "alt": "Une famille sourit dans son salon pendant qu'une intervenante Mambo Proxi s'occupe du ménage."
         },
         "visualSecondary": {
           "illustration": "chef",
-          "image": {
-            "id": "photo-chef-2",
-            "url": "/photos/chef-2.png",
-            "width": 1536,
-            "height": 1024,
-            "variants": []
-          },
+          "imageId": "photo-chef-2",
           "alt": "Un chef privé présente un plat de poisson braisé."
         },
         "floatingCards": [
@@ -175,13 +163,7 @@
         "leadMobile": "",
         "visual": {
           "illustration": "equipe",
-          "image": {
-            "id": "photo-agence-equipe",
-            "url": "/photos/agence-equipe.png",
-            "width": 1024,
-            "height": 1024,
-            "variants": []
-          },
+          "imageId": "photo-agence-equipe",
           "alt": "L'équipe Mambo Proxi réunie autour d'une table à l'agence."
         },
         "items": [
@@ -296,24 +278,12 @@
             "socialProof": "4.9/5 · more than 150 projects supported",
             "visual": {
               "illustration": "accueil",
-              "image": {
-                "id": "photo-home-hero",
-                "url": "/photos/home-hero.png",
-                "width": 960,
-                "height": 1280,
-                "variants": []
-              },
+              "imageId": "photo-home-hero",
               "alt": "A family smiles in their living room while a Mambo Proxi housekeeper does the cleaning."
             },
             "visualSecondary": {
               "illustration": "chef",
-              "image": {
-                "id": "photo-chef-2",
-                "url": "/photos/chef-2.png",
-                "width": 1536,
-                "height": 1024,
-                "variants": []
-              },
+              "imageId": "photo-chef-2",
               "alt": "A private chef presents a grilled fish dish."
             },
             "floatingCards": [
@@ -437,13 +407,7 @@
             "leadMobile": "",
             "visual": {
               "illustration": "equipe",
-              "image": {
-                "id": "photo-agence-equipe",
-                "url": "/photos/agence-equipe.png",
-                "width": 1024,
-                "height": 1024,
-                "variants": []
-              },
+              "imageId": "photo-agence-equipe",
               "alt": "The Mambo Proxi team gathered around a table at the agency."
             },
             "items": [
@@ -559,13 +523,7 @@
         "showWhatsapp": true,
         "visual": {
           "illustration": "accueil",
-          "image": {
-            "id": "photo-douala-ville",
-            "url": "/photos/douala-ville.png",
-            "width": 1536,
-            "height": 1024,
-            "variants": []
-          },
+          "imageId": "photo-douala-ville",
           "alt": "Douala au coucher du soleil, le pont sur le Wouri."
         }
       },
@@ -614,13 +572,7 @@
             "showWhatsapp": true,
             "visual": {
               "illustration": "accueil",
-              "image": {
-                "id": "photo-douala-ville",
-                "url": "/photos/douala-ville.png",
-                "width": 1536,
-                "height": 1024,
-                "variants": []
-              },
+              "imageId": "photo-douala-ville",
               "alt": "Douala at sunset, the bridge over the Wouri."
             }
           },
@@ -684,13 +636,7 @@
         "leadMobile": "Quatre zones au départ de Cité SIC. Conditions confirmées sur devis.",
         "visual": {
           "illustration": "livraison",
-          "image": {
-            "id": "photo-prox-scooter",
-            "url": "/photos/prox-scooter.png",
-            "width": 1280,
-            "height": 960,
-            "variants": []
-          },
+          "imageId": "photo-prox-scooter",
           "alt": "Un livreur Mambo Proxi à scooter sur une avenue bordée de palmiers, à Douala."
         },
         "showWhatsapp": false,
@@ -761,13 +707,7 @@
             "leadMobile": "Four areas from our Cité SIC base. Terms confirmed in the quote.",
             "visual": {
               "illustration": "livraison",
-              "image": {
-                "id": "photo-prox-scooter",
-                "url": "/photos/prox-scooter.png",
-                "width": 1280,
-                "height": 960,
-                "variants": []
-              },
+              "imageId": "photo-prox-scooter",
               "alt": "A Mambo Proxi delivery rider on a scooter on a palm-lined avenue in Douala."
             },
             "showWhatsapp": false,
@@ -857,13 +797,7 @@
         "lead": "MAMBO Proxi est une agence de services de proximité née d’un constat : au Cameroun, il est difficile de trouver rapidement des services compétents. Nous intervenons à domicile et dans l’immobilier, les services du quotidien, l’expérience, la culture et l’événementiel.",
         "visual": {
           "illustration": "equipe",
-          "image": {
-            "id": "photo-qsn-hero",
-            "url": "/photos/qsn-hero.png",
-            "width": 1280,
-            "height": 960,
-            "variants": []
-          },
+          "imageId": "photo-qsn-hero",
           "alt": "Une conseillère Mambo Proxi accueille un couple au comptoir de l’agence."
         },
         "showWhatsapp": false,
@@ -923,13 +857,7 @@
         "signature": "Mireille Bell — Fondatrice et directrice",
         "visual": {
           "illustration": "portrait",
-          "image": {
-            "id": "photo-fondatrice",
-            "url": "/photos/fondatrice.png",
-            "width": 1117,
-            "height": 1185,
-            "variants": []
-          },
+          "imageId": "photo-fondatrice",
           "alt": "Mireille Bell, fondatrice de Mambo Proxi."
         },
         "chips": []
@@ -950,13 +878,7 @@
             "location": "Douala",
             "visual": {
               "illustration": "portrait",
-              "image": {
-                "id": "portrait-1",
-                "url": "/illustrations/portraits/portrait-1.svg",
-                "width": 480,
-                "height": 360,
-                "variants": []
-              },
+              "imageId": "portrait-1",
               "alt": ""
             }
           },
@@ -966,13 +888,7 @@
             "location": "Douala",
             "visual": {
               "illustration": "portrait",
-              "image": {
-                "id": "portrait-2",
-                "url": "/illustrations/portraits/portrait-2.svg",
-                "width": 480,
-                "height": 360,
-                "variants": []
-              },
+              "imageId": "portrait-2",
               "alt": ""
             }
           },
@@ -982,13 +898,7 @@
             "location": "Yaoundé",
             "visual": {
               "illustration": "portrait",
-              "image": {
-                "id": "portrait-3",
-                "url": "/illustrations/portraits/portrait-3.svg",
-                "width": 480,
-                "height": 360,
-                "variants": []
-              },
+              "imageId": "portrait-3",
               "alt": ""
             }
           },
@@ -998,13 +908,7 @@
             "location": "Douala",
             "visual": {
               "illustration": "portrait",
-              "image": {
-                "id": "portrait-4",
-                "url": "/illustrations/portraits/portrait-4.svg",
-                "width": 480,
-                "height": 360,
-                "variants": []
-              },
+              "imageId": "portrait-4",
               "alt": ""
             }
           }
@@ -1139,13 +1043,7 @@
             "lead": "MAMBO Proxi is a local services agency born from a simple observation: in Cameroon, it is hard to find skilled services quickly. We work in your home and in real estate, everyday services, experiences, culture and events.",
             "visual": {
               "illustration": "equipe",
-              "image": {
-                "id": "photo-qsn-hero",
-                "url": "/photos/qsn-hero.png",
-                "width": 1280,
-                "height": 960,
-                "variants": []
-              },
+              "imageId": "photo-qsn-hero",
               "alt": "A Mambo Proxi adviser welcomes a couple at the agency’s front desk."
             },
             "showWhatsapp": false,
@@ -1205,13 +1103,7 @@
             "signature": "Mireille Bell — Founder and director",
             "visual": {
               "illustration": "portrait",
-              "image": {
-                "id": "photo-fondatrice",
-                "url": "/photos/fondatrice.png",
-                "width": 1117,
-                "height": 1185,
-                "variants": []
-              },
+              "imageId": "photo-fondatrice",
               "alt": "Mireille Bell, founder of Mambo Proxi."
             },
             "chips": []
@@ -1232,13 +1124,7 @@
                 "location": "Douala",
                 "visual": {
                   "illustration": "portrait",
-                  "image": {
-                    "id": "portrait-1",
-                    "url": "/illustrations/portraits/portrait-1.svg",
-                    "width": 480,
-                    "height": 360,
-                    "variants": []
-                  },
+                  "imageId": "portrait-1",
                   "alt": ""
                 }
               },
@@ -1248,13 +1134,7 @@
                 "location": "Douala",
                 "visual": {
                   "illustration": "portrait",
-                  "image": {
-                    "id": "portrait-2",
-                    "url": "/illustrations/portraits/portrait-2.svg",
-                    "width": 480,
-                    "height": 360,
-                    "variants": []
-                  },
+                  "imageId": "portrait-2",
                   "alt": ""
                 }
               },
@@ -1264,13 +1144,7 @@
                 "location": "Yaoundé",
                 "visual": {
                   "illustration": "portrait",
-                  "image": {
-                    "id": "portrait-3",
-                    "url": "/illustrations/portraits/portrait-3.svg",
-                    "width": 480,
-                    "height": 360,
-                    "variants": []
-                  },
+                  "imageId": "portrait-3",
                   "alt": ""
                 }
               },
@@ -1280,13 +1154,7 @@
                 "location": "Douala",
                 "visual": {
                   "illustration": "portrait",
-                  "image": {
-                    "id": "portrait-4",
-                    "url": "/illustrations/portraits/portrait-4.svg",
-                    "width": 480,
-                    "height": 360,
-                    "variants": []
-                  },
+                  "imageId": "portrait-4",
                   "alt": ""
                 }
               }
@@ -1441,13 +1309,7 @@
         "lead": "Notre mission, notre vision, nos engagements et la méthode qui nous permet d’organiser chaque service avec rigueur.",
         "visual": {
           "illustration": "accueil",
-          "image": {
-            "id": "photo-mission-hero",
-            "url": "/photos/mission-hero.png",
-            "width": 1280,
-            "height": 960,
-            "variants": []
-          },
+          "imageId": "photo-mission-hero",
           "alt": "Une conseillère Mambo Proxi prend des notes auprès d’une famille, dans son salon."
         },
         "showWhatsapp": false,
@@ -1586,13 +1448,7 @@
         "author": "La signature de MAMBO Proxi",
         "visual": {
           "illustration": "culture",
-          "image": {
-            "id": "photo-douala-ville",
-            "url": "/photos/douala-ville.png",
-            "width": 1536,
-            "height": 1024,
-            "variants": []
-          },
+          "imageId": "photo-douala-ville",
           "alt": "Douala au coucher du soleil, le pont sur le Wouri."
         }
       },
@@ -1629,13 +1485,7 @@
             "lead": "Our mission, our vision, our commitments and the method we use to organise every service with care.",
             "visual": {
               "illustration": "accueil",
-              "image": {
-                "id": "photo-mission-hero",
-                "url": "/photos/mission-hero.png",
-                "width": 1280,
-                "height": 960,
-                "variants": []
-              },
+              "imageId": "photo-mission-hero",
               "alt": "A Mambo Proxi adviser takes notes with a family in their living room."
             },
             "showWhatsapp": false,
@@ -1774,13 +1624,7 @@
             "author": "The MAMBO Proxi signature",
             "visual": {
               "illustration": "culture",
-              "image": {
-                "id": "photo-douala-ville",
-                "url": "/photos/douala-ville.png",
-                "width": 1536,
-                "height": 1024,
-                "variants": []
-              },
+              "imageId": "photo-douala-ville",
               "alt": "Douala at sunset, the bridge over the Wouri."
             }
           },
@@ -1838,13 +1682,7 @@
         "lead": "Chauffeurs, chefs, photographes, propriétaires, agences, entreprises : rejoignez le réseau MAMBO Proxi et recevez des demandes qualifiées.",
         "visual": {
           "illustration": "equipe",
-          "image": {
-            "id": "photo-part-hero",
-            "url": "/photos/part-hero.png",
-            "width": 1280,
-            "height": 960,
-            "variants": []
-          },
+          "imageId": "photo-part-hero",
           "alt": "Une partenaire et un responsable de Mambo Proxi se serrent la main autour d’un bureau."
         },
         "primaryCta": {
@@ -1885,13 +1723,7 @@
             "text": "Recevez des demandes de prestations près de chez vous.",
             "visual": {
               "illustration": "equipe",
-              "image": {
-                "id": "photo-part-exp",
-                "url": "/photos/part-exp.png",
-                "width": 1536,
-                "height": 864,
-                "variants": []
-              },
+              "imageId": "photo-part-exp",
               "alt": ""
             },
             "cta": {
@@ -1906,13 +1738,7 @@
             "text": "Confiez une gestion locative ou proposez vos logements.",
             "visual": {
               "illustration": "logement",
-              "image": {
-                "id": "photo-immo-recherche",
-                "url": "/photos/immo-recherche.png",
-                "width": 1536,
-                "height": 1024,
-                "variants": []
-              },
+              "imageId": "photo-immo-recherche",
               "alt": ""
             },
             "cta": {
@@ -1927,13 +1753,7 @@
             "text": "Développez votre activité avec un partenaire de confiance.",
             "visual": {
               "illustration": "equipe",
-              "image": {
-                "id": "photo-part-entreprise",
-                "url": "/photos/part-entreprise.png",
-                "width": 1536,
-                "height": 864,
-                "variants": []
-              },
+              "imageId": "photo-part-entreprise",
               "alt": ""
             },
             "cta": {
@@ -2020,13 +1840,7 @@
             "lead": "Drivers, chefs, photographers, landlords, agencies, businesses: join the MAMBO Proxi network and receive qualified requests.",
             "visual": {
               "illustration": "equipe",
-              "image": {
-                "id": "photo-part-hero",
-                "url": "/photos/part-hero.png",
-                "width": 1280,
-                "height": 960,
-                "variants": []
-              },
+              "imageId": "photo-part-hero",
               "alt": "A partner and a Mambo Proxi manager shake hands across a desk."
             },
             "primaryCta": {
@@ -2067,13 +1881,7 @@
                 "text": "Receive service requests close to where you are.",
                 "visual": {
                   "illustration": "equipe",
-                  "image": {
-                    "id": "photo-part-exp",
-                    "url": "/photos/part-exp.png",
-                    "width": 1536,
-                    "height": 864,
-                    "variants": []
-                  },
+                  "imageId": "photo-part-exp",
                   "alt": ""
                 },
                 "cta": {
@@ -2088,13 +1896,7 @@
                 "text": "Entrust us with property management or list your homes.",
                 "visual": {
                   "illustration": "logement",
-                  "image": {
-                    "id": "photo-immo-recherche",
-                    "url": "/photos/immo-recherche.png",
-                    "width": 1536,
-                    "height": 1024,
-                    "variants": []
-                  },
+                  "imageId": "photo-immo-recherche",
                   "alt": ""
                 },
                 "cta": {
@@ -2109,13 +1911,7 @@
                 "text": "Grow your business with a partner you can trust.",
                 "visual": {
                   "illustration": "equipe",
-                  "image": {
-                    "id": "photo-part-entreprise",
-                    "url": "/photos/part-entreprise.png",
-                    "width": 1536,
-                    "height": 864,
-                    "variants": []
-                  },
+                  "imageId": "photo-part-entreprise",
                   "alt": ""
                 },
                 "cta": {
@@ -2222,13 +2018,7 @@
         "lead": "Formations pour les professionnels, ateliers et sessions de sensibilisation : transmettre le savoir-faire, le savoir-être et les bonnes pratiques.",
         "visual": {
           "illustration": "formation",
-          "image": {
-            "id": "photo-formation-hero",
-            "url": "/photos/formation-hero.png",
-            "width": 1280,
-            "height": 960,
-            "variants": []
-          },
+          "imageId": "photo-formation-hero",
           "alt": "Une formatrice anime une session devant des intervenants en tenue Mambo Proxi."
         },
         "primaryCta": {
@@ -2298,13 +2088,7 @@
         "lead": "Dites-nous ce dont vous avez besoin : nous vous proposons un programme et un devis adaptés.",
         "visual": {
           "illustration": "formation",
-          "image": {
-            "id": "photo-formation-form",
-            "url": "/photos/formation-form.png",
-            "width": 1536,
-            "height": 1024,
-            "variants": []
-          },
+          "imageId": "photo-formation-form",
           "alt": "Une formatrice montre à une intervenante comment préparer un lit."
         }
       }
@@ -2329,13 +2113,7 @@
             "lead": "Training for professionals, workshops and awareness sessions: passing on know-how, people skills and good practice.",
             "visual": {
               "illustration": "formation",
-              "image": {
-                "id": "photo-formation-hero",
-                "url": "/photos/formation-hero.png",
-                "width": 1280,
-                "height": 960,
-                "variants": []
-              },
+              "imageId": "photo-formation-hero",
               "alt": "A trainer leads a session for service providers in Mambo Proxi uniforms."
             },
             "primaryCta": {
@@ -2405,13 +2183,7 @@
             "lead": "Tell us what you need: we will suggest a programme and a quote to match.",
             "visual": {
               "illustration": "formation",
-              "image": {
-                "id": "photo-formation-form",
-                "url": "/photos/formation-form.png",
-                "width": 1536,
-                "height": 1024,
-                "variants": []
-              },
+              "imageId": "photo-formation-form",
               "alt": "A trainer shows a service provider how to make a bed."
             }
           }
@@ -2456,13 +2228,7 @@
         "lead": "Collaborateurs, prestataires, partenaires : nous recherchons à Douala des personnes fiables, attentionnées et exigeantes.",
         "visual": {
           "illustration": "equipe",
-          "image": {
-            "id": "photo-recrut-hero",
-            "url": "/photos/recrut-hero.png",
-            "width": 1280,
-            "height": 960,
-            "variants": []
-          },
+          "imageId": "photo-recrut-hero",
           "alt": "Une responsable de l’agence serre la main d’une intervenante en tenue Mambo Proxi."
         },
         "primaryCta": {
@@ -2559,13 +2325,7 @@
             "lead": "Employees, service providers, partners: we are looking for reliable, caring and demanding people in Douala.",
             "visual": {
               "illustration": "equipe",
-              "image": {
-                "id": "photo-recrut-hero",
-                "url": "/photos/recrut-hero.png",
-                "width": 1280,
-                "height": 960,
-                "variants": []
-              },
+              "imageId": "photo-recrut-hero",
               "alt": "An agency manager shakes hands with a service provider in a Mambo Proxi uniform."
             },
             "primaryCta": {
@@ -3062,13 +2822,7 @@
         "lead": "Le magazine du bien-être global : santé, nutrition, beauté, immobilier, solidarité et culture. Un rendez-vous de partage et de découverte, à lire en ligne et à recevoir par e-mail.",
         "visual": {
           "illustration": "portrait",
-          "image": {
-            "id": "photo-magazine-hero",
-            "url": "/photos/magazine-hero.png",
-            "width": 1280,
-            "height": 960,
-            "variants": []
-          },
+          "imageId": "photo-magazine-hero",
           "alt": "Une lectrice feuillette le magazine Mambo Proxi sur une terrasse, devant un petit-déjeuner de fruits."
         },
         "showWhatsapp": false,
@@ -3117,13 +2871,7 @@
         "signature": "Mireille Bell — Fondatrice de Mambo Proxi",
         "visual": {
           "illustration": "portrait",
-          "image": {
-            "id": "photo-fondatrice",
-            "url": "/photos/fondatrice.png",
-            "width": 1117,
-            "height": 1185,
-            "variants": []
-          },
+          "imageId": "photo-fondatrice",
           "alt": "Mireille Bell, fondatrice de Mambo Proxi."
         },
         "chips": []
@@ -3200,13 +2948,7 @@
             "lead": "The magazine of overall well-being: health, nutrition, beauty, real estate, solidarity and culture. A place to share and discover, to read online and to receive by email.",
             "visual": {
               "illustration": "portrait",
-              "image": {
-                "id": "photo-magazine-hero",
-                "url": "/photos/magazine-hero.png",
-                "width": 1280,
-                "height": 960,
-                "variants": []
-              },
+              "imageId": "photo-magazine-hero",
               "alt": "A reader browses the Mambo Proxi magazine on a terrace, over a fruit breakfast."
             },
             "showWhatsapp": false,
@@ -3255,13 +2997,7 @@
             "signature": "Mireille Bell — Founder of Mambo Proxi",
             "visual": {
               "illustration": "portrait",
-              "image": {
-                "id": "photo-fondatrice",
-                "url": "/photos/fondatrice.png",
-                "width": 1117,
-                "height": 1185,
-                "variants": []
-              },
+              "imageId": "photo-fondatrice",
               "alt": "Mireille Bell, founder of Mambo Proxi."
             },
             "chips": []

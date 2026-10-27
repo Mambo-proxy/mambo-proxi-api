@@ -151,7 +151,7 @@ const categories = {
     ],
     ctaTitle: 'Envie d’un moment\nsur mesure ?',
     ctaText: 'Dites-nous ce que vous imaginez : nous vous proposons un devis gratuit sous 24 h.',
-    seoTitle: 'Expérience : chef privé, location de voiture, photographe au Cameroun',
+    seoTitle: 'Expérience : chef privé, voiture, photographe au Cameroun',
     seoDescription: 'Des prestataires de confiance réservés pour vous au Cameroun.',
     sortOrder: 2,
     translations: {
@@ -330,7 +330,7 @@ const services = {
     name: 'Chef privé',
     summary: 'Un chef à domicile pour vos dîners, réceptions et grandes occasions.',
     tagline:
-      'Un chef à domicile pour vos dîners, réceptions et grandes occasions. Vous profitez de vos invités, nous nous occupons du reste.',
+      'Un chef à domicile pour vos dîners et grandes occasions. Vous profitez de vos invités, nous nous occupons du reste.',
     icon: 'ChefHat',
     illustration: 'chef',
     coverImageId: MEDIA.chef['id'],

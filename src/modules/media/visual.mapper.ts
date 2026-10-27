@@ -142,12 +142,25 @@ function isVisualReference(
   return isPlainObject(value) && 'imageId' in value && !('image' in value);
 }
 
+/**
+ * Visuel enregistré sous la forme du contrat avec une image de la médiathèque (`{ illustration, image: { id, … },
+ * alt }`, copie d'un média dans un JSON) : identifiant de l'image, relue dans la médiathèque comme une référence, pour
+ * renvoyer partout la même forme complète (`MediaImage` à jour : texte alternatif, point focal, variantes).
+ */
+function inlineImageId(value: unknown): string | null {
+  if (!isPlainObject(value) || !('illustration' in value) || !isPlainObject(value['image'])) return null;
+  const id = value['image']['id'];
+  return typeof id === 'string' ? id : null;
+}
+
 /** Identifiants des médias référencés dans un JSON (sections de pages, visuels de rubriques, paramètres). */
 export function collectImageIds(value: unknown, into: Set<string> = new Set()): Set<string> {
   if (Array.isArray(value)) {
     for (const item of value) collectImageIds(item, into);
   } else if (isPlainObject(value)) {
     if (isVisualReference(value) && typeof value.imageId === 'string') into.add(value.imageId);
+    const inline = inlineImageId(value);
+    if (inline !== null) into.add(inline);
     for (const item of Object.values(value)) collectImageIds(item, into);
   }
   return into;
@@ -163,6 +176,16 @@ export function resolveJsonVisuals<T>(
     return value.map((item: unknown) => resolveJsonVisuals(item, media, publicBaseUrl)) as T;
   }
   if (!isPlainObject(value)) return value;
+  const inline = inlineImageId(value);
+  const inlineMedia = inline === null ? undefined : media.get(inline);
+  if (inlineMedia !== undefined) {
+    return toVisual(
+      isIllustration(value['illustration']) ? value['illustration'] : DEFAULT_ILLUSTRATION,
+      inlineMedia,
+      publicBaseUrl,
+      typeof value['alt'] === 'string' ? value['alt'] : null,
+    ) as T;
+  }
   if (isVisualReference(value)) {
     const imageId = typeof value.imageId === 'string' ? value.imageId : null;
     const visual = toVisual(

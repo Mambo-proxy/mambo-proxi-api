@@ -357,6 +357,12 @@ export function contentTables(passwordHash: string, now: Date): PrismaTables {
             variant: 'home',
             title: 'Vos services, ==au plus près de vous.==',
             visual: { illustration: 'accueil', imageId: 'm_hd', alt: '' },
+            // Copie d'un média sous la forme du contrat (ancien seed) : relue dans la médiathèque.
+            visualSecondary: {
+              illustration: 'chef',
+              image: { id: 'm_small', url: '/photos/m_small.png', width: 800, height: 528, variants: [] },
+              alt: '',
+            },
           },
           {
             id: 'univers',

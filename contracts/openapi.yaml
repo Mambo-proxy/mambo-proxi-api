@@ -9162,7 +9162,7 @@ components:
           - { name: occasion, label: "Type d'occasion", type: select, required: false, options: [Anniversaire, Mariage, Dîner entre amis, Séjour en famille, Événement d'entreprise, Autre], width: half }
         otherCategories: []
         cta: { title: "Envie d’un moment\nsur mesure ?", text: 'Dites-nous ce que vous imaginez : nous vous proposons un devis gratuit sous 24 h.' }
-        seo: { title: 'Expérience : chef privé, location de voiture, photographe au Cameroun', description: 'Des prestataires de confiance réservés pour vous au Cameroun : location de voiture, chef privé, massage, photographe, événementiel.', ogImageUrl: null, noindex: false }
+        seo: { title: 'Expérience : chef privé, voiture, photographe au Cameroun', description: 'Des prestataires de confiance réservés pour vous au Cameroun : location de voiture, chef privé, massage, photographe, événementiel.', ogImageUrl: null, noindex: false }
 
     ServiceChefPrive:
       summary: Fiche « Chef privé » (offres en carrousel « Nos chefs »)
@@ -9177,7 +9177,7 @@ components:
         category: { slug: experience, name: Expérience }
         href: /services/experience/chef-prive
         featuredOnHome: true
-        tagline: Un chef à domicile pour vos dîners, réceptions et grandes occasions. Vous profitez de vos invités, nous nous occupons du reste.
+        tagline: Un chef à domicile pour vos dîners et grandes occasions. Vous profitez de vos invités, nous nous occupons du reste.
         cities: [Douala, Yaoundé, Kribi]
         offers:
           eyebrow: Nos chefs
@@ -9314,7 +9314,7 @@ components:
         href: /services/services-a-domicile/entretien-du-logement
         featuredOnHome: false
         kind: service
-        tagline: 'Ménage, cuisine et salle de bain, sols et surfaces : une intervenante Mambo Proxi entretient votre logement, ponctuellement ou chaque semaine.'
+        tagline: 'Ménage, cuisine, salle de bain et sols : une intervenante entretient votre logement, ponctuellement ou chaque semaine.'
         cities: [Douala et environs]
         offers:
           eyebrow: Nos offres
@@ -9383,7 +9383,7 @@ components:
         href: /services/services-a-domicile/entretien-du-logement
         featuredOnHome: false
         kind: service
-        tagline: 'Cleaning, kitchen and bathroom, floors and surfaces: a Mambo Proxi housekeeper looks after your home, as a one-off or every week.'
+        tagline: 'Cleaning, kitchen, bathroom and floors: a housekeeper looks after your home, as a one-off or every week.'
         cities: [Douala and surroundings]
         offers:
           eyebrow: Our offers

@@ -519,3 +519,24 @@
   le contrat, donc pas d'écriture.
 - Un service publié, dépublié puis republié à une autre adresse ne reçoit pas de redirection depuis l'ancienne
   (l'adresse publiée n'est pas mémorisée).
+
+### Correctif après la CI (blocs sur la base réelle)
+
+- **Titres Google des rubriques trop longs** (seed : 66 à 69 caractères pour 60 ; `GET /v1/admin/categories` non
+  conforme) : raccourcis dans `prisma/seed/data/catalogue.json`, ainsi que les phrases d'accroche des services qui
+  dépassaient les 120 caractères du contrat (refrain « Vous nous confiez votre demande, nous nous occupons du reste. »
+  ramené à « Nous nous occupons du reste. », « We take care of the rest. » en anglais). Mêmes textes alignés dans les
+  exemples du contrat, `test/fixtures/public-content.ts` et les données simulées du site (`catalogue-services.json`,
+  `category-details.ts`, `service-details.ts`, `contract-examples.json` régénéré). Le double ne l'avait pas vu : ses
+  données sont écrites à la main (ou reprises des données simulées du site), le seed n'est lu que par la base réelle.
+  Nouveau test unitaire `src/seed-content.spec.ts` : rubriques, services, pages, zones, paramètres et modèles
+  d'e-mails du seed (français et traductions) passés aux schémas d'enregistrement du back-office. Une base déjà
+  remplie garde les anciens textes (le seed n'écrase pas) : à corriger dans le back-office ou en relançant le seed sur
+  une base vide.
+- **Aller-retour d'un brouillon de page** : le seed des pages (et la promotion du méga-menu) recopiait les images sous
+  la forme du contrat (`{ illustration, image: { id, url, width, height, variants }, alt }`), renvoyée telle quelle, alors
+  qu'un brouillon enregistré passe par référence et revient sous la forme complète de la médiathèque (`alt`,
+  `focalPoint`, `blurDataUrl`). Cause corrigée des deux côtés : le seed enregistre des références
+  (`{ illustration, imageId, alt }`), et la lecture des JSON relit dans la médiathèque toute image copiée dont
+  l'identifiant y existe (`resolveJsonVisuals`) : même forme, à jour, pour le site et le back-office. Le double
+  reproduit le cas (copie dans `test/fixtures/content.ts`, test d'aller-retour sans base réelle).

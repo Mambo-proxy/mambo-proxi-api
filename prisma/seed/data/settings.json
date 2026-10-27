@@ -549,13 +549,7 @@
         },
         "visual": {
           "illustration": "accueil",
-          "image": {
-            "id": "photo-accompagnement-installation",
-            "url": "/photos/accueil.png",
-            "width": 1448,
-            "height": 1086,
-            "variants": []
-          },
+          "imageId": "photo-accompagnement-installation",
           "alt": ""
         }
       }
@@ -877,13 +871,7 @@
           },
           "visual": {
             "illustration": "accueil",
-            "image": {
-              "id": "photo-accompagnement-installation",
-              "url": "/photos/accueil.png",
-              "width": 1448,
-              "height": 1086,
-              "variants": []
-            },
+            "imageId": "photo-accompagnement-installation",
             "alt": ""
           }
         }

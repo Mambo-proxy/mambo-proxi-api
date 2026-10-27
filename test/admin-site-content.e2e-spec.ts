@@ -225,6 +225,31 @@ describe('pages, zones, paramètres et e-mails du back-office (avec des doubles)
       ]);
     });
 
+    it('relit le brouillon tel qu’il a été envoyé (aller-retour), images sous leur forme complète', async () => {
+      const page = (await sessions.editor.agent.get('/v1/admin/pages/accueil')).body as Row;
+      const hero = (page['sections'] as Row[])[0] ?? {};
+      for (const key of ['visual', 'visualSecondary'])
+        expect(Object.keys((hero[key] as Row)['image'] as Row).sort()).toEqual([
+          'alt',
+          'blurDataUrl',
+          'focalPoint',
+          'height',
+          'id',
+          'url',
+          'variants',
+          'width',
+        ]);
+      const saved = await write('editor', 'put', '/v1/admin/pages/accueil').send({
+        sections: page['sections'],
+        seo: page['seo'],
+      });
+      expectContract('put', '/v1/admin/pages/{key}', 200, saved);
+      expect((saved.body as Row)['sections']).toEqual(page['sections']);
+      // Le site lit la même forme.
+      const site = (await request(server).get('/v1/pages/accueil')).body as Row;
+      expect(((site['sections'] as Row[])[0] ?? {})['visualSecondary']).toEqual(hero['visualSecondary']);
+    });
+
     it('abandonne le brouillon et délivre un jeton d’aperçu du brouillon', async () => {
       const token = await sessions.manager.agent.get('/v1/admin/pages/mentions-legales/preview-token');
       expectContract('get', '/v1/admin/pages/{key}/preview-token', 200, token);

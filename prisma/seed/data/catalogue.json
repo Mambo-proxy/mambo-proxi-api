@@ -118,7 +118,7 @@
       ],
       "ctaTitle": "Besoin d’un coup de main\nà la maison ?",
       "ctaText": "Choisissez votre formule : nous confirmons votre créneau sous 24 h.",
-      "seoTitle": "Services à domicile à Douala : entretien du logement, véhicule, linge",
+      "seoTitle": "Services à domicile à Douala : ménage, véhicule, linge",
       "seoDescription": "Une intervenante Mambo Proxi chez vous, selon la formule choisie : entretien du logement, nettoyage du véhicule, collecte du linge. Devis gratuit.",
       "status": "PUBLISHED",
       "sortOrder": 1,
@@ -368,7 +368,7 @@
       ],
       "ctaTitle": "Envie d’un moment\nsur mesure ?",
       "ctaText": "Dites-nous ce que vous imaginez : nous vous proposons un devis gratuit sous 24 h.",
-      "seoTitle": "Expérience : chef privé, location de voiture, photographe au Cameroun",
+      "seoTitle": "Expérience : chef privé, voiture, photographe au Cameroun",
       "seoDescription": "Des prestataires de confiance réservés pour vous au Cameroun : location de voiture, chef privé, massage, photographe, événementiel.",
       "status": "PUBLISHED",
       "sortOrder": 2,
@@ -468,7 +468,7 @@
           ],
           "ctaTitle": "Fancy a tailor-made\nmoment?",
           "ctaText": "Tell us what you have in mind: we send you a free quote within 24 hours.",
-          "seoTitle": "Experience: private chef, car rental, photographer in Cameroon",
+          "seoTitle": "Experience: private chef, car hire, photographer in Cameroon",
           "seoDescription": "Trusted providers booked for you in Cameroon: car rental, private chef, massage, photographer, events."
         }
       },
@@ -880,7 +880,7 @@
       ],
       "ctaTitle": "Un logement à trouver\nou à confier ?",
       "ctaText": "Expliquez-nous votre projet immobilier : devis gratuit et réponse sous 24 h.",
-      "seoTitle": "Immobilier : recherche de logement et gestion locative au Cameroun",
+      "seoTitle": "Immobilier : logement et gestion locative au Cameroun",
       "seoDescription": "Achat et vente, recherche de logement, location, logement temporaire et gestion locative : une équipe sur place à Douala, même pendant votre absence.",
       "status": "PUBLISHED",
       "sortOrder": 3,
@@ -1002,7 +1002,7 @@
           ],
           "ctaTitle": "A home to find\nor to entrust?",
           "ctaText": "Tell us about your property project: free quote and reply within 24 hours.",
-          "seoTitle": "Real estate: buying, renting and property management in Cameroon",
+          "seoTitle": "Real estate: buying, renting and management in Cameroon",
           "seoDescription": "Buying and selling, home search, rentals, temporary housing and property management: a team on the ground in Douala, even while you are away."
         }
       },
@@ -1428,7 +1428,7 @@
           ],
           "ctaTitle": "Need a hand\nwith daily life?",
           "ctaText": "Meals, groceries or parcels: describe your need, we reply within 24 hours.",
-          "seoTitle": "Local services in Douala: meals, groceries, parcels and laundry",
+          "seoTitle": "Local services in Douala: meals, groceries and parcels",
           "seoDescription": "Meal delivery, grocery delivery, parcel and mail collection, dry cleaning and laundry: we look after your loved ones in Douala."
         }
       },
@@ -2163,7 +2163,7 @@
       "shortName": null,
       "categoryId": "cat_domicile",
       "kind": "SERVICE",
-      "tagline": "Ménage, cuisine et salle de bain, sols et surfaces : une intervenante Mambo Proxi entretient votre logement, ponctuellement ou chaque semaine.",
+      "tagline": "Ménage, cuisine, salle de bain et sols : une intervenante entretient votre logement, ponctuellement ou chaque semaine.",
       "summary": "Ménage, cuisine et salle de bain, sols et surfaces, ponctuellement ou chaque semaine.",
       "icon": "Sparkles",
       "illustration": "logement",
@@ -2263,7 +2263,7 @@
       "translations": {
         "en": {
           "name": "Home cleaning",
-          "tagline": "Cleaning, kitchen and bathroom, floors and surfaces: a Mambo Proxi housekeeper looks after your home, as a one-off or every week.",
+          "tagline": "Cleaning, kitchen, bathroom and floors: a housekeeper looks after your home, as a one-off or every week.",
           "summary": "Cleaning, kitchen and bathroom, floors and surfaces, as a one-off or every week.",
           "audiences": [
             "Busy professionals and families short on time",
@@ -2493,7 +2493,7 @@
       "shortName": null,
       "categoryId": "cat_domicile",
       "kind": "SERVICE",
-      "tagline": "Votre véhicule nettoyé à domicile. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Votre véhicule nettoyé à domicile. Nous nous occupons du reste.",
       "summary": "Votre véhicule nettoyé à domicile.",
       "icon": "Car",
       "illustration": "voiture",
@@ -2589,7 +2589,7 @@
       "translations": {
         "en": {
           "name": "Car cleaning",
-          "tagline": "Your vehicle cleaned at home. You entrust us with your request, we take care of the rest.",
+          "tagline": "Your vehicle cleaned at home. We take care of the rest.",
           "summary": "Your vehicle cleaned at home.",
           "audiences": [
             "Busy professionals and families short on time",
@@ -2684,7 +2684,7 @@
       "shortName": null,
       "categoryId": "cat_experience",
       "kind": "SERVICE",
-      "tagline": "Un chef à domicile pour vos dîners, réceptions et grandes occasions. Vous profitez de vos invités, nous nous occupons du reste.",
+      "tagline": "Un chef à domicile pour vos dîners et grandes occasions. Vous profitez de vos invités, nous nous occupons du reste.",
       "summary": "Un chef à domicile pour vos dîners, réceptions et grandes occasions.",
       "icon": "ChefHat",
       "illustration": "chef",
@@ -3020,7 +3020,7 @@
       "shortName": null,
       "categoryId": "cat_experience",
       "kind": "SERVICE",
-      "tagline": "Véhicules récents, avec ou sans chauffeur, pour vos trajets et vos séjours. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Véhicules récents, avec ou sans chauffeur, pour vos trajets et vos séjours. Nous nous occupons du reste.",
       "summary": "Véhicules récents, avec ou sans chauffeur, pour vos trajets et vos séjours.",
       "icon": "Car",
       "illustration": "voiture",
@@ -3116,7 +3116,7 @@
       "translations": {
         "en": {
           "name": "Car rental",
-          "tagline": "Recent vehicles, with or without a driver, for your trips and stays. You entrust us with your request, we take care of the rest.",
+          "tagline": "Recent vehicles, with or without a driver, for your trips and stays. We take care of the rest.",
           "summary": "Recent vehicles, with or without a driver, for your trips and stays.",
           "audiences": [
             "Individuals who want to treat themselves",
@@ -3211,7 +3211,7 @@
       "shortName": null,
       "categoryId": "cat_experience",
       "kind": "SERVICE",
-      "tagline": "Portraits, événements, reportages : vos moments immortalisés. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Portraits, événements, reportages : vos moments immortalisés. Nous nous occupons du reste.",
       "summary": "Portraits, événements, reportages : vos moments immortalisés.",
       "icon": "Camera",
       "illustration": "photo",
@@ -3307,7 +3307,7 @@
       "translations": {
         "en": {
           "name": "Photographer",
-          "tagline": "Portraits, events, reports: your moments captured. You entrust us with your request, we take care of the rest.",
+          "tagline": "Portraits, events, reports: your moments captured. We take care of the rest.",
           "summary": "Portraits, events, reports: your moments captured.",
           "audiences": [
             "Individuals who want to treat themselves",
@@ -3402,7 +3402,7 @@
       "shortName": null,
       "categoryId": "cat_experience",
       "kind": "SERVICE",
-      "tagline": "Des praticiens qualifiés, chez vous ou sur votre lieu de séjour. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Des praticiens qualifiés, chez vous ou sur votre lieu de séjour. Nous nous occupons du reste.",
       "summary": "Des praticiens qualifiés, chez vous ou sur votre lieu de séjour.",
       "icon": "Flower2",
       "illustration": "massage",
@@ -3498,7 +3498,7 @@
       "translations": {
         "en": {
           "name": "Wellness massage",
-          "tagline": "Qualified practitioners, at your home or where you are staying. You entrust us with your request, we take care of the rest.",
+          "tagline": "Qualified practitioners, at your home or where you are staying. We take care of the rest.",
           "summary": "Qualified practitioners, at your home or where you are staying.",
           "audiences": [
             "Individuals who want to treat themselves",
@@ -3593,7 +3593,7 @@
       "shortName": null,
       "categoryId": "cat_experience",
       "kind": "SERVICE",
-      "tagline": "Décoration, traiteur, animation : des prestataires pour vos événements privés. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Décoration, traiteur, animation : des prestataires pour vos événements privés. Nous nous occupons du reste.",
       "summary": "Décoration, traiteur, animation : des prestataires pour vos événements privés.",
       "icon": "PartyPopper",
       "illustration": "evenement",
@@ -3689,7 +3689,7 @@
       "translations": {
         "en": {
           "name": "Event services",
-          "tagline": "Decoration, catering, entertainment: providers for your private events. You entrust us with your request, we take care of the rest.",
+          "tagline": "Decoration, catering, entertainment: providers for your private events. We take care of the rest.",
           "summary": "Decoration, catering, entertainment: providers for your private events.",
           "audiences": [
             "Individuals who want to treat themselves",
@@ -3784,7 +3784,7 @@
       "shortName": null,
       "categoryId": "cat_immobilier",
       "kind": "SERVICE",
-      "tagline": "Maisons, appartements, villas, immeubles : nous vous accompagnons pour acheter ou vendre. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Maisons, appartements, villas, immeubles : nous vous accompagnons pour acheter ou vendre. Nous nous occupons du reste.",
       "summary": "Maisons, appartements, villas, immeubles : nous vous accompagnons pour acheter ou vendre.",
       "icon": "Wrench",
       "illustration": "logement",
@@ -3880,7 +3880,7 @@
       "translations": {
         "en": {
           "name": "Buying and selling property",
-          "tagline": "Houses, apartments, villas, buildings: we help you buy or sell. You entrust us with your request, we take care of the rest.",
+          "tagline": "Houses, apartments, villas, buildings: we help you buy or sell. We take care of the rest.",
           "summary": "Houses, apartments, villas, buildings: we help you buy or sell.",
           "audiences": [
             "Diaspora families preparing their return",
@@ -3979,7 +3979,7 @@
       "shortName": null,
       "categoryId": "cat_immobilier",
       "kind": "SERVICE",
-      "tagline": "Nous trouvons le bien qui correspond à vos critères et à votre budget. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Nous trouvons le bien qui correspond à vos critères et à votre budget. Nous nous occupons du reste.",
       "summary": "Nous trouvons le bien qui correspond à vos critères et à votre budget.",
       "icon": "Search",
       "illustration": "logement",
@@ -4075,7 +4075,7 @@
       "translations": {
         "en": {
           "name": "Home search",
-          "tagline": "We find the property that matches your criteria and your budget. You entrust us with your request, we take care of the rest.",
+          "tagline": "We find the property that matches your criteria and your budget. We take care of the rest.",
           "summary": "We find the property that matches your criteria and your budget.",
           "audiences": [
             "Diaspora families preparing their return",
@@ -4174,7 +4174,7 @@
       "shortName": null,
       "categoryId": "cat_immobilier",
       "kind": "SERVICE",
-      "tagline": "Des solutions souples, avec des contrats clairs et un suivi. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Des solutions souples, avec des contrats clairs et un suivi. Nous nous occupons du reste.",
       "summary": "Des solutions souples, avec des contrats clairs et un suivi.",
       "icon": "Key",
       "illustration": "logement",
@@ -4270,7 +4270,7 @@
       "translations": {
         "en": {
           "name": "Rental, subletting and flatsharing",
-          "tagline": "Flexible solutions, with clear contracts and follow-up. You entrust us with your request, we take care of the rest.",
+          "tagline": "Flexible solutions, with clear contracts and follow-up. We take care of the rest.",
           "summary": "Flexible solutions, with clear contracts and follow-up.",
           "audiences": [
             "Diaspora families preparing their return",
@@ -4365,7 +4365,7 @@
       "shortName": "Logement adapté et appartement meublé",
       "categoryId": "cat_immobilier",
       "kind": "SERVICE",
-      "tagline": "Logements thérapeutiques ou adaptés, et meublés prêts à vivre. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Logements thérapeutiques ou adaptés, et meublés prêts à vivre. Nous nous occupons du reste.",
       "summary": "Logements thérapeutiques ou adaptés, et meublés prêts à vivre.",
       "icon": "HouseHeart",
       "illustration": "logement",
@@ -4462,7 +4462,7 @@
         "en": {
           "name": "Adapted housing and furnished apartments",
           "shortName": "Adapted and furnished housing",
-          "tagline": "Therapeutic or adapted homes, and furnished apartments ready to move into. You entrust us with your request, we take care of the rest.",
+          "tagline": "Therapeutic or adapted homes, and furnished apartments ready to move into. We take care of the rest.",
           "summary": "Therapeutic or adapted homes, and furnished apartments ready to move into.",
           "audiences": [
             "Diaspora families preparing their return",
@@ -4561,7 +4561,7 @@
       "shortName": null,
       "categoryId": "cat_immobilier",
       "kind": "SERVICE",
-      "tagline": "Nous gérons votre bien à Douala, du locataire à l’entretien. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Nous gérons votre bien à Douala, du locataire à l’entretien. Nous nous occupons du reste.",
       "summary": "Nous gérons votre bien à Douala, du locataire à l’entretien.",
       "icon": "Building",
       "illustration": "equipe",
@@ -4657,7 +4657,7 @@
       "translations": {
         "en": {
           "name": "Property management",
-          "tagline": "We manage your property in Douala, from tenants to maintenance. You entrust us with your request, we take care of the rest.",
+          "tagline": "We manage your property in Douala, from tenants to maintenance. We take care of the rest.",
           "summary": "We manage your property in Douala, from tenants to maintenance.",
           "audiences": [
             "Diaspora families preparing their return",
@@ -4756,7 +4756,7 @@
       "shortName": null,
       "categoryId": "cat_immobilier",
       "kind": "SERVICE",
-      "tagline": "Démarches, abonnements, ameublement : on vous aide à vous installer. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Démarches, abonnements, ameublement : on vous aide à vous installer. Nous nous occupons du reste.",
       "summary": "Démarches, abonnements, ameublement : on vous aide à vous installer.",
       "icon": "House",
       "illustration": "accueil",
@@ -4852,7 +4852,7 @@
       "translations": {
         "en": {
           "name": "Help settling in",
-          "tagline": "Paperwork, subscriptions, furnishing: we help you settle in. You entrust us with your request, we take care of the rest.",
+          "tagline": "Paperwork, subscriptions, furnishing: we help you settle in. We take care of the rest.",
           "summary": "Paperwork, subscriptions, furnishing: we help you settle in.",
           "audiences": [
             "Diaspora families preparing their return",
@@ -4951,7 +4951,7 @@
       "shortName": null,
       "categoryId": "cat_immobilier",
       "kind": "SERVICE",
-      "tagline": "Un logement pour quelques jours ou quelques mois, prêt à votre arrivée. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Un logement pour quelques jours ou quelques mois, prêt à votre arrivée. Nous nous occupons du reste.",
       "summary": "Un logement pour quelques jours ou quelques mois, prêt à votre arrivée.",
       "icon": "Clock",
       "illustration": "logement",
@@ -5047,7 +5047,7 @@
       "translations": {
         "en": {
           "name": "Temporary housing solutions",
-          "tagline": "A home for a few days or a few months, ready when you arrive. You entrust us with your request, we take care of the rest.",
+          "tagline": "A home for a few days or a few months, ready when you arrive. We take care of the rest.",
           "summary": "A home for a few days or a few months, ready when you arrive.",
           "audiences": [
             "Diaspora families preparing their return",
@@ -5146,7 +5146,7 @@
       "shortName": null,
       "categoryId": "cat_proximite",
       "kind": "SERVICE",
-      "tagline": "Des repas livrés au domicile de la personne accompagnée. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Des repas livrés au domicile de la personne accompagnée. Nous nous occupons du reste.",
       "summary": "Des repas livrés au domicile de la personne accompagnée.",
       "icon": "Utensils",
       "illustration": "livraison",
@@ -5242,7 +5242,7 @@
       "translations": {
         "en": {
           "name": "Meal delivery",
-          "tagline": "Meals delivered to the home of the person you support. You entrust us with your request, we take care of the rest.",
+          "tagline": "Meals delivered to the home of the person you support. We take care of the rest.",
           "summary": "Meals delivered to the home of the person you support.",
           "audiences": [
             "Elderly people and their relatives",
@@ -5341,7 +5341,7 @@
       "shortName": null,
       "categoryId": "cat_proximite",
       "kind": "SERVICE",
-      "tagline": "Vos courses et achats effectués, puis livrés au bénéficiaire. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Vos courses et achats effectués, puis livrés au bénéficiaire. Nous nous occupons du reste.",
       "summary": "Vos courses et achats effectués, puis livrés au bénéficiaire.",
       "icon": "ShoppingCart",
       "illustration": "livraison",
@@ -5437,7 +5437,7 @@
       "translations": {
         "en": {
           "name": "Grocery and order delivery",
-          "tagline": "Your groceries and purchases made, then delivered to the recipient. You entrust us with your request, we take care of the rest.",
+          "tagline": "Your groceries and purchases made, then delivered to the recipient. We take care of the rest.",
           "summary": "Your groceries and purchases made, then delivered to the recipient.",
           "audiences": [
             "Elderly people and their relatives",
@@ -5536,7 +5536,7 @@
       "shortName": null,
       "categoryId": "cat_proximite",
       "kind": "SERVICE",
-      "tagline": "Collecte chez l’expéditeur et livraison à l’adresse du destinataire. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Collecte chez l’expéditeur et livraison à l’adresse du destinataire. Nous nous occupons du reste.",
       "summary": "Collecte chez l’expéditeur et livraison à l’adresse du destinataire.",
       "icon": "Package",
       "illustration": "colis",
@@ -5632,7 +5632,7 @@
       "translations": {
         "en": {
           "name": "Parcel and mail collection and delivery",
-          "tagline": "Collection from the sender and delivery to the recipient's address. You entrust us with your request, we take care of the rest.",
+          "tagline": "Collection from the sender and delivery to the recipient's address. We take care of the rest.",
           "summary": "Collection from the sender and delivery to the recipient's address.",
           "audiences": [
             "Elderly people and their relatives",
@@ -5731,7 +5731,7 @@
       "shortName": null,
       "categoryId": "cat_proximite",
       "kind": "SERVICE",
-      "tagline": "Lavage automatique, repassage, petite couture, collecte et retour du linge à domicile. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Lavage automatique, repassage, petite couture, collecte et retour du linge à domicile. Nous nous occupons du reste.",
       "summary": "Lavage automatique, repassage, petite couture, collecte et retour du linge à domicile.",
       "icon": "Package",
       "illustration": "livraison",
@@ -5827,7 +5827,7 @@
       "translations": {
         "en": {
           "name": "Dry cleaning and laundry",
-          "tagline": "Machine washing, ironing, minor alterations, laundry pick-up and return at home. You entrust us with your request, we take care of the rest.",
+          "tagline": "Machine washing, ironing, minor alterations, laundry pick-up and return at home. We take care of the rest.",
           "summary": "Machine washing, ironing, minor alterations, laundry pick-up and return at home.",
           "audiences": [
             "Elderly people and their relatives",
@@ -5926,7 +5926,7 @@
       "shortName": null,
       "categoryId": "cat_culture",
       "kind": "SERVICE",
-      "tagline": "Circuits et visites pour découvrir le pays autrement. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Circuits et visites pour découvrir le pays autrement. Nous nous occupons du reste.",
       "summary": "Circuits et visites pour découvrir le pays autrement.",
       "icon": "Compass",
       "illustration": "culture",
@@ -6022,7 +6022,7 @@
       "translations": {
         "en": {
           "name": "Discover Cameroon",
-          "tagline": "Tours and visits to discover the country differently. You entrust us with your request, we take care of the rest.",
+          "tagline": "Tours and visits to discover the country differently. We take care of the rest.",
           "summary": "Tours and visits to discover the country differently.",
           "audiences": [
             "Visitors discovering Cameroon",
@@ -6121,7 +6121,7 @@
       "shortName": null,
       "categoryId": "cat_culture",
       "kind": "SERVICE",
-      "tagline": "Concerts, expositions, sorties : l'agenda culturel à portée de main. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Concerts, expositions, sorties : l'agenda culturel à portée de main. Nous nous occupons du reste.",
       "summary": "Concerts, expositions, sorties : l'agenda culturel à portée de main.",
       "icon": "Sparkles",
       "illustration": "culture",
@@ -6217,7 +6217,7 @@
       "translations": {
         "en": {
           "name": "Cultural activities, leisure and outings",
-          "tagline": "Concerts, exhibitions, outings: the cultural calendar at your fingertips. You entrust us with your request, we take care of the rest.",
+          "tagline": "Concerts, exhibitions, outings: the cultural calendar at your fingertips. We take care of the rest.",
           "summary": "Concerts, exhibitions, outings: the cultural calendar at your fingertips.",
           "audiences": [
             "Visitors discovering Cameroon",
@@ -6316,7 +6316,7 @@
       "shortName": null,
       "categoryId": "cat_culture",
       "kind": "SERVICE",
-      "tagline": "Des sorties et des événements conçus et organisés par Mambo. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Des sorties et des événements conçus et organisés par Mambo. Nous nous occupons du reste.",
       "summary": "Des sorties et des événements conçus et organisés par Mambo.",
       "icon": "CalendarCheck",
       "illustration": "evenement",
@@ -6412,7 +6412,7 @@
       "translations": {
         "en": {
           "name": "Organising activities and events",
-          "tagline": "Outings and events designed and organised by Mambo. You entrust us with your request, we take care of the rest.",
+          "tagline": "Outings and events designed and organised by Mambo. We take care of the rest.",
           "summary": "Outings and events designed and organised by Mambo.",
           "audiences": [
             "Visitors discovering Cameroon",
@@ -6511,7 +6511,7 @@
       "shortName": null,
       "categoryId": "cat_culture",
       "kind": "SERVICE",
-      "tagline": "Repères, rencontres et conseils pour vous sentir chez vous. Vous nous confiez votre demande, nous nous occupons du reste.",
+      "tagline": "Repères, rencontres et conseils pour vous sentir chez vous. Nous nous occupons du reste.",
       "summary": "Repères, rencontres et conseils pour vous sentir chez vous.",
       "icon": "Globe",
       "illustration": "culture",
@@ -6607,7 +6607,7 @@
       "translations": {
         "en": {
           "name": "Discovery and local integration",
-          "tagline": "Landmarks, meetings and advice to help you feel at home. You entrust us with your request, we take care of the rest.",
+          "tagline": "Landmarks, meetings and advice to help you feel at home. We take care of the rest.",
           "summary": "Landmarks, meetings and advice to help you feel at home.",
           "audiences": [
             "Visitors discovering Cameroon",
