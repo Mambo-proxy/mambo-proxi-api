@@ -405,6 +405,43 @@ paths:
                 detail: Ce lien de téléchargement a expiré. Relancez le téléchargement depuis le back-office.
         '429': { $ref: '#/components/responses/TooManyRequests' }
 
+  /v1/media/{folder}/{file}:
+    get:
+      tags: [Site]
+      operationId: getMediaFile
+      summary: Fichier public d'un média (original assaini ou variante)
+      description: |
+        Adresse des `MediaImage.url` et `variants[].url` (préfixe `MEDIA_PUBLIC_URL`, éventuellement un CDN placé
+        devant l'API). Seuls les fichiers de la médiathèque, rangés à part des fichiers privés, sont lisibles ici. Chaque
+        fichier a une adresse unique et n'est jamais modifié (un remplacement crée de nouvelles adresses) :
+        `Cache-Control: public, max-age=31536000, immutable`. SVG servis avec une CSP `sandbox`.
+      parameters:
+        - name: folder
+          in: path
+          required: true
+          description: Dossier du média (32 caractères hexadécimaux).
+          schema: { type: string, pattern: '^[0-9a-f]{32}$' }
+        - name: file
+          in: path
+          required: true
+          description: '`original.(jpg|png|webp|svg)` ou `<largeur>.(avif|webp)` (largeurs 480, 960, 1600).'
+          schema: { type: string, examples: [960.avif] }
+      responses:
+        '200':
+          description: Contenu du fichier.
+          content:
+            image/avif:
+              schema: { type: string, format: binary }
+            image/webp:
+              schema: { type: string, format: binary }
+            image/jpeg:
+              schema: { type: string, format: binary }
+            image/png:
+              schema: { type: string, format: binary }
+            image/svg+xml:
+              schema: { type: string, format: binary }
+        '404': { $ref: '#/components/responses/NotFound' }
+
   # ─────────────────────────── Catalogue ──────────────────────────
   /v1/categories:
     get:
@@ -1036,6 +1073,15 @@ paths:
       tags: [Newsletter]
       operationId: unsubscribeNewsletter
       summary: Désinscription en un clic (jeton signé, compatible `List-Unsubscribe-Post`)
+      description: >-
+        Page du site : JSON `{ token }`. Messagerie (RFC 8058) : `POST` à l'adresse de l'en-tête `List-Unsubscribe`,
+        jeton dans `?token=` et corps `List-Unsubscribe=One-Click`. Le jeton du corps l'emporte sur celui de
+        l'adresse. Idempotente : un abonné déjà désinscrit reçoit la même réponse.
+      parameters:
+        - name: token
+          in: query
+          description: Jeton signé de l'e-mail (désinscription en un clic depuis la messagerie).
+          schema: { type: string, maxLength: 512 }
       requestBody:
         required: true
         content:
@@ -4468,9 +4514,18 @@ paths:
       operationId: adminListMedia
       x-permissions: [content:read]
       summary: Médiathèque
+      description: |
+        Médias les plus récents d'abord. `q` cherche dans le nom du fichier et le texte alternatif (sans tenir compte
+        de la casse). `status` et `used` filtrent la liste (`used=false` : images utilisées nulle part).
       security: [{ cookieAuth: [] }]
       parameters:
         - $ref: '#/components/parameters/Q'
+        - name: status
+          in: query
+          schema: { type: string, enum: [PROCESSING, READY, FAILED] }
+        - name: used
+          in: query
+          schema: { type: boolean }
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/PageSize'
       responses:
@@ -4484,13 +4539,21 @@ paths:
                 properties:
                   data: { type: array, items: { $ref: '#/components/schemas/Media' } }
                   meta: { $ref: '#/components/schemas/PaginationMeta' }
+        '400': { $ref: '#/components/responses/InvalidQuery' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
     post:
       tags: [Admin — Médias]
       operationId: adminUploadMedia
       x-permissions: [media:write]
       summary: Envoyer une image (JPG, PNG, WebP, SVG assaini ; 10 Mo max)
-      description: Génère les variantes WebP/AVIF 480/960/1600 en tâche de fond.
+      description: |
+        Type réel contrôlé par signature (JPG, PNG, WebP, SVG), 10 Mo et 50 mégapixels au plus. Image matricielle :
+        redressée selon son orientation EXIF puis réenregistrée sans métadonnées (EXIF, GPS) ; `url` est servie
+        aussitôt, `blurDataUrl` est calculé à l'envoi, le média est renvoyé `PROCESSING` et les variantes WebP/AVIF
+        480/960/1600 (sans agrandissement : seules les largeurs inférieures ou égales à l'original) sont générées en
+        tâche de fond (`READY`, ou `FAILED` après 3 échecs). SVG assaini (scripts, gestionnaires d'événements,
+        `foreignObject`, feuilles de style et références externes retirés), sans variante, `READY` aussitôt.
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
         required: true
@@ -4509,24 +4572,36 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Media' }
         '401': { $ref: '#/components/responses/Unauthorized' }
-        '413':
-          description: Fichier trop volumineux.
-          content:
-            application/problem+json:
-              schema: { $ref: '#/components/schemas/Problem' }
-        '415':
-          description: Format non accepté.
-          content:
-            application/problem+json:
-              schema: { $ref: '#/components/schemas/Problem' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '413': { $ref: '#/components/responses/MediaTooLarge' }
+        '415': { $ref: '#/components/responses/UnsupportedMedia' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
   /v1/admin/media/{id}:
+    get:
+      tags: [Admin — Médias]
+      operationId: adminGetMedia
+      x-permissions: [content:read]
+      summary: Détail d'un média (avec ses usages)
+      security: [{ cookieAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdPath' }]
+      responses:
+        '200':
+          description: Média.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Media' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
     patch:
       tags: [Admin — Médias]
       operationId: adminUpdateMedia
       x-permissions: [media:write]
       summary: Texte alternatif et point focal
+      description: |
+        `focalPoint: null` retire le point focal (cadrage centré). Le site est revalidé pour les contenus qui
+        utilisent l'image.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       requestBody:
@@ -4539,7 +4614,7 @@ paths:
               properties:
                 alt: { type: string, minLength: 1, maxLength: 200 }
                 focalPoint:
-                  type: object
+                  type: [object, 'null']
                   required: [x, y]
                   properties:
                     x: { type: number, minimum: 0, maximum: 1 }
@@ -4551,17 +4626,23 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Media' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
     delete:
       tags: [Admin — Médias]
       operationId: adminDeleteMedia
       x-permissions: [media:write]
       summary: Supprimer un média non utilisé
+      description: |
+        Refusé (409 `media-in-use`) tant qu'un contenu (service, rubrique, page, paramètres, partenaire, événement,
+        magazine) l'utilise, brouillons compris. Les fichiers (original et variantes) sont supprimés du stockage.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       responses:
         '204': { $ref: '#/components/responses/NoContent' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409':
           description: Média encore utilisé.
@@ -4569,6 +4650,40 @@ paths:
             application/problem+json:
               schema: { $ref: '#/components/schemas/Problem' }
               example: { type: https://api.mamboproxi.com/problems/media-in-use, title: Image utilisée, status: 409, detail: 'Cette image est utilisée par : Chef privé (photo principale). Remplacez-la avant de la supprimer.' }
+
+  /v1/admin/media/{id}/file:
+    put:
+      tags: [Admin — Médias]
+      operationId: adminReplaceMediaFile
+      x-permissions: [media:write]
+      summary: Remplacer le fichier d'un média (mêmes contrôles que l'envoi)
+      description: |
+        Le média garde son identifiant, son texte alternatif et son point focal : tous les contenus qui l'utilisent
+        affichent la nouvelle image (revalidation du site). Les nouveaux fichiers ont de nouvelles adresses (cache
+        immuable) ; les anciens sont supprimés 24 h plus tard. Variantes régénérées en tâche de fond (`PROCESSING`).
+      security: [{ cookieAuth: [], csrfToken: [] }]
+      parameters: [{ $ref: '#/components/parameters/IdPath' }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: { type: string, contentMediaType: application/octet-stream }
+      responses:
+        '200':
+          description: Média enregistré avec le nouveau fichier.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Media' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '413': { $ref: '#/components/responses/MediaTooLarge' }
+        '415': { $ref: '#/components/responses/UnsupportedMedia' }
+        '422': { $ref: '#/components/responses/ValidationError' }
 
   # ──────────────────────────── Admin — Journal ───────────────────
   /v1/admin/audit-log:
@@ -4824,6 +4939,18 @@ components:
             detail: La vérification anti-robot n'a pas abouti. Rechargez la page puis réessayez.
     NoContent:
       description: Opération effectuée.
+    MediaTooLarge:
+      description: Image de plus de 10 Mo.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+          example: { type: https://api.mamboproxi.com/problems/file-too-large, title: Fichier trop volumineux, status: 413, detail: 'L’image dépasse 10 Mo. Réduisez-la avant de l’envoyer.' }
+    UnsupportedMedia:
+      description: Format non accepté (type réel contrôlé), image illisible ou de plus de 50 mégapixels.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+          example: { type: https://api.mamboproxi.com/problems/unsupported-file, title: Format non accepté, status: 415, detail: 'Formats acceptés : JPG, PNG, WebP ou SVG.' }
 
   schemas:
     Id:

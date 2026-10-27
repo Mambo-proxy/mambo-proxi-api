@@ -433,6 +433,7 @@ export class AdminServicesService {
       });
       return this.find(tx, row.id);
     });
+    await this.media.refreshUsages({ kind: 'service', entityId: created.id });
     return this.respond(created, now);
   }
 
@@ -505,6 +506,7 @@ export class AdminServicesService {
       }
       return next;
     });
+    await this.media.refreshUsages({ kind: 'service', entityId: id });
     return this.respond(updated, now);
   }
 
@@ -531,6 +533,7 @@ export class AdminServicesService {
         before: { status: service.status, slug: service.slug },
       });
     });
+    await this.media.refreshUsages({ kind: 'service', entityId: id });
   }
 
   /** Champs exigés pour publier : nom, rubrique et accroche. */
@@ -688,6 +691,7 @@ export class AdminServicesService {
       });
       return this.find(tx, row.id);
     });
+    await this.media.refreshUsages({ kind: 'service', entityId: created.id });
     return this.respond(created, now);
   }
 

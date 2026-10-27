@@ -209,6 +209,7 @@ export class AdminPagesService {
       },
       select: { key: true },
     });
+    await this.media.refreshUsages({ kind: 'page', entityId: key });
     return this.detail(key);
   }
 
@@ -244,6 +245,7 @@ export class AdminPagesService {
         label: `A publié la page « ${page.title} »`,
       });
     });
+    await this.media.refreshUsages({ kind: 'page', entityId: key });
     return this.detail(key);
   }
 
@@ -269,6 +271,7 @@ export class AdminPagesService {
         label: `A abandonné le brouillon de la page « ${page.title} »`,
       });
     });
+    await this.media.refreshUsages({ kind: 'page', entityId: key });
     return this.detail(key);
   }
 

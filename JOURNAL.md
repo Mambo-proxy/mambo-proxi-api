@@ -796,3 +796,161 @@
 - Suppression automatique des candidatures refusées après la durée de conservation (24 mois) : tâche à écrire.
 - CV du seed : clés sans fichier sur le disque (téléchargement → 404).
 - Tests unitaires et e2e du lot : après le branchement du site.
+
+## Phase 2 — Médiathèque (27 octobre 2026)
+
+### Fait
+
+- Module `src/modules/media` complété (`MediaLibraryModule`, enregistré dans `app.module.ts`) : back-office
+  `GET|POST /v1/admin/media`, `GET|PATCH|DELETE /v1/admin/media/{id}`, `PUT /v1/admin/media/{id}/file` ; fichiers
+  publics `GET /v1/media/{folder}/{file}` ; file BullMQ `media` (`media-processing.service.ts`, worker
+  `media-processing.processor.ts`) ; usages (`media-usages.ts`) ; traitement d'image (`image-processing.ts`, sharp) ;
+  assainissement SVG (`svg-sanitizer.ts`, sanitize-html) ; signature des images (`detectImageType` dans
+  `storage/file-signature.ts`).
+- **Envoi** : multer en mémoire (champ `file`, 10 Mo → 413 avant toute autre vérification), `alt` obligatoire (422),
+  fichier manquant → 422 `file`. Type réel par octets magiques (JPEG `FF D8 FF`, PNG, RIFF/WEBP, SVG : texte
+  commençant par `<svg` après déclaration XML, commentaires et DOCTYPE) ; AVIF, GIF, HEIC, PDF… → 415. Image décodée
+  entièrement (`failOn: 'error'` : fichier tronqué → 415), 50 mégapixels au plus (415), redressée selon l'orientation
+  EXIF puis réencodée dans son format (JPEG mozjpeg 88, PNG niveau 9, WebP 88) **sans aucune métadonnée** (EXIF, GPS,
+  XMP) ; `blurDataUrl` = WebP de 16 px en `data:` (≈ 120 octets). L'original publié est cette version nettoyée : le
+  fichier envoyé n'est jamais conservé. Nom affiché assaini (`sanitizeFileName`), empreinte SHA-256 de l'envoi.
+- **Variantes** : AVIF (qualité 50, effort 4) et WebP (78) en 480/960/1600 px, seulement les largeurs ≤ à l'original
+  (aucun agrandissement ; image de moins de 480 px : aucune variante, `READY` aussitôt). Média `PROCESSING` jusqu'à la
+  tâche `media-<id>-<dossier>` (un traitement à la fois, 3 essais à 30 s / 1 min / 2 min, puis `FAILED`). Variantes
+  écrites puis `updateMany` conditionnel (même fichier, toujours `PROCESSING`) : un remplacement ou une suppression
+  pendant le traitement fait jeter les variantes. Redis indisponible : l'envoi rend la main après 3 s ; au démarrage
+  du worker (`MAIL_WORKER=on`), reprise des médias `PROCESSING` (200 au plus) et reconstruction de `media_usages`.
+- **SVG** : liste blanche d'éléments graphiques (formes, texte, dégradés, masques, filtres `fe*`, `image`) ;
+  supprimés : `script`, `style`, `foreignObject` (avec leur contenu), animations (`set`/`animate` peuvent réécrire un
+  lien), `a`, gestionnaires `on*`, attributs d'espaces de noms inconnus, liens autres que `#id` (et, pour `image`,
+  `data:image/png|jpeg|webp|gif;base64`), valeurs avec `url(` externe, `javascript:`, `expression(`, `@import`.
+  Déclaration XML, DOCTYPE et entités retirés avant l'analyse (aucune entité développée). Publié tel quel, sans
+  variante, `READY` ; dimensions et miniature tirées du rendu librsvg.
+- **Remplacement** : même identifiant, texte alternatif et point focal ; nouveau dossier (adresses nouvelles, cache
+  immuable), variantes régénérées ; anciens fichiers supprimés 24 h plus tard (tâche différée `media-cleanup-…` :
+  pages du site encore en cache). Un média du seed remplacé devient un média stocké.
+- **Modification** (`alt`, `focalPoint`, `null` = centré), **remplacement**, fin du traitement (`READY`/`FAILED`) :
+  demande de revalidation (`revalidation_requests`) des étiquettes des contenus publiés qui l'utilisent (service,
+  rubrique, page, paramètres, `partners`/`events`).
+- **Suppression** : usages recalculés sur les contenus (brouillons et versions anglaises compris) et relations
+  directes → 409 `media-in-use` « Cette image est utilisée par : … Remplacez-la avant de la supprimer. » (5 usages
+  cités, les suivants comptés) ; violation de clé étrangère imprévue → même 409. Fichiers supprimés après la
+  transaction (jamais ceux d'un média du seed, servis par le site).
+- **Usages** (`media_usages`, sortes du seed) : `service.cover`, `service.gallery`, `offer.image` (emplacement
+  `service:<id>` / `category:<id>`), `category.image`, `category.visual`, `page.section` (emplacement : section),
+  `settings.seo` / `settings.navigation`. Réécrits par `MediaService.refreshUsages` après l'enregistrement d'un
+  service (création, sauvegarde, duplication, suppression), d'une rubrique, d'une page (brouillon, publication,
+  abandon) et des paramètres SEO. Partenaires, événements et magazine : lus par leurs clés étrangères (relations de
+  `Media`) au moment de la lecture, sans écriture dans leurs modules.
+- **Liste** : plus récents d'abord, `q` sur le nom du fichier et le texte alternatif (sans casse ; accents non
+  repliés), `status`, `used` (table et relations directes).
+- **Contrat** : `GET /v1/admin/media/{id}`, `PUT /v1/admin/media/{id}/file`, `GET /v1/media/{folder}/{file}` ;
+  filtres `status` et `used` ; `focalPoint: null` ; 400, 403, 404, 413/415 (`MediaTooLarge`, `UnsupportedMedia`),
+  422 ; règles décrites (traitement, SVG, suppression, remplacement).
+- **Configuration** : `MEDIA_STORAGE_DIR` (`var/media`) ; `MEDIA_PUBLIC_URL` par défaut `http://localhost:4000/v1/media`.
+- **Dépendance** : `sharp` 0.35.5 (version figée ; binaires libvips précompilés des paquets `@img/sharp-*`,
+  `allowBuilds: sharp: false` dans `pnpm-workspace.yaml`). Chargée à la première image traitée (import dynamique) :
+  ni le démarrage de l'API ni les tests ne chargent la bibliothèque native.
+- Aucune migration : colonnes existantes (`media.*`, `media_usages`).
+
+### Décisions
+
+- **Médias publics servis par l'API** plutôt que par un répertoire statique : route `@Public()` sans limitation de
+  débit, `Cache-Control: public, max-age=31536000, immutable`, `Cross-Origin-Resource-Policy: cross-origin`, CSP
+  `sandbox` sur les SVG. Seuls les noms produits par l'API sont acceptés (dossier de 32 caractères hexadécimaux,
+  `original.<jpg|png|webp|svg>` ou `<480|960|1600>.<avif|webp>`), lus dans un pilote de stockage distinct de celui des
+  fichiers privés (`MEDIA_STORAGE_DIR`) ; le démarrage échoue si les deux répertoires coïncident ou s'imbriquent. Aucun
+  fichier privé n'est donc atteignable par ce chemin. Aucune lecture de la base par image. En production, un CDN (ou
+  Caddy) placé devant `/v1/media` et `MEDIA_PUBLIC_URL` pointé sur lui.
+- **Usages après la transaction** du contenu, sans la faire échouer (journalisé) : le double de Prisma des tests e2e
+  ne connaît pas `media_usages` (non modifié, priorité au branchement) ; la table est reconstruite au démarrage du
+  worker, et la suppression d'un média ne s'appuie pas sur elle (recalcul sur les contenus : quelques dizaines de
+  lignes).
+- Remplacement ajouté au contrat (le back-office simulé ne l'a pas) : le cahier des charges prévoit de remplacer les
+  illustrations par les vraies photos sans reprendre chaque contenu.
+- Pas de « légende » : ni colonne ni champ au contrat.
+
+### Écarts avec le back-office simulé du site (le contrat prime)
+
+- Envoi : `status: PROCESSING` et `variants: []` jusqu'à la fin du traitement (mock : `READY` aussitôt) ; `url`
+  absolue vers l'API (mock : `blob:`) ; 415 sur le type réel (mock : type annoncé par le navigateur) ; erreurs de champ
+  au format du contrat.
+- Suppression d'un média utilisé : `type` `media-in-use`, titre « Image utilisée » et texte du contrat (mock : 409
+  générique « Ce média est utilisé (…) : retirez-le d'abord. »).
+- Libellés d'usage : forme du seed (« Service « Maison Essentiel » (photo principale) »).
+
+### Points ouverts
+
+- Site : `next.config` (`images.remotePatterns`) doit autoriser l'hôte de `MEDIA_PUBLIC_URL` ; le composant `<Visual>`
+  peut servir `variants` (AVIF/WebP) en `srcset` et `focalPoint` en `object-position`.
+- Pilote S3 des médias (bucket public `S3_BUCKET_PUBLIC`) ; `checks.storage` de `/v1/health` pour les médias.
+- Recherche sans accents (colonne de recherche à ajouter si besoin).
+- Tests unitaires et e2e du lot (signature, SVG, traitement, routes, contrat) : après le branchement du site.
+
+## Phase 2 — Partenaires, formations, agenda et newsletter (27 octobre 2026)
+
+### Fait
+
+- **Partenaires** (`src/modules/partners`) : `GET /v1/partners` (logos visibles, triés par catégorie puis par ordre,
+  libellé de catégorie traduit) ; `/v1/admin/partners*` : ajout (fin de catégorie, visible par défaut), modification
+  dont visibilité et changement de catégorie, ordre (`scope` = catégorie facultative), suppression. Logo : image de la
+  médiathèque (422 `unknown_media` sinon).
+- **Formations** (`src/modules/trainings`) : `GET /v1/trainings` (publiées, `translations.en`) ;
+  `/v1/admin/trainings*` (création en brouillon, slug libre tiré du titre, publication, ordre, suppression — les
+  demandes restent sans formation), `requestsCount` = demandes `FORMATION` non anonymisées ;
+  `GET /v1/admin/training-requests` (demandes `FORMATION`, la plus récente en premier).
+- **Agenda** (`src/modules/events`) : `GET /v1/events` (`upcoming` : non terminés, du plus proche ; sinon tous, du
+  plus récent ; `limit` = taille de page ; places restantes) ; `/v1/admin/events*` (période `upcoming` / `past` /
+  `all`, inscriptions et places réservées, détail avec les demandes `EVENEMENT`, création en brouillon, fin après le
+  début, capacité jamais sous les places réservées, suppression — les inscriptions restent sans événement).
+- **Newsletter** (`src/modules/newsletter`) :
+  - double opt-in : inscription (anti-spam des formulaires, consentement horodaté, rattachement à la fiche contact de
+    même adresse), lien de confirmation à usage unique (condensat HMAC en base, 7 jours) par `newsletter-confirm`,
+    confirmation `EN_ATTENTE → CONFIRME`, 410 `link-expired` ; une adresse confirmée ne reçoit rien
+    (`alreadySubscribed: true`) ; l'inscription avec la case newsletter envoie aussi le lien (`FormsService`,
+    `afterCommit`) ;
+  - désinscription en un clic : jeton signé sans état (abonné + campagne d'origine), page du site en JSON ou POST
+    `List-Unsubscribe=One-Click` (RFC 8058) avec `?token=` ; idempotente ; comptée dans `Campaign.unsubscribes` ;
+  - back-office : inscrits (liste, recherche, export CSV des confirmés, suppression), campagnes (indicateurs, segments
+    fixes et par étiquette avec effectifs, brouillon au HTML assaini — `img` et `a[data-button]` en plus du texte
+    riche — et version texte générée, aperçu par le vrai gabarit, test « [Test] … » limité à 10 par minute,
+    programmation, annulation, envoi immédiat) ;
+  - envoi par lots : file BullMQ `newsletter-campaigns` (worker démarré avec `MAIL_WORKER=on`) — étapes `start`
+    (réservation atomique `PROGRAMMEE → EN_COURS_ENVOI`, la programmation de la tâche doit être celle de la
+    campagne), matérialisation des envois `campaign_deliveries` (unicité campagne + abonné), lots de 50 toutes les
+    minutes, `finalize` (`ENVOYEE` quand plus aucun envoi n'est `PENDING`) ; identifiants de tâches stables ; reprise au
+    démarrage du worker ; tâche d'e-mail `campagne-envoi-{deliveryId}` (`mailJobId`) : un envoi n'est jamais mis deux
+    fois en file.
+- **Socle** : étiquettes `partners`, `trainings`, `events` (`CACHE_TAGS`), file `newsletterCampaigns`
+  (`QUEUE_NAMES`), `MailContentService` exporté par `MailModule` (aperçu des campagnes).
+- **Contrat** : paramètre `token` (requête) et description de `POST /v1/newsletter/unsubscribe` (désinscription en un
+  clic depuis la messagerie).
+- **Aucune migration, aucune dépendance, aucune variable d'environnement** : colonnes existantes ; débit fixé par des
+  constantes (`CAMPAIGN_BATCH_SIZE`, `CAMPAIGN_BATCH_INTERVAL_MS`).
+
+### Décisions
+
+- Mesure d'ouverture et de clic : le contrat ne prévoit ni pixel ni redirection de lien ; `opens` / `clicks` (et les
+  taux) sont `null` tant que `analytics.newsletterTracking` est désactivé, et ne valent que les colonnes de la campagne
+  sinon.
+- `recipients` : 0 pour un brouillon, effectif actuel du segment pour une campagne programmée, nombre d'envois ensuite.
+- La liste des campagnes comprend celles du magazine (mêmes envois, même file).
+- Suppression d'un inscrit : effacement de la ligne et de ses envois individuels (droit à l'effacement) ; les
+  compteurs des campagnes restent.
+- Pas de nouveaux tests (priorité au branchement du site) ; tests existants passés.
+
+### Écarts avec le back-office simulé du site (le contrat prime)
+
+- « Envoyer maintenant » sans objet ou sans contenu : 409 (le mock accepte) ; programmation : 422 sur `subject` /
+  `html` en plus de `scheduledAt`.
+- Libellé du segment « Tous les inscrits » (comme le mock ; exemple du contrat : « Tous les abonnés »).
+- Export CSV des inscrits : colonnes E-mail, Nom, Téléphone, Pays, Langue, Statut, Origine, Étiquettes, Confirmé le,
+  Inscrit le (mock : 5 colonnes).
+- Inscriptions d'un événement : toutes les demandes `EVENEMENT` (anonymisées comprises, elles occupent des places).
+
+### Points ouverts
+
+- Purge des inscriptions jamais confirmées (tâche RGPD quotidienne à écrire).
+- Pas de détail d'un inscrit ni de préférences, pas d'export des inscrits d'un événement : absents du contrat.
+- `POST /v1/admin/magazine/editions/{id}/newsletter/*` : lot du magazine.
+- Tests unitaires et e2e du lot : après le branchement du site.

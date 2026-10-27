@@ -260,6 +260,7 @@ export class AdminCategoriesService {
       });
       return this.find(tx, row.id);
     });
+    await this.media.refreshUsages({ kind: 'category', entityId: created.id });
     return toAdminCategory(created, this.media);
   }
 
@@ -310,6 +311,7 @@ export class AdminCategoriesService {
       });
       return next;
     });
+    await this.media.refreshUsages({ kind: 'category', entityId: id });
     return toAdminCategory(updated, this.media);
   }
 
@@ -332,6 +334,7 @@ export class AdminCategoriesService {
         before: { status: category.status, slug: category.slug },
       });
     });
+    await this.media.refreshUsages({ kind: 'category', entityId: id });
   }
 
   /** `PATCH /v1/admin/categories/reorder` : ordre des rubriques (site, menus, accueil). */

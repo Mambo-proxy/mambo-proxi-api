@@ -18,6 +18,7 @@ const COMMON_DEFAULTS: Record<string, string> = {
   MAIL_WORKER: 'on',
   STORAGE_DRIVER: 'local',
   STORAGE_DIR: 'var/storage',
+  MEDIA_STORAGE_DIR: 'var/media',
 };
 
 /** Valeurs par défaut de développement et de test : celles de `.env.example` (services de docker-compose.yml). */
@@ -34,7 +35,7 @@ const LOCAL_DEFAULTS: Record<string, string> = {
   S3_BUCKET_PUBLIC: 'mambo-public',
   S3_BUCKET_PRIVATE: 'mambo-private',
   S3_FORCE_PATH_STYLE: 'true',
-  MEDIA_PUBLIC_URL: 'http://localhost:8333/mambo-public',
+  MEDIA_PUBLIC_URL: 'http://localhost:4000/v1/media',
   SMTP_HOST: 'localhost',
   SMTP_PORT: '1025',
   MAIL_FROM: 'MAMBO Proxi <contact@mamboproxi.com>',
@@ -110,6 +111,10 @@ const envSchema = z
     // tout dossier servi, monté en volume sur le serveur (relatif au répertoire de lancement de l'API).
     STORAGE_DRIVER: z.enum(['local'], { error: invalid('Valeur attendue : local.') }),
     STORAGE_DIR: text,
+    // Médias publics (images de la médiathèque et leurs variantes) : répertoire distinct de `STORAGE_DIR` (vérifié
+    // au démarrage), servi par `GET /v1/media/{folder}/{file}` ; `MEDIA_PUBLIC_URL` pointe sur cette route (ou un CDN
+    // placé devant elle).
+    MEDIA_STORAGE_DIR: text,
     SMTP_HOST: text,
     SMTP_PORT: port,
     SMTP_SECURE: flag,

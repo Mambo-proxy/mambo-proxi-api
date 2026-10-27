@@ -227,6 +227,8 @@ export class AdminSettingsService {
         after: { fields: changed },
       });
     });
+    // Seul groupe modifiable qui référence une image (`ogImageId`).
+    if (group === 'seo') await this.media.refreshUsages({ kind: 'setting', entityId: group });
     return this.toValue(group, next);
   }
 

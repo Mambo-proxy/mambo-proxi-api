@@ -13,5 +13,8 @@ allowBuilds:
   # argon2 : binaires précompilés fournis par le paquet (prebuilds glibc et musl, Windows, macOS) ; le script
   # `node-gyp-build` ne compile qu'en l'absence de binaire pour la plateforme.
   argon2: false
+  # sharp (médiathèque) : binaires libvips précompilés fournis par les dépendances facultatives @img/sharp-* ;
+  # le script d'installation ne compile qu'en l'absence de binaire pour la plateforme.
+  sharp: false
   # Mesure d'installation d'un paquet tiers : refusée.
   '@scarf/scarf': false

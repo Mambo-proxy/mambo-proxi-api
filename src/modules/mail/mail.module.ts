@@ -45,6 +45,7 @@ function createSmtpTransport(config: AppConfigService): MailTransport {
     MailSender,
     MailProcessor,
   ],
-  exports: [MailQueueService],
+  // `MailContentService` : aperçu réel des campagnes de la newsletter (modèle et coordonnées en base).
+  exports: [MailQueueService, MailContentService],
 })
 export class MailModule {}

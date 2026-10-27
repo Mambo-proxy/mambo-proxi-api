@@ -19,6 +19,7 @@ import { ContactsService, type SavedContact } from '../contacts/contacts.service
 import { adminApplicationPath, visibleJobWhere } from '../jobs/job.mapper.js';
 import type { JobApplicationInput } from '../jobs/job.schemas.js';
 import { MailQueueService } from '../mail/mail-queue.service.js';
+import { NewsletterSubscriptionsService } from '../newsletter/newsletter-subscriptions.service.js';
 import { decoyReference } from '../requests/reference.js';
 import {
   RequestsService,
@@ -132,6 +133,8 @@ interface Submission {
   /** Écritures propres au formulaire, dans la même transaction (places, centres d'intérêt, newsletter). */
   before?: (tx: Prisma.TransactionClient) => Promise<void>;
   after?: (tx: Prisma.TransactionClient, contact: SavedContact) => Promise<TransactionExtra>;
+  /** Après l'enregistrement et les e-mails (confirmation de la newsletter) ; ne doit pas échouer. */
+  afterCommit?: (contact: SavedContact, extra: TransactionExtra) => Promise<void>;
   /** Écritures qui dépendent de la demande créée (rendez-vous relié à sa demande). */
   afterRequest?: (
     tx: Prisma.TransactionClient,
@@ -168,6 +171,7 @@ export class FormsService {
     @Inject(AppConfigService) private readonly config: AppConfigService,
     @Inject(AvailabilityService) private readonly availability: AvailabilityService,
     @Inject(StorageService) private readonly storage: StorageService,
+    @Inject(NewsletterSubscriptionsService) private readonly newsletter: NewsletterSubscriptionsService,
   ) {}
 
   /** `POST /v1/quote-requests`. */
@@ -384,6 +388,11 @@ export class FormsService {
           now,
         );
         return { newsletterPending: status === 'EN_ATTENTE' };
+      },
+      // Double opt-in : lien de confirmation envoyé par le module de la newsletter.
+      afterCommit: async (contact, extra) => {
+        if (extra.newsletterPending === true)
+          await this.newsletter.sendPendingConfirmation(contact.email, now);
       },
       acknowledgement: (contact, request, extra) => ({
         template: 'registration-confirmed',
@@ -853,6 +862,7 @@ export class FormsService {
         ).toString(),
       },
     );
+    await submission.afterCommit?.(contact, extra);
     return { reference: request.reference, message: acceptedMessage(kind, lang) };
   }
 

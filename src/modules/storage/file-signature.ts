@@ -42,3 +42,59 @@ export function detectDocumentType(body: Buffer): DocumentType | null {
     return body.includes(DOCX_CONTENT_TYPES) && body.includes(DOCX_WORD_PART) ? DOCX : null;
   return null;
 }
+
+/**
+ * Images de la médiathèque (contrat, `POST /v1/admin/media`) : JPG, PNG, WebP et SVG. Les autres formats d'image
+ * (AVIF, GIF, HEIC, TIFF…) sont refusés à l'envoi ; AVIF et WebP ne sont produits que comme variantes.
+ */
+export interface ImageType {
+  mimeType: 'image/jpeg' | 'image/png' | 'image/webp' | 'image/svg+xml';
+  extension: 'jpg' | 'png' | 'webp' | 'svg';
+  /** Valeur de l'énumération `MediaMimeType` de la base. */
+  kind: 'JPEG' | 'PNG' | 'WEBP' | 'SVG';
+  vector: boolean;
+}
+
+export const JPEG_IMAGE: ImageType = {
+  mimeType: 'image/jpeg',
+  extension: 'jpg',
+  kind: 'JPEG',
+  vector: false,
+};
+export const PNG_IMAGE: ImageType = { mimeType: 'image/png', extension: 'png', kind: 'PNG', vector: false };
+export const WEBP_IMAGE: ImageType = {
+  mimeType: 'image/webp',
+  extension: 'webp',
+  kind: 'WEBP',
+  vector: false,
+};
+export const SVG_IMAGE: ImageType = {
+  mimeType: 'image/svg+xml',
+  extension: 'svg',
+  kind: 'SVG',
+  vector: true,
+};
+
+const JPEG_MAGIC = Buffer.from([0xff, 0xd8, 0xff]);
+const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+const RIFF_MAGIC = Buffer.from('RIFF', 'latin1');
+const WEBP_MAGIC = Buffer.from('WEBP', 'latin1');
+/**
+ * Début d'un SVG : BOM (reconnu par `\s`), déclaration XML, commentaires et DOCTYPE (avec ses entités) facultatifs,
+ * puis l'élément racine `<svg`. Le DOCTYPE est retiré par l'assainissement (aucune entité n'est développée).
+ */
+const SVG_START =
+  /^\s*(?:<\?xml[^>]{0,200}\?>\s*)?(?:<!--[\s\S]{0,2000}?-->\s*)*(?:<!DOCTYPE[^>[]{0,500}(?:\[[\s\S]{0,8000}?\])?\s*>\s*)?(?:<!--[\s\S]{0,2000}?-->\s*)*<svg[\s>]/i;
+/** Les DOCTYPE des logiciels de dessin déclarent parfois des entités : en-tête lu sur 16 Ko. */
+const SVG_HEADER_WINDOW = 16 * 1024;
+
+/** Type de l'image, ou `null` si elle n'est ni un JPG, ni un PNG, ni un WebP, ni un SVG. */
+export function detectImageType(body: Buffer): ImageType | null {
+  if (startsWith(body, JPEG_MAGIC)) return JPEG_IMAGE;
+  if (startsWith(body, PNG_MAGIC)) return PNG_IMAGE;
+  if (startsWith(body, RIFF_MAGIC) && body.length >= 12 && body.subarray(8, 12).equals(WEBP_MAGIC))
+    return WEBP_IMAGE;
+  const head = body.subarray(0, SVG_HEADER_WINDOW);
+  if (head.includes(0)) return null;
+  return SVG_START.test(head.toString('utf8')) ? SVG_IMAGE : null;
+}

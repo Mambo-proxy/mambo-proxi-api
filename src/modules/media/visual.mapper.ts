@@ -77,7 +77,8 @@ export function mediaUrl(storageKey: string, publicBaseUrl: string): string {
   return `${publicBaseUrl.replace(/\/+$/, '')}/${storageKey.replace(/^\/+/, '')}`;
 }
 
-function toVariants(value: Prisma.JsonValue, publicBaseUrl: string): MediaVariant[] {
+/** Variantes du contrat lues dans la colonne `variants` (`[{ storageKey | url, width, format }]`). */
+export function toVariants(value: Prisma.JsonValue, publicBaseUrl: string): MediaVariant[] {
   if (!Array.isArray(value)) return [];
   return value.flatMap((variant): MediaVariant[] => {
     if (!isPlainObject(variant) || !VARIANT_WIDTHS.has(variant['width'])) return [];

@@ -1,7 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { AppConfigService } from '../../config/app-config.service.js';
 import type { IllustrationScene } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
+import { collectOwnerUsages, writeOwnerUsages, type UsageOwner } from './media-usages.js';
 import {
   collectImageIds,
   mediaImageSelect,
@@ -16,6 +17,7 @@ import {
 /** Images publiques : adresses des fichiers et visuels référencés dans des JSON (chargés en une requête). */
 @Injectable()
 export class MediaService {
+  private readonly logger = new Logger(MediaService.name);
   private readonly publicBaseUrl: string;
 
   constructor(
@@ -69,5 +71,23 @@ export class MediaService {
     for (const value of values) collectImageIds(value, ids);
     const media = await this.findByIds(ids);
     return values.map((value) => resolveJsonVisuals(value, media, this.publicBaseUrl)) as unknown as T;
+  }
+
+  /**
+   * Réécrit les usages des médias (`media_usages`) des contenus enregistrés, après la validation de leur
+   * transaction. Sans effet sur l'enregistrement s'il échoue (journalisé) : la table est reconstruite au démarrage
+   * du worker de la médiathèque, et la suppression d'un média recalcule ses usages sur les contenus.
+   */
+  async refreshUsages(...owners: UsageOwner[]): Promise<void> {
+    for (const owner of owners) {
+      try {
+        const entries = await collectOwnerUsages(this.prisma, owner);
+        await writeOwnerUsages(this.prisma, owner, entries);
+      } catch (error) {
+        this.logger.warn(
+          `Usages des médias non mis à jour (${owner.kind}) : ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
   }
 }

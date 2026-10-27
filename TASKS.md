@@ -38,7 +38,7 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
   - [x] Back-office : `/v1/admin/services*` (liste et compteurs, détail, création, sauvegarde automatique avec `If-Match`/412, publication, dépublication, duplication, ordre, suppression, complétude, jeton d'aperçu), `/v1/admin/categories*` (carrousels d'offres, champs du devis, statut, ordre, suppression d'une rubrique vide), `/v1/admin/pages*` (brouillon, publication, abandon, jeton d'aperçu, HTML riche assaini), `/v1/admin/zones*` (quartiers déplacés d'une zone à l'autre, contours GeoJSON contrôlés, ordre), `/v1/admin/settings/{group}` (9 groupes, `analytics`/`securite` réservés aux administrateurs), `/v1/admin/system-status`, `/v1/admin/email-templates*` (variables contrôlées, aperçu React Email, envoi de test)
   - [x] Redirections 301 automatiques (slug ou rubrique d'un service publié, slug d'une rubrique publiée) ; demandes de revalidation inscrites (`revalidation_requests`, étiquettes du site) à chaque modification visible ; journal d'activité sans donnée personnelle
   - [x] Tests : unitaires (assainissement HTML, slugs, jetons d'aperçu, complétude, contours, fiches des e-mails) ; e2e `test/admin-catalog.e2e-spec.ts`, `test/admin-site-content.e2e-spec.ts` (double de Prisma, permissions par rôle dont MANAGER refusé en écriture, relecture par les routes publiques ; bloc base réelle)
-  - [ ] Usages des médias (`media_usages`) tenus à jour à l'enregistrement des contenus : avec le module de la médiathèque
+  - [x] Usages des médias (`media_usages`) tenus à jour à l'enregistrement des contenus (services, rubriques, pages, paramètres SEO ; après la transaction, reconstruits au démarrage du worker) : module de la médiathèque
   - [ ] Textes anglais (`translations`, `…En`) des services, rubriques, pages et e-mails : aucune opération du contrat ne les modifie
   - [ ] Premier passage des tests en local et en CI (non lancés sur la machine de développement)
 - [~] Formulaires publics : quote-requests, contact-messages, registrations, training-requests, partner-requests, event-registrations (anti-spam Turnstile + piège + délai, limitation de débit)
@@ -67,7 +67,7 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
   - [x] Seed : mots de passe `SEED_ADMIN_PASSWORD` et `SEED_DEMO_PASSWORD` (développement) hachés en argon2id
   - [x] Tests : unitaires (permissions contre le contrat, JWT, politique des mots de passe) ; e2e `test/auth.e2e-spec.ts`, `test/admin-users.e2e-spec.ts` (doubles ; bloc base réelle)
   - [x] Contrat : 422 (login, verify-otp, resend-otp, forgot-password, PATCH users), 401 (resend-otp), 423 (verify-otp), 404 et 409 (DELETE et reset-password d'un utilisateur), 403 (logout), 429 (refresh), exemple `csrf-token-invalid` de `Forbidden` ; tests passés sur `expectContract`
-  - [~] Contrat : 403 `Forbidden` absent des mutations à cookie hors auth/utilisateurs/demandes/contacts : ajouté pour services, rubriques, pages, zones, paramètres, e-mails, rendez-vous et avis ; reste médias, magazine… avec leurs modules
+  - [~] Contrat : 403 `Forbidden` absent des mutations à cookie hors auth/utilisateurs/demandes/contacts : ajouté pour services, rubriques, pages, zones, paramètres, e-mails, rendez-vous, avis et médias ; reste magazine… avec leurs modules
   - [ ] Site : appeler `POST /v1/auth/refresh` sur un 401 (jeton d'accès de 15 min) avant de rediriger vers la connexion
 - [x] appointments + availability (créneaux, 409, confirmation `.ics`, proposition, rappel J-1 9 h Douala)
   - [x] Site (`src/modules/appointments`, `src/modules/forms`) : `GET /v1/appointments/availability` (plages, fermetures et horaires exceptionnels, rendez-vous qui occupent un créneau, délai minimal, horizon, format ; 62 jours au plus, `no-store`), `POST /v1/appointments` (anti-spam des formulaires, créneau proposé exigé → 422, pris → 409 `slot-taken`, demande `RENDEZ_VOUS` de même référence, e-mail « demande reçue », alerte de l'équipe), `POST /v1/appointments/{reference}/accept-proposal` (jeton HMAC, 410 expiré, 409 clos ou pris)
@@ -94,9 +94,22 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
   - [x] Contrat : `GET /v1/files/{token}` ajouté ; 400 / 403 / 422 manquants des routes du lot
   - [ ] Tests (unitaires, e2e) : après le branchement du site
   - [ ] Pilote S3 (aucune dépendance S3 installée), `checks.storage` de `/v1/health`, suppression des candidatures refusées après la durée de conservation, duplication / ordre / notes des offres et candidatures (absents du contrat)
-- [ ] partners · trainings · events
-- [ ] newsletter (double opt-in, segments, campagnes par lots, `List-Unsubscribe`, export, mesure optionnelle)
-- [ ] media (sharp : AVIF/WebP 480/960/1600, SVG assaini, point focal)
+- [~] partners · trainings · events
+  - [x] Site : `GET /v1/partners` (visibles, `category`, libellés traduits), `GET /v1/trainings` (publiées, `category`, `translations.en`), `GET /v1/events` (`upcoming`, `limit`, `page`, places restantes)
+  - [x] Back-office : `/v1/admin/partners*` (ajout, modification dont visibilité, ordre par catégorie, suppression), `/v1/admin/trainings*` (création en brouillon, slug libre, publication, ordre, suppression), `GET /v1/admin/training-requests`, `/v1/admin/events*` (période, inscrits et places réservées, détail avec inscriptions, capacité ≥ places réservées) ; audit, revalidation `partners` / `page:partenaires`, `trainings` / `page:formation`, `events`
+  - [ ] Tests (unitaires, e2e) : après le branchement du site
+  - [ ] Export CSV des inscrits d'un événement : absent du contrat (inscriptions = demandes `EVENEMENT`, export des demandes)
+- [~] newsletter (double opt-in, segments, campagnes par lots, `List-Unsubscribe`, export, mesure optionnelle)
+  - [x] Site : `POST /v1/newsletter/subscriptions` (anti-spam, consentement horodaté, lien à usage unique valable 7 jours, e-mail `newsletter-confirm`), `confirm` (410 lien expiré), `unsubscribe` (jeton signé sans état, JSON ou `List-Unsubscribe=One-Click` avec `?token=`, idempotent) ; confirmation envoyée aussi après l'inscription avec la case newsletter
+  - [x] Back-office : `/v1/admin/subscribers*` (liste, export CSV des confirmés, suppression), `/v1/admin/campaigns*` (indicateurs, segments avec effectifs, brouillon HTML assaini, aperçu réel, test, programmation, annulation, envoi immédiat ; 409 hors brouillon / programmée)
+  - [x] File BullMQ `newsletter-campaigns` : départ à l'heure programmée (réservation atomique), envois individuels uniques par abonné, lots de 50 par minute, identifiant de tâche par envoi, clôture `ENVOYEE` quand plus rien n'est en attente, reprise au démarrage du worker ; en-têtes `List-Unsubscribe` + `List-Unsubscribe-Post`
+  - [ ] Tests (unitaires, e2e) : après le branchement du site
+  - [ ] Mesure d'ouverture et de clic : `opens` / `clicks` à `null` sans l'option `analytics.newsletterTracking` ; aucun pixel ni lien de suivi (absents du contrat)
+  - [ ] Purge des inscriptions jamais confirmées (tâche RGPD quotidienne), détail d'un inscrit et préférences (absents du contrat)
+- [x] media (sharp : AVIF/WebP 480/960/1600, SVG assaini, point focal)
+  - [x] `/v1/admin/media*` : liste (`q`, `status`, `used`), détail, envoi (type réel, 10 Mo, 50 Mpx, EXIF/GPS retirés, orientation), remplacement du fichier, texte alternatif et point focal, suppression refusée si utilisée (409 `media-in-use`) ; revalidation des contenus qui l'utilisent
+  - [x] Variantes en tâche de fond (file `media`, `PROCESSING` → `READY`/`FAILED`), fichiers publics `GET /v1/media/{folder}/{file}` (répertoire `MEDIA_STORAGE_DIR` distinct des fichiers privés, cache immuable)
+  - [ ] Tests unitaires et e2e du lot (après le branchement du site) ; pilote S3 des médias
 - [ ] dashboard · search · notifications · audit
 - [~] Revalidation du site (`POST {WEB_URL}/api/revalidate` avec tags) : demandes inscrites par les contenus du back-office (`revalidation_requests`, `PENDING`) ; envoi et réessais à faire
 - [ ] Tâches planifiées : nettoyage RGPD quotidien, sauvegarde `pg_dump` vers S3 (rotation 30 jours)

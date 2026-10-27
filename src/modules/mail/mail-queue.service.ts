@@ -34,8 +34,11 @@ function stableJson(value: unknown): string {
  * Identifiant stable d'une tâche liée à une demande (`reference`) : la même tâche ajoutée deux fois (double envoi
  * du formulaire, nouvelle tentative du code appelant) n'est envoyée qu'une fois tant que la première est
  * conservée par BullMQ. Condensat : aucune adresse e-mail en clair dans les clés Redis.
+ * Envoi d'une campagne (`data.deliveryId`) : une tâche par envoi individuel, même si le lot est rejoué (reprise).
  */
 export function mailJobId(job: MailJob): string | undefined {
+  const deliveryId = job.data['deliveryId'];
+  if (typeof deliveryId === 'string' && deliveryId !== '') return `campagne-envoi-${deliveryId}`;
   if (job.reference === undefined) return undefined;
   const digest = createHash('sha256')
     .update(stableJson({ template: job.template, to: job.to.toLowerCase(), lang: job.lang, data: job.data }))

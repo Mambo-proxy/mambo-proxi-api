@@ -14,6 +14,8 @@ export const QUEUE_NAMES = {
   mail: 'mail',
   appointmentReminders: 'appointment-reminders',
   surveyInvitations: 'survey-invitations',
+  newsletterCampaigns: 'newsletter-campaigns',
+  media: 'media',
 } as const;
 
 const MINUTE_MS = 60_000;
