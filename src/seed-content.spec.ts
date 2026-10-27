@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import type { z } from 'zod';
+import { availabilityConfigSchema } from './modules/appointments/availability.schemas.js';
 import { categoryPatchSchema, servicePatchSchema } from './modules/catalog/admin-catalog.schemas.js';
 import { emailTemplateInputSchema } from './modules/mail/admin-email-templates.service.js';
 import { pageDraftSchema } from './modules/pages/page-sections.schemas.js';
@@ -132,6 +133,34 @@ describe('données de départ et limites du contrat', () => {
         ),
       );
     expect(errors).toEqual([]);
+  });
+
+  it('disponibilités des rendez-vous (plages, fermetures, paramètre `availability`)', () => {
+    const availability = seed('availability') as { rules: Row[]; exceptions: Row[] };
+    const setting = (seed('settings') as Row[]).find((row) => row['key'] === 'availability');
+    const config = { ...availability, ...(setting?.['value'] as Row) };
+    const result = availabilityConfigSchema.safeParse(config);
+    expect(
+      result.success ? [] : result.error.issues.map((issue) => `${issue.path.join('.')} : ${issue.message}`),
+    ).toEqual([]);
+    // Relu tel quel par `GET /v1/admin/availability` puis renvoyé par `PUT` : aucune valeur réécrite.
+    expect(result.data?.rules.map((rule) => rule.formats)).toEqual(
+      availability.rules.map((rule) => rule['formats']),
+    );
+  });
+
+  it('rendez-vous (liens de visio, durées)', () => {
+    const appointments = seed('appointments') as Row[];
+    const problems = appointments.flatMap((row) => {
+      const link = row['videoLink'];
+      const errors: string[] = [];
+      if (typeof link === 'string' && !/^https?:\/\/[^\s]+$/.test(link))
+        errors.push(`${String(row['id'])} : videoLink`);
+      if (row['format'] === 'AGENCE' && row['videoLink'] !== null)
+        errors.push(`${String(row['id'])} : visio en agence`);
+      return errors;
+    });
+    expect(problems).toEqual([]);
   });
 
   it('modèles d’e-mails', () => {

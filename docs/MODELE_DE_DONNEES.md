@@ -86,6 +86,22 @@ colonnes dédiées (`trainingId`, `participants`, `eventId`, `seats`, `partnersh
   vers l'ancienne adresse sont reportées sur la nouvelle). Chaque modification visible sur le site ajoute une ligne
   `revalidation_requests` (`PENDING`, étiquettes du site) dans la même transaction.
 
+- **Rendez-vous.** Une demande en ligne crée une demande `RENDEZ_VOUS` et un rendez-vous de **même référence**
+  (`appointments.request_id`) ; une saisie manuelle n'a pas de demande (`request_id` vide, `created_by_id` renseigné).
+  Créneau occupé : `[starts_at, ends_at[` pour « À confirmer » et « Confirmé », créneau proposé (`proposed_starts_at`,
+  même durée) pour « Autre créneau proposé » ; le créneau d'origine est alors libéré (et sort de l'index unique
+  partiel). Toute écriture qui prend un créneau pose d'abord le verrou consultatif
+  `pg_advisory_xact_lock(hashtext('mambo:appointments'))` puis vérifie le chevauchement ; l'index unique partiel
+  reste le dernier rempart (P2002 → 409). Lien d'acceptation d'un autre créneau : jeton aléatoire envoyé par e-mail,
+  condensat HMAC-SHA256 (`TOKEN_SIGNING_SECRET`, usage `appointment-proposal`) dans `proposal_token_hash`, échéance
+  `proposal_expires_at` (début du créneau proposé, 7 jours au plus), conservés après l'acceptation (seconde ouverture
+  du lien) et effacés à l'annulation. `reminder_sent_at` : posé atomiquement par la tâche de rappel (BullMQ, file
+  `appointment-reminders`, identifiant `rappel-<id>-<début>`), remis à vide quand le rendez-vous change de créneau.
+  Plages `availability_rules` (heures locales « HH:MM », 1 = lundi … 7 = dimanche) et exceptions
+  `availability_exceptions` (`date` seule, minuit UTC côté Prisma) remplacées en bloc par
+  `PUT /v1/admin/availability` (identifiants connus conservés). Aucune migration ajoutée : toutes les colonnes
+  existaient.
+
 ## Contraintes ajoutées à la main dans les migrations (non exprimables en Prisma)
 
 Faites dans `prisma/migrations/20261026000000_init` : CHECK des offres, index unique partiel des créneaux, bornes des notes, jours, point focal et coordonnées. Restent pour le module de recherche : `unaccent` et index plein texte.

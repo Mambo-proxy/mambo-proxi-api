@@ -13,6 +13,11 @@ import request from 'supertest';
 import { expect, vi } from 'vitest';
 import { AppModule } from '../../src/app.module.js';
 import { configureApp } from '../../src/app.setup.js';
+import {
+  REMINDER_QUEUE_FACTORY,
+  type ReminderJob,
+  type ReminderQueueClient,
+} from '../../src/modules/appointments/appointment-reminders.service.js';
 import { MailQueueService } from '../../src/modules/mail/mail-queue.service.js';
 import type { MailJob } from '../../src/modules/mail/mail.types.js';
 import { PrismaService } from '../../src/prisma/prisma.service.js';
@@ -65,6 +70,32 @@ export class MailQueueDouble {
   }
 }
 
+/**
+ * Double de la file des rappels de rendez-vous (`ReminderQueueClient`) : tâches différées en mémoire, avec la règle
+ * de BullMQ (un identifiant déjà présent n'est pas ajouté de nouveau).
+ */
+export class ReminderQueueDouble implements ReminderQueueClient {
+  readonly jobs = new Map<string, { data: ReminderJob; delay: number }>();
+  readonly removed: string[] = [];
+  readonly add = vi.fn((_name: string, data: ReminderJob, opts: { jobId?: string; delay?: number }) => {
+    const jobId = opts.jobId ?? `job-${String(this.jobs.size + 1)}`;
+    if (!this.jobs.has(jobId)) this.jobs.set(jobId, { data, delay: opts.delay ?? 0 });
+    return Promise.resolve({ id: jobId });
+  });
+  readonly remove = vi.fn((jobId: string) => {
+    this.removed.push(jobId);
+    return Promise.resolve(this.jobs.delete(jobId) ? 1 : 0);
+  });
+  readonly close = vi.fn(() => Promise.resolve());
+
+  reset(): void {
+    this.jobs.clear();
+    this.removed.length = 0;
+    this.add.mockClear();
+    this.remove.mockClear();
+  }
+}
+
 /** Stockage de la limitation de débit remis à zéro entre les tests. */
 export class ResettableThrottlerStorage implements ThrottlerStorage {
   private current = new ThrottlerStorageService();
@@ -83,6 +114,8 @@ export interface Doubles {
   mail: MailQueueDouble;
   throttler: ResettableThrottlerStorage;
   tables?: PrismaTables;
+  /** File des rappels de rendez-vous (par défaut : un double neuf, jamais Redis). */
+  reminders?: ReminderQueueDouble;
   /** Contrôleurs ajoutés à l'application (sondes de la garde globale). */
   controllers?: Type[];
 }
@@ -96,7 +129,9 @@ export async function createApp(doubles: Doubles): Promise<NestExpressApplicatio
     .overrideProvider(MailQueueService)
     .useValue(doubles.mail)
     .overrideProvider(ThrottlerStorage)
-    .useValue(doubles.throttler);
+    .useValue(doubles.throttler)
+    .overrideProvider(REMINDER_QUEUE_FACTORY)
+    .useValue(() => doubles.reminders ?? new ReminderQueueDouble());
   if (doubles.tables)
     builder = builder.overrideProvider(PrismaService).useValue(createPrismaDouble(doubles.tables));
   const moduleRef = await builder.compile();

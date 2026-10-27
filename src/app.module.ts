@@ -8,6 +8,7 @@ import { AppConfigModule } from './config/app-config.module.js';
 import { AppConfigService } from './config/app-config.service.js';
 import { HealthModule } from './health/health.module.js';
 import { buildLoggerParams } from './logging/logger.config.js';
+import { AppointmentsModule } from './modules/appointments/appointments.module.js';
 import { AuthGuard } from './modules/auth/auth.guard.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
@@ -48,6 +49,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
     UsersModule,
     RequestsModule,
     ContactsModule,
+    AppointmentsModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: ProblemFilter },

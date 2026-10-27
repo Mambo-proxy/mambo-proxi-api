@@ -8,6 +8,11 @@ import { validationException } from '../../common/validation/validation-exceptio
 import { AppConfigService } from '../../config/app-config.service.js';
 import type { Language, NotificationKind, Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
+import { adminAppointmentPath } from '../appointments/admin-appointments.service.js';
+import { formatLabel, reasonLabel } from '../appointments/appointment-labels.js';
+import { isSlotTakenError, lockSlots, slotTakenException } from '../appointments/appointment-slots.js';
+import type { AppointmentInput } from '../appointments/appointment.schemas.js';
+import { AvailabilityService } from '../appointments/availability.service.js';
 import { publishedServiceWhere } from '../catalog/catalog.selects.js';
 import { shortName, type ContactSubmission } from '../contacts/contact.mapper.js';
 import { ContactsService, type SavedContact } from '../contacts/contacts.service.js';
@@ -24,6 +29,7 @@ import { SETTING_KEYS } from '../settings/settings.constants.js';
 import {
   submissionMailJobs,
   type AcknowledgementMail,
+  type AppointmentReceivedData,
   type ContactAckData,
   type EventRegistrationData,
   type PartnerRequestReceivedData,
@@ -120,11 +126,22 @@ interface Submission {
   /** Écritures propres au formulaire, dans la même transaction (places, centres d'intérêt, newsletter). */
   before?: (tx: Prisma.TransactionClient) => Promise<void>;
   after?: (tx: Prisma.TransactionClient, contact: SavedContact) => Promise<TransactionExtra>;
+  /** Écritures qui dépendent de la demande créée (rendez-vous relié à sa demande). */
+  afterRequest?: (
+    tx: Prisma.TransactionClient,
+    contact: SavedContact,
+    request: CreatedRequest,
+  ) => Promise<TransactionExtra>;
 }
 
 interface TransactionExtra {
   newsletterPending?: boolean;
+  /** Lien du back-office de l'alerte de l'équipe (par défaut : la demande). */
+  adminPath?: string;
 }
+
+export const SLOT_UNAVAILABLE =
+  'Ce créneau n’est pas proposé. Choisissez un horaire parmi les créneaux disponibles.';
 
 /**
  * Formulaires publics : anti-spam, contrôle des références (rubrique, service, formation, événement), puis, dans une
@@ -143,6 +160,7 @@ export class FormsService {
     @Inject(RequestsService) private readonly requests: RequestsService,
     @Inject(MailQueueService) private readonly mailQueue: MailQueueService,
     @Inject(AppConfigService) private readonly config: AppConfigService,
+    @Inject(AvailabilityService) private readonly availability: AvailabilityService,
   ) {}
 
   /** `POST /v1/quote-requests`. */
@@ -566,6 +584,107 @@ export class FormsService {
     });
   }
 
+  /**
+   * `POST /v1/appointments` : demande de rendez-vous (statut « À confirmer »), reliée à une demande `RENDEZ_VOUS`
+   * de même référence. Le créneau doit être l'un de ceux proposés par `GET /v1/appointments/availability` pour ce
+   * format (sinon 422 sur `startsAt`) et encore libre : vérifié sous le verrou des créneaux, dans la transaction de
+   * l'enregistrement (pris entre-temps → 409 `slot-taken`, comme une violation de l'index unique du créneau).
+   */
+  async createAppointment(input: AppointmentInput, meta: SubmissionMeta): Promise<SubmissionAccepted> {
+    const lang = resolveLang(input.lang, meta.acceptLanguage);
+    const now = new Date();
+    if (await this.isTrapped(input.antiSpam, meta, now)) return this.decoy('appointment', lang, now);
+
+    const startsAt = new Date(input.startsAt);
+    const reason = reasonLabel(input.reason);
+    const when = formatDoualaDateTime(startsAt);
+    let endsAt = startsAt;
+    const fields: RequestField[] = [];
+    pushField(fields, 'motif', 'Motif', reason);
+    pushField(fields, 'format', 'Format', formatLabel(input.format));
+    pushField(fields, 'creneau', 'Créneau', when);
+    pushField(fields, 'ville', 'Ville', input.contact.city);
+    try {
+      return await this.submit('appointment', lang, now, meta, {
+        serviceName: `Rendez-vous — ${reason}`,
+        contact: { ...input.contact, source: 'rendez-vous', language: toLanguage(lang) },
+        draft: {
+          type: 'RENDEZ_VOUS',
+          subject: `Rendez-vous — ${reason}`,
+          payload: {
+            reason: input.reason,
+            format: input.format,
+            startsAt: startsAt.toISOString(),
+            fields: toJsonFields(fields),
+          },
+          message: input.message,
+        },
+        notification: { kind: 'APPOINTMENT', title: `Nouvelle demande de rendez-vous — ${reason}, ${when}` },
+        before: async (tx) => {
+          await lockSlots(tx);
+          const found = await this.availability.lookup(tx, startsAt, input.format, now);
+          if (found.status === 'taken') throw slotTakenException();
+          if (found.status === 'invalid')
+            throw validationException([{ path: 'startsAt', code: 'unavailable', message: SLOT_UNAVAILABLE }]);
+          endsAt = new Date(found.slot.endsAt);
+        },
+        afterRequest: async (tx, contact, request) => {
+          const appointment = await tx.appointment.create({
+            data: {
+              reference: request.reference,
+              requestId: request.id,
+              contactId: contact.id,
+              reason: input.reason,
+              format: input.format,
+              startsAt,
+              endsAt,
+              status: 'A_CONFIRMER',
+              proposedStartsAt: null,
+              proposalTokenHash: null,
+              proposalExpiresAt: null,
+              location: null,
+              videoLink: null,
+              message: input.message,
+              notes: null,
+              language: toLanguage(lang),
+              assignedToId: null,
+              createdById: null,
+              confirmedAt: null,
+              cancelledAt: null,
+              completedAt: null,
+              reminderSentAt: null,
+              isDemo: false,
+              createdAt: now,
+              updatedAt: now,
+            },
+            select: { id: true },
+          });
+          // Notifications de l'équipe : vers le rendez-vous plutôt que vers la demande.
+          const adminPath = adminAppointmentPath(appointment.id);
+          await tx.notification.updateMany({
+            where: { entityType: 'Request', entityId: request.id },
+            data: { link: adminPath, entityType: 'Appointment', entityId: appointment.id },
+          });
+          return { adminPath };
+        },
+        acknowledgement: (contact, request) => ({
+          template: 'appointment-received',
+          data: {
+            ...acknowledgementBase(contact, request),
+            startsAt: startsAt.toISOString(),
+            endsAt: endsAt.toISOString(),
+            reasonLabel: reasonLabel(input.reason, lang),
+            formatLabel: formatLabel(input.format, lang),
+            serviceName: reasonLabel(input.reason, lang),
+          } satisfies AppointmentReceivedData,
+        }),
+      });
+    } catch (error) {
+      if (isSlotTakenError(error)) throw slotTakenException();
+      throw error;
+    }
+  }
+
   /** Champ piège rempli → succès factice ; délai trop court ou jeton refusé → 400 (levé par `AntiSpamService`). */
   private async isTrapped(antiSpam: AntiSpamInput, meta: SubmissionMeta, now: Date): Promise<boolean> {
     return (await this.antiSpam.check(antiSpam, meta.ip, now)) === 'trapped';
@@ -601,7 +720,8 @@ export class FormsService {
         submission.notification,
         now,
       );
-      return { contact: saved, request: created, extra: extraValues };
+      const late = (await submission.afterRequest?.(tx, saved, created)) ?? {};
+      return { contact: saved, request: created, extra: { ...extraValues, ...late } };
     });
 
     const acknowledgement = submission.acknowledgement(contact, request, extra);
@@ -624,7 +744,10 @@ export class FormsService {
         message: submission.draft.message ?? null,
         receivedAt: request.createdAt,
         dueAt: request.dueAt,
-        adminUrl: new URL(adminRequestPath(request.id), this.config.get('WEB_URL')).toString(),
+        adminUrl: new URL(
+          extra.adminPath ?? adminRequestPath(request.id),
+          this.config.get('WEB_URL'),
+        ).toString(),
       },
     );
     return { reference: request.reference, message: acceptedMessage(kind, lang) };

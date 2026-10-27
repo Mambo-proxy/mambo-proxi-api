@@ -540,3 +540,124 @@
   (`{ illustration, imageId, alt }`), et la lecture des JSON relit dans la médiathèque toute image copiée dont
   l'identifiant y existe (`resolveJsonVisuals`) : même forme, à jour, pour le site et le back-office. Le double
   reproduit le cas (copie dans `test/fixtures/content.ts`, test d'aller-retour sans base réelle).
+
+## Phase 2 — Rendez-vous et disponibilités (27 octobre 2026)
+
+### Fait
+
+- Module `src/modules/appointments` : créneaux libres (`availability.ts`, calcul pur), disponibilités
+  (`availability.service.ts` : plages `availability_rules`, exceptions `availability_exceptions`, paramètre
+  `availability`), occupation des créneaux et verrou (`appointment-slots.ts`), e-mails au client
+  (`appointment-mail.service.ts`, invitation `ics.ts`), rappels de la veille (`appointment-reminders.service.ts`,
+  worker `appointment-reminder.processor.ts`), acceptation d'un créneau proposé (`appointments.service.ts`),
+  back-office (`admin-appointments.*`), libellés FR/EN (`appointment-labels.ts`), schémas zod.
+- Site : `GET /v1/appointments/availability`, `POST /v1/appointments` (dans `FormsService`, avec l'anti-spam, la fiche
+  contact, la demande `RENDEZ_VOUS` de même référence, les notifications et l'alerte de l'équipe des autres
+  formulaires ; nouveau crochet `afterRequest`), `POST /v1/appointments/{reference}/accept-proposal`.
+- Back-office : `GET|POST /v1/admin/appointments`, `GET|PATCH /v1/admin/appointments/{id}` (`confirm`, `propose`,
+  `cancel`, `complete`, `notes`, `assign`), `GET|PUT /v1/admin/availability`.
+- Socle : `common/time/agency-day.ts` (heure locale ↔ instant à décalage fixe, jours `AAAA-MM-JJ`, jour ISO de la
+  semaine), usage `appointment-proposal` des condensats de jetons, clé de paramètre `availability`, file
+  `appointment-reminders` (`REMINDER_JOB_OPTIONS`). Gabarits : lieu, lien de visio et message de l'agence ajoutés aux
+  cartes des rendez-vous (`template-definitions.ts`).
+- Contrat : 403 `Forbidden` (avec l'exemple `csrfTokenInvalid` de la réponse commune) sur les 7 opérations du
+  back-office, 400 `InvalidQuery` sur l'agenda, exemple 409 `slot-taken` sur la saisie manuelle, exemple 410 et
+  réponses 422 / 429 sur l'acceptation ; règles décrites (calcul des créneaux, validation du créneau demandé,
+  transitions, défauts du lieu et du lien, report, rappel, remplacement des disponibilités). Site synchronisé
+  (`pnpm contract:sync`) : seuls `contracts/openapi.yaml` et `src/lib/api/schema.d.ts` changent.
+- Tests : unitaires `agency-day.spec.ts`, `availability.spec.ts`, `appointment.schemas.spec.ts`, `appointments.spec.ts`,
+  seed des disponibilités et des rendez-vous (`seed-content.spec.ts`) ; e2e `test/appointments.e2e-spec.ts` (données
+  `test/fixtures/appointments.ts`) et `test/appointment-reminders.e2e-spec.ts` (Redis réel).
+- Double de Prisma rapproché de PostgreSQL : annulation des écritures d'une transaction qui échoue, index uniques des
+  rendez-vous (référence et index partiel du créneau) avec l'erreur P2002 sous la forme de l'adaptateur `pg`,
+  `null` pour une colonne sélectionnée jamais renseignée, `$executeRaw`, tables des disponibilités. Les 196 tests e2e
+  existants passent inchangés. `test/support/auth.ts` : double de la file des rappels (`ReminderQueueDouble`), branché
+  par défaut dans `createApp` (aucun test ne joint Redis par erreur).
+
+### Décisions
+
+- **Créneaux** : chaque plage hebdomadaire est découpée par pas de sa durée (`slotMinutes`) tant que le créneau tient
+  avant la fin ; horaires exceptionnels = une plage aux durée et formats de la première règle du jour (comme le
+  back-office simulé). Un créneau est retiré avant le délai minimal (`minNoticeHours`, 24 h), après l'horizon
+  (`maxAdvanceDays`, 60 j), s'il chevauche un rendez-vous à confirmer ou confirmé, ou le créneau proposé d'un
+  rendez-vous « Autre créneau proposé » (même durée ; son créneau d'origine est libéré, comme dans l'index partiel).
+  `closedReason` : libellé de l'exception, « Fermé le <jour> », « Complet », sinon `null`. Réponse `no-store`.
+- **Fuseau** : Douala est à UTC+1 toute l'année ; conversion par décalage fixe (aucune table de fuseaux), vérifiée de
+  part et d'autre des changements d'heure européens (29 mars et 25 octobre 2026).
+- **Demande en ligne** : `startsAt` doit être un des créneaux proposés pour ce format (sinon 422 sur `startsAt`), la
+  fin est celle du créneau. Vérification sous verrou dans la transaction : déjà pris → 409 `slot-taken`.
+- **Double réservation** : toute transaction qui prend un créneau (demande, saisie, confirmation, proposition,
+  acceptation) pose `pg_advisory_xact_lock(hashtext('mambo:appointments'))` avant de vérifier le chevauchement (deux
+  durées différentes peuvent se chevaucher sans avoir le même début, ce que l'index ne voit pas) ; ordre des verrous
+  identique partout (verrou consultatif, puis compteur des références) : pas d'interblocage avec les autres
+  formulaires. L'index unique partiel reste le dernier rempart : `isSlotTakenError` reconnaît la P2002 de l'adaptateur
+  (`meta.driverAdapterError.cause.constraint.index`, message « Unique constraint failed on the constraint: … ») et la
+  traduit en 409. `$executeRaw` plutôt que `$queryRaw` : la fonction renvoie `void`, que le client ne sait pas lire.
+- **Saisie manuelle** : confirmée d'office, non limitée aux plages du site mais sans chevauchement (409 `slot-taken`
+  avec la référence du rendez-vous en conflit) ; assignée par défaut à qui la saisit, à quelqu'un d'autre avec
+  `appointments:assign` ; personne assignable = membre actif dont le rôle voit des rendez-vous. Lieu par défaut
+  (Agence) : `agencyAddress` ; lien par défaut (Visio) : `defaultVideoLink`, sinon `null` (aucun lien inventé).
+- **Actions** : `confirm` sur « À confirmer » ou « Autre créneau proposé » (passe sur le créneau proposé) ; `propose`
+  sur tout rendez-vous non clos, créneau à venir et libre, lien valable jusqu'au début du créneau proposé (7 jours au
+  plus) ; `cancel` sur tout rendez-vous non clos (lien d'acceptation effacé) ; `complete` sur « Confirmé » ; `notes`
+  sur tout rendez-vous ; 409 sinon. Rôle : toute action sauf `assign` avec `appointments:write`, ou
+  `appointments:write-assigned` pour ses rendez-vous ; un rendez-vous hors du périmètre de lecture est introuvable.
+- **Acceptation** : jeton aléatoire de 256 bits, condensat HMAC-SHA256 (usage `appointment-proposal`) ; lien inconnu,
+  remplacé ou expiré → 410 ; rendez-vous clos → 409 ; créneau pris → 409 `slot-taken` ; seconde ouverture après
+  acceptation → même réponse 200 (le condensat est gardé jusqu'à une nouvelle proposition ou une annulation). La
+  personne assignée reçoit une notification. Limité à 5 envois par minute et par adresse, comme les formulaires.
+- **Rappel** : la veille (jour de Douala) à `emails.appointmentReminderHour` (9 h par défaut), tâche différée BullMQ
+  d'identifiant `rappel-<id>-<début en ms>` (sans `:`) : programmée à chaque confirmation (saisie, `confirm`,
+  acceptation), retirée à la proposition d'un autre créneau, à l'annulation et à la fin. Moment déjà passé : pas de
+  rappel. À l'exécution, la tâche ne fait rien si le rendez-vous n'est plus confirmé au même créneau ou a déjà été
+  rappelé : `reminderSentAt` est posé par un `updateMany` conditionnel avant la mise en file de l'e-mail (une seule
+  exécution envoie, même rejouée). Worker démarré avec celui des e-mails (`MAIL_WORKER=on`).
+- **E-mails** : dans la langue du rendez-vous (celle de l'envoi en ligne, celle de la fiche pour une saisie) ;
+  `appointment-confirmed` avec invitation `.ics` (UTC, `METHOD:REQUEST`, UID stable par rendez-vous, `SEQUENCE`
+  croissante), lieu ou lien de visio ; `appointment-proposed` avec le lien `…/rendez-vous/confirmer?ref=&token=` ;
+  `appointment-cancelled` avec le lien de prise de rendez-vous ; message de l'agence repris dans la carte. Aucun
+  e-mail pour une fiche anonymisée.
+- **Journal d'activité** : `appointment.create|confirm|propose|cancel|complete|assign`, `availability.update` ;
+  libellés avec la référence et le créneau (« A confirmé le rendez-vous MP-2026-0142 (jeudi 12 novembre 2026 à
+  14:00) »), jamais le nom du client. Notes internes non journalisées (comme les notes des demandes).
+- **Disponibilités** : `PUT` remplace plages et exceptions (identifiant connu conservé, sinon nouvelle ligne) ;
+  contrôles : fin après début, pas de chevauchement de deux plages d'un même jour, une exception par date, horaires
+  obligatoires d'une journée non fermée ; `agencyAddress` / `defaultVideoLink` absents → valeurs conservées. Aucun
+  contenu public mis en cache ne dépend des disponibilités (lues à chaque appel) : pas de demande de revalidation.
+- **Aucune migration** : toutes les colonnes nécessaires existaient (`proposal_token_hash`, `proposal_expires_at`,
+  `reminder_sent_at`, `language`…).
+
+### Écarts avec le back-office simulé du site (le contrat prime)
+
+- Agenda : paramètres invalides ou absents → 400 `invalid-query` (mock : 422). Erreurs au format du contrat (titres,
+  `type`, chemins en notation pointée `rules.0.endTime`, mock : `rules[0].endTime`).
+- Saisie manuelle et proposition : conflit signalé par la référence et le créneau du rendez-vous en conflit (mock : nom
+  du contact) ; aucun lien de visio fabriqué (mock : `https://meet.mamboproxi.com/rdv-…`) ; lieu par défaut seulement
+  pour le format Agence (comme le mock).
+- Demande en ligne : créneau contrôlé (422 / 409, le mock accepte tout) ; durée = celle de la plage du créneau (mock :
+  première règle trouvée).
+- Disponibilités : chevauchement de plages et dates en double refusés (mock : acceptés).
+- Acceptation : sémantique réelle (mock : jetons `expire` → 410 et `pris` → 409).
+
+### Difficultés et solutions
+
+- **Le double ne reproduisait ni l'annulation d'une transaction ni l'index unique** : sans cela, la traduction de la
+  P2002 et l'absence d'écriture partielle ne pouvaient être testées sans base. Ajoutés au double (copie des tables
+  avant `fn`, restaurée en cas d'erreur ; index déclarés par table), puis vérifiés sur la vraie base dans le bloc
+  `E2E_REAL_SERVICES` (deux réservations simultanées du même créneau → un 201 et un 409 ; insertion directe d'un
+  second rendez-vous actif au même instant → P2002 reconnue).
+- **Colonnes jamais renseignées** : une ligne créée par l'API sans `anonymizedAt` renvoyait `undefined` au lieu de
+  `null` ; le double renvoie désormais `null` pour toute colonne sélectionnée, comme PostgreSQL.
+- **zod 4** : les contrôles d'ensemble (`superRefine` de l'objet) s'exécutent même quand un champ est en erreur ;
+  toutes les erreurs sont donc renvoyées d'un coup (testé).
+- **Machine** : tests sur PostgreSQL et Redis réels non lancés en local (pas de Docker) ; les blocs concernés ont été
+  relus ligne à ligne (requêtes, formes renvoyées par l'adaptateur, nettoyage).
+
+### Points ouverts
+
+- Compteur « Rendez-vous » des pastilles (`sidebar-counts`) et bloc du tableau de bord : module du tableau de bord.
+- Rappel d'un rendez-vous dont l'heure de rappel change dans les paramètres : les tâches déjà programmées gardent
+  l'ancienne heure (identifiant inchangé) ; à reprogrammer si le paramètre change (non prévu par le contrat).
+- La demande `RENDEZ_VOUS` reliée n'est pas mise à jour quand le rendez-vous est confirmé, annulé ou terminé (statuts
+  indépendants) ; à décider avec la cliente.
+- Invitation `.ics` d'annulation (`METHOD:CANCEL`) : non envoyée (le gabarit d'annulation n'en joint pas).

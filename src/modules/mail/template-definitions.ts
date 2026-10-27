@@ -62,6 +62,7 @@ const LABELS = {
   format: { fr: 'Format', en: 'Format' },
   event: { fr: 'Événement', en: 'Event' },
   place: { fr: 'Lieu', en: 'Venue' },
+  videoLink: { fr: 'Lien visio', en: 'Video link' },
   seats: { fr: 'Places', en: 'Seats' },
   training: { fr: 'Formation', en: 'Training' },
   participants: { fr: 'Participants', en: 'Participants' },
@@ -100,6 +101,14 @@ const appointmentCard = (input: DefinitionInput): readonly SummaryEntry[] => [
   ['date', summaryDate(input)],
   ['time', summaryTime(input)],
   ['format', readText(input.data, 'formatLabel')],
+  ['place', readText(input.data, 'place')],
+  ['videoLink', readText(input.data, 'videoLink')],
+];
+
+/** Carte du rendez-vous suivie du message de l'agence (proposition d'un autre créneau, annulation). */
+const appointmentCardWithMessage = (input: DefinitionInput): readonly SummaryEntry[] => [
+  ...appointmentCard(input),
+  ['message', readText(input.data, 'message')],
 ];
 
 /** Lien du back-office vers une demande (`/admin/demandes?id=…`). */
@@ -214,7 +223,7 @@ export const TEMPLATE_DEFINITIONS: Record<MailTemplateKey, TemplateDefinition> =
   'appointment-proposed': {
     audience: 'client',
     required: ['date', 'actionUrl'],
-    summary: appointmentCard,
+    summary: appointmentCardWithMessage,
   },
   'appointment-cancelled': {
     audience: 'client',
@@ -222,6 +231,7 @@ export const TEMPLATE_DEFINITIONS: Record<MailTemplateKey, TemplateDefinition> =
     summary: (input) => [
       ['date', summaryDate(input)],
       ['time', summaryTime(input)],
+      ['message', readText(input.data, 'message')],
     ],
   },
   'appointment-reminder': {

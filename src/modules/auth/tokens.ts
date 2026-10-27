@@ -37,4 +37,5 @@ export const TOKEN_PURPOSES = {
   passwordReset: 'password-reset',
   invitation: 'invitation',
   csrf: 'csrf',
+  appointmentProposal: 'appointment-proposal',
 } as const;

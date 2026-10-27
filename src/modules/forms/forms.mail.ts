@@ -70,6 +70,16 @@ export interface PartnerRequestReceivedData extends AcknowledgementData {
   activity: string;
 }
 
+export interface AppointmentReceivedData extends AcknowledgementData {
+  /** Créneau demandé (ISO 8601), affiché à l'heure de Douala. */
+  startsAt: string;
+  endsAt: string;
+  /** Motif et format dans la langue de l'envoi (« Devis », « Visio »). */
+  reasonLabel: string;
+  formatLabel: string;
+  serviceName: string;
+}
+
 export interface EventRegistrationData extends AcknowledgementData {
   eventName: string;
   startsAt: string;
@@ -118,6 +128,7 @@ export interface AcknowledgementMail {
     | 'training-request-received'
     | 'partner-request-received'
     | 'event-registration'
+    | 'appointment-received'
   >;
   to: string;
   lang: Lang;

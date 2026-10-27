@@ -20,6 +20,7 @@ import {
 } from './forms.schemas.js';
 import { FormsService, type SubmissionAccepted, type SubmissionMeta } from './forms.service.js';
 import { Public } from '../auth/auth.decorators.js';
+import { appointmentInputSchema, type AppointmentInput } from '../appointments/appointment.schemas.js';
 
 function metaOf(request: Request): SubmissionMeta {
   return {
@@ -31,7 +32,7 @@ function metaOf(request: Request): SubmissionMeta {
 
 /**
  * Formulaires publics (tag « Formulaires » du contrat) : `201 { reference, message }`, 400 `spam-check-failed`,
- * 422 `validation-error`, 429 `rate-limited` (limite resserrée : 5 envois par minute et par adresse IP et par formulaire).
+ * 409 `event-full` / `slot-taken`, 422 `validation-error`, 429 `rate-limited` (limite resserrée : 5 envois par minute et par adresse IP et par formulaire).
  */
 @ApiTags('Formulaires')
 @Public()
@@ -94,6 +95,19 @@ export class FormsController {
     @Req() request: Request,
   ): Promise<SubmissionAccepted> {
     return this.forms.createPartnerRequest(body, metaOf(request));
+  }
+
+  @Post('appointments')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    operationId: 'createAppointment',
+    summary: 'Demande de rendez-vous (statut « À confirmer »)',
+  })
+  createAppointment(
+    @Body(new ZodValidationPipe(appointmentInputSchema)) body: AppointmentInput,
+    @Req() request: Request,
+  ): Promise<SubmissionAccepted> {
+    return this.forms.createAppointment(body, metaOf(request));
   }
 
   @Post('event-registrations')

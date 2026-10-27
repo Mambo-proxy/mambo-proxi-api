@@ -95,6 +95,25 @@ après 60 s), sauf sur un appareil de confiance (cookie `mp_td`, 30 jours, param
   revalidation (`revalidation_requests`) ; les lectures publiques, relues à chaque requête (`ETag`), sont à jour
   aussitôt.
 
+## Rendez-vous
+
+- Site : `GET /v1/appointments/availability` (créneaux libres de 62 jours au plus, calculés à chaque appel :
+  plages hebdomadaires − fermetures − rendez-vous à confirmer, confirmés ou proposés − délai minimal − horizon),
+  `POST /v1/appointments` (anti-spam des formulaires ; demande `RENDEZ_VOUS` et rendez-vous « À confirmer » de même
+  référence), `POST /v1/appointments/{reference}/accept-proposal` (lien de l'e-mail « autre créneau proposé »).
+- Back-office : `/v1/admin/appointments*` (agenda d'une période et file « À confirmer », saisie manuelle confirmée,
+  confirmation, report, annulation, fin, notes, assignation ; un chargé de clientèle ne voit que ses rendez-vous) et
+  `/v1/admin/availability` (plages, fermetures et horaires exceptionnels, délai minimal, horizon, adresse de l'agence,
+  lien de visio par défaut).
+- Heures de Douala (UTC+1 toute l'année, sans heure d'été) converties avec un décalage fixe
+  (`src/common/time/agency-day.ts`).
+- Double réservation impossible : verrou consultatif PostgreSQL pendant toute écriture qui prend un créneau, et
+  index unique partiel `appointments_active_slot_key` (violation → 409 `slot-taken`).
+- E-mails au client dans sa langue : demande reçue, confirmation avec invitation `.ics`, autre créneau proposé,
+  annulation, rappel la veille à l'heure `emails.appointmentReminderHour` (9 h). Le rappel est une tâche différée de
+  la file BullMQ `appointment-reminders` (identifiant stable par rendez-vous et créneau, retirée au report et à
+  l'annulation, envoi vérifié et marqué `reminderSentAt` au moment de l'exécution).
+
 ## E-mails
 
 Les e-mails partent en arrière-plan par la file BullMQ `mail` (Redis) : `MailQueueService.enqueue(...)` ajoute une
@@ -103,7 +122,8 @@ avec une version texte brut. 5 tentatives à attente exponentielle (1, 2, 4, 8 m
 (7 jours pour les réussies, 30 jours pour les échecs).
 
 - En local, les e-mails arrivent dans **Mailpit** : http://localhost:8025 (`pnpm services:up`).
-- `MAIL_WORKER=on|off` : démarre ou non le worker dans le processus (`off` par défaut en test).
+- `MAIL_WORKER=on|off` : démarre ou non les workers dans le processus (e-mails et rappels de rendez-vous ; `off` par
+  défaut en test).
 - Données attendues par chaque gabarit : `src/modules/mail/templates/README.md`.
 
 ```bash

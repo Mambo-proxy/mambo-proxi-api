@@ -20,6 +20,12 @@
  * Contenus du back-office (services, rubriques, zones, pages) : mêmes relations par clé (`service.category` par
  * `categoryId`, `category.services`, `zone.quarters`…), y compris pour les tris sur une relation ; une ligne créée
  * par l'API est ainsi lue telle quelle par les lectures publiques.
+ *
+ * Comme PostgreSQL : une colonne sélectionnée mais jamais renseignée vaut `null` ; `$transaction(fn)` annule les
+ * écritures de `fn` si elle échoue (copie des tables avant, restaurée en cas d'erreur — pas de transactions
+ * simultanées) ; l'index unique partiel des rendez-vous (`appointments_active_slot_key` : même `startsAt` pour deux
+ * rendez-vous à confirmer ou confirmés) et l'unicité de leur référence lèvent l'erreur P2002 de Prisma (forme de
+ * l'adaptateur `pg`) ; `$executeRaw` (verrou consultatif) ne fait rien.
  */
 import { vi } from 'vitest';
 import { Prisma } from '../../src/generated/prisma/client.js';
@@ -99,6 +105,8 @@ export interface PrismaTables {
   invitation?: Row[];
   auditLog?: Row[];
   appointment?: Row[];
+  availabilityRule?: Row[];
+  availabilityException?: Row[];
   requestNote?: Row[];
   // Tables des demandes du back-office (facultatives : vides par défaut).
   survey?: Row[];
@@ -152,6 +160,8 @@ const LINKS: Partial<Record<TableName, Record<string, Link>>> = {
   appointment: {
     contact: { table: 'contact', from: 'contactId', to: 'id' },
     assignedTo: toUser('assignedToId'),
+    createdBy: toUser('createdById'),
+    request: { table: 'request', from: 'requestId', to: 'id' },
   },
   // Contenus créés par le back-office (les enregistrements des lectures publiques portent leurs relations).
   category: {
@@ -383,8 +393,12 @@ function project(record: Row, selection: Row | undefined, graph?: Graph, table?:
       result[key] = countRelations(graph, table, record, args);
       continue;
     }
-    // Champ simple ou JSON sélectionné (`cities: true`, `translations: true`) : valeur telle quelle, déjà copiée.
-    if (!isRelation(table, key)) continue;
+    // Champ simple ou JSON sélectionné (`cities: true`, `translations: true`) : valeur telle quelle, déjà copiée ;
+    // colonne jamais renseignée : `null`, comme la base.
+    if (!isRelation(table, key)) {
+      if (!(key in result)) result[key] = null;
+      continue;
+    }
     const value = related(graph, table, record, key);
     const nestedTable = linkOf(table, key)?.table;
     if (Array.isArray(value)) {
@@ -408,6 +422,67 @@ function findRows(rows: readonly Row[], args: Args = {}, graph?: Graph, table?: 
 }
 
 let idSequence = 0;
+
+/** Contraintes d'unicité reproduites (nom de l'index, colonnes, condition de l'index partiel). */
+interface UniqueIndex {
+  name: string;
+  fields: string[];
+  where?: (row: Row) => boolean;
+}
+
+const ACTIVE_APPOINTMENT = new Set(['A_CONFIRMER', 'CONFIRME']);
+
+const UNIQUE_INDEXES: Partial<Record<TableName, UniqueIndex[]>> = {
+  appointment: [
+    { name: 'appointments_reference_key', fields: ['reference'] },
+    {
+      name: 'appointments_active_slot_key',
+      fields: ['startsAt'],
+      where: (row) => ACTIVE_APPOINTMENT.has(String(row['status'])),
+    },
+  ],
+};
+
+/** Erreur P2002 de Prisma avec l'adaptateur `pg` (message et `meta.driverAdapterError.cause.constraint`). */
+function uniqueViolation(name: TableName, index: UniqueIndex): Error {
+  return new Prisma.PrismaClientKnownRequestError(
+    `Unique constraint failed on the constraint: \`${index.name}\``,
+    {
+      code: 'P2002',
+      clientVersion: Prisma.prismaVersion.client,
+      meta: {
+        modelName: name.charAt(0).toUpperCase() + name.slice(1),
+        driverAdapterError: {
+          name: 'DriverAdapterError',
+          cause: { kind: 'UniqueConstraintViolation', constraint: { index: index.name } },
+        },
+      },
+    },
+  );
+}
+
+/** Vérifie qu'un enregistrement (créé ou modifié) respecte les index uniques de sa table. */
+function checkUnique(name: TableName, rows: readonly Row[], candidate: Row, self?: Row): void {
+  for (const index of UNIQUE_INDEXES[name] ?? []) {
+    if (index.where && !index.where(candidate)) continue;
+    const values = index.fields.map((field) => comparable(candidate[field]));
+    if (values.some((value) => value === null || value === undefined)) continue;
+    const clash = rows.some(
+      (row) =>
+        row !== self &&
+        (!index.where || index.where(row)) &&
+        index.fields.every((field, position) => comparable(row[field]) === values[position]),
+    );
+    if (clash) throw uniqueViolation(name, index);
+  }
+}
+
+/** Valeurs d'un enregistrement après une écriture, sans le modifier. */
+function preview(record: Row, data: Row): Row {
+  const next = { ...record };
+  applyData(next, data);
+  return next;
+}
 
 /** Applique les valeurs d'une écriture (`{ increment }`, `{ set }` ou valeur simple) à un enregistrement. */
 function applyData(record: Row, data: Row): void {
@@ -434,10 +509,12 @@ function delegate(name: TableName, rows: () => Row[], graph: Graph) {
     const now = new Date();
     const record: Row = { id: `${name}_${String(idSequence)}`, createdAt: now, updatedAt: now };
     applyData(record, data);
+    checkUnique(name, rows(), record);
     rows().push(record);
     return record;
   };
   const update = (record: Row, data: Row): Row => {
+    checkUnique(name, rows(), preview(record, data), record);
     applyData(record, data);
     if (!('updatedAt' in data)) record['updatedAt'] = new Date();
     return record;
@@ -450,7 +527,13 @@ function delegate(name: TableName, rows: () => Row[], graph: Graph) {
     findFirst: vi.fn((args?: Args) => Promise.resolve(findRows(rows(), args, graph, name)[0] ?? null)),
     findUnique: vi.fn((args?: Args) => Promise.resolve(findRows(rows(), args, graph, name)[0] ?? null)),
     count: vi.fn((args?: Args) => Promise.resolve(matching(args?.where).length)),
-    create: vi.fn((args: WriteArgs) => Promise.resolve(output(insert(args.data as Row), args))),
+    create: vi.fn((args: WriteArgs) => {
+      try {
+        return Promise.resolve(output(insert(args.data as Row), args));
+      } catch (error) {
+        return Promise.reject(error instanceof Error ? error : new Error(String(error)));
+      }
+    }),
     createMany: vi.fn((args: WriteArgs) => {
       const data = Array.isArray(args.data) ? args.data : [args.data as Row];
       data.forEach((item) => insert(item));
@@ -460,11 +543,19 @@ function delegate(name: TableName, rows: () => Row[], graph: Graph) {
       const record = matching(args.where)[0];
       if (!record)
         return Promise.reject(new Error(`Double Prisma : ${name} introuvable pour la mise à jour.`));
-      return Promise.resolve(output(update(record, args.data as Row), args));
+      try {
+        return Promise.resolve(output(update(record, args.data as Row), args));
+      } catch (error) {
+        return Promise.reject(error instanceof Error ? error : new Error(String(error)));
+      }
     }),
     updateMany: vi.fn((args: WriteArgs) => {
       const found = matching(args.where);
-      found.forEach((record) => update(record, args.data as Row));
+      try {
+        found.forEach((record) => update(record, args.data as Row));
+      } catch (error) {
+        return Promise.reject(error instanceof Error ? error : new Error(String(error)));
+      }
       return Promise.resolve({ count: found.length });
     }),
     delete: vi.fn((args: WriteArgs) => {
@@ -532,6 +623,8 @@ const OPTIONAL_TABLES = [
   'invitation',
   'auditLog',
   'appointment',
+  'availabilityRule',
+  'availabilityException',
   'requestNote',
   'survey',
   'attachment',
@@ -568,14 +661,32 @@ export function createPrismaDouble(tables: PrismaTables) {
   const delegates = Object.fromEntries(
     DELEGATED_TABLES.map((name) => [name, delegate(name, table(name), graph)]),
   ) as Record<(typeof DELEGATED_TABLES)[number], ReturnType<typeof delegate>>;
+  /** Copie des tables (lignes comprises) avant une transaction, restaurée si elle échoue. */
+  const snapshot = (): Record<string, Row[]> =>
+    Object.fromEntries(
+      Object.entries(tables).map(([key, rows]) => [key, (rows as Row[]).map((row) => ({ ...row }))]),
+    );
+  const restore = (copy: Record<string, Row[]>): void => {
+    for (const [key, rows] of Object.entries(copy)) {
+      const current = (tables as unknown as Record<string, Row[]>)[key];
+      if (current) current.splice(0, current.length, ...rows);
+      else (tables as unknown as Record<string, Row[]>)[key] = rows;
+    }
+  };
   const double = {
     ...delegates,
     $queryRaw: vi.fn().mockResolvedValue([{ '?column?': 1 }]),
+    $executeRaw: vi.fn().mockResolvedValue(1),
     $disconnect: vi.fn().mockResolvedValue(undefined),
-    $transaction: vi.fn((operation: unknown): Promise<unknown> => {
-      if (typeof operation === 'function')
-        return Promise.resolve((operation as (tx: unknown) => unknown)(double));
-      return Promise.all(operation as Promise<unknown>[]);
+    $transaction: vi.fn(async (operation: unknown): Promise<unknown> => {
+      if (typeof operation !== 'function') return Promise.all(operation as Promise<unknown>[]);
+      const copy = snapshot();
+      try {
+        return await (operation as (tx: unknown) => unknown)(double);
+      } catch (error) {
+        restore(copy);
+        throw error;
+      }
     }),
   };
   return double;

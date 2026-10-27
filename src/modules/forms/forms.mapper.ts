@@ -21,7 +21,8 @@ export interface QuoteFieldDefinition {
 export type NeedValue = string | number | string[] | null;
 
 /** Message de confirmation (`SubmissionAccepted.message`), dans la langue de l'envoi. */
-export type SubmissionKind = 'quote' | 'contact' | 'registration' | 'training' | 'partner' | 'event';
+export type SubmissionKind =
+  'quote' | 'contact' | 'registration' | 'training' | 'partner' | 'event' | 'appointment';
 
 const ACCEPTED_MESSAGES: Record<SubmissionKind, Record<Lang, string>> = {
   quote: {
@@ -47,6 +48,10 @@ const ACCEPTED_MESSAGES: Record<SubmissionKind, Record<Lang, string>> = {
   event: {
     fr: 'Merci, votre inscription est bien enregistrée ! Vous recevrez un e-mail de confirmation dans quelques instants.',
     en: 'Thank you, your registration is confirmed! You will receive a confirmation email in a few moments.',
+  },
+  appointment: {
+    fr: 'Votre demande de rendez-vous est enregistrée. Nous la confirmons par e-mail très rapidement.',
+    en: 'Your appointment request has been recorded. We will confirm it by e-mail very shortly.',
   },
 };
 

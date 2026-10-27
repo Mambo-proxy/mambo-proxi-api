@@ -12,6 +12,7 @@ export const DEFAULT_QUEUE_PREFIX = 'mambo';
 /** Noms des files d'attente. */
 export const QUEUE_NAMES = {
   mail: 'mail',
+  appointmentReminders: 'appointment-reminders',
 } as const;
 
 const MINUTE_MS = 60_000;
@@ -32,3 +33,14 @@ export const MAIL_JOB_OPTIONS = {
 
 /** Nombre d'e-mails envoyés en parallèle par un worker. */
 export const MAIL_WORKER_CONCURRENCY = 4;
+
+/**
+ * Options des rappels de rendez-vous (tâches différées jusqu'à la veille du rendez-vous) : 3 tentatives (la tâche ne
+ * fait que relire la base et mettre l'e-mail en file), purge comme les e-mails.
+ */
+export const REMINDER_JOB_OPTIONS = {
+  attempts: 3,
+  backoff: { type: 'exponential', delay: MINUTE_MS },
+  removeOnComplete: { age: 7 * DAY_S, count: 1_000 },
+  removeOnFail: { age: 30 * DAY_S, count: 5_000 },
+} as const satisfies DefaultJobOptions;

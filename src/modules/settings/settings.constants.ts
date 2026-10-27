@@ -14,7 +14,9 @@
  * - `navigation` : `{ main, signUp, footer, legal, megaMenuPromo }` (formes du schéma `Navigation`) ;
  * - `zones` : `{ showFees, note }` ;
  * - `emails` : `{ teamRecipients, senderName, replyTo, surveyDelayHours, surveyReminderDays, appointmentReminderHour }`
- *   (`SettingsEmails`, destinataires des alertes « nouvelle demande »).
+ *   (`SettingsEmails`, destinataires des alertes « nouvelle demande ») ;
+ * - `availability` : `{ minNoticeHours, maxAdvanceDays, agencyAddress, defaultVideoLink }` (prise de rendez-vous ;
+ *   plages et fermetures dans `availability_rules` et `availability_exceptions`).
  */
 export const SETTING_KEYS = {
   site: 'site',
@@ -29,6 +31,7 @@ export const SETTING_KEYS = {
   navigation: 'navigation',
   zones: 'zones',
   emails: 'emails',
+  availability: 'availability',
 } as const;
 
 export type SettingKey = (typeof SETTING_KEYS)[keyof typeof SETTING_KEYS];
