@@ -1,6 +1,7 @@
-import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
+import { Controller, Get, Inject, Param, Query, Res } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { PublicCache } from '../../common/http-cache/http-cache.js';
+import type { Response } from 'express';
+import { PREVIEW_CACHE_CONTROL, PublicCache } from '../../common/http-cache/http-cache.js';
 import { ZodValidationPipe } from '../../common/validation/zod-validation.pipe.js';
 import {
   catalogDetailQuerySchema,
@@ -28,14 +29,18 @@ export class ServicesController {
     return this.catalog.listServices(query);
   }
 
-  /** `GET /v1/services/{slug}` : fiche service. */
+  /** `GET /v1/services/{slug}` : fiche service (brouillon compris avec un jeton d'aperçu, jamais mis en cache). */
   @Get(':slug')
   @ApiOperation({ operationId: 'getService', summary: 'Fiche service' })
   @PublicCache()
   getService(
     @Param('slug') slug: string,
     @Query(new ZodValidationPipe(catalogDetailQuerySchema)) query: CatalogDetailQuery,
+    @Res({ passthrough: true }) response: Response,
   ): Promise<ServiceDetail> {
-    return this.catalog.getService(slug, query);
+    const now = new Date();
+    if (this.catalog.previewServiceId(query.preview, now) !== undefined)
+      response.setHeader('Cache-Control', PREVIEW_CACHE_CONTROL);
+    return this.catalog.getService(slug, query, now);
   }
 }

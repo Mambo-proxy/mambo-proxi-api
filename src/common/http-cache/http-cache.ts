@@ -12,6 +12,9 @@ import { applyDecorators, Header } from '@nestjs/common';
  */
 export const PUBLIC_CACHE_CONTROL = 'public, no-cache';
 
+/** Aperçu d'un brouillon (jeton `?preview=` du back-office) : jamais conservé par un cache. */
+export const PREVIEW_CACHE_CONTROL = 'private, no-store';
+
 /** Réglage Express du calcul de l'`ETag` des réponses (`W/"<longueur>-<empreinte>"`). */
 export const ETAG_MODE = 'weak';
 

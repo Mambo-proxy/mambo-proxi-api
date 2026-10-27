@@ -48,6 +48,21 @@ export class MediaService {
     return new Map(media.map((item) => [item.id, item]));
   }
 
+  /**
+   * Identifiants qui ne désignent aucun média utilisable de la médiathèque (absent, ou traitement échoué) : les
+   * contenus du back-office ne font que référencer des médias déjà envoyés (une seule requête).
+   */
+  async unknownIds(ids: Iterable<string>): Promise<Set<string>> {
+    const unique = [...new Set(ids)];
+    if (unique.length === 0) return new Set();
+    const found = await this.prisma.media.findMany({
+      where: { id: { in: unique }, status: { not: 'FAILED' } },
+      select: { id: true },
+    });
+    const known = new Set(found.map((item) => item.id));
+    return new Set(unique.filter((id) => !known.has(id)));
+  }
+
   /** Résout les références `{ illustration, imageId, alt }` de plusieurs JSON avec une seule requête. */
   async resolveVisuals<T extends readonly unknown[]>(...values: T): Promise<T> {
     const ids = new Set<string>();

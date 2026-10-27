@@ -78,6 +78,23 @@ après 60 s), sauf sur un appareil de confiance (cookie `mp_td`, 30 jours, param
   `=`, `+`, `-`, `@`, sauf nombres et téléphones), inscrits au journal d'activité.
 - Recherche et quartier sans accents ni casse (colonnes `search_text`, `city_key` : `docs/MODELE_DE_DONNEES.md`).
 
+## Back-office : contenus
+
+- `/v1/admin/services*` et `/v1/admin/categories*` : services et rubriques de tous statuts, création (slug et SEO
+  pré-remplis), sauvegarde automatique (`If-Match` → 412 si la version a changé), publication et dépublication,
+  duplication, ordre d'affichage, complétude, jeton d'aperçu (30 min). Un changement d'adresse d'un contenu publié
+  crée une redirection 301 (`/v1/site/redirects`).
+- `/v1/admin/pages*` : brouillon enregistré à côté de la version en ligne, publication, abandon, jeton d'aperçu
+  (`/v1/pages/{key}?preview=`). Le HTML des pages légales est assaini côté serveur (`src/common/html/rich-text.ts`).
+- `/v1/admin/zones*` : zones, quartiers (un quartier n'appartient qu'à une zone), contours GeoJSON contrôlés dans
+  l'emprise du Cameroun, délais et tarifs indicatifs.
+- `/v1/admin/settings/{group}`, `/v1/admin/system-status`, `/v1/admin/email-templates*` (aperçu rendu par les
+  gabarits React Email, envoi de test).
+- Le MANAGER lit les contenus sans pouvoir les modifier ; l'EDITOR et le WRITER les éditent ; `analytics` et
+  `securite` sont réservés aux administrateurs. Chaque modification visible sur le site inscrit une demande de
+  revalidation (`revalidation_requests`) ; les lectures publiques, relues à chaque requête (`ETag`), sont à jour
+  aussitôt.
+
 ## E-mails
 
 Les e-mails partent en arrière-plan par la file BullMQ `mail` (Redis) : `MailQueueService.enqueue(...)` ajoute une

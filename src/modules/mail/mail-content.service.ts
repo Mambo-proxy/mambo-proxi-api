@@ -6,10 +6,10 @@ import { PrismaService } from '../../prisma/prisma.service.js';
 import { DEFAULT_CONTENTS, type MailContent } from './default-contents.js';
 import { formatPhone } from './mail-format.js';
 import type { MailContext } from './mail-view.js';
-import { SECURITY_TEMPLATES, type MailLang, type MailTemplateKey } from './mail.types.js';
+import { ESSENTIAL_TEMPLATES, type MailLang, type MailTemplateKey } from './mail.types.js';
 
 export interface ResolvedTemplate {
-  /** `false` : modèle désactivé dans le back-office (jamais pour les e-mails de sécurité). */
+  /** `false` : modèle désactivé dans le back-office (jamais pour les modèles indispensables). */
   enabled: boolean;
   content: MailContent;
   source: 'database' | 'default';
@@ -70,7 +70,7 @@ export class MailContentService {
         : translationFor(row.translations, lang) === undefined
           ? DEFAULT_CONTENTS[lang][key]
           : localizeFields(french, row.translations, lang, TRANSLATABLE_FIELDS);
-    return { enabled: row.enabled || SECURITY_TEMPLATES.has(key), content, source: 'database' };
+    return { enabled: row.enabled || ESSENTIAL_TEMPLATES.has(key), content, source: 'database' };
   }
 
   async getSettings(lang: MailLang): Promise<MailSettings> {

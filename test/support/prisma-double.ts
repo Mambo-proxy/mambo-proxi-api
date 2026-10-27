@@ -16,8 +16,13 @@
  * `contact.requests` par `request.contactId`…), pour les sélections, les filtres (`some`, `none`, `every`, `is`,
  * `isNot`, filtre direct) et `_count`. Opérateurs de texte : `contains`, `startsWith`, `endsWith` (avec
  * `mode: 'insensitive'`) ; pagination : `skip`.
+ *
+ * Contenus du back-office (services, rubriques, zones, pages) : mêmes relations par clé (`service.category` par
+ * `categoryId`, `category.services`, `zone.quarters`…), y compris pour les tris sur une relation ; une ligne créée
+ * par l'API est ainsi lue telle quelle par les lectures publiques.
  */
 import { vi } from 'vitest';
+import { Prisma } from '../../src/generated/prisma/client.js';
 
 type Row = Record<string, unknown>;
 type Args = { where?: Row; orderBy?: unknown; take?: number; skip?: number; select?: Row; include?: Row };
@@ -99,6 +104,16 @@ export interface PrismaTables {
   survey?: Row[];
   attachment?: Row[];
   jobApplication?: Row[];
+  // Tables des contenus du back-office (facultatives : vides par défaut).
+  serviceGalleryImage?: Row[];
+  serviceRelation?: Row[];
+  serviceFeaturedReview?: Row[];
+  serviceOffer?: Row[];
+  categoryOfferSection?: Row[];
+  zoneQuarter?: Row[];
+  emailTemplate?: Row[];
+  revalidationRequest?: Row[];
+  backupRun?: Row[];
 }
 
 type TableName = keyof PrismaTables;
@@ -138,6 +153,35 @@ const LINKS: Partial<Record<TableName, Record<string, Link>>> = {
     contact: { table: 'contact', from: 'contactId', to: 'id' },
     assignedTo: toUser('assignedToId'),
   },
+  // Contenus créés par le back-office (les enregistrements des lectures publiques portent leurs relations).
+  category: {
+    services: { table: 'service', from: 'id', to: 'categoryId', many: true },
+    image: { table: 'media', from: 'imageId', to: 'id' },
+    testimonial: { table: 'review', from: 'testimonialId', to: 'id' },
+    offerSections: { table: 'categoryOfferSection', from: 'id', to: 'categoryId', many: true },
+  },
+  categoryOfferSection: {
+    offers: { table: 'serviceOffer', from: 'id', to: 'sectionId', many: true },
+  },
+  service: {
+    category: { table: 'category', from: 'categoryId', to: 'id' },
+    coverImage: { table: 'media', from: 'coverImageId', to: 'id' },
+    gallery: { table: 'serviceGalleryImage', from: 'id', to: 'serviceId', many: true },
+    offers: { table: 'serviceOffer', from: 'id', to: 'serviceId', many: true },
+    related: { table: 'serviceRelation', from: 'id', to: 'serviceId', many: true },
+    featuredReviews: { table: 'serviceFeaturedReview', from: 'id', to: 'serviceId', many: true },
+    requests: { table: 'request', from: 'id', to: 'serviceId', many: true },
+  },
+  serviceGalleryImage: { media: { table: 'media', from: 'mediaId', to: 'id' } },
+  serviceRelation: { relatedService: { table: 'service', from: 'relatedServiceId', to: 'id' } },
+  serviceFeaturedReview: { review: { table: 'review', from: 'reviewId', to: 'id' } },
+  serviceOffer: {
+    image: { table: 'media', from: 'imageId', to: 'id' },
+    targetService: { table: 'service', from: 'targetServiceId', to: 'id' },
+  },
+  review: { service: { table: 'service', from: 'serviceId', to: 'id' } },
+  zone: { quarters: { table: 'zoneQuarter', from: 'id', to: 'zoneId', many: true } },
+  page: { updatedBy: toUser('updatedById'), publishedBy: toUser('publishedById') },
 };
 
 /** Accès aux tables du double (relations retrouvées par clé). */
@@ -280,22 +324,28 @@ function compareValues(a: unknown, b: unknown): number {
   return (left as number | string) < (right as number | string) ? -1 : 1;
 }
 
-function compareBy(a: Row, b: Row, order: Row): number {
+function compareBy(a: Row, b: Row, order: Row, graph?: Graph, table?: TableName): number {
   for (const [key, direction] of Object.entries(order)) {
     const result = isObject(direction)
-      ? compareBy((a[key] ?? {}) as Row, (b[key] ?? {}) as Row, direction)
+      ? compareBy(
+          (related(graph, table, a, key) ?? {}) as Row,
+          (related(graph, table, b, key) ?? {}) as Row,
+          direction,
+          graph,
+          linkOf(table, key)?.table,
+        )
       : compareValues(a[key], b[key]) * (direction === 'desc' ? -1 : 1);
     if (result !== 0) return result;
   }
   return 0;
 }
 
-function sortRows(rows: Row[], orderBy: unknown): Row[] {
+function sortRows(rows: Row[], orderBy: unknown, graph?: Graph, table?: TableName): Row[] {
   if (orderBy === undefined) return rows;
   const orders = (Array.isArray(orderBy) ? orderBy : [orderBy]) as Row[];
   return [...rows].sort((a, b) => {
     for (const order of orders) {
-      const result = compareBy(a, b, order);
+      const result = compareBy(a, b, order, graph, table);
       if (result !== 0) return result;
     }
     return 0;
@@ -351,7 +401,7 @@ function project(record: Row, selection: Row | undefined, graph?: Graph, table?:
 
 function findRows(rows: readonly Row[], args: Args = {}, graph?: Graph, table?: TableName): Row[] {
   const filtered = rows.filter((row) => matchesWhere(row, args.where, graph, table));
-  const sorted = sortRows(filtered, args.orderBy);
+  const sorted = sortRows(filtered, args.orderBy, graph, table);
   const start = args.skip ?? 0;
   const limited = sorted.slice(start, args.take === undefined ? undefined : start + args.take);
   return limited.map((row) => project(row, args.select ?? args.include, graph, table));
@@ -363,6 +413,11 @@ let idSequence = 0;
 function applyData(record: Row, data: Row): void {
   for (const [key, value] of Object.entries(data)) {
     if (value === undefined) continue;
+    // `Prisma.DbNull` / `Prisma.JsonNull` : colonne JSON remise à `null`.
+    if (value === Prisma.DbNull || value === Prisma.JsonNull) {
+      record[key] = null;
+      continue;
+    }
     if (isObject(value) && Object.keys(value).length === 1 && 'increment' in value) {
       record[key] = ((record[key] as number | null | undefined) ?? 0) + (value['increment'] as number);
     } else if (isObject(value) && Object.keys(value).length === 1 && 'set' in value) {
@@ -481,6 +536,15 @@ const OPTIONAL_TABLES = [
   'survey',
   'attachment',
   'jobApplication',
+  'serviceGalleryImage',
+  'serviceRelation',
+  'serviceFeaturedReview',
+  'serviceOffer',
+  'categoryOfferSection',
+  'zoneQuarter',
+  'emailTemplate',
+  'revalidationRequest',
+  'backupRun',
 ] as const;
 
 const DELEGATED_TABLES = [

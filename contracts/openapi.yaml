@@ -1785,13 +1785,20 @@ paths:
                     additionalProperties: { type: integer }
               examples:
                 default: { $ref: '#/components/examples/AdminServices' }
+        '400': { $ref: '#/components/responses/InvalidQuery' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
     post:
       tags: [Admin — Services]
       operationId: adminCreateService
       x-permissions: [content:write]
       summary: Créer un service (brouillon)
-      description: Seuls le nom, la rubrique et l'accroche sont nécessaires ; le slug et le SEO sont pré-remplis.
+      description: |
+        Seuls le nom, la rubrique et l'accroche sont nécessaires ; le slug et le SEO sont pré-remplis : slug tiré du
+        nom (`-2`, `-3`… s'il est déjà pris), titre Google « Nom | MAMBO Proxi », description Google reprise de la
+        description courte ou de l'accroche. Un `slug` envoyé et déjà utilisé par un autre service → `409`. Le
+        service est créé en brouillon, à la fin de sa rubrique. Rubrique, images (médias existants de la
+        médiathèque), services liés, avis mis en avant (avis publiés) inconnus → `422` avec le chemin du champ.
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
         required: true
@@ -1805,6 +1812,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminService' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '409': { $ref: '#/components/responses/Conflict' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
@@ -1814,6 +1822,9 @@ paths:
       operationId: adminReorderServices
       x-permissions: [content:write]
       summary: Ordre d'affichage dans une rubrique
+      description: |
+        `ids` : services d'une même rubrique dans l'ordre voulu (`scope` : slug de cette rubrique, facultatif) ; les
+        services non listés gardent leur rang. Identifiant inconnu, en double ou d'une autre rubrique → `422`.
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
         required: true
@@ -1823,6 +1834,7 @@ paths:
       responses:
         '204': { $ref: '#/components/responses/NoContent' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
   /v1/admin/services/{id}:
@@ -1840,13 +1852,21 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminService' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
     patch:
       tags: [Admin — Services]
       operationId: adminUpdateService
       x-permissions: [content:write]
       summary: Enregistrer (sauvegarde automatique ou manuelle)
-      description: Mise à jour partielle. Si le service est publié, les modifications sont en ligne immédiatement (revalidation). En-tête `If-Match` facultatif pour éviter d'écraser une version plus récente.
+      description: |
+        Mise à jour partielle. Si le service est publié, les modifications sont en ligne immédiatement (revalidation)
+        et l'accroche ne peut pas être vidée (`422`). En-tête `If-Match` facultatif pour éviter d'écraser une version
+        plus récente (valeur `version` de la dernière réponse ; différente → `412`). Les listes envoyées
+        (`galleryImageIds`, `relatedServiceIds`, `featuredReviewIds`, `offers`) remplacent les listes enregistrées ;
+        une offre renvoyée avec son `id` le garde. Changement de rubrique : le service passe à la fin de la nouvelle
+        rubrique. Slug déjà utilisé → `409`. Service publié dont l'adresse change (slug ou rubrique) : redirection
+        301 de l'ancienne adresse (`GET /v1/site/redirects`).
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters:
         - $ref: '#/components/parameters/IdPath'
@@ -1865,6 +1885,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminService' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
         '412':
@@ -1883,6 +1904,7 @@ paths:
       responses:
         '204': { $ref: '#/components/responses/NoContent' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409':
           description: Service publié — le dépublier d'abord.
@@ -1906,6 +1928,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminService' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
@@ -1915,6 +1938,7 @@ paths:
       operationId: adminUnpublishService
       x-permissions: [content:write]
       summary: Dépublier (repasse en brouillon)
+      description: Le service disparaît du site, de sa rubrique, du menu, du formulaire de devis et du plan du site.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       responses:
@@ -1924,6 +1948,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminService' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   /v1/admin/services/{id}/duplicate:
@@ -1932,6 +1957,9 @@ paths:
       operationId: adminDuplicateService
       x-permissions: [content:write]
       summary: Dupliquer (copie en brouillon)
+      description: |
+        Copie en brouillon : « (copie) » ajouté au nom, slug `<slug>-copie` (`-2`… si besoin), hors menu et hors
+        accueil, à la fin de la rubrique ; galerie, services liés, avis mis en avant et offres recopiés.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       responses:
@@ -1941,6 +1969,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminService' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   /v1/admin/services/{id}/preview-token:
@@ -1949,6 +1978,10 @@ paths:
       operationId: adminGetServicePreviewToken
       x-permissions: [content:read]
       summary: Jeton de prévisualisation de la page complète (30 min)
+      description: |
+        Jeton signé valable 30 minutes, quel que soit le statut du service ; `url` = adresse de la fiche sur le site
+        avec `?preview=<jeton>`. `GET /v1/services/{slug}?preview=<jeton>` renvoie alors la fiche (en-tête
+        `Cache-Control: private, no-store`).
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       responses:
@@ -1958,6 +1991,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/PreviewToken' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   /v1/admin/services/{id}/completeness:
@@ -1966,6 +2000,10 @@ paths:
       operationId: adminGetServiceCompleteness
       x-permissions: [content:read]
       summary: Indicateur de complétude (7 critères)
+      description: |
+        Critères : informations générales (nom, rubrique, accroche, description courte), au moins un public, une
+        étape, un avantage, une question avec sa réponse, un service lié, photo principale d'au moins 1 600 px de
+        large ; `percent` = critères remplis / 7, arrondi.
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       responses:
@@ -1975,6 +2013,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Completeness' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   /v1/admin/categories:
@@ -1991,11 +2030,16 @@ paths:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/AdminCategory' } }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
     post:
       tags: [Admin — Services]
       operationId: adminCreateCategory
       x-permissions: [content:write]
       summary: Créer une rubrique
+      description: |
+        Rubrique créée en brouillon (sauf `status` envoyé), à la fin de la liste ; slug tiré du nom (`-2`… s'il est
+        déjà pris), `heroTitle` et `heroLead` repris du nom et de la description s'ils sont absents. `slug` envoyé
+        déjà utilisé → `409`.
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
         required: true
@@ -2009,6 +2053,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminCategory' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '409': { $ref: '#/components/responses/Conflict' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
@@ -2027,6 +2072,8 @@ paths:
       responses:
         '204': { $ref: '#/components/responses/NoContent' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
 
   /v1/admin/categories/{id}:
     get:
@@ -2043,12 +2090,17 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminCategory' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
     patch:
       tags: [Admin — Services]
       operationId: adminUpdateCategory
       x-permissions: [content:write]
       summary: Modifier une rubrique
+      description: |
+        Mise à jour partielle (statut compris : publier, dépublier, archiver). `offerSections` remplace les carrousels
+        d'offres. Slug déjà utilisé → `409`. Rubrique publiée dont le slug change : redirections 301 de la page
+        rubrique et de ses fiches publiées.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       requestBody:
@@ -2063,7 +2115,9 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminCategory' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
         '422': { $ref: '#/components/responses/ValidationError' }
     delete:
       tags: [Admin — Services]
@@ -2075,6 +2129,8 @@ paths:
       responses:
         '204': { $ref: '#/components/responses/NoContent' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
         '409':
           description: La rubrique contient encore des services.
           content:
@@ -2096,6 +2152,7 @@ paths:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/AdminPageSummary' } }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
 
   /v1/admin/pages/{key}:
     get:
@@ -2112,12 +2169,19 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminPage' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
     put:
       tags: [Admin — Pages]
       operationId: adminSavePageDraft
       x-permissions: [content:write]
       summary: Enregistrer le brouillon (sauvegarde automatique)
+      description: |
+        Enregistre le brouillon sans modifier la version en ligne. Une section d'un type absent de
+        `allowedSectionTypes` n'est acceptée que si elle existe déjà dans la page (même `id` et même `type`, ex.
+        sections automatiques `dynamic`, dont la `source` ne peut pas changer) ; identifiants de sections uniques ;
+        images référencées connues de la médiathèque. Le HTML des articles (`richText`) est assaini côté serveur
+        (liste blanche du schéma `Html`). Sinon `422` avec le chemin du champ (`sections.3.items.0.title`).
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/PageKeyPath' }]
       requestBody:
@@ -2132,6 +2196,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminPage' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
@@ -2141,6 +2206,7 @@ paths:
       operationId: adminPublishPage
       x-permissions: [content:write]
       summary: Publier les modifications
+      description: Le brouillon (sections et SEO) devient la version en ligne. Sans brouillon, la page est renvoyée telle quelle.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/PageKeyPath' }]
       responses:
@@ -2150,6 +2216,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminPage' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   /v1/admin/pages/{key}/discard:
@@ -2158,6 +2225,7 @@ paths:
       operationId: adminDiscardPageDraft
       x-permissions: [content:write]
       summary: Abandonner le brouillon
+      description: La version publiée est rétablie dans l'éditeur ; le site n'est pas modifié.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/PageKeyPath' }]
       responses:
@@ -2167,6 +2235,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminPage' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
 
   /v1/admin/pages/{key}/preview-token:
     get:
@@ -2174,6 +2244,9 @@ paths:
       operationId: adminGetPagePreviewToken
       x-permissions: [content:read]
       summary: Jeton d'aperçu du brouillon
+      description: |
+        Jeton signé valable 30 minutes ; `GET /v1/pages/{key}?preview=<jeton>` renvoie alors le brouillon
+        (`isPreview: true`, en-tête `Cache-Control: private, no-store`), même pour une page jamais publiée.
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/PageKeyPath' }]
       responses:
@@ -2183,6 +2256,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/PreviewToken' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
 
   # ──────────────────────────── Admin — Avis ──────────────────────
   /v1/admin/reviews:
@@ -3251,11 +3326,13 @@ paths:
               examples:
                 default: { $ref: '#/components/examples/AdminZones' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
     post:
       tags: [Admin — Zones]
       operationId: adminCreateZone
       x-permissions: [content:write]
       summary: Créer une zone
+      description: Clé (`key`) tirée du nom, unique (`-2`… si besoin). Mêmes règles que la modification pour les quartiers et le contour.
       security: [{ cookieAuth: [], csrfToken: [] }]
       requestBody:
         required: true
@@ -3269,6 +3346,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminZone' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
   /v1/admin/zones/reorder:
@@ -3286,6 +3364,8 @@ paths:
       responses:
         '204': { $ref: '#/components/responses/NoContent' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '422': { $ref: '#/components/responses/ValidationError' }
 
   /v1/admin/zones/{id}:
     patch:
@@ -3312,6 +3392,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminZone' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '422': { $ref: '#/components/responses/ValidationError' }
     delete:
@@ -3325,6 +3406,7 @@ paths:
       responses:
         '204': { $ref: '#/components/responses/NoContent' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
 
@@ -3869,6 +3951,7 @@ paths:
               schema: { $ref: '#/components/schemas/SettingsGroupValue' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
     put:
       tags: [Admin — Paramètres]
       operationId: adminSaveSettings
@@ -3891,6 +3974,7 @@ paths:
               schema: { $ref: '#/components/schemas/SettingsGroupValue' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
   /v1/admin/system-status:
@@ -3907,6 +3991,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/SystemStatus' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
 
   /v1/admin/email-templates:
     get:
@@ -3922,6 +4007,7 @@ paths:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/EmailTemplate' } }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
 
   /v1/admin/email-templates/{key}:
     get:
@@ -3938,12 +4024,17 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/EmailTemplate' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
     put:
       tags: [Admin — Paramètres]
       operationId: adminSaveEmailTemplate
       x-permissions: [settings:write]
       summary: Modifier un modèle (objet, titre, paragraphes, bouton, activation)
+      description: |
+        Seules les variables du modèle (`variables`) sont acceptées dans les textes, sinon `422`
+        (`unknown_variable`) ; paragraphes vides retirés. Désactiver un modèle dont `canDisable` vaut `false` →
+        `422`.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/EmailTemplateKeyPath' }]
       requestBody:
@@ -3958,6 +4049,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/EmailTemplate' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
   /v1/admin/email-templates/{key}/preview:
@@ -3966,6 +4059,9 @@ paths:
       operationId: adminPreviewEmailTemplate
       x-permissions: [settings:read]
       summary: Aperçu avec des données d'exemple (contenu non enregistré possible)
+      description: |
+        Rendu du gabarit (HTML React Email et texte brut) avec les données d'exemple du modèle et les coordonnées des
+        paramètres ; les champs envoyés remplacent ceux du modèle enregistré, sans l'enregistrer.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/EmailTemplateKeyPath' }]
       requestBody:
@@ -3979,6 +4075,9 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/EmailPreview' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
 
   /v1/admin/email-templates/{key}/test:
     post:
@@ -3986,6 +4085,7 @@ paths:
       operationId: adminTestEmailTemplate
       x-permissions: [settings:write]
       summary: Envoi de test
+      description: Envoi du modèle enregistré, avec les données d'exemple, à l'adresse indiquée. Modèle désactivé → `409`.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/EmailTemplateKeyPath' }]
       requestBody:
@@ -4004,6 +4104,10 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/MessageResponse' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationError' }
 
   # ─────────────────────────── Admin — Utilisateurs ───────────────
   /v1/admin/users:
@@ -4595,7 +4699,11 @@ components:
       format: date-time
     Html:
       type: string
-      description: 'HTML assaini côté serveur (balises autorisées : p, h2, h3, h4, strong, em, a, ul, ol, li, br, blockquote).'
+      description: >-
+        HTML assaini côté serveur (balises autorisées : p, h2, h3, h4, strong, em, a, ul, ol, li, br, blockquote ;
+        b et i deviennent strong et em). Seul attribut conservé : `href` des liens, en http(s), mailto, tel ou relatif
+        au site (`/contact`, `#article`) ; les autres liens sont retirés (texte gardé), comme les balises non
+        autorisées (`script`, `style`, `iframe` avec leur contenu).
       maxLength: 200000
 
     EmailHtml:
@@ -6588,7 +6696,13 @@ components:
             seoDescription: { type: [string, 'null'] }
             publishedAt: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }] }
             completenessDetail: { $ref: '#/components/schemas/Completeness' }
-            version: { type: string, description: Valeur à renvoyer dans `If-Match`. }
+            version: { type: string, description: Valeur à renvoyer dans `If-Match`., examples: [v3] }
+            categoryId: { $ref: '#/components/schemas/Id' }
+            coverImageId: { oneOf: [{ $ref: '#/components/schemas/Id' }, { type: 'null' }] }
+            reviewsTitle: { type: [string, 'null'] }
+            relatedTitle: { type: [string, 'null'] }
+            ctaTitle: { type: [string, 'null'] }
+            ctaText: { type: [string, 'null'] }
 
     Completeness:
       type: object

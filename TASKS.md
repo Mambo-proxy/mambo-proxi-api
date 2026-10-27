@@ -29,12 +29,17 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
 
 ### Modules (ordre docs/08)
 
-- [~] settings · navigation · pages · categories · services (lecture publique, cache, preview ; offres en carrousel des fiches, `ServiceOffer`)
+- [~] settings · navigation · pages · categories · services (lecture publique, cache, preview ; offres en carrousel des fiches, `ServiceOffer`) — back-office fait
   - [x] `GET /v1/site/settings`, `/site/navigation`, `/site/redirects`, `/pages/{key}`, `/zones`, `/sitemap`, `/categories`, `/categories/{slug}`, `/services`, `/services/{slug}` (`src/modules/*`)
   - [x] Langue (`?lang=fr|en`, fusion `translations` / colonnes `…En`, repli champ par champ : `src/common/i18n`), cache HTTP (`public, no-cache` + `ETag` → 304 : `src/common/http-cache`)
   - [x] Publication : statuts, `publishedAt`, rubrique publiée, zones actives, sections désactivées masquées ; aucun tarif ni prix exposé
   - [x] Tests unitaires des mappers et de la fusion des langues ; e2e `test/public-content.e2e-spec.ts` (double de Prisma, et base remplie par le seed en CI) ; `pnpm db:seed` en CI
-  - [ ] Prévisualisation (`?preview=` : jetons signés du back-office, brouillons) avec les modules admin
+  - [x] Prévisualisation (`?preview=` : jetons signés HMAC de 30 min, sans état) : brouillon d'une page (`isPreview`), fiche d'un service quel que soit son statut, `Cache-Control: private, no-store` ; rubriques : pas de jeton dans le contrat (version publiée)
+  - [x] Back-office : `/v1/admin/services*` (liste et compteurs, détail, création, sauvegarde automatique avec `If-Match`/412, publication, dépublication, duplication, ordre, suppression, complétude, jeton d'aperçu), `/v1/admin/categories*` (carrousels d'offres, champs du devis, statut, ordre, suppression d'une rubrique vide), `/v1/admin/pages*` (brouillon, publication, abandon, jeton d'aperçu, HTML riche assaini), `/v1/admin/zones*` (quartiers déplacés d'une zone à l'autre, contours GeoJSON contrôlés, ordre), `/v1/admin/settings/{group}` (9 groupes, `analytics`/`securite` réservés aux administrateurs), `/v1/admin/system-status`, `/v1/admin/email-templates*` (variables contrôlées, aperçu React Email, envoi de test)
+  - [x] Redirections 301 automatiques (slug ou rubrique d'un service publié, slug d'une rubrique publiée) ; demandes de revalidation inscrites (`revalidation_requests`, étiquettes du site) à chaque modification visible ; journal d'activité sans donnée personnelle
+  - [x] Tests : unitaires (assainissement HTML, slugs, jetons d'aperçu, complétude, contours, fiches des e-mails) ; e2e `test/admin-catalog.e2e-spec.ts`, `test/admin-site-content.e2e-spec.ts` (double de Prisma, permissions par rôle dont MANAGER refusé en écriture, relecture par les routes publiques ; bloc base réelle)
+  - [ ] Usages des médias (`media_usages`) tenus à jour à l'enregistrement des contenus : avec le module de la médiathèque
+  - [ ] Textes anglais (`translations`, `…En`) des services, rubriques, pages et e-mails : aucune opération du contrat ne les modifie
   - [ ] Premier passage des tests en local et en CI (non lancés sur la machine de développement)
 - [~] Formulaires publics : quote-requests, contact-messages, registrations, training-requests, partner-requests, event-registrations (anti-spam Turnstile + piège + délai, limitation de débit)
   - [x] Six opérations du contrat (`src/modules/forms`) : `201 { reference, message }`, 400 `spam-check-failed`, 409 `event-full`, 422 `validation-error` (chemins et messages en français), 429 `rate-limited`
@@ -62,7 +67,7 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
   - [x] Seed : mots de passe `SEED_ADMIN_PASSWORD` et `SEED_DEMO_PASSWORD` (développement) hachés en argon2id
   - [x] Tests : unitaires (permissions contre le contrat, JWT, politique des mots de passe) ; e2e `test/auth.e2e-spec.ts`, `test/admin-users.e2e-spec.ts` (doubles ; bloc base réelle)
   - [x] Contrat : 422 (login, verify-otp, resend-otp, forgot-password, PATCH users), 401 (resend-otp), 423 (verify-otp), 404 et 409 (DELETE et reset-password d'un utilisateur), 403 (logout), 429 (refresh), exemple `csrf-token-invalid` de `Forbidden` ; tests passés sur `expectContract`
-  - [ ] Contrat : 403 `Forbidden` absent des mutations à cookie hors auth/utilisateurs/demandes/contacts (services, pages, avis, médias…), à ajouter avec leurs modules
+  - [~] Contrat : 403 `Forbidden` absent des mutations à cookie hors auth/utilisateurs/demandes/contacts : ajouté pour services, rubriques, pages, zones, paramètres et e-mails ; reste avis, médias, rendez-vous, magazine… avec leurs modules
   - [ ] Site : appeler `POST /v1/auth/refresh` sur un 401 (jeton d'accès de 15 min) avant de rediriger vers la connexion
 - [ ] appointments + availability (créneaux, 409, confirmation `.ics`, proposition, rappel J-1 9 h Douala)
 - [ ] surveys + reviews (invitation après « Prestation réalisée », relance J+3, jeton unique 30 j, consentement de publication)
@@ -71,7 +76,7 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
 - [ ] newsletter (double opt-in, segments, campagnes par lots, `List-Unsubscribe`, export, mesure optionnelle)
 - [ ] media (sharp : AVIF/WebP 480/960/1600, SVG assaini, point focal)
 - [ ] dashboard · search · notifications · audit
-- [ ] Revalidation du site (`POST {WEB_URL}/api/revalidate` avec tags)
+- [~] Revalidation du site (`POST {WEB_URL}/api/revalidate` avec tags) : demandes inscrites par les contenus du back-office (`revalidation_requests`, `PENDING`) ; envoi et réessais à faire
 - [ ] Tâches planifiées : nettoyage RGPD quotidien, sauvegarde `pg_dump` vers S3 (rotation 30 jours)
 
 ## Phase 3 — Intégration

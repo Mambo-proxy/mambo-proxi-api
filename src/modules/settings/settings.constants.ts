@@ -9,6 +9,7 @@
  * - `seo` : `{ defaultTitle, defaultDescription, ogImageId, searchConsoleVerification }` ;
  * - `analytics` : `{ ga4MeasurementId, ga4PropertyId, newsletterTracking }` ;
  * - `chiffres` : `{ keyFigures: KeyFigure[] }` ;
+ * - `rgpd` : `{ inactiveContactsRetentionMonths, rejectedApplicationsRetentionMonths }` ;
  * - `securite` : `{ maintenanceMode, trustedDeviceDays }` ;
  * - `navigation` : `{ main, signUp, footer, legal, megaMenuPromo }` (formes du schéma `Navigation`) ;
  * - `zones` : `{ showFees, note }` ;
@@ -23,6 +24,7 @@ export const SETTING_KEYS = {
   seo: 'seo',
   analytics: 'analytics',
   chiffres: 'chiffres',
+  rgpd: 'rgpd',
   securite: 'securite',
   navigation: 'navigation',
   zones: 'zones',

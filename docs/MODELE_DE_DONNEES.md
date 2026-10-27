@@ -77,6 +77,15 @@ colonnes dédiées (`trainingId`, `participants`, `eventId`, `seats`, `partnersh
   effacé », `anonymized_at`), demandes anonymisées, abonnement anonymisé et désinscrit (statistiques des campagnes
   conservées). Ces lignes ne sont plus affichées par le back-office.
 
+- **Contenus du back-office.** `services.version` (verrouillage optimiste, `If-Match: v<n>`) est incrémentée à chaque
+  enregistrement ; les listes d'un service (galerie, services liés, avis mis en avant, offres) et les carrousels
+  d'une rubrique sont remplacés à chaque envoi, une offre renvoyée avec son identifiant le garde (et sa traduction).
+  Les visuels des sections de pages sont enregistrés par référence (`{ illustration, imageId, alt }`), le HTML des
+  articles assaini avant l'enregistrement. Quartiers : `normalized_name` (clé sans accents) unique, un quartier
+  ajouté à une zone quitte l'ancienne. Changement d'adresse d'un contenu publié : ligne `redirects` (les redirections
+  vers l'ancienne adresse sont reportées sur la nouvelle). Chaque modification visible sur le site ajoute une ligne
+  `revalidation_requests` (`PENDING`, étiquettes du site) dans la même transaction.
+
 ## Contraintes ajoutées à la main dans les migrations (non exprimables en Prisma)
 
 Faites dans `prisma/migrations/20261026000000_init` : CHECK des offres, index unique partiel des créneaux, bornes des notes, jours, point focal et coordonnées. Restent pour le module de recherche : `unaccent` et index plein texte.
@@ -100,8 +109,15 @@ Faites dans `prisma/migrations/20261026000000_init` : CHECK des offres, index un
   l'API la déduit de la page d'origine (à confirmer, ou ajouter `lang` au contrat).
 - Les segments de campagne sont calculés (`ALL`, `FRANCE`, `CAMEROUN`, `PROFESSIONNELS`, `TAGS`) et non une table ;
   la campagne garde son segment (`segmentKind`, `segmentTags`, `language`).
-- Jetons de prévisualisation (`PreviewToken`) : signés et sans état, donc sans table.
+- Jetons de prévisualisation (`PreviewToken`) : signés (HMAC, `TOKEN_SIGNING_SECRET`), valables 30 minutes et sans
+  état, donc sans table.
+- Textes anglais (`translations` des services, rubriques, offres, pages et modèles d'e-mails ; `…En` des zones) : le
+  contrat du back-office ne les édite pas (sauf les champs `…En` des zones) ; ils sont conservés tels quels quand le
+  français change.
+- Navigation : aucune opération d'écriture dans le contrat ; le méga-menu se déduit des services publiés
+  (`showInMenu`), le pied de page vient du paramètre interne `navigation`.
 - Libellés calculés non stockés : `RequestEvent.label`, `initials`, statut d'utilisateur (`ACTIF`/`INVITE`/`DESACTIVE`),
   `isOverdue`, `completeness`, `requests30d`, `readers`, `remainingPlaces`.
 - Les images référencées dans des JSON (sections de pages, visuels secondaires des rubriques, image de partage) ne
-  peuvent pas avoir de clé étrangère : l'API tient `media_usages` à jour à chaque enregistrement.
+  peuvent pas avoir de clé étrangère : `media_usages` doit être tenu à jour à chaque enregistrement (à faire avec le
+  module de la médiathèque ; le back-office des contenus vérifie déjà que chaque image référencée existe).

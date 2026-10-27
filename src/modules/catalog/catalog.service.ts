@@ -1,6 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Lang } from '../../common/i18n/lang.js';
+import { verifyPreviewToken } from '../../common/preview/preview-token.js';
 import { notFoundException } from '../../common/problem/problem.js';
+import { AppConfigService } from '../../config/app-config.service.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { MediaService } from '../media/media.service.js';
 import {
@@ -66,7 +68,14 @@ export class CatalogService {
   constructor(
     @Inject(PrismaService) private readonly prisma: PrismaService,
     @Inject(MediaService) private readonly media: MediaService,
+    @Inject(AppConfigService) private readonly config: AppConfigService,
   ) {}
+
+  /** Identifiant du service désigné par un jeton d'aperçu valide du back-office, sinon `undefined`. */
+  previewServiceId(preview: string | undefined, now: Date): string | undefined {
+    if (preview === undefined || preview === '') return undefined;
+    return verifyPreviewToken(this.config.get('TOKEN_SIGNING_SECRET'), preview, 'service', now)?.id;
+  }
 
   /** Rubriques publiées dans l'ordre du back-office, avec leurs services publiés (deux requêtes au plus). */
   private async loadCategories(lang: Lang, now: Date): Promise<CategoryEntry[]> {
@@ -160,13 +169,18 @@ export class CatalogService {
     );
   }
 
-  /** `GET /v1/services/{slug}` : fiche avec services liés, offres et avis publiés. */
-  async getService(slug: string, query: CatalogDetailQuery): Promise<ServiceDetail> {
+  /**
+   * `GET /v1/services/{slug}` : fiche avec services liés, offres et avis publiés. Avec un jeton d'aperçu valide
+   * (`?preview=`, émis pour ce service), la fiche est renvoyée quel que soit son statut ou celui de sa rubrique.
+   */
+  async getService(slug: string, query: CatalogDetailQuery, now = new Date()): Promise<ServiceDetail> {
     if (!isSlug(slug)) throw notFoundException(SERVICE_NOT_FOUND);
     const { lang } = query;
-    const now = new Date();
+    const previewId = this.previewServiceId(query.preview, now);
     const service = await this.prisma.service.findFirst({
-      where: { AND: [visibleServiceWhere(now), slugWhere(slug, lang)] },
+      where: {
+        AND: [previewId === undefined ? visibleServiceWhere(now) : { id: previewId }, slugWhere(slug, lang)],
+      },
       select: serviceDetailSelect,
     });
     if (service === null) throw notFoundException(SERVICE_NOT_FOUND);

@@ -2,6 +2,8 @@ import { Global, Module } from '@nestjs/common';
 import { createTransport } from 'nodemailer';
 import { AppConfigService } from '../../config/app-config.service.js';
 import { QueueModule } from '../queue/queue.module.js';
+import { AdminEmailTemplatesController } from './admin-email-templates.controller.js';
+import { AdminEmailTemplatesService } from './admin-email-templates.service.js';
 import { MailContentService } from './mail-content.service.js';
 import { MailQueueService, mailQueueFactoryProvider } from './mail-queue.service.js';
 import { MailRecorder } from './mail-recorder.service.js';
@@ -25,13 +27,16 @@ function createSmtpTransport(config: AppConfigService): MailTransport {
 }
 
 /**
- * E-mails : file d'attente (producteur `MailQueueService`, seul service exporté) et worker d'envoi (Nodemailer +
- * gabarits React Email). Global : tout module peut injecter `MailQueueService`.
+ * E-mails : file d'attente (producteur `MailQueueService`, seul service exporté), worker d'envoi (Nodemailer +
+ * gabarits React Email) et modèles du back-office (`/v1/admin/email-templates*`). Global : tout module peut
+ * injecter `MailQueueService`.
  */
 @Global()
 @Module({
   imports: [QueueModule],
+  controllers: [AdminEmailTemplatesController],
   providers: [
+    AdminEmailTemplatesService,
     { provide: MAIL_TRANSPORT, inject: [AppConfigService], useFactory: createSmtpTransport },
     mailQueueFactoryProvider,
     MailQueueService,

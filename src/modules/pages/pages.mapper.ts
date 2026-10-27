@@ -100,7 +100,8 @@ export function visibleSections(sections: unknown): JsonObject[] {
   );
 }
 
-function toSeo(value: unknown): Page['seo'] {
+/** Schéma `Seo` du contrat (une image de partage non absolue est ignorée). */
+export function toSeo(value: unknown): Page['seo'] {
   const seo = asObject(value);
   const ogImageUrl = readNullableString(seo, 'ogImageUrl');
   return {

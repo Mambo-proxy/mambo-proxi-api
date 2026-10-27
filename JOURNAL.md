@@ -388,3 +388,134 @@
 - Tableau de bord et `sidebar-counts` (lot suivant) : exclure les demandes anonymisées, comme la présence
   (`openTasks`, corrigée dans ce lot).
 - Envoi et relance du questionnaire programmé, avec le nouveau jeton : module des questionnaires.
+
+## Phase 2 — Back-office : contenus (27 octobre 2026)
+
+### Fait
+
+- Services et rubriques (`src/modules/catalog/admin-*`) : `GET /v1/admin/services` (filtres `category`, `status`,
+  `q` sans accents ; compteurs par rubrique calculés sans le filtre de rubrique ; demandes des 30 derniers jours ;
+  complétude), `POST`, `GET`/`PATCH`/`DELETE` de `/v1/admin/services/{id}`, `publish`, `unpublish`, `duplicate`,
+  `preview-token`, `completeness`, `PATCH /v1/admin/services/reorder` ; `/v1/admin/categories*` (liste, création,
+  modification avec carrousels d'offres et champs du devis, ordre, suppression d'une rubrique vide).
+- Pages (`src/modules/pages/admin-pages.*`, `page-sections.schemas.ts`) : liste, page avec son brouillon, `PUT`
+  (sauvegarde automatique du brouillon), `publish`, `discard`, `preview-token` ; sections validées par l'union
+  `PageSection` du contrat (zod, propriétés inconnues ignorées), HTML des articles assaini.
+- Zones (`src/modules/zones/admin-zones.*`) : liste (`showFees` du paramètre `zones`, demandes des 12 derniers mois
+  par quartier), création, modification (quartiers, contour, tarif), ordre, suppression.
+- Paramètres (`src/modules/settings/admin-settings.*`) : `GET`/`PUT /v1/admin/settings/{group}` pour les 9 groupes du
+  contrat, `GET /v1/admin/system-status`. E-mails (`src/modules/mail/admin-email-templates.*`,
+  `email-template-catalog.ts`) : liste, modèle, modification, aperçu, envoi de test.
+- Lecture publique : `?preview=` de `GET /v1/pages/{key}` (brouillon, `isPreview: true`) et de
+  `GET /v1/services/{slug}` (fiche de tout statut), `Cache-Control: private, no-store`.
+- Socle : `common/html/rich-text.ts` (assainissement ; dépendances `sanitize-html` 2.18.1 et `@types/sanitize-html`
+  2.16.2, versions figées), `common/text/slug.ts`, `common/preview/preview-token.ts`,
+  `common/revalidation/revalidation.ts`, `common/validation/content.schemas.ts`, `modules/navigation/redirects.ts`,
+  `modules/media/media-refs.ts`, `modules/auth/audit-actor.ts`.
+- Contrat : 403 `Forbidden` sur les opérations du lot qui ne le déclaraient pas ; 400 `InvalidQuery` (liste des
+  services) ; 404 (suppression d'une rubrique, abandon et aperçu d'une page, groupe de paramètres inconnu,
+  modification, aperçu et test d'un modèle d'e-mail) ; 409 (slug d'une rubrique, test d'un modèle désactivé) ; 422
+  (ordre des rubriques et des zones, aperçu et test d'un modèle) ; règles décrites (slug et SEO pré-remplis,
+  `If-Match`, redirections, duplication, complétude, aperçu, brouillon, variables des e-mails) ; liste blanche du
+  schéma `Html` précisée ; `AdminService` : `categoryId`, `coverImageId`, titres des blocs (facultatifs). Site
+  synchronisé (`pnpm contract:sync`, `pnpm contract:generate` : seuls `contracts/openapi.yaml` et
+  `src/lib/api/schema.d.ts` changent).
+- Tests : unitaires (`rich-text.spec.ts`, `slug.spec.ts`, `preview-token.spec.ts`, `admin-catalog.mapper.spec.ts`,
+  `admin-zones.schemas.spec.ts`, `email-template-catalog.spec.ts`) ; e2e `test/admin-catalog.e2e-spec.ts` et
+  `test/admin-site-content.e2e-spec.ts` (données `test/fixtures/content.ts`), avec un bloc sur la base réelle. Le double
+  de Prisma retrouve désormais les relations des contenus par clé (service → rubrique, rubrique → services, zone →
+  quartiers…), y compris pour les tris, et comprend `Prisma.DbNull`.
+
+### Décisions
+
+- **Rôles** : matrice inchangée. Lecture `content:read` (ADMIN, MANAGER, EDITOR, WRITER), écriture `content:write`
+  (ADMIN, EDITOR, WRITER) : le MANAGER est en lecture seule (403 sur chaque écriture, testé). Paramètres :
+  `settings:read` (ADMIN, MANAGER, EDITOR), `settings:write` (ADMIN, EDITOR), `analytics` et `securite` réservés à
+  `settings:admin` (« Ces paramètres sont réservés aux administrateurs. »). Aperçu d'un e-mail : `settings:read`
+  (contrat), envoi de test : `settings:write`.
+- **Slugs** : tirés du nom (`slugify` : sans accents, ligatures dépliées), suffixés `-2`, `-3`… s'ils sont pris ; un
+  slug choisi et déjà pris → 409 (services et rubriques). Unicité globale des services (contrainte de la base).
+- **Verrouillage optimiste** : `version: "v<n>"` (forme du back-office simulé), `If-Match` facultatif (avec ou sans
+  guillemets, `W/` accepté), différent → 412 `precondition-failed`. Publication et dépublication incrémentent aussi
+  la version.
+- **Publication d'un service** : statut seulement (fiche, carte, menu, devis, plan du site se lisent sur les services
+  publiés) ; exige nom et accroche ; `publishedAt` gardé s'il est passé, sinon maintenant (une publication programmée
+  plus tard devient immédiate). Dépublication : brouillon, `publishedAt` conservé (comme le back-office simulé).
+  Suppression : brouillon ou archivé seulement, listes liées supprimées, offres qui le présélectionnaient détachées,
+  demandes et avis conservés (`SetNull`).
+- **Redirections** : un changement de slug ou de rubrique d'un service publié, ou du slug d'une rubrique publiée
+  (avec ses fiches publiées), crée une redirection 301 ; les redirections vers l'ancienne adresse sont reportées sur
+  la nouvelle, une redirection partant de la nouvelle adresse est supprimée (pas de boucle). Pas de redirection pour
+  les formules (adresse `#formules` de la rubrique).
+- **Revalidation (point d'accroche)** : chaque modification visible sur le site inscrit, dans sa transaction, une
+  ligne `revalidation_requests` `PENDING` avec les étiquettes de `mambo-proxi-web/src/lib/api/tags.ts`
+  (`services`, `service:<slug>`, `category:<slug>`, `categories`, `navigation`, `sitemap`, `page:<clé>`, `zones`,
+  `settings`, `redirects`). Le module de revalidation enverra ces demandes. En attendant, les routes publiques n'ont
+  aucun cache côté API : `Cache-Control: public, no-cache` et `ETag` recalculé sur le corps ; les tests vérifient
+  qu'une publication change aussitôt le corps et l'`ETag` (un ancien `If-None-Match` reçoit 200).
+- **Aperçu** : jeton HMAC-SHA256 (`TOKEN_SIGNING_SECRET`, préfixe `preview`) `{ k, id, exp }`, 30 minutes, valable pour
+  un seul contenu, sans état ; adresse `WEB_URL` + chemin + `?preview=` (avant l'ancre). Réponse jamais mise en cache
+  (`private, no-store`). Le contrat accepte `preview` sur les rubriques sans route pour en délivrer : ignoré.
+- **Pages** : un type de section absent de `allowedSectionTypes` n'est accepté que pour une section déjà présente
+  (même `id` et `type`, publiée ou dans le brouillon) ; la `source` d'une section `dynamic` ne change pas ; types par
+  défaut si la page n'en déclare aucun (légales : `hero`, `richText`). Publication sans brouillon d'une page déjà
+  publiée : renvoyée telle quelle ; page jamais publiée : publiée. Sauvegarde automatique non journalisée ;
+  publication et abandon journalisés.
+- **HTML riche** : liste blanche du schéma `Html` ; `b`/`i` → `strong`/`em` ; seul `href` est gardé, en `http(s)`,
+  `mailto`, `tel` ou relatif au site (`/…`, `#…`) ; lien refusé : balise retirée, texte gardé ; `script`, `style`,
+  `iframe`… supprimés avec leur contenu. Assaini à l'enregistrement du brouillon (idempotent).
+- **Zones** : clé tirée du nom à la création, jamais changée ensuite ; `quarters` remplace la liste et retire ces
+  quartiers des autres zones ; traduction d'un quartier gardée tant que son texte français ne change pas ; ordre de 0
+  à n-1 (comme le seed et le back-office simulé). Demandes par zone : `contacts.city_key` commence par un quartier.
+- **Paramètres** : `PUT` du groupe complet (schéma du contrat), clés internes conservées (libellés d'affichage retirés
+  quand le numéro change, recalculés à la lecture), groupe jamais enregistré renvoyé avec des valeurs par défaut.
+  Journal : noms des champs modifiés seulement (adresses et numéros hors du journal).
+- **E-mails** : fiches (nom, description) reprises du back-office simulé ; variables = celles que l'API sait remplir
+  pour le modèle (données d'exemple des gabarits, plus `{référence}` des accusés de réception) ; une autre variable →
+  422 `unknown_variable`. Modèles indispensables (`canDisable: false`, toujours envoyés) : code, mot de passe,
+  invitation, confirmation de la newsletter, gabarit des campagnes (`ESSENTIAL_TEMPLATES`, appliqué aussi à l'envoi).
+  Aperçu : gabarit React Email réel, données d'exemple, coordonnées des paramètres. Test : modèle enregistré mis en
+  file, 409 si le modèle est désactivé (le worker ne l'enverrait pas), adresse absente du journal.
+- **Journal d'activité** : `service.create|update|publish|unpublish|duplicate|delete|reorder` (mise à jour journalisée
+  pour un service en ligne seulement : la sauvegarde automatique d'un brouillon toutes les 1,5 s n'y figure pas),
+  `category.*`, `page.publish|discard`, `zone.*`, `settings.update`, `email-template.update|test`.
+
+### Écarts avec le back-office simulé du site (le contrat prime)
+
+- Erreurs au format du contrat (`type` `https://api.mamboproxi.com/problems/…`, titre « Certaines informations sont à
+  corriger ») au lieu de `about:blank` / « Données invalides » ; toutes les erreurs d'un corps sont renvoyées (le
+  mock des zones n'en renvoie qu'une). Chemin d'un quartier en double : `quarters.<i>.name` (mock : `quarters`).
+- Création d'un service : 409 pour un slug choisi déjà pris (le mock suffixe toujours) ; rubrique : slug tiré du nom
+  suffixé au lieu d'un 409 ; modification d'une rubrique : slug contrôlé (409), le mock ne vérifie rien.
+- Ordre des services : identifiants d'une même rubrique exigés même sans `scope` ; doublons refusés. Ordre des
+  rubriques et des zones : identifiant inconnu → 422 (le mock des zones l'ignore).
+- `PUT` d'une page sans `sections` : 422 (mock : 400). Section `dynamic` dont la source change : 422 (mock : accepté).
+  Service publié dont l'accroche est vidée : 422 (mock : accepté). HTML assaini (le mock enregistre tel quel).
+- Jeton d'aperçu des pages : 30 minutes (mock : 60), jeton signé au lieu d'un identifiant aléatoire.
+- `requests30d`, `requestsCount`, `showFees`, `system-status` calculés (le mock renvoie des valeurs fixes : `1.0.0`,
+  `Resend`) ; `system-status.lastBackupAt` vaut `null` tant que les sauvegardes n'existent pas.
+- E-mails : variables `{lien}` et `{organisation}` du mock absentes (l'adresse du bouton est fournie à part, la
+  structure du partenaire n'est pas une variable de l'API) ; `{nom}`, `{ville}`, `{heure}`, `{lieu}`, `{rubrique}`,
+  `{poste}` en plus ; texte avec une variable inconnue refusé (mock : accepté) ; test d'un modèle désactivé : 409
+  (mock : 202). Un modèle jamais enregistré en base a `updatedAt` = 1970-01-01 (le seed les crée tous).
+
+### Difficultés et solutions
+
+- **Double de Prisma** : les lignes créées par l'API n'ont pas les valeurs par défaut de la base ; les créations de
+  services, rubriques et zones écrivent désormais toutes leurs colonnes (comportement identique en base réelle).
+- **`sanitize-html`** : renommer une balise refusée (`a` → `span`) produisait une fermeture `</span>` sur le lien
+  suivant ; remplacé par `exclusiveFilter` → `'excludeTag'` (balise retirée, texte gardé).
+- **Machine** : commandes lourdes lancées une à une ; tests sur la base réelle non lancés en local (pas de Docker),
+  exécutés par la CI.
+
+### Points ouverts
+
+- Revalidation : envoi des demandes `revalidation_requests` (`POST {WEB_URL}/api/revalidate`, secret, réessais).
+- Médiathèque : tenir `media_usages` à jour à l'enregistrement des contenus (pages, rubriques, paramètres, services) et
+  refuser la suppression d'une image utilisée.
+- Textes anglais des contenus (`translations`) : aucune opération du contrat ne les modifie ; ils restent ceux du seed
+  quand le français change (à prévoir dans le contrat pour le site bilingue).
+- Navigation (pied de page, promotion du méga-menu) et `showFees`/`note` des zones : pas de groupe de paramètres dans
+  le contrat, donc pas d'écriture.
+- Un service publié, dépublié puis republié à une autre adresse ne reçoit pas de redirection depuis l'ancienne
+  (l'adresse publiée n'est pas mémorisée).

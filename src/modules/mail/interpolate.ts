@@ -16,6 +16,11 @@ const VARIABLE = /\{\{?\s*([\p{L}\p{N}_.-]+)\s*\}?\}/gu;
 // eslint-disable-next-line no-control-regex
 const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u2028\u2029]/g;
 
+/** Variables écrites dans un texte (`« Bonjour {prénom} »` → `['prénom']`), dans l'ordre. */
+export function variablesIn(template: string): string[] {
+  return [...template.matchAll(VARIABLE)].map((match) => match[1] ?? '');
+}
+
 /** Nom de variable normalisé : minuscules, sans accents (`Référence` → `reference`). */
 export function normalizeVariableName(name: string): string {
   return name.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();

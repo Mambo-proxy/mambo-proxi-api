@@ -74,5 +74,17 @@ export function isMailTemplateKey(value: unknown): value is MailTemplateKey {
   return typeof value === 'string' && (MAIL_TEMPLATE_KEYS as readonly string[]).includes(value);
 }
 
-/** Modèles de sécurité : ne peuvent pas être désactivés dans le back-office (`canDisable: false`). */
+/** Modèles de sécurité (code de connexion, mot de passe). */
 export const SECURITY_TEMPLATES: ReadonlySet<MailTemplateKey> = new Set(['otp-code', 'password-reset']);
+
+/**
+ * Modèles indispensables, qui ne peuvent pas être désactivés dans le back-office (`canDisable: false`) et sont
+ * toujours envoyés : e-mails de sécurité, invitation au back-office (activation du compte), confirmation du double
+ * opt-in et gabarit des campagnes de la newsletter (l'envoi d'une campagne se décide campagne par campagne).
+ */
+export const ESSENTIAL_TEMPLATES: ReadonlySet<MailTemplateKey> = new Set([
+  ...SECURITY_TEMPLATES,
+  'user-invite',
+  'newsletter-confirm',
+  'newsletter-campaign',
+]);
