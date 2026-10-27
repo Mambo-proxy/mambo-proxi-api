@@ -68,6 +68,8 @@ export interface MailJob {
   data: Record<string, unknown>;
   /** référence MP-AAAA-NNNN pour le suivi */
   reference?: string;
+  /** Préfixe ajouté à l'objet rendu (« [TEST] » des envois de test du back-office). */
+  subjectPrefix?: string;
 }
 
 export function isMailTemplateKey(value: unknown): value is MailTemplateKey {

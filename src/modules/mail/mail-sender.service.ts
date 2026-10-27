@@ -29,6 +29,7 @@ export const mailJobSchema = z.object({
     .string()
     .regex(/^MP-\d{4}-\d{4,}$/)
     .optional(),
+  subjectPrefix: z.string().max(20).optional(),
 });
 
 /** Tâche invalide : inutile de réessayer. */
@@ -77,7 +78,7 @@ export class MailSender implements OnModuleDestroy {
       from: this.sender(settings.senderName),
       to: job.to,
       replyTo: settings.replyTo,
-      subject: rendered.subject,
+      subject: job.subjectPrefix ? `${job.subjectPrefix} ${rendered.subject}` : rendered.subject,
       html: rendered.html,
       text: rendered.text,
       headers: this.headers(job),

@@ -13,6 +13,10 @@ info:
     - tri `?sort=-createdAt` (préfixe `-` = décroissant) ;
     - erreurs au format RFC 9457 « Problem Details » (`application/problem+json`), messages en français prêts à afficher ;
     - références lisibles des demandes `MP-AAAA-NNNN` (séquence annuelle) ;
+    - langue : `?lang=fr|en` pour les contenus publics (`fr` par défaut) ; pour les formulaires publics, champ facultatif
+      `lang` du corps (schéma `SubmissionLanguage`), à défaut la première langue prise en charge de l'en-tête
+      `Accept-Language`, sinon `fr` — elle fixe la langue des e-mails envoyés (l'inscription à la newsletter ne lit que
+      l'en-tête) ;
     - aucun prix n'est stocké ni renvoyé pour les prestations (devis uniquement).
 
     Authentification du back-office : cookies `httpOnly` (`mp_at` jeton d'accès 15 min, `mp_rt` jeton de rafraîchissement rotatif),
@@ -2961,7 +2965,9 @@ paths:
           schema: { $ref: '#/components/schemas/ApplicationStatus' }
         - name: job
           in: query
-          description: Identifiant de l'offre, ou `spontaneous`.
+          description: |
+            Identifiant de l'offre, ou `spontaneous` : candidatures déposées sans offre (celles dont l'offre a été
+            supprimée depuis en sont exclues).
           schema: { type: string }
         - $ref: '#/components/parameters/Page'
         - $ref: '#/components/parameters/PageSize'
@@ -4359,7 +4365,7 @@ paths:
       operationId: adminTestEmailTemplate
       x-permissions: [settings:write]
       summary: Envoi de test
-      description: Envoi du modèle enregistré, avec les données d'exemple, à l'adresse indiquée. Modèle désactivé → `409`.
+      description: Envoi du modèle enregistré, avec les données d'exemple, à l'adresse indiquée, objet préfixé « [TEST] ». Modèle désactivé → `409`.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/EmailTemplateKeyPath' }]
       requestBody:
@@ -5623,7 +5629,8 @@ components:
           description: |
             Adresse interne française, comme partout dans le contrat ; le site la convertit dans la langue de la page
             (`SiteLink`). Services `/services/{rubrique}/{service}`, rubriques `/services/{rubrique}`, offres
-            `/recrutement/{slug}`, formations `/formation#{slug}`, articles `/magazine#article-{id}`, pages : leur adresse.
+            `/recrutement/{slug}`, formations `/formation#{slug}`, articles `/magazine#article-{id}` (dernière édition publiée) ou
+            `/magazine?edition={editionId}#article-{id}` (édition plus ancienne), pages : leur adresse.
           examples: [/services/experience/chef-prive]
         visual:
           description: Photo ou illustration du contenu ; `null` pour une page sans visuel ou une offre d'emploi.
@@ -6270,6 +6277,13 @@ components:
       type: string
       enum: [WHATSAPP, TELEPHONE, EMAIL]
 
+    SubmissionLanguage:
+      type: string
+      enum: [fr, en]
+      description: |
+        Langue de l'envoi (facultative) : celle des e-mails envoyés à la personne (accusé de réception, suites).
+        Absente, l'API retient la première langue prise en charge de l'en-tête `Accept-Language`, sinon `fr`.
+
     QuoteRequestInput:
       type: object
       required: [categorySlug, needs, description, contact, contactPreference, consent, antiSpam]
@@ -6297,6 +6311,7 @@ components:
         contactPreference: { $ref: '#/components/schemas/ContactPreference' }
         consent: { $ref: '#/components/schemas/Consent' }
         antiSpam: { $ref: '#/components/schemas/AntiSpam' }
+        lang: { $ref: '#/components/schemas/SubmissionLanguage' }
 
     ContactMessageInput:
       type: object
@@ -6320,6 +6335,7 @@ components:
         message: { type: string, minLength: 10, maxLength: 3000 }
         consent: { $ref: '#/components/schemas/Consent' }
         antiSpam: { $ref: '#/components/schemas/AntiSpam' }
+        lang: { $ref: '#/components/schemas/SubmissionLanguage' }
 
     AppointmentInput:
       type: object
@@ -6332,6 +6348,7 @@ components:
         message: { type: [string, 'null'], maxLength: 1000 }
         consent: { $ref: '#/components/schemas/Consent' }
         antiSpam: { $ref: '#/components/schemas/AntiSpam' }
+        lang: { $ref: '#/components/schemas/SubmissionLanguage' }
 
     RegistrationInput:
       type: object
@@ -6356,6 +6373,7 @@ components:
         newsletter: { type: boolean, default: false, description: Case non cochée par défaut (consentement explicite). }
         consent: { $ref: '#/components/schemas/Consent' }
         antiSpam: { $ref: '#/components/schemas/AntiSpam' }
+        lang: { $ref: '#/components/schemas/SubmissionLanguage' }
 
     TrainingRequestInput:
       type: object
@@ -6373,6 +6391,7 @@ components:
         message: { type: [string, 'null'], maxLength: 3000 }
         consent: { $ref: '#/components/schemas/Consent' }
         antiSpam: { $ref: '#/components/schemas/AntiSpam' }
+        lang: { $ref: '#/components/schemas/SubmissionLanguage' }
 
     PartnershipType:
       type: string
@@ -6393,6 +6412,7 @@ components:
         presentation: { type: [string, 'null'], maxLength: 3000, description: 'Présentation de l''activité (expérience, zones d''intervention, disponibilités).' }
         consent: { $ref: '#/components/schemas/Consent' }
         antiSpam: { $ref: '#/components/schemas/AntiSpam' }
+        lang: { $ref: '#/components/schemas/SubmissionLanguage' }
 
     EventRegistrationInput:
       type: object
@@ -6403,6 +6423,7 @@ components:
         contact: { $ref: '#/components/schemas/ContactIdentity' }
         consent: { $ref: '#/components/schemas/Consent' }
         antiSpam: { $ref: '#/components/schemas/AntiSpam' }
+        lang: { $ref: '#/components/schemas/SubmissionLanguage' }
 
     JobApplicationInput:
       type: object
@@ -6420,6 +6441,7 @@ components:
         turnstileToken: { type: string }
         honeypot: { type: string, maxLength: 0 }
         startedAt: { type: string, format: date-time }
+        lang: { $ref: '#/components/schemas/SubmissionLanguage' }
 
     NewsletterSubscriptionInput:
       type: object
@@ -7492,13 +7514,14 @@ components:
 
     AdminApplication:
       type: object
-      required: [id, requestId, reference, status, contact, cv, createdAt]
+      required: [id, requestId, reference, status, jobTitle, contact, cv, createdAt]
       properties:
         id: { $ref: '#/components/schemas/Id' }
         requestId: { $ref: '#/components/schemas/Id' }
         reference: { $ref: '#/components/schemas/Reference' }
         status: { $ref: '#/components/schemas/ApplicationStatus' }
         job:
+          description: Offre visée ; `null` pour une candidature spontanée ou quand l'offre a été supprimée depuis.
           oneOf:
             - type: object
               required: [id, title]
@@ -7506,6 +7529,12 @@ components:
                 id: { $ref: '#/components/schemas/Id' }
                 title: { type: string }
             - type: 'null'
+        jobTitle:
+          type: [string, 'null']
+          description: |
+            Intitulé du poste visé : celui de l'offre, ou celui conservé à l'envoi quand l'offre a été supprimée ;
+            `null` pour une candidature spontanée (déposée sans offre).
+          examples: [Chef cuisinier à domicile (H/F)]
         contact: { $ref: '#/components/schemas/ContactSummary' }
         message: { type: [string, 'null'] }
         cv: { $ref: '#/components/schemas/Attachment' }
@@ -7679,8 +7708,8 @@ components:
         coverId: { oneOf: [{ $ref: '#/components/schemas/Id' }, { type: 'null' }] }
         editorial: { type: [string, 'null'], maxLength: 20000, description: 'HTML de l''édito, signé, affiché en ouverture de l''édition.' }
         editorialEn: { type: [string, 'null'], maxLength: 20000 }
-        signature: { type: [string, 'null'], maxLength: 120 }
-        signatureEn: { type: [string, 'null'], maxLength: 120 }
+        signature: { type: [string, 'null'], maxLength: 120, description: 'Nom et fonction séparés par un tiret cadratin : « Mireille Bell — Fondatrice de Mambo Proxi ».' }
+        signatureEn: { type: [string, 'null'], maxLength: 120, description: 'Version anglaise, même format (« Mireille Bell — Founder of Mambo Proxi »).' }
 
     MagazineEditionInput:
       allOf:
@@ -9920,7 +9949,7 @@ components:
           publishedAt: '2026-10-01T08:00:00.000Z'
           articlesCount: 2
           editorial: '<p>Bienvenue dans le premier numéro du magazine Mambo Proxi.</p>'
-          signature: Mireille Bell, fondatrice de Mambo Proxi
+          signature: Mireille Bell — Fondatrice de Mambo Proxi
           articles:
             - { id: mag_art_2, anchor: article-mag_art_2, title: 'Recevoir à la camerounaise : les conseils d''un chef de Bonapriso', theme: Art de vivre, excerpt: 'Ndolé, poisson braisé, beignets-haricots : un chef de Bonapriso partage ses astuces pour recevoir douze personnes sans stress.', body: '<p>Recevoir douze personnes sans stress, c''est possible.</p>', image: null }
             - { id: mag_art_5, anchor: article-mag_art_5, title: Bien manger au quotidien à Douala, theme: Santé et nutrition, excerpt: Les conseils de notre chef pour des repas équilibrés avec les produits du marché Sandaga., body: null, image: null }
@@ -10092,8 +10121,8 @@ components:
         updatedAt: '2026-10-04T09:00:00.000Z'
         editorial: '<p>Chers lecteurs, chères lectrices,</p><p>Ce premier numéro de Mambo Proxi est bien plus qu’un magazine : c’est une histoire de vie que je partage avec vous.</p>'
         editorialEn: '<p>Dear readers,</p><p>This first issue of Mambo Proxi is much more than a magazine: it is a life story that I am sharing with you.</p>'
-        signature: Mireille Bell, fondatrice de Mambo Proxi
-        signatureEn: Mireille Bell, founder of Mambo Proxi
+        signature: Mireille Bell — Fondatrice de Mambo Proxi
+        signatureEn: Mireille Bell — Founder of Mambo Proxi
         articles:
           - { id: art_bien_manger, title: Bien manger au quotidien sans se ruiner, titleEn: Eating well every day without breaking the bank, theme: Santé et nutrition, themeEn: Health and nutrition, excerpt: null, excerptEn: null, body: '<p>…</p>', bodyEn: '<p>…</p>', image: { id: photo-magazine-bien-manger, url: /photos/magazine-bien-manger.png, width: 420, height: 285, alt: '', variants: [] }, languages: [fr, en], edition: { id: mag_n1, label: N° 1 }, updatedAt: '2026-09-28T10:00:00.000Z' }
           - { id: art_kribi, title: 'Kribi, la nature à deux heures de Douala', titleEn: null, theme: Culture, themeEn: null, excerpt: null, excerptEn: null, body: '<p>…</p>', bodyEn: null, image: { id: photo-culture-decouverte, url: /photos/culture-decouverte.png, width: 1536, height: 1024, alt: '', variants: [] }, languages: [fr], edition: { id: mag_n1, label: N° 1 }, updatedAt: '2026-09-29T10:00:00.000Z' }

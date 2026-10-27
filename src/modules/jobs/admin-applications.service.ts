@@ -9,6 +9,7 @@ import { ANONYMIZED_FILE_NAME } from '../storage/storage.types.js';
 import {
   ADMIN_APPLICATION_SELECT,
   APPLICATION_STATUS_LABELS,
+  SPONTANEOUS_APPLICATION_SUBJECT,
   toAdminApplication,
   type AdminApplication,
   type AdminApplicationRow,
@@ -17,6 +18,18 @@ import { SPONTANEOUS_JOB, type ListApplicationsQuery } from './job.schemas.js';
 
 export const APPLICATION_NOT_FOUND = 'Cette candidature n’existe pas ou a été supprimée.';
 const applicationNotFound = () => notFoundException(APPLICATION_NOT_FOUND);
+
+/**
+ * Filtre `job` : une offre, ou `spontaneous` — candidatures déposées sans offre, et non celles dont l'offre a été
+ * supprimée depuis (elles gardent l'intitulé du poste dans l'objet de la demande).
+ */
+function jobFilter(job: string): Prisma.JobApplicationWhereInput {
+  if (job !== SPONTANEOUS_JOB) return { jobOfferId: job };
+  return {
+    jobOfferId: null,
+    request: { anonymizedAt: null, OR: [{ subject: SPONTANEOUS_APPLICATION_SUBJECT }, { subject: null }] },
+  };
+}
 
 /** Candidatures affichées : demande non anonymisée. */
 const VISIBLE: Prisma.JobApplicationWhereInput = { request: { anonymizedAt: null } };
@@ -38,7 +51,7 @@ export class AdminApplicationsService {
     const where: Prisma.JobApplicationWhereInput = {
       ...VISIBLE,
       ...(query.status ? { status: query.status } : {}),
-      ...(query.job === undefined ? {} : { jobOfferId: query.job === SPONTANEOUS_JOB ? null : query.job }),
+      ...(query.job === undefined ? {} : jobFilter(query.job)),
     };
     const [rows, total] = await Promise.all([
       this.prisma.jobApplication.findMany({

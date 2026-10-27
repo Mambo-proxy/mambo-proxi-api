@@ -126,6 +126,7 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
 - [x] Revalidation du site : tâche planifiée `revalidation` (toutes les 15 s, étiquettes regroupées par paquets de 100, `Authorization: Bearer REVALIDATE_SECRET`, réessais 30 s × 2ⁿ, `SUCCEEDED` / `FAILED` après 8 tentatives) ; revalidation `page:magazine` à la date des éditions programmées (toutes les 5 min)
 - [~] Tâches planifiées (file `maintenance`, worker `MAIL_WORKER=on`) : nettoyage RGPD quotidien (contacts inactifs, candidatures refusées, inscriptions non confirmées, jetons et sessions, journaux, audience 13 mois, fichiers orphelins) ; sauvegarde `pg_dump` locale (`BACKUP_DIR`, rotation 30 jours, `pnpm db:backup`)
   - [ ] Copie des sauvegardes vers S3 (aucune dépendance S3 : point d'extension documenté) ; restauration testée (EXPLOITATION)
+- [x] Correctifs du branchement : lien de recherche des articles d'une édition ancienne (`?edition=`), `lang` des formulaires publics au contrat (`SubmissionLanguage`, repli `Accept-Language`), édito complet et signature « Nom — Fonction » du seed, `jobTitle` des candidatures et filtre `spontaneous` sans les offres supprimées, objet « [TEST] » des tests de modèles d'e-mails
 
 ## Phase 3 — Intégration
 

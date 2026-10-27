@@ -1079,3 +1079,29 @@
   renseigner le même `REVALIDATE_SECRET` des deux côtés.
 - Copie des sauvegardes vers S3 et restauration testée (documentation d'exploitation).
 - Tests unitaires et e2e du lot : après le branchement du site.
+
+## Correctifs du branchement du site (27 octobre 2026)
+
+### Fait
+
+- **Recherche** : un article d'une édition plus ancienne que la dernière publiée pointe vers
+  `/magazine?edition={editionId}#article-{id}` (la page sans paramètre affiche la dernière édition). La dernière
+  édition est lue une fois par recherche, avec la condition et l'ordre du module magazine (`visibleEditionWhere`,
+  `LATEST_EDITION_ORDER`, partagé avec `MagazineService`).
+- **Contrat** : `lang` facultatif (`SubmissionLanguage`, `fr`/`en`) dans les corps des formulaires publics qui le
+  lisent (devis, contact, rendez-vous, inscription, formation, partenaire, événement, candidature) ; repli
+  `Accept-Language` puis `fr` décrit dans les conventions (la newsletter ne lit que l'en-tête).
+- **Seed du magazine** : édito complet de l'édition n° 1 repris de la section `edito` de la page `magazine` (français
+  et anglais) ; signatures au format de la page, « Mireille Bell — Fondatrice de Mambo Proxi » (un seul champ
+  `signature`, nom et fonction séparés par un tiret cadratin, décrit au contrat).
+- **Candidatures** : `jobTitle` (`AdminApplication`) = intitulé de l'offre, sinon l'objet de la demande conservé à
+  l'envoi (offre supprimée), `null` pour une candidature spontanée. Le filtre `spontaneous` exige en plus un objet
+  « Candidature spontanée » (constante `SPONTANEOUS_APPLICATION_SUBJECT`, aussi utilisée à l'envoi) : les candidatures
+  dont l'offre a été supprimée en sont exclues, sans migration.
+- **Modèles d'e-mails** : l'envoi de test (`POST /v1/admin/email-templates/{key}/test`) préfixe l'objet par « [TEST] »
+  (champ facultatif `subjectPrefix` des tâches d'e-mail).
+
+### Points ouverts
+
+- Tests (unitaires, e2e, contrat) de ces correctifs : après le branchement, comme convenu.
+- Site : afficher `jobTitle` dans le back-office après `pnpm contract:sync`.

@@ -108,6 +108,13 @@ export function visibleEditionWhere(now: Date): Prisma.MagazineEditionWhereInput
   };
 }
 
+/** Ordre des éditions du site, de la plus récente à la plus ancienne : la première est l'édition affichée par défaut. */
+export const LATEST_EDITION_ORDER = [
+  { publishAt: { sort: 'desc', nulls: 'last' } },
+  { publishedAt: 'desc' },
+  { id: 'asc' },
+] as const satisfies Prisma.MagazineEditionOrderByWithRelationInput[];
+
 /** Édition visible sur le site (ou qui le deviendra à sa date) : ses modifications demandent une revalidation. */
 export function isOnline(row: Pick<MagazineEditionRow, 'status'>): boolean {
   return row.status === 'PUBLISHED' || row.status === 'SCHEDULED';

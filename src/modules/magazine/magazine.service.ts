@@ -6,6 +6,7 @@ import { AppConfigService } from '../../config/app-config.service.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { MediaService } from '../media/media.service.js';
 import {
+  LATEST_EDITION_ORDER,
   MAGAZINE_EDITION_SELECT,
   toPublicEdition,
   toPublicSummary,
@@ -45,7 +46,7 @@ export class MagazineService {
     const lang: Lang = query.lang;
     const rows = await this.prisma.magazineEdition.findMany({
       where: visibleEditionWhere(now),
-      orderBy: [{ publishAt: { sort: 'desc', nulls: 'last' } }, { publishedAt: 'desc' }, { id: 'asc' }],
+      orderBy: [...LATEST_EDITION_ORDER],
       select: MAGAZINE_EDITION_SELECT,
     });
     const editions = rows.map((row) => toPublicSummary(row, lang, this.image));

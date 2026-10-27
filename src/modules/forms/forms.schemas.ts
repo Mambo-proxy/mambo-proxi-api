@@ -42,7 +42,7 @@ const countrySchema = z
 const slugSchema = z.string().trim().min(1, { abort: true }).max(SLUG_MAX_LENGTH).regex(SLUG_PATTERN);
 const optionalSlug = slugSchema.nullish().transform((value) => value ?? null);
 const consentSchema = z.literal(true, { error: CONSENT_MESSAGE });
-/** Langue de l'envoi (absente du contrat) : celle des e-mails ; à défaut, l'en-tête `Accept-Language`. */
+/** Langue de l'envoi (`SubmissionLanguage` du contrat) : celle des e-mails ; à défaut, l'en-tête `Accept-Language`. */
 const langSchema = z.enum(LANGS).optional();
 
 /** Schéma `ContactIdentity` (pays et ville facultatifs ; `null` accepté comme absence). */

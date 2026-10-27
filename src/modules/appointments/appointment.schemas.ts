@@ -50,7 +50,7 @@ const contactIdentitySchema = z.object({
   city: optionalText(80),
 });
 
-/** `POST /v1/appointments` (`AppointmentInput`) ; `lang` (hors contrat) : langue des e-mails, comme les formulaires. */
+/** `POST /v1/appointments` (`AppointmentInput`) ; `lang` : langue des e-mails, comme les formulaires. */
 export const appointmentInputSchema = z.object({
   reason: reasonSchema,
   format: formatSchema,

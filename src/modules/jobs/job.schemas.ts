@@ -169,7 +169,7 @@ export const jobApplicationInputSchema = z
     turnstileToken: z.string().max(4096),
     honeypot: z.string().max(4096).optional(),
     startedAt: z.iso.datetime({ offset: true }),
-    /** Langue de l'envoi (absente du contrat) : celle des e-mails ; à défaut, l'en-tête `Accept-Language`. */
+    /** Langue de l'envoi (`SubmissionLanguage` du contrat) : celle des e-mails ; à défaut, l'en-tête `Accept-Language`. */
     lang: z.enum(LANGS).optional(),
   })
   .transform(({ turnstileToken, honeypot, startedAt, ...rest }) => ({

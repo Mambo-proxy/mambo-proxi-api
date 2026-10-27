@@ -16,7 +16,11 @@ import { AvailabilityService } from '../appointments/availability.service.js';
 import { publishedServiceWhere } from '../catalog/catalog.selects.js';
 import { shortName, type ContactSubmission } from '../contacts/contact.mapper.js';
 import { ContactsService, type SavedContact } from '../contacts/contacts.service.js';
-import { adminApplicationPath, visibleJobWhere } from '../jobs/job.mapper.js';
+import {
+  SPONTANEOUS_APPLICATION_SUBJECT,
+  adminApplicationPath,
+  visibleJobWhere,
+} from '../jobs/job.mapper.js';
 import type { JobApplicationInput } from '../jobs/job.schemas.js';
 import { MailQueueService } from '../mail/mail-queue.service.js';
 import { NewsletterSubscriptionsService } from '../newsletter/newsletter-subscriptions.service.js';
@@ -722,8 +726,8 @@ export class FormsService {
       throw validationException([{ path: 'jobSlug', code: 'unavailable', message: JOB_UNAVAILABLE }]);
 
     const stored = await this.storage.storeDocument(input.cv, 'cv', now);
-    const spontaneous = lang === 'en' ? 'Unsolicited application' : 'Candidature spontanée';
-    const subject = job?.title ?? 'Candidature spontanée';
+    const spontaneous = lang === 'en' ? 'Unsolicited application' : SPONTANEOUS_APPLICATION_SUBJECT;
+    const subject = job?.title ?? SPONTANEOUS_APPLICATION_SUBJECT;
     const fields: RequestField[] = [];
     pushField(fields, 'poste', 'Poste visé', subject);
     pushField(fields, 'ville', 'Ville', input.city);

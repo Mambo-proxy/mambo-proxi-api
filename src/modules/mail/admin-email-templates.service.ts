@@ -253,7 +253,7 @@ export class AdminEmailTemplatesService {
 
   /**
    * `POST /v1/admin/email-templates/{key}/test` : met en file un envoi du modèle enregistré, avec les données
-   * d'exemple, à l'adresse indiquée. Modèle désactivé : 409 (le worker ne l'enverrait pas).
+   * d'exemple, à l'adresse indiquée, objet préfixé « [TEST] ». Modèle désactivé : 409 (le worker ne l'enverrait pas).
    */
   async test(key: string, input: EmailTestInput, actor: AuditActor): Promise<{ message: string }> {
     const entry = this.entry(key);
@@ -271,6 +271,7 @@ export class AdminEmailTemplatesService {
       to: input.email,
       lang: 'fr',
       data: SAMPLE_DATA[entry.key],
+      subjectPrefix: '[TEST]',
     });
     await recordAudit(this.prisma, actor, {
       action: 'email-template.test',

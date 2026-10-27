@@ -232,6 +232,12 @@ export interface AttachmentSummary {
   size: number;
 }
 
+/**
+ * Objet (`Request.subject`) d'une candidature spontanée, enregistré à l'envoi ; une candidature à une offre garde
+ * l'intitulé de l'offre, ce qui la distingue d'une candidature spontanée quand l'offre a été supprimée.
+ */
+export const SPONTANEOUS_APPLICATION_SUBJECT = 'Candidature spontanée';
+
 /** Schéma `AdminApplication`. */
 export interface AdminApplication {
   id: string;
@@ -239,6 +245,8 @@ export interface AdminApplication {
   reference: string;
   status: ApplicationStatus;
   job: { id: string; title: string } | null;
+  /** Intitulé du poste : celui de l'offre, sinon celui conservé à l'envoi (offre supprimée) ; `null` si spontanée. */
+  jobTitle: string | null;
   contact: ContactSummary;
   message: string | null;
   cv: AttachmentSummary;
@@ -292,6 +300,11 @@ export function toAdminApplication(row: AdminApplicationRow): AdminApplication {
     reference: row.request.reference,
     status: row.status,
     job: row.jobOffer ? { id: row.jobOffer.id, title: row.jobOffer.title } : null,
+    jobTitle:
+      row.jobOffer?.title ??
+      (row.request.subject === null || row.request.subject === SPONTANEOUS_APPLICATION_SUBJECT
+        ? null
+        : row.request.subject),
     contact: toContactSummary(row.request.contact),
     message: row.request.message,
     cv: {

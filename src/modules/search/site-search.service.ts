@@ -7,7 +7,7 @@ import { PrismaService } from '../../prisma/prisma.service.js';
 import { serviceHref } from '../catalog/catalog.mapper.js';
 import { visibleServiceWhere } from '../catalog/catalog.selects.js';
 import { visibleJobWhere } from '../jobs/job.mapper.js';
-import { visibleEditionWhere } from '../magazine/magazine.mapper.js';
+import { LATEST_EDITION_ORDER, visibleEditionWhere } from '../magazine/magazine.mapper.js';
 import {
   DEFAULT_ILLUSTRATION,
   mediaImageSelect,
@@ -330,24 +330,32 @@ export class SiteSearchService {
   }
 
   private async articles(lang: Lang, now: Date): Promise<Candidate[]> {
-    const rows = await this.prisma.magazineArticle.findMany({
-      where: {
-        edition: { is: visibleEditionWhere(now) },
-      },
-      select: {
-        id: true,
-        title: true,
-        titleEn: true,
-        theme: true,
-        themeEn: true,
-        excerpt: true,
-        excerptEn: true,
-        body: true,
-        bodyEn: true,
-        image: { select: mediaImageSelect },
-      },
-      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-    });
+    const [latest, rows] = await Promise.all([
+      this.prisma.magazineEdition.findFirst({
+        where: visibleEditionWhere(now),
+        orderBy: [...LATEST_EDITION_ORDER],
+        select: { id: true },
+      }),
+      this.prisma.magazineArticle.findMany({
+        where: {
+          edition: { is: visibleEditionWhere(now) },
+        },
+        select: {
+          id: true,
+          editionId: true,
+          title: true,
+          titleEn: true,
+          theme: true,
+          themeEn: true,
+          excerpt: true,
+          excerptEn: true,
+          body: true,
+          bodyEn: true,
+          image: { select: mediaImageSelect },
+        },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      }),
+    ]);
     const baseUrl = this.config.get('MEDIA_PUBLIC_URL');
     return rows.map((row) => {
       const image = toMediaImage(row.image, baseUrl);
@@ -361,7 +369,11 @@ export class SiteSearchService {
           pickLocalized(row.excerpt, row.excerptEn, lang),
           pickLocalized(row.body, row.bodyEn, lang),
         ),
-        href: `/magazine#article-${row.id}`,
+        // La page sans paramètre affiche la dernière édition : les autres sont désignées par `?edition=`.
+        href:
+          row.editionId === null || row.editionId === latest?.id
+            ? `/magazine#article-${row.id}`
+            : `/magazine?edition=${encodeURIComponent(row.editionId)}#article-${row.id}`,
         visual: { illustration: DEFAULT_ILLUSTRATION, image, alt: image?.alt ?? '' },
         icon: null,
       };
