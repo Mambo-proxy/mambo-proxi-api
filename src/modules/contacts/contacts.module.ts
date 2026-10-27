@@ -12,6 +12,6 @@ import { ContactsService } from './contacts.service.js';
   imports: [RequestsModule],
   controllers: [AdminContactsController],
   providers: [ContactsService, AdminContactsService],
-  exports: [ContactsService],
+  exports: [ContactsService, AdminContactsService],
 })
 export class ContactsModule {}

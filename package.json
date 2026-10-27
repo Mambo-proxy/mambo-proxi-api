@@ -25,6 +25,7 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:purge-demo": "tsx prisma/purge-demo.ts",
+    "db:backup": "tsx scripts/db-backup.ts",
     "mail:preview": "tsx scripts/mail-preview.ts",
     "postinstall": "prisma generate",
     "contract:lint": "redocly lint",

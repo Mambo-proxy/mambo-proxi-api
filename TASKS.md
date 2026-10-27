@@ -67,7 +67,7 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
   - [x] Seed : mots de passe `SEED_ADMIN_PASSWORD` et `SEED_DEMO_PASSWORD` (développement) hachés en argon2id
   - [x] Tests : unitaires (permissions contre le contrat, JWT, politique des mots de passe) ; e2e `test/auth.e2e-spec.ts`, `test/admin-users.e2e-spec.ts` (doubles ; bloc base réelle)
   - [x] Contrat : 422 (login, verify-otp, resend-otp, forgot-password, PATCH users), 401 (resend-otp), 423 (verify-otp), 404 et 409 (DELETE et reset-password d'un utilisateur), 403 (logout), 429 (refresh), exemple `csrf-token-invalid` de `Forbidden` ; tests passés sur `expectContract`
-  - [~] Contrat : 403 `Forbidden` absent des mutations à cookie hors auth/utilisateurs/demandes/contacts : ajouté pour services, rubriques, pages, zones, paramètres, e-mails, rendez-vous, avis et médias ; reste magazine… avec leurs modules
+  - [~] Contrat : 403 `Forbidden` absent des mutations à cookie hors auth/utilisateurs/demandes/contacts : ajouté pour services, rubriques, pages, zones, paramètres, e-mails, rendez-vous, avis, médias et magazine ; reste les autres modules
   - [ ] Site : appeler `POST /v1/auth/refresh` sur un 401 (jeton d'accès de 15 min) avant de rediriger vers la connexion
 - [x] appointments + availability (créneaux, 409, confirmation `.ics`, proposition, rappel J-1 9 h Douala)
   - [x] Site (`src/modules/appointments`, `src/modules/forms`) : `GET /v1/appointments/availability` (plages, fermetures et horaires exceptionnels, rendez-vous qui occupent un créneau, délai minimal, horizon, format ; 62 jours au plus, `no-store`), `POST /v1/appointments` (anti-spam des formulaires, créneau proposé exigé → 422, pris → 409 `slot-taken`, demande `RENDEZ_VOUS` de même référence, e-mail « demande reçue », alerte de l'équipe), `POST /v1/appointments/{reference}/accept-proposal` (jeton HMAC, 410 expiré, 409 clos ou pris)
@@ -106,13 +106,26 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
   - [ ] Tests (unitaires, e2e) : après le branchement du site
   - [ ] Mesure d'ouverture et de clic : `opens` / `clicks` à `null` sans l'option `analytics.newsletterTracking` ; aucun pixel ni lien de suivi (absents du contrat)
   - [ ] Purge des inscriptions jamais confirmées (tâche RGPD quotidienne), détail d'un inscrit et préférences (absents du contrat)
+- [~] magazine (éditions, articles, aperçu, envoi par la newsletter)
+  - [x] Back-office : `/v1/admin/magazine*` (tableau de bord et dernière campagne, éditions : création avec numéro suivant ou hors-série, modification, 409 numéro pris, suppression d'une édition non publiée, publication immédiate ou programmée, dépublication, articles dans l'ordre de lecture, jeton d'aperçu ; articles : liste filtrée, création, modification, suppression) ; HTML assaini, médias contrôlés, audit, revalidation `page:magazine`
+  - [x] Newsletter d'une édition : test (une version par langue complète), programmation = une campagne par langue (`Campaign.language`, inscrits de cette langue ; français pour les anglophones tant que l'anglais est incomplet), même file et même liste que les campagnes, contenu régénéré à chaque modification, annulé à la dépublication
+  - [x] Site : `GET /v1/magazine` ajouté au contrat (édition affichée, éditions publiées, `lang`, `edition`, `?preview=`)
+  - [x] Contrat : 403 des opérations du magazine, 400 (liste des articles), 422 (test)
+  - [ ] Site : lire `GET /v1/magazine` dans la page Magazine (aujourd'hui : sections de la page `magazine`) ; revalidation à la date d'une édition programmée (tâche planifiée)
+  - [ ] Tests (unitaires, e2e) : après le branchement du site
 - [x] media (sharp : AVIF/WebP 480/960/1600, SVG assaini, point focal)
   - [x] `/v1/admin/media*` : liste (`q`, `status`, `used`), détail, envoi (type réel, 10 Mo, 50 Mpx, EXIF/GPS retirés, orientation), remplacement du fichier, texte alternatif et point focal, suppression refusée si utilisée (409 `media-in-use`) ; revalidation des contenus qui l'utilisent
   - [x] Variantes en tâche de fond (file `media`, `PROCESSING` → `READY`/`FAILED`), fichiers publics `GET /v1/media/{folder}/{file}` (répertoire `MEDIA_STORAGE_DIR` distinct des fichiers privés, cache immuable)
   - [ ] Tests unitaires et e2e du lot (après le branchement du site) ; pilote S3 des médias
-- [ ] dashboard · search · notifications · audit
-- [~] Revalidation du site (`POST {WEB_URL}/api/revalidate` avec tags) : demandes inscrites par les contenus du back-office (`revalidation_requests`, `PENDING`) ; envoi et réessais à faire
-- [ ] Tâches planifiées : nettoyage RGPD quotidien, sauvegarde `pg_dump` vers S3 (rotation 30 jours)
+- [x] dashboard · search · notifications · audit · mesure d'audience
+  - [x] `GET /v1/admin/dashboard` (KPI et période précédente, graphique jours / semaines / mois, rubriques, dernières demandes, « à faire », questionnaires, newsletter, visites de la mesure interne), `GET /v1/admin/sidebar-counts` : périmètre des permissions (`…-assigned`, 0 sans permission), demandes, rendez-vous et candidatures de demandes anonymisées exclus
+  - [x] `GET /v1/admin/search` (demandes, contacts, services, offres, pages ; sans accents ; groupes selon les permissions), `GET|PATCH /v1/admin/notifications*`, `GET /v1/admin/audit-log` (filtres, `diff` déduit des états avant / après)
+  - [x] `GET /v1/search` (site public : services, rubriques, pages, articles, offres, formations ; sans accents, pluriels simples, extraits et plages surlignées, cache 5 min)
+  - [x] `POST /v1/analytics/events` (JSON ou `text/plain`, origine du site, 16 Kio, 30 lots/min, robots ignorés, agrégats quotidiens sans IP ni agent utilisateur, condensat HMAC du visiteur avec consentement) et `GET /v1/admin/analytics/summary`
+  - [ ] Tests (unitaires, e2e) : après le branchement du site
+- [x] Revalidation du site : tâche planifiée `revalidation` (toutes les 15 s, étiquettes regroupées par paquets de 100, `Authorization: Bearer REVALIDATE_SECRET`, réessais 30 s × 2ⁿ, `SUCCEEDED` / `FAILED` après 8 tentatives) ; revalidation `page:magazine` à la date des éditions programmées (toutes les 5 min)
+- [~] Tâches planifiées (file `maintenance`, worker `MAIL_WORKER=on`) : nettoyage RGPD quotidien (contacts inactifs, candidatures refusées, inscriptions non confirmées, jetons et sessions, journaux, audience 13 mois, fichiers orphelins) ; sauvegarde `pg_dump` locale (`BACKUP_DIR`, rotation 30 jours, `pnpm db:backup`)
+  - [ ] Copie des sauvegardes vers S3 (aucune dépendance S3 : point d'extension documenté) ; restauration testée (EXPLOITATION)
 
 ## Phase 3 — Intégration
 

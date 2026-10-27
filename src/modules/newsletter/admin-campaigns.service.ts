@@ -5,7 +5,7 @@ import { notFoundException, ProblemException, type ProblemFieldError } from '../
 import { DAY_MS } from '../../common/time/agency-day.js';
 import { validationException } from '../../common/validation/validation-exception.js';
 import { AppConfigService } from '../../config/app-config.service.js';
-import type { CampaignSegmentKind, CampaignStatus, Prisma } from '../../generated/prisma/client.js';
+import type { CampaignSegmentKind, CampaignStatus, Language, Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { MailContentService } from '../mail/mail-content.service.js';
 import { MailQueueService } from '../mail/mail-queue.service.js';
@@ -114,13 +114,19 @@ export class AdminCampaignsService {
     return asObject(setting?.value)['newsletterTracking'] === true;
   }
 
-  private countSegment(kind: CampaignSegmentKind, tags: readonly string[]): Promise<number> {
-    return this.prisma.subscriber.count({ where: segmentWhere(kind, tags) });
+  private countSegment(
+    kind: CampaignSegmentKind,
+    tags: readonly string[],
+    language: Language | null = null,
+  ): Promise<number> {
+    return this.prisma.subscriber.count({ where: segmentWhere(kind, tags, language) });
   }
 
   private async toCampaign(row: CampaignRow, tracking?: boolean): Promise<Campaign> {
     const estimate =
-      row.status === 'PROGRAMMEE' ? await this.countSegment(row.segmentKind, row.segmentTags) : undefined;
+      row.status === 'PROGRAMMEE'
+        ? await this.countSegment(row.segmentKind, row.segmentTags, row.language)
+        : undefined;
     return toCampaign(row, tracking ?? (await this.tracking()), estimate);
   }
 
@@ -144,14 +150,15 @@ export class AdminCampaignsService {
         a.id.localeCompare(b.id),
     );
     const estimates = new Map<string, number>();
+    const estimateKey = (row: CampaignRow): string =>
+      `${row.segmentKind}:${row.segmentTags.join(',')}:${row.language ?? ''}`;
     for (const row of rows) {
       if (row.status !== 'PROGRAMMEE') continue;
-      const key = `${row.segmentKind}:${row.segmentTags.join(',')}`;
-      if (!estimates.has(key)) estimates.set(key, await this.countSegment(row.segmentKind, row.segmentTags));
+      const key = estimateKey(row);
+      if (!estimates.has(key))
+        estimates.set(key, await this.countSegment(row.segmentKind, row.segmentTags, row.language));
     }
-    const data = rows.map((row) =>
-      toCampaign(row, tracking, estimates.get(`${row.segmentKind}:${row.segmentTags.join(',')}`)),
-    );
+    const data = rows.map((row) => toCampaign(row, tracking, estimates.get(estimateKey(row))));
     return { data, stats: await this.stats(tracking, now) };
   }
 
@@ -429,7 +436,7 @@ export class AdminCampaignsService {
     if (!isEditable(current.status)) throw conflict('Cet envoi est déjà parti.');
     const errors = contentErrors(current);
     if (errors.length > 0) throw conflict(errors.map((error) => error.message).join(' '));
-    const recipients = await this.countSegment(current.segmentKind, current.segmentTags);
+    const recipients = await this.countSegment(current.segmentKind, current.segmentTags, current.language);
     const row = await this.prisma.$transaction(async (tx) => {
       const claimed = await tx.campaign.updateMany({
         where: { id, status: { in: ['BROUILLON', 'PROGRAMMEE'] } },

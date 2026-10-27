@@ -649,6 +649,32 @@ export class AdminRequestsService {
     await this.purgeFiles(storageKeys);
   }
 
+  /**
+   * Candidature refusée arrivée au terme de sa durée de conservation (nettoyage RGPD quotidien) : la demande
+   * `CANDIDATURE` est anonymisée et rattachée à la fiche commune anonyme, la candidature et ses pièces jointes sont
+   * supprimées, puis le CV est effacé du stockage. Sans auteur (tâche planifiée).
+   */
+  async purgeRejectedApplication(applicationId: string, now: Date): Promise<boolean> {
+    const application = await this.prisma.jobApplication.findUnique({
+      where: { id: applicationId },
+      select: { id: true, requestId: true, status: true },
+    });
+    if (!application || application.status !== 'REFUSE') return false;
+    const storageKeys = await this.prisma.$transaction(async (tx) => {
+      const anonymousId = await this.anonymousContactId(tx, now);
+      const keys = await this.anonymizeInTx(tx, [application.requestId], null, now, anonymousId);
+      const attachments = await tx.attachment.findMany({
+        where: { requestId: application.requestId },
+        select: { storageKey: true },
+      });
+      await tx.jobApplication.delete({ where: { id: application.id }, select: { id: true } });
+      await tx.attachment.deleteMany({ where: { requestId: application.requestId } });
+      return [...new Set([...keys, ...attachments.map((attachment) => attachment.storageKey)])];
+    });
+    await this.purgeFiles(storageKeys);
+    return true;
+  }
+
   /** Fiche commune « Contact anonymisé » (créée à la première anonymisation, jamais affichée). */
   private async anonymousContactId(tx: Prisma.TransactionClient, now: Date): Promise<string> {
     const contact = await tx.contact.upsert({
@@ -690,7 +716,7 @@ export class AdminRequestsService {
   async anonymizeInTx(
     tx: Prisma.TransactionClient,
     ids: readonly string[],
-    actorId: string,
+    actorId: string | null,
     now: Date,
     relinkContactId?: string,
   ): Promise<string[]> {

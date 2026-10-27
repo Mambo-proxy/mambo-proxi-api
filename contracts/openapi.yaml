@@ -720,6 +720,38 @@ paths:
               examples:
                 default: { $ref: '#/components/examples/EventsPage' }
 
+  /v1/magazine:
+    get:
+      tags: [Contenus]
+      operationId: getMagazine
+      summary: Magazine — édition affichée et éditions publiées
+      description: |
+        Page Magazine du site (`/magazine`) : l'édition affichée (édito signé, articles dans l'ordre de lecture, ancres
+        `article-{id}` visées par la recherche) et la liste des éditions publiées, de la plus récente à la plus ancienne.
+        Sans paramètre `edition`, l'édition affichée est la dernière publiée (`null` s'il n'y en a aucune). Une édition
+        programmée est publiée à sa date (`publishAt`). Avec un jeton d'aperçu du back-office
+        (`GET /v1/admin/magazine/editions/{id}/preview-token`), l'édition du jeton est renvoyée quel que soit son statut
+        (`isPreview: true`, `Cache-Control: private, no-store`). En anglais, chaque champ non traduit est renvoyé en
+        français. Tag de revalidation `page:magazine`.
+      parameters:
+        - $ref: '#/components/parameters/Lang'
+        - name: edition
+          in: query
+          description: Identifiant d'une édition publiée (sinon la dernière publiée).
+          schema: { $ref: '#/components/schemas/Id' }
+        - $ref: '#/components/parameters/Preview'
+      responses:
+        '200':
+          description: Magazine.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Magazine' }
+              examples:
+                default: { $ref: '#/components/examples/Magazine' }
+        '400': { $ref: '#/components/responses/InvalidQuery' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
   # ─────────────────────────── Rendez-vous ────────────────────────
   /v1/appointments/availability:
     get:
@@ -3231,6 +3263,7 @@ paths:
               examples:
                 default: { $ref: '#/components/examples/AdminMagazineOverview' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
 
   /v1/admin/magazine/editions:
     post:
@@ -3251,6 +3284,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminMagazineEdition' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '409': { $ref: '#/components/responses/Conflict' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
@@ -3271,6 +3305,7 @@ paths:
               examples:
                 default: { $ref: '#/components/examples/AdminMagazineEdition' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
     patch:
       tags: [Admin — Magazine]
@@ -3292,6 +3327,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminMagazineEdition' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
         '422': { $ref: '#/components/responses/ValidationError' }
@@ -3306,6 +3342,7 @@ paths:
       responses:
         '204': { $ref: '#/components/responses/NoContent' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
 
@@ -3332,6 +3369,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminMagazineEdition' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
@@ -3350,6 +3388,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminMagazineEdition' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   /v1/admin/magazine/editions/{id}/articles:
@@ -3377,6 +3416,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminMagazineEdition' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
@@ -3386,6 +3426,7 @@ paths:
       operationId: adminGetMagazineEditionPreviewToken
       x-permissions: [content:read]
       summary: Jeton de prévisualisation de l'édition sur le site (30 min)
+      description: L'URL ouvre la page Magazine du site (`/magazine?preview=`), lue par `GET /v1/magazine?preview=`.
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       responses:
@@ -3395,6 +3436,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/PreviewToken' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   /v1/admin/magazine/editions/{id}/newsletter/test:
@@ -3421,7 +3463,9 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/MessageResponse' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationError' }
         '429': { $ref: '#/components/responses/TooManyRequests' }
 
   /v1/admin/magazine/editions/{id}/newsletter/schedule:
@@ -3433,7 +3477,10 @@ paths:
       description: |
         Crée (ou reprogramme) une campagne par langue, envoyée aux seuls inscrits confirmés de cette langue ; tant que la
         version anglaise est incomplète, les inscrits anglophones reçoivent la version française. L'édition doit être
-        publiée, ou programmée avant la date d'envoi (409 sinon).
+        publiée, ou programmée avant la date d'envoi (409 sinon) ; une édition dont l'envoi est parti renvoie 409. Les
+        campagnes apparaissent dans la liste des envois de la newsletter ; leur contenu (édito, sommaire des articles
+        avec liens vers le site) est régénéré à chaque modification de l'édition tant qu'elles ne sont pas parties. La
+        dépublication de l'édition annule la programmation.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       requestBody:
@@ -3452,6 +3499,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminMagazineEdition' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
         '422': { $ref: '#/components/responses/ValidationError' }
@@ -3475,7 +3523,9 @@ paths:
           content:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/AdminMagazineArticle' } }
+        '400': { $ref: '#/components/responses/InvalidQuery' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
     post:
       tags: [Admin — Magazine]
       operationId: adminCreateMagazineArticle
@@ -3494,6 +3544,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminMagazineArticle' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
   /v1/admin/magazine/articles/{id}:
@@ -3516,6 +3567,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminMagazineArticle' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '422': { $ref: '#/components/responses/ValidationError' }
     delete:
@@ -3528,6 +3580,7 @@ paths:
       responses:
         '204': { $ref: '#/components/responses/NoContent' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   # ──────────────────────────── Admin — Zones d'intervention ──────
@@ -6083,6 +6136,53 @@ components:
         capacity: { type: [integer, 'null'] }
         remainingPlaces: { type: [integer, 'null'] }
         limited: { type: boolean, description: Afficher la mention « Places limitées ». }
+
+    MagazineArticle:
+      type: object
+      required: [id, anchor, title, theme, excerpt, body, image]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        anchor: { type: string, description: 'Ancre de la carte de l''article (`/magazine#article-{id}`).', examples: [article-mag_art_2] }
+        title: { type: string }
+        theme: { type: string, examples: [Santé et nutrition] }
+        excerpt: { type: [string, 'null'] }
+        body: { oneOf: [{ $ref: '#/components/schemas/Html' }, { type: 'null' }] }
+        image: { oneOf: [{ $ref: '#/components/schemas/MediaImage' }, { type: 'null' }] }
+
+    MagazineEditionSummary:
+      type: object
+      required: [id, number, label, title, subtitle, themes, cover, publishedAt, articlesCount]
+      properties:
+        id: { $ref: '#/components/schemas/Id' }
+        number: { type: [integer, 'null'], description: '`null` pour un hors-série.' }
+        label: { type: string, description: '« N° 1 » ou « Hors-série » (« No. 1 », « Special issue » en anglais).', examples: [N° 1] }
+        title: { type: string }
+        subtitle: { type: [string, 'null'] }
+        themes: { type: [string, 'null'] }
+        cover: { oneOf: [{ $ref: '#/components/schemas/MediaImage' }, { type: 'null' }] }
+        publishedAt: { oneOf: [{ $ref: '#/components/schemas/DateTime' }, { type: 'null' }], description: 'Date de publication affichée ; `null` pour un brouillon vu en aperçu.' }
+        articlesCount: { type: integer }
+
+    MagazineEdition:
+      allOf:
+        - $ref: '#/components/schemas/MagazineEditionSummary'
+        - type: object
+          required: [editorial, signature, articles]
+          properties:
+            editorial: { oneOf: [{ $ref: '#/components/schemas/Html' }, { type: 'null' }] }
+            signature: { type: [string, 'null'] }
+            articles:
+              type: array
+              description: Articles dans l'ordre de lecture.
+              items: { $ref: '#/components/schemas/MagazineArticle' }
+
+    Magazine:
+      type: object
+      required: [edition, editions, isPreview]
+      properties:
+        edition: { oneOf: [{ $ref: '#/components/schemas/MagazineEdition' }, { type: 'null' }] }
+        editions: { type: array, items: { $ref: '#/components/schemas/MagazineEditionSummary' } }
+        isPreview: { type: boolean, description: "`true` : édition vue avec un jeton d'aperçu (brouillon possible)." }
 
     # ─────────────────────────── Rendez-vous ────────────────────────
     AppointmentFormat:
@@ -9805,6 +9905,28 @@ components:
           - { id: evt_lobe, slug: randonnee-cascades-lobe, title: Randonnée et cascades de la Lobé, startsAt: '2026-11-22T07:00:00.000Z', endsAt: null, city: Kribi, place: journée, tag: Nature, visual: { illustration: culture, image: null, alt: '' }, description: null, capacity: 20, remainingPlaces: 8, limited: true }
           - { id: evt_artisans, slug: visite-ateliers-artisans, title: Visite des ateliers d’artisans, startsAt: '2026-12-06T08:00:00.000Z', endsAt: '2026-12-07T17:00:00.000Z', city: Foumban, place: week-end, tag: Artisanat, visual: { illustration: marche, image: null, alt: '' }, description: null, capacity: 15, remainingPlaces: 6, limited: true }
         meta: { page: 1, pageSize: 3, total: 3, totalPages: 1 }
+
+    Magazine:
+      summary: Dernière édition publiée
+      value:
+        edition:
+          id: mag_n1
+          number: 1
+          label: N° 1
+          title: Bien-être et art de vivre à Douala
+          subtitle: Édition de lancement
+          themes: Bien-être global
+          cover: null
+          publishedAt: '2026-10-01T08:00:00.000Z'
+          articlesCount: 2
+          editorial: '<p>Bienvenue dans le premier numéro du magazine Mambo Proxi.</p>'
+          signature: Mireille Bell, fondatrice de Mambo Proxi
+          articles:
+            - { id: mag_art_2, anchor: article-mag_art_2, title: 'Recevoir à la camerounaise : les conseils d''un chef de Bonapriso', theme: Art de vivre, excerpt: 'Ndolé, poisson braisé, beignets-haricots : un chef de Bonapriso partage ses astuces pour recevoir douze personnes sans stress.', body: '<p>Recevoir douze personnes sans stress, c''est possible.</p>', image: null }
+            - { id: mag_art_5, anchor: article-mag_art_5, title: Bien manger au quotidien à Douala, theme: Santé et nutrition, excerpt: Les conseils de notre chef pour des repas équilibrés avec les produits du marché Sandaga., body: null, image: null }
+        editions:
+          - { id: mag_n1, number: 1, label: N° 1, title: Bien-être et art de vivre à Douala, subtitle: Édition de lancement, themes: Bien-être global, cover: null, publishedAt: '2026-10-01T08:00:00.000Z', articlesCount: 2 }
+        isPreview: false
 
     Availability:
       summary: Créneaux disponibles

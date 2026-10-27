@@ -365,68 +365,95 @@ export class AdminContactsService {
     });
     if (!contact) throw contactNotFound();
     const storageKeys = await this.prisma.$transaction(async (tx) => {
-      const requests = await tx.request.findMany({
-        where: { contactId: id, anonymizedAt: null },
-        select: { id: true },
-      });
-      const keys = await this.requests.anonymizeInTx(
-        tx,
-        requests.map((request) => request.id),
-        actor.auth.user.id,
-        now,
-      );
-      await tx.appointment.updateMany({ where: { contactId: id }, data: { message: null, notes: null } });
-      await tx.contactInterest.deleteMany({ where: { contactId: id } });
-      const subscribers = await tx.subscriber.findMany({
-        where: { OR: [{ contactId: id }, { email: contact.email }] },
-        select: { id: true, unsubscribedAt: true },
-      });
-      for (const subscriber of subscribers)
-        await tx.subscriber.update({
-          where: { id: subscriber.id },
-          data: {
-            email: `efface-${subscriber.id}@${ERASED_DOMAIN}`,
-            name: null,
-            phone: null,
-            country: null,
-            tags: [],
-            status: 'DESINSCRIT',
-            unsubscribedAt: subscriber.unsubscribedAt ?? now,
-            confirmTokenHash: null,
-            confirmTokenExpires: null,
-          },
-          select: { id: true },
-        });
-      await tx.contact.update({
-        where: { id },
-        data: {
-          email: `efface-${id}@${ERASED_DOMAIN}`,
-          fullName: ERASED_CONTACT_NAME,
-          firstName: null,
-          lastName: null,
-          phone: null,
-          country: null,
-          city: null,
-          district: null,
-          organization: null,
-          activity: null,
-          preferredChannel: null,
-          searchText: '',
-          cityKey: null,
-          anonymizedAt: now,
-        },
-        select: { id: true },
-      });
+      const { keys, anonymizedRequests } = await this.eraseInTx(tx, contact, actor.auth.user.id, now);
       await recordAudit(tx, auditActor(actor), {
         action: 'contact.erase',
         entity: 'Contact',
         entityId: id,
         label: 'A effacé les données d’un contact (droit à l’effacement)',
-        after: { anonymizedRequests: requests.length },
+        after: { anonymizedRequests },
       });
       return keys;
     });
     // Fichiers (CV, pièces jointes) supprimés du stockage une fois l'effacement enregistré.
     await this.requests.purgeFiles(storageKeys);
+  }
+
+  /**
+   * Effacement automatique d'un contact inactif depuis la durée de conservation (nettoyage RGPD quotidien) : même
+   * effacement que le droit à l'effacement, sans auteur. Renvoie `false` si le contact est déjà effacé.
+   */
+  async eraseInactive(id: string, now: Date): Promise<boolean> {
+    const contact = await this.prisma.contact.findFirst({
+      where: { id, ...VISIBLE_CONTACTS },
+      select: { id: true, email: true },
+    });
+    if (!contact) return false;
+    const { keys } = await this.prisma.$transaction((tx) => this.eraseInTx(tx, contact, null, now));
+    await this.requests.purgeFiles(keys);
+    return true;
+  }
+
+  /** Effacement d'un contact dans une transaction : renvoie les fichiers à supprimer et le nombre de demandes. */
+  private async eraseInTx(
+    tx: Prisma.TransactionClient,
+    contact: { id: string; email: string },
+    actorId: string | null,
+    now: Date,
+  ): Promise<{ keys: string[]; anonymizedRequests: number }> {
+    const id = contact.id;
+    const requests = await tx.request.findMany({
+      where: { contactId: id, anonymizedAt: null },
+      select: { id: true },
+    });
+    const keys = await this.requests.anonymizeInTx(
+      tx,
+      requests.map((request) => request.id),
+      actorId,
+      now,
+    );
+    await tx.appointment.updateMany({ where: { contactId: id }, data: { message: null, notes: null } });
+    await tx.contactInterest.deleteMany({ where: { contactId: id } });
+    const subscribers = await tx.subscriber.findMany({
+      where: { OR: [{ contactId: id }, { email: contact.email }] },
+      select: { id: true, unsubscribedAt: true },
+    });
+    for (const subscriber of subscribers)
+      await tx.subscriber.update({
+        where: { id: subscriber.id },
+        data: {
+          email: `efface-${subscriber.id}@${ERASED_DOMAIN}`,
+          name: null,
+          phone: null,
+          country: null,
+          tags: [],
+          status: 'DESINSCRIT',
+          unsubscribedAt: subscriber.unsubscribedAt ?? now,
+          confirmTokenHash: null,
+          confirmTokenExpires: null,
+        },
+        select: { id: true },
+      });
+    await tx.contact.update({
+      where: { id },
+      data: {
+        email: `efface-${id}@${ERASED_DOMAIN}`,
+        fullName: ERASED_CONTACT_NAME,
+        firstName: null,
+        lastName: null,
+        phone: null,
+        country: null,
+        city: null,
+        district: null,
+        organization: null,
+        activity: null,
+        preferredChannel: null,
+        searchText: '',
+        cityKey: null,
+        anonymizedAt: now,
+      },
+      select: { id: true },
+    });
+    return { keys, anonymizedRequests: requests.length };
   }
 }

@@ -952,5 +952,130 @@
 
 - Purge des inscriptions jamais confirmées (tâche RGPD quotidienne à écrire).
 - Pas de détail d'un inscrit ni de préférences, pas d'export des inscrits d'un événement : absents du contrat.
-- `POST /v1/admin/magazine/editions/{id}/newsletter/*` : lot du magazine.
+- `POST /v1/admin/magazine/editions/{id}/newsletter/*` : lot du magazine (fait, voir ci-dessous).
+- Tests unitaires et e2e du lot : après le branchement du site.
+
+## Phase 2 — Magazine (27 octobre 2026)
+
+### Fait
+
+- **Back-office** (`src/modules/magazine`) : les 15 opérations `/v1/admin/magazine*` du contrat.
+  - Éditions : création en brouillon (numéro suivant si `number` est absent, `null` = hors-série, 409 si le numéro
+    est pris, y compris en cas de course : P2002), enregistrement (édito assaini, couverture de la médiathèque :
+    422 `unknown_media`), suppression refusée pour une édition publiée (409 ; articles détachés, campagnes non
+    parties supprimées), publication immédiate ou programmée (`SCHEDULED`, publiée à sa date : statut évalué à la
+    lecture), dépublication (programmation de la newsletter annulée), articles dans l'ordre de lecture (422 sur
+    `ids.N` inconnu ; un article ajouté quitte son édition précédente), jeton d'aperçu (`kind: magazine`, URL
+    `/magazine?preview=`).
+  - Articles : liste (`edition` = identifiant ou `none`, `q` sans accents), création à la fin de l'édition,
+    modification (changement d'édition → fin de la nouvelle), suppression.
+  - Tableau de bord : éditions de la plus récente à la plus ancienne, `toTranslate`, `languages` (anglais complet :
+    titre, édito et tous les articles), `readers` (ouvertures des e-mails de l'édition ; `null` avant publication),
+    `lastCampaign` (dernière édition envoyée : envois, taux d'ouverture et écart à la moyenne, clics, nouveaux
+    inscrits depuis la publication ; `null` si la mesure est désactivée).
+  - Audit sans donnée personnelle (l'adresse du test n'est pas journalisée) ; revalidation `page:magazine` pour toute
+    modification d'une édition publiée ou programmée (et des images utilisées, `media-usages.ts`).
+- **Newsletter d'une édition** (`MagazineNewsletterService`) : réutilise les campagnes et la file
+  `newsletter-campaigns`. Programmation = une campagne par langue (`Campaign.language`, `magazineEditionId`), créée
+  ou reprogrammée ; `segmentWhere` filtre désormais par langue (matérialisation des envois, estimations de la liste
+  des campagnes). Contenu généré (titre, couverture, édito signé, sommaire avec liens absolus vers
+  `/magazine#article-{id}`, bouton « Lire le magazine ») et régénéré après chaque modification tant que les
+  campagnes ne sont pas parties. Test : une version par langue complète, 10 par minute.
+- **Site** : `GET /v1/magazine` (`@Public`, `public, no-cache` ; aperçu `private, no-store`).
+- **Contrat** : `GET /v1/magazine` et schémas `Magazine`, `MagazineEdition`, `MagazineEditionSummary`,
+  `MagazineArticle` (+ exemple) ; 403 sur toutes les opérations du magazine, 400 sur la liste des articles, 422 sur
+  le test ; règles de la programmation décrites.
+- **Aucune migration, aucune dépendance, aucune variable d'environnement** : colonnes existantes.
+
+### Décisions
+
+- Aucune route publique du magazine n'existait : le site affiche la page `magazine` (sections) et la recherche vise
+  `/magazine#article-{id}`. Une seule route (`GET /v1/magazine?edition=&preview=`) suffit à la page unique ; pas
+  de slug d'édition (colonne absente), l'édition se choisit par identifiant.
+- Une campagne par langue même sans version anglaise (la campagne `EN` porte alors le texte français) : les
+  inscrits anglophones reçoivent le gabarit en anglais autour du contenu français.
+- Pas de nouveaux tests (priorité au branchement) ; tests existants passés.
+
+### Écarts avec le back-office simulé du site (le contrat prime)
+
+- Ordre des éditions : de la plus récente à la plus ancienne (contrat) ; mock : numéros croissants, hors-séries
+  ensuite.
+- `languages` d'une édition : anglais complet seulement si tous ses articles le sont (mock : titre et édito).
+- Programmation de la newsletter : 409 aussi quand l'envoi est déjà parti.
+
+### Points ouverts
+
+- Site : page Magazine branchée sur `GET /v1/magazine` (cartes d'articles avec l'ancre `anchor`).
+- Édition programmée : revalidation `page:magazine` à sa date (tâche planifiée) ; le statut passe à `PUBLISHED` à la
+  lecture seulement.
+- `readers` ne compte que les ouvertures d'e-mails (pas de mesure par édition sur le site).
+- Tests unitaires et e2e du lot : après le branchement du site.
+
+## Phase 2 — Finitions : tableau de bord, recherche, notifications, journal, audience, tâches planifiées (27 octobre 2026)
+
+### Fait
+
+- **Back-office transverse** (`src/modules/dashboard`) : `GET /v1/admin/dashboard`, `GET /v1/admin/sidebar-counts`,
+  `GET /v1/admin/search`, `GET /v1/admin/notifications`, `PATCH /v1/admin/notifications/read`,
+  `GET /v1/admin/audit-log`. Toutes les routes du contrat hors magazine sont désormais déclarées.
+- **Recherche du site** (`src/modules/search`) : `GET /v1/search`.
+- **Mesure d'audience** (`src/modules/analytics`) : `POST /v1/analytics/events`, `GET /v1/admin/analytics/summary`.
+- **Tâches planifiées** (`src/modules/maintenance`, file BullMQ `maintenance`, « job schedulers » démarrés avec
+  `MAIL_WORKER=on`) : `revalidation` (15 s), `magazine-publication` (5 min), `database-backup` (2 h, Douala),
+  `gdpr-cleanup` (3 h 30, Douala). Script `pnpm db:backup`.
+- **Configuration** : `BACKUP_DIR` (`var/backups`), `PG_DUMP_PATH` (`pg_dump`) ; `REVALIDATE_SECRET` existant utilisé.
+  Corps `text/plain` (16 Kio) accepté pour `navigator.sendBeacon`.
+- **Aucune migration, aucune dépendance** : colonnes existantes (`revalidation_requests`, `backup_runs`,
+  `analytics_*_daily`, `notifications`, `audit_logs`).
+
+### Décisions
+
+- **Périmètre** : demandes et questionnaires selon `requests:read` / `requests:read-assigned` (dossiers assignés),
+  rendez-vous selon `appointments:read(-assigned)`, avis selon `reviews:moderate`, candidatures selon
+  `applications:read`, newsletter selon `newsletter:read`, carte « Visites » selon `analytics:read` ; bloc vide (0) sans
+  permission. Exclus partout : demandes anonymisées, rendez-vous d'une demande anonymisée ou d'un contact effacé,
+  candidatures d'une demande anonymisée (les avis de demandes anonymisées sont masqués, donc jamais « à valider »).
+- **Tableau de bord** : périodes en jours entiers de Douala (7 et 30 jours aujourd'hui compris, 12 mois mois en cours
+  compris), période précédente de même durée ; graphique : 7 jours, 12 semaines ISO (maquette) ou 12 mois ;
+  `newRequests` = demandes reçues sur la période, `servicesCompleted` = `completedAt` sur la période, `satisfaction` =
+  note moyenne des questionnaires répondus ; `visits` = pages vues de la mesure interne (pas de GA4 Data API), `null`
+  tant qu'aucune mesure n'est reçue.
+- **Recherche du back-office** : demandes et contacts par les colonnes `search_text` (sans accents) ; services, offres
+  et pages en mémoire (quelques dizaines). Liens : `/admin/demandes?id=`, `/admin/contacts?id=`,
+  `/admin/services/{id}`, `/admin/recrutement/offres/{id}`, `/admin/pages?page={clé}` (paramètres lus par les écrans).
+- **Recherche du site** : contenus publiés lus puis comparés en mémoire (sans accents ni casse, ligatures, mots en début
+  de mot, pluriels en -s/-x) ; pas de racinisation complète ni d'index plein texte (volume faible). Articles : éditions
+  visibles (`visibleEditionWhere` du magazine).
+- **Audience** : 202 dès la validation, écriture en tâche de fond (`INSERT … ON CONFLICT DO UPDATE`) ; IP et agent
+  utilisateur seulement pour la limitation de débit et le filtre des robots, jamais enregistrés ; `visitorId` haché
+  (HMAC `TOKEN_SIGNING_SECRET`) et seulement avec consentement ; doublons d'un lot, pages `/admin`, `/api`, `/_next` et
+  horodatages hors fenêtre comptés dans `rejected`. Résumé calculé à la demande (`generatedAt` = maintenant).
+- **Revalidation** : réservation `FOR UPDATE SKIP LOCKED` (`RUNNING`), attente croissante calculée depuis la création
+  (`created_at + (2^tentatives − 1) × 30 s`, sans colonne supplémentaire) ; état `SUCCEEDED` (énumération `TaskStatus`)
+  plutôt que `SENT`. Demandes `RUNNING` remises en attente au démarrage du worker.
+- **Magazine** : une édition programmée n'est jamais réécrite ; elle est « traitée » dès qu'une demande contenant
+  `page:magazine` a été inscrite après sa date (par la tâche ou par le back-office) : pas de double inscription.
+- **RGPD** : contacts inactifs effacés comme par le droit à l'effacement (`AdminContactsService.eraseInactive`, sauf
+  abonnés confirmés, demande ouverte ou rendez-vous à venir) ; candidatures refusées : demande anonymisée rattachée à
+  la fiche anonyme, candidature et pièces jointes supprimées, CV effacé (`purgeRejectedApplication`) ; conservation
+  fixée : inscriptions non confirmées 30 j, journal d'activité 12 mois, notifications lues 90 j (toutes 12 mois),
+  revalidations traitées 30 j, historique des sauvegardes 90 j, audience 13 mois, sessions et codes 1 j après
+  expiration ; fichiers orphelins de plus de 24 h. Résumé (nombres seulement) au journal d'activité, sans auteur. Les
+  anciens dossiers des médias remplacés étaient déjà supprimés par la file `media`.
+- **Sauvegarde** : mot de passe passé par `PGPASSWORD` (jamais en argument), paramètre Prisma `schema` ignoré, fichier
+  `.partial` renommé à la fin ; `pg_dump` absent → `FAILED` avec message explicite.
+
+### Écarts avec le back-office simulé du site (le contrat prime)
+
+- Tableau de bord d'un chargé de clientèle : rubriques, graphique et questionnaires calculés sur ses dossiers (mock :
+  vides ou figés) ; `newRegistrations` = inscriptions « Nouvelle » visibles (mock : `contacts:read`).
+- Notifications : celles enregistrées pour l'utilisateur (pas de filtrage par rôle comme le mock).
+- Journal : `pageSize` 20 par défaut (contrat ; mock : 25) ; `entity` = nom technique (`Request`, `Service`…), comme
+  enregistré par les modules (mock : libellés français).
+
+### Points ouverts
+
+- Site : la route `POST /api/revalidate` existe (`src/app/api/revalidate/route.ts`, `Bearer`, 100 étiquettes au plus) :
+  renseigner le même `REVALIDATE_SECRET` des deux côtés.
+- Copie des sauvegardes vers S3 et restauration testée (documentation d'exploitation).
 - Tests unitaires et e2e du lot : après le branchement du site.

@@ -393,9 +393,15 @@ export async function collectAllUsages(client: ReadClient): Promise<MediaUsageEn
 export const FOREIGN_USAGES_SELECT = {
   partners: { select: { id: true, name: true } },
   events: { select: { id: true, title: true, status: true } },
-  magazineCovers: { select: { id: true, title: true } },
-  magazineArticles: { select: { id: true, title: true, editionId: true } },
+  magazineCovers: { select: { id: true, title: true, status: true } },
+  magazineArticles: {
+    select: { id: true, title: true, editionId: true, edition: { select: { status: true } } },
+  },
 } satisfies Prisma.MediaSelect;
+
+/** Édition publiée ou programmée : une image modifiée demande la revalidation de la page Magazine. */
+const magazineTags = (status: string | undefined): string[] =>
+  status === 'PUBLISHED' || status === 'SCHEDULED' ? [CACHE_TAGS.page('magazine')] : [];
 
 export type ForeignUsagesRow = Prisma.MediaGetPayload<{ select: typeof FOREIGN_USAGES_SELECT }>;
 
@@ -426,7 +432,7 @@ export function liveForeignUsages(mediaId: string, row: ForeignUsagesRow): Media
       slot: '',
       label: `Magazine « ${edition.title} » (couverture)`,
       href: `/admin/magazine/${edition.id}`,
-      tags: [],
+      tags: magazineTags(edition.status),
     })),
     ...row.magazineArticles.map((article) => ({
       mediaId,
@@ -435,7 +441,7 @@ export function liveForeignUsages(mediaId: string, row: ForeignUsagesRow): Media
       slot: '',
       label: `Article « ${article.title} »`,
       href: article.editionId === null ? '/admin/magazine' : `/admin/magazine/${article.editionId}`,
-      tags: [],
+      tags: magazineTags(article.edition?.status),
     })),
   ];
 }

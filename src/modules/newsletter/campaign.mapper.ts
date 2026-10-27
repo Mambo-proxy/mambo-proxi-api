@@ -1,4 +1,4 @@
-import type { CampaignSegmentKind, CampaignStatus, Prisma } from '../../generated/prisma/client.js';
+import type { CampaignSegmentKind, CampaignStatus, Language, Prisma } from '../../generated/prisma/client.js';
 
 /** Schéma `CampaignSegment` du contrat. */
 export interface CampaignSegment {
@@ -31,13 +31,16 @@ function countryWhere(country: string): Prisma.SubscriberWhereInput {
 
 /**
  * Destinataires d'un segment : abonnés confirmés (double opt-in) seulement ; France / Cameroun par le pays,
- * professionnels par le profil de la fiche contact, étiquettes : au moins une en commun.
+ * professionnels par le profil de la fiche contact, étiquettes : au moins une en commun. `language` (envois du
+ * magazine, une campagne par langue) : abonnés de cette langue seulement.
  */
 export function segmentWhere(
   kind: CampaignSegmentKind,
   tags: readonly string[],
+  language: Language | null = null,
 ): Prisma.SubscriberWhereInput {
-  const confirmed: Prisma.SubscriberWhereInput = { status: 'CONFIRME' };
+  const confirmed: Prisma.SubscriberWhereInput =
+    language === null ? { status: 'CONFIRME' } : { status: 'CONFIRME', language };
   switch (kind) {
     case 'ALL':
       return confirmed;
@@ -60,6 +63,7 @@ export const CAMPAIGN_SELECT = {
   text: true,
   segmentKind: true,
   segmentTags: true,
+  language: true,
   status: true,
   scheduledAt: true,
   startedAt: true,

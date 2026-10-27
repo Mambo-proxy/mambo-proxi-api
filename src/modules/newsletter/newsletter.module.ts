@@ -13,7 +13,8 @@ import { NewsletterController } from './newsletter.controller.js';
  * Newsletter : double opt-in et désinscription en un clic (`/v1/newsletter/*`), inscrits
  * (`/v1/admin/subscribers*`) et campagnes (`/v1/admin/campaigns*`) du back-office, envoi par lots par la file
  * BullMQ `newsletter-campaigns` (worker démarré avec `MAIL_WORKER=on`). `NewsletterSubscriptionsService` est
- * exporté pour la confirmation demandée par le formulaire d'inscription.
+ * exporté pour la confirmation demandée par le formulaire d'inscription, `CampaignDispatchService` pour l'envoi des
+ * éditions du magazine (mêmes campagnes, même file).
  */
 @Module({
   imports: [AntiSpamModule, QueueModule],
@@ -26,6 +27,6 @@ import { NewsletterController } from './newsletter.controller.js';
     CampaignDispatchService,
     CampaignDispatchProcessor,
   ],
-  exports: [NewsletterSubscriptionsService],
+  exports: [NewsletterSubscriptionsService, CampaignDispatchService],
 })
 export class NewsletterModule {}

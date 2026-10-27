@@ -142,7 +142,14 @@ export class CampaignDispatchService implements OnModuleDestroy {
   private async start(job: Extract<CampaignJob, { step: 'start' }>, now: Date): Promise<CampaignOutcome> {
     const campaign = await this.prisma.campaign.findUnique({
       where: { id: job.campaignId },
-      select: { id: true, status: true, scheduledAt: true, segmentKind: true, segmentTags: true },
+      select: {
+        id: true,
+        status: true,
+        scheduledAt: true,
+        segmentKind: true,
+        segmentTags: true,
+        language: true,
+      },
     });
     if (campaign === null) return 'skipped';
     if (campaign.status === 'PROGRAMMEE') {
@@ -156,7 +163,8 @@ export class CampaignDispatchService implements OnModuleDestroy {
     } else if (campaign.status !== 'EN_COURS_ENVOI') return 'skipped';
 
     const existing = await this.prisma.campaignDelivery.count({ where: { campaignId: campaign.id } });
-    if (existing === 0) await this.materialize(campaign.id, campaign.segmentKind, campaign.segmentTags);
+    if (existing === 0)
+      await this.materialize(campaign.id, campaign.segmentKind, campaign.segmentTags, campaign.language);
     const recipients = await this.prisma.campaignDelivery.count({ where: { campaignId: campaign.id } });
     await this.prisma.campaign.update({
       where: { id: campaign.id },
@@ -168,16 +176,20 @@ export class CampaignDispatchService implements OnModuleDestroy {
     return 'started';
   }
 
-  /** Envois individuels des abonnés confirmés du segment (par tranches, sans doublon). */
+  /**
+   * Envois individuels des abonnés confirmés du segment, de la langue de la campagne s'il y en a une (par tranches,
+   * sans doublon).
+   */
   private async materialize(
     campaignId: string,
     kind: Parameters<typeof segmentWhere>[0],
     tags: readonly string[],
+    language: Parameters<typeof segmentWhere>[2],
   ): Promise<void> {
     let cursor: string | undefined;
     for (;;) {
       const subscribers = await this.prisma.subscriber.findMany({
-        where: segmentWhere(kind, tags),
+        where: segmentWhere(kind, tags, language),
         orderBy: { id: 'asc' },
         take: MATERIALIZE_CHUNK,
         ...(cursor === undefined ? {} : { skip: 1, cursor: { id: cursor } }),

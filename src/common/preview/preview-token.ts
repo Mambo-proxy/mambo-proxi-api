@@ -3,18 +3,18 @@ import { safeEqual } from '../../modules/auth/tokens.js';
 
 /**
  * Jetons de prévisualisation du back-office (`GET /v1/admin/services/{id}/preview-token`,
- * `GET /v1/admin/pages/{key}/preview-token`), lus par les routes publiques (`?preview=`) : charge utile JSON
- * `{ k, id, exp }` encodée en base64url, puis signature HMAC-SHA256 (`TOKEN_SIGNING_SECRET`, préfixe d'usage
- * `preview`). Valables 30 minutes, sans état en base ; un jeton ne vaut que pour le contenu pour lequel il a été émis.
+ * `GET /v1/admin/pages/{key}/preview-token`, `GET /v1/admin/magazine/editions/{id}/preview-token`), lus par les
+ * routes publiques (`?preview=`) : charge utile JSON `{ k, id, exp }` encodée en base64url, puis signature
+ * HMAC-SHA256 (`TOKEN_SIGNING_SECRET`, préfixe d'usage `preview`). Valables 30 minutes, sans état en base ; un jeton ne vaut que pour le contenu pour lequel il a été émis.
  */
 
 export const PREVIEW_TOKEN_TTL_MS = 30 * 60_000;
 
-export type PreviewKind = 'service' | 'page';
+export type PreviewKind = 'service' | 'page' | 'magazine';
 
 export interface PreviewClaims {
   kind: PreviewKind;
-  /** Identifiant du service ou clé de la page. */
+  /** Identifiant du service ou de l'édition du magazine, ou clé de la page. */
   id: string;
   expiresAt: Date;
 }

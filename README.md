@@ -122,8 +122,8 @@ avec une version texte brut. 5 tentatives à attente exponentielle (1, 2, 4, 8 m
 (7 jours pour les réussies, 30 jours pour les échecs).
 
 - En local, les e-mails arrivent dans **Mailpit** : http://localhost:8025 (`pnpm services:up`).
-- `MAIL_WORKER=on|off` : démarre ou non les workers dans le processus (e-mails et rappels de rendez-vous ; `off` par
-  défaut en test).
+- `MAIL_WORKER=on|off` : démarre ou non les workers dans le processus (e-mails, rappels de rendez-vous,
+  questionnaires, campagnes, médias et tâches planifiées ; `off` par défaut en test).
 - Données attendues par chaque gabarit : `src/modules/mail/templates/README.md`.
 
 ```bash
@@ -132,6 +132,23 @@ pnpm mail:preview   # rend les 21 gabarits (FR et EN) dans tmp/mail-preview/ —
 
 La prévisualisation utilise les textes par défaut et des données d'exemple, sans base ni Redis ; le logo est chargé
 depuis `WEB_URL` (site local par défaut, `WEB_URL=https://mamboproxi.com pnpm mail:preview` pour le site en ligne).
+
+## Tâches planifiées
+
+Démarrées avec les workers (`MAIL_WORKER=on`), par la file BullMQ `maintenance` (« job schedulers » : une seule
+exécution par échéance, même avec plusieurs instances) :
+
+| Tâche                  | Fréquence        | Rôle                                                                                                                                                                                                                                 |
+| ---------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `revalidation`         | toutes les 15 s  | Envoie les demandes `revalidation_requests` en attente au site (`POST {WEB_URL}/api/revalidate`, `Authorization: Bearer REVALIDATE_SECRET`), étiquettes regroupées ; réessais 30 s × 2ⁿ, `FAILED` après 8                            |
+| `magazine-publication` | toutes les 5 min | Demande la revalidation de `page:magazine` quand une édition programmée atteint sa date de publication (une fois par édition)                                                                                                        |
+| `database-backup`      | 2 h (Douala)     | `pg_dump` dans `BACKUP_DIR` (rotation 30 jours), suivi dans `backup_runs` et le journal ; échec clair si `pg_dump` est absent (`PG_DUMP_PATH`)                                                                                       |
+| `gdpr-cleanup`         | 3 h 30 (Douala)  | Durées de conservation : contacts inactifs (paramètre `rgpd`, 36 mois), candidatures refusées (24 mois), inscriptions newsletter non confirmées (30 j), sessions et jetons expirés, journaux, audience (13 mois), fichiers orphelins |
+
+```bash
+pnpm db:backup      # sauvegarde manuelle (même fichier que la tâche planifiée)
+pg_restore --clean --if-exists --no-owner -d mambo_proxi var/backups/mambo-proxi-AAAAMMJJ-HHMMSS.dump
+```
 
 ## Vérifications
 

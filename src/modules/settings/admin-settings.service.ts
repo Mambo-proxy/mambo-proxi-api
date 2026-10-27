@@ -10,6 +10,7 @@ import type { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { forbiddenException } from '../auth/auth.errors.js';
 import type { AuthContext } from '../auth/auth.types.js';
+import { BACKUP_RETENTION_DAYS } from '../maintenance/database-backup.js';
 import { unknownMediaErrors } from '../media/media-refs.js';
 import { MediaService } from '../media/media.service.js';
 import {
@@ -21,8 +22,8 @@ import {
 
 export const SETTINGS_GROUP_NOT_FOUND = 'Ce groupe de paramètres n’existe pas.';
 
-/** Durée de conservation des sauvegardes quotidiennes (`pg_dump`, docs/07). */
-export const BACKUP_RETENTION_DAYS = 30;
+// Durée de conservation des sauvegardes quotidiennes (`pg_dump`, docs/07) : celle de la tâche de sauvegarde.
+export { BACKUP_RETENTION_DAYS };
 
 /** Libellés des groupes (journal d'activité). */
 const GROUP_LABELS: Record<SettingsGroup, string> = {

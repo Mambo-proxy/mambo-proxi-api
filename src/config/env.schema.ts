@@ -19,6 +19,8 @@ const COMMON_DEFAULTS: Record<string, string> = {
   STORAGE_DRIVER: 'local',
   STORAGE_DIR: 'var/storage',
   MEDIA_STORAGE_DIR: 'var/media',
+  BACKUP_DIR: 'var/backups',
+  PG_DUMP_PATH: 'pg_dump',
 };
 
 /** Valeurs par défaut de développement et de test : celles de `.env.example` (services de docker-compose.yml). */
@@ -115,6 +117,10 @@ const envSchema = z
     // au démarrage), servi par `GET /v1/media/{folder}/{file}` ; `MEDIA_PUBLIC_URL` pointe sur cette route (ou un CDN
     // placé devant elle).
     MEDIA_STORAGE_DIR: text,
+    // Sauvegarde quotidienne de la base (tâche planifiée du worker, `pnpm db:backup`) : fichiers `pg_dump` (format
+    // personnalisé) rangés dans ce répertoire, rotation 30 jours ; `PG_DUMP_PATH` = commande ou chemin de `pg_dump`.
+    BACKUP_DIR: text,
+    PG_DUMP_PATH: text,
     SMTP_HOST: text,
     SMTP_PORT: port,
     SMTP_SECURE: flag,

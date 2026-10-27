@@ -33,6 +33,9 @@ export function configureApp(app: NestExpressApplication): void {
   );
   // Analyseur JSON déclaré ici (NestJS ne le réenregistre pas) pour traduire aussitôt ses erreurs.
   app.useBodyParser('json', { limit: '100kb' });
+  // Lots de la mesure d'audience envoyés par `navigator.sendBeacon` (JSON en `text/plain`, 16 Kio au plus) : la
+  // seule route qui lit un corps texte (`POST /v1/analytics/events`) ; ailleurs, un corps texte échoue à la validation.
+  app.useBodyParser('text', { type: 'text/plain', limit: '16kb' });
   app.use(mapBodyParserErrors);
   app.use(cookieParser());
   app.enableCors({

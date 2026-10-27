@@ -16,6 +16,8 @@ export const QUEUE_NAMES = {
   surveyInvitations: 'survey-invitations',
   newsletterCampaigns: 'newsletter-campaigns',
   media: 'media',
+  /** Tâches planifiées : revalidation du site, nettoyage RGPD quotidien, sauvegarde de la base. */
+  maintenance: 'maintenance',
 } as const;
 
 const MINUTE_MS = 60_000;

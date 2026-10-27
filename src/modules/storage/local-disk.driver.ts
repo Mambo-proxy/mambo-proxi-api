@@ -1,7 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import { createReadStream } from 'node:fs';
-import { mkdir, rename, rm, stat, writeFile } from 'node:fs/promises';
-import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
+import { mkdir, readdir, rename, rm, stat, writeFile } from 'node:fs/promises';
+import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import type { Readable } from 'node:stream';
 import type { StorageDriver } from './storage.types.js';
 
@@ -61,6 +61,36 @@ export class LocalDiskStorageDriver implements StorageDriver {
 
   async delete(key: string): Promise<void> {
     await rm(this.pathOf(key), { force: true });
+  }
+
+  /**
+   * Objets enregistrés (clés valides seulement : ni fichiers temporaires ni sondes de santé), avec leur date de
+   * modification : nettoyage des fichiers orphelins par la tâche RGPD quotidienne.
+   */
+  async *list(): AsyncGenerator<{ key: string; modifiedAt: Date }> {
+    const pending: string[] = [this.root];
+    while (pending.length > 0) {
+      const directory = pending.pop() as string;
+      let entries;
+      try {
+        entries = await readdir(directory, { withFileTypes: true });
+      } catch (error) {
+        if (isMissing(error)) continue;
+        throw error;
+      }
+      for (const entry of entries) {
+        const path = join(directory, entry.name);
+        if (entry.isDirectory()) {
+          pending.push(path);
+          continue;
+        }
+        if (!entry.isFile()) continue;
+        const key = relative(this.root, path).split(sep).join('/');
+        if (!KEY_PATTERN.test(key) || key.endsWith('.tmp')) continue;
+        const info = await stat(path);
+        yield { key, modifiedAt: info.mtime };
+      }
+    }
   }
 
   async check(): Promise<boolean> {

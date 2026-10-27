@@ -4,9 +4,10 @@ import type { Prisma } from '../../generated/prisma/client.js';
  * Point d'accroche de la revalidation du site (docs/05 §3.4) : chaque modification visible sur le site public
  * (publication, dépublication, enregistrement d'un contenu publié, paramètres, zones) inscrit, dans la même
  * transaction, une demande `revalidation_requests` (`PENDING`) avec les étiquettes de cache du site
- * (`mambo-proxi-web/src/lib/api/tags.ts`). L'envoi (`POST {WEB_URL}/api/revalidate`, réessais) sera fait par le
- * module de revalidation ; d'ici là, les lectures publiques restent à jour d'elles-mêmes : elles sont relues à
- * chaque requête (`Cache-Control: public, no-cache` + `ETag` recalculé sur le corps).
+ * (`mambo-proxi-web/src/lib/api/tags.ts`). L'envoi (`POST {WEB_URL}/api/revalidate`, étiquettes regroupées,
+ * réessais avec attente croissante, `SUCCEEDED` / `FAILED`) est fait par la tâche planifiée du worker
+ * (`modules/maintenance/revalidation-dispatch.service.ts`, toutes les 15 s). Les lectures publiques de l'API restent
+ * relues à chaque requête (`Cache-Control: public, no-cache` + `ETag` recalculé sur le corps).
  */
 export const CACHE_TAGS = {
   settings: 'settings',
