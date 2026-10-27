@@ -1105,3 +1105,40 @@
 
 - Tests (unitaires, e2e, contrat) de ces correctifs : après le branchement, comme convenu.
 - Site : afficher `jobTitle` dans le back-office après `pnpm contract:sync`.
+
+## Phase 4 — Préparation du déploiement de production (28 octobre 2026)
+
+### Fait
+
+- `Dockerfile` multi-étapes (Node 24 sur Debian trixie slim, pnpm par corepack) : cible `runtime` (dépendances de
+  production installées sans scripts, `dist/` avec le client Prisma compilé, `postgresql-client-18` du dépôt PGDG pour
+  `pg_dump`, utilisateur `node`, `HEALTHCHECK` sur `/v1/health`) et cible `tools` (dépendances complètes, `prisma/`,
+  pour `prisma migrate deploy` et le seed). `.dockerignore`.
+- `deploy/` : `docker-compose.prod.yml` (caddy, api, migrate en profil `tools`, postgres 18.4, redis 8.10.2 AOF
+  `noeviction`, mailpit), `Caddyfile`, `.env.production.example`, `deploy.sh`, `bootstrap.sh` (Amazon Linux 2023).
+- Workflow manuel `.github/workflows/deploy.yml` : images poussées dans ECR (OIDC, cache GHA), puis commande SSM sur
+  l'instance `Name=mambo-proxi-api` (fichiers de `deploy/` extraits de l'image vers `/opt/mambo`, puis `deploy.sh`),
+  attente du résultat et sortie affichée.
+- `docs/DEPLOIEMENT.md` : architecture, première mise en place, seed, Mailpit par tunnel SSM, sauvegardes,
+  restauration, domaine, coûts.
+
+### Décisions
+
+- **AWS EC2 unique** (t3.small, 2 Go + 2 Go d'échange) plutôt que GHCR et étiquettes `v*` : image dans ECR, accès par
+  SSM sans SSH, déploiement à la demande comme la CI.
+- **API et workers dans le même conteneur** (`MAIL_WORKER=on`) : les workers démarrent dans le processus de l'API ;
+  un second conteneur doublerait la mémoire sur 2 Go.
+- **Image `tools` séparée** : la CLI Prisma, `tsx` et `dotenv` sont des dépendances de développement ; l'image
+  d'exécution reste minimale.
+- **Fichiers de déploiement livrés dans l'image** (`/app/deploy`) : versionnés avec le code, sans dépôt S3 ni limite de
+  taille des paramètres SSM.
+- **E-mails retenus dans Mailpit** (aucun transport « désactivé » dans l'API) : interface sur `127.0.0.1:8025` du
+  serveur, consultée par tunnel SSM ; indispensable pour lire les codes de connexion du back-office.
+- `DATABASE_URL`, `REDIS_URL`, `API_URL` et `MEDIA_PUBLIC_URL` composées par `docker-compose.prod.yml` à partir de
+  `POSTGRES_PASSWORD` et `API_DOMAIN` : une seule valeur à changer pour passer à un vrai domaine.
+- Aucune modification du code de l'API : écoute sur toutes les interfaces et `trust proxy` (production) déjà en place.
+
+### Points ouverts
+
+- Image jamais construite localement (pas de Docker) : à valider au premier lancement du workflow.
+- Cookies `SameSite=Lax` : le back-office exige un domaine commun site/API (ou un relais `/v1` côté site).

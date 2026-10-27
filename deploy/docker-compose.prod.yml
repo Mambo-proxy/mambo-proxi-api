@@ -1,0 +1,154 @@
+# Production sur un serveur unique (EC2 t3.small, 2 Go de RAM + 2 Go d'échange) : docs/DEPLOIEMENT.md.
+# Copié dans /opt/mambo par le déploiement ; variables lues dans /opt/mambo/.env (modèle : .env.production.example).
+# IMAGE_TAG est fourni par deploy.sh (SHA du commit déployé).
+name: mambo
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '5'
+
+x-api-env: &api-env
+  NODE_ENV: production
+  # Services internes du réseau compose (jamais exposés sur Internet).
+  DATABASE_URL: postgresql://mambo:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD manquant dans .env}@postgres:5432/mambo_proxi?schema=public
+  REDIS_URL: redis://redis:6379
+  API_URL: https://${API_DOMAIN:?API_DOMAIN manquant dans .env}
+  MEDIA_PUBLIC_URL: ${MEDIA_PUBLIC_URL:-https://${API_DOMAIN}/v1/media}
+
+services:
+  caddy:
+    image: caddy:2.10.2-alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp' # HTTP/3
+    environment:
+      API_DOMAIN: ${API_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:?ACME_EMAIL manquant dans .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - api
+    mem_limit: 128m
+    logging: *logging
+
+  # API et workers dans le même processus (MAIL_WORKER=on : e-mails, médias, rappels, campagnes, tâches planifiées
+  # dont la sauvegarde pg_dump quotidienne).
+  api:
+    image: ${API_IMAGE_REPO:-168692730521.dkr.ecr.eu-west-3.amazonaws.com/mambo-proxi-api}:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      <<: *api-env
+      MAIL_WORKER: 'on'
+      NODE_OPTIONS: --max-old-space-size=512
+    volumes:
+      - storage:/app/var/storage
+      - media:/app/var/media
+      - backups:/app/var/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    mem_limit: 768m
+    logging: *logging
+
+  # Commandes ponctuelles (image « tools ») : migrations à chaque déploiement, seed à la première mise en place.
+  #   docker compose --profile tools run --rm migrate                      # prisma migrate deploy
+  #   docker compose --profile tools run --rm -e SEED_DEMO=false migrate prisma db seed
+  migrate:
+    profiles: ['tools']
+    image: ${API_IMAGE_REPO:-168692730521.dkr.ecr.eu-west-3.amazonaws.com/mambo-proxi-api}:tools-${IMAGE_TAG:-latest}
+    env_file: .env
+    environment:
+      <<: *api-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    mem_limit: 512m
+    logging: *logging
+
+  postgres:
+    image: postgres:18.4-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mambo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: mambo_proxi
+    command:
+      - postgres
+      - -c
+      - shared_buffers=128MB
+      - -c
+      - effective_cache_size=384MB
+      - -c
+      - work_mem=4MB
+      - -c
+      - maintenance_work_mem=64MB
+      - -c
+      - max_connections=50
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U mambo -d mambo_proxi']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    shm_size: 128m
+    mem_limit: 512m
+    logging: *logging
+
+  # File BullMQ : persistance AOF, aucune éviction (BullMQ l'exige).
+  redis:
+    image: redis:8.10.2-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --appendonly
+      - 'yes'
+      - --maxmemory
+      - 96mb
+      - --maxmemory-policy
+      - noeviction
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    mem_limit: 160m
+    logging: *logging
+
+  # Pas d'envoi réel pour l'instant : les e-mails (codes de connexion compris) arrivent dans Mailpit.
+  # Interface sur 127.0.0.1:8025 du serveur seulement, consultée par un tunnel SSM (docs/DEPLOIEMENT.md).
+  mailpit:
+    image: axllent/mailpit:v1.31.4
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:8025:8025'
+    environment:
+      MP_DATABASE: /data/mailpit.db
+      MP_MAX_MESSAGES: '1000'
+      MP_SMTP_AUTH_ACCEPT_ANY: 'true'
+      MP_SMTP_AUTH_ALLOW_INSECURE: 'true'
+    volumes:
+      - mailpit-data:/data
+    mem_limit: 96m
+    logging: *logging
+
+volumes:
+  caddy-data:
+  caddy-config:
+  storage:
+  media:
+  backups:
+  postgres-data:
+  redis-data:
+  mailpit-data:

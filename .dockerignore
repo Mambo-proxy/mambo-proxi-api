@@ -1,0 +1,17 @@
+.git
+.github
+.env
+.env.*
+!.env.example
+node_modules
+dist
+coverage
+tmp
+var
+src/generated
+**/*.spec.ts
+test
+docs
+*.md
+!src/modules/mail/templates/README.md
+deploy/.env

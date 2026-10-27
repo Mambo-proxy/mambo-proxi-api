@@ -134,8 +134,10 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
 
 ## Phase 4 — Production
 
-- [ ] Dockerfile multi-étapes (non-root, HEALTHCHECK), `docker-compose.prod.yml` + Caddy
-- [ ] CI/CD : lint, types, tests, conformité au contrat, image GHCR, `prisma migrate deploy`, déploiement sur étiquette `v*`
+- [x] Dockerfile multi-étapes (non-root, HEALTHCHECK, `pg_dump` 18, cibles `runtime` et `tools`), `deploy/docker-compose.prod.yml` + Caddy (sslip.io en attendant un domaine), Mailpit interne, `deploy/bootstrap.sh` (Amazon Linux 2023)
+- [x] Déploiement : workflow manuel `deploy.yml` (image ECR par OIDC, `deploy/deploy.sh` par SSM : migrations, `up --wait`, santé)
+- [ ] Premier déploiement réel sur l'instance EC2 et seed de production
+- [ ] Envoi réel des e-mails (fournisseur SMTP, SPF/DKIM) ; domaine commun site/API pour le back-office (`COOKIE_DOMAIN`)
 - [ ] Tests de charge k6 (50 utilisateurs simultanés), `pnpm audit` sans vulnérabilité haute
-- [ ] Documentation : README (5 commandes), DEPLOIEMENT, EXPLOITATION (sauvegardes, restauration testée, secrets), ARCHITECTURE
+- [~] Documentation : README (5 commandes), DEPLOIEMENT (fait), EXPLOITATION (sauvegardes, restauration testée, secrets), ARCHITECTURE
 - [ ] `RAPPORT_DE_LIVRAISON.md`

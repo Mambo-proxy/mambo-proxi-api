@@ -1,0 +1,145 @@
+name: Déploiement
+
+# Lancé à la demande seulement (onglet Actions ou `gh workflow run deploy.yml`) : construit l'image, la pousse dans
+# Amazon ECR, puis déploie sur l'instance EC2 étiquetée Name=mambo-proxi-api par SSM (docs/DEPLOIEMENT.md).
+# Authentification AWS par OIDC : rôle de la variable de dépôt AWS_DEPLOY_ROLE_ARN.
+on:
+  workflow_dispatch:
+    inputs:
+      deployer:
+        description: 'Déployer sur le serveur après la construction (sinon : image seulement)'
+        type: boolean
+        default: true
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: eu-west-3
+  ECR_REGISTRY: 168692730521.dkr.ecr.eu-west-3.amazonaws.com
+  ECR_REPOSITORY: mambo-proxi-api
+  INSTANCE_TAG: mambo-proxi-api
+
+jobs:
+  image:
+    name: Image (construction et envoi dans ECR)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - uses: aws-actions/amazon-ecr-login@v2
+      - uses: docker/setup-buildx-action@v3
+      - name: Image d'exécution (API et workers)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: runtime
+          push: true
+          provenance: false
+          tags: |
+            ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+            ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:latest
+          cache-from: type=gha,scope=runtime
+          cache-to: type=gha,mode=max,scope=runtime
+      - name: Image des outils (migrations, seed)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: tools
+          push: true
+          provenance: false
+          tags: |
+            ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:tools-${{ github.sha }}
+            ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:tools-latest
+          cache-from: |
+            type=gha,scope=runtime
+            type=gha,scope=tools
+          cache-to: type=gha,mode=max,scope=tools
+
+  deploy:
+    name: Déploiement sur le serveur (SSM)
+    needs: image
+    if: inputs.deployer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Commande SSM sur l'instance Name=${{ env.INSTANCE_TAG }}
+        env:
+          TAG: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          image="$ECR_REGISTRY/$ECR_REPOSITORY:$TAG"
+          # Script exécuté en root sur le serveur : copie des fichiers de déploiement contenus dans l'image
+          # (/app/deploy → /opt/mambo, sans toucher au .env), puis deploy.sh.
+          script=$(cat <<EOF
+          set -euo pipefail
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+          docker pull --quiet $image
+          cid=\$(docker create $image)
+          trap 'docker rm -f \$cid >/dev/null' EXIT
+          install -d -m 0750 /opt/mambo
+          docker cp \$cid:/app/deploy/. /opt/mambo/
+          chmod 0755 /opt/mambo/deploy.sh /opt/mambo/bootstrap.sh
+          bash /opt/mambo/deploy.sh $TAG
+          EOF
+          )
+          jq -n --arg script "$script" \
+            '{commands: [$script], executionTimeout: ["1200"]}' > parameters.json
+
+          command_id=$(aws ssm send-command \
+            --document-name AWS-RunShellScript \
+            --targets "Key=tag:Name,Values=$INSTANCE_TAG" \
+            --max-concurrency 1 --max-errors 0 \
+            --timeout-seconds 600 \
+            --comment "Déploiement mambo-proxi-api ${TAG:0:12}" \
+            --parameters file://parameters.json \
+            --query Command.CommandId --output text)
+          echo "Commande SSM : $command_id"
+
+          # Attente de la fin (20 min au plus) : statut de chaque instance ciblée.
+          status=Pending
+          for attempt in $(seq 1 240); do
+            sleep 5
+            statuses=$(aws ssm list-command-invocations --command-id "$command_id" \
+              --query 'CommandInvocations[].Status' --output text)
+            if [ -z "$statuses" ]; then
+              if [ "$attempt" -ge 12 ]; then
+                echo "::error::Aucune instance en ligne (SSM) avec l'étiquette Name=$INSTANCE_TAG."
+                exit 1
+              fi
+              continue
+            fi
+            case "$statuses" in
+              *Pending* | *InProgress* | *Delayed*) continue ;;
+            esac
+            status="$statuses"
+            break
+          done
+
+          for instance in $(aws ssm list-command-invocations --command-id "$command_id" \
+            --query 'CommandInvocations[].InstanceId' --output text); do
+            echo "::group::Sortie de $instance"
+            aws ssm get-command-invocation --command-id "$command_id" --instance-id "$instance" \
+              --query StandardOutputContent --output text
+            echo '--- erreurs ---'
+            aws ssm get-command-invocation --command-id "$command_id" --instance-id "$instance" \
+              --query StandardErrorContent --output text
+            echo '::endgroup::'
+          done
+
+          if [ "$status" != Success ]; then
+            echo "::error::Déploiement en échec (statut SSM : $status)."
+            exit 1
+          fi
+          echo "Déployé : $TAG"

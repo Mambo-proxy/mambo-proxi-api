@@ -1,0 +1,29 @@
+# Mandataire inverse de l'API : HTTPS automatique (Let's Encrypt), compression, en-têtes de sécurité.
+# API_DOMAIN : 13-38-208-248.sslip.io tant qu'il n'y a pas de nom de domaine, puis ex. api.mamboproxi.com.
+{
+	email {$ACME_EMAIL}
+}
+
+{$API_DOMAIN} {
+	encode zstd gzip
+
+	# Plus grand envoi accepté par l'API : média de 10 Mo (CV et pièces jointes : 5 Mo), plus l'enveloppe multipart.
+	request_body {
+		max_size 12MB
+	}
+
+	# L'API pose déjà ses en-têtes (Helmet) : valeurs par défaut seulement s'ils manquent.
+	header {
+		defer
+		-Server
+		-X-Powered-By
+		?Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		?X-Content-Type-Options "nosniff"
+		?Referrer-Policy "no-referrer"
+		?X-Frame-Options "DENY"
+		?Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	}
+
+	# X-Forwarded-For posé par Caddy : l'API (trust proxy = 1 en production) en tire l'adresse du visiteur.
+	reverse_proxy api:4000
+}

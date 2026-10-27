@@ -163,5 +163,6 @@ pnpm contract:lint      # valider le contrat
 ## Documentation
 
 - `CLAUDE.md` — conventions du dépôt et règles non négociables.
+- `docs/DEPLOIEMENT.md` — production (EC2 + Docker Compose + Caddy, image ECR, déploiement par SSM, sauvegardes).
 - `TASKS.md` — avancement.
 - `JOURNAL.md` — décisions, difficultés et solutions, étape par étape.
