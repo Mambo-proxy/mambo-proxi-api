@@ -6,7 +6,7 @@ export type NodeEnv = (typeof NODE_ENVS)[number];
 
 export const LOG_LEVELS = ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'] as const;
 
-/** Clé d'essai Cloudflare Turnstile (valide toujours) : interdite en production. */
+/** Clé d'essai Cloudflare Turnstile (valide toujours) : interdite en production (`SITE_ENV=production`). */
 export const TURNSTILE_TEST_SECRET = '1x0000000000000000000000000000000AA';
 
 /** Valeurs par défaut communes à tous les environnements. */
@@ -189,7 +189,8 @@ const envSchema = z
         "Les secrets des jetons d'accès et de rafraîchissement doivent être différents.",
       );
     }
-    if (env.TURNSTILE_SECRET_KEY === TURNSTILE_TEST_SECRET) {
+    // Préproduction (serveur sans domaine ni site public) : la clé d'essai reste admise.
+    if (env.TURNSTILE_SECRET_KEY === TURNSTILE_TEST_SECRET && env.SITE_ENV === 'production') {
       addIssue('TURNSTILE_SECRET_KEY', "La clé d'essai Turnstile est interdite en production.");
     }
   });
