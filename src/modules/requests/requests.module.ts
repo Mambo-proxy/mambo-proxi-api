@@ -1,9 +1,16 @@
 import { Module } from '@nestjs/common';
+import { AdminRequestsController, MyTasksController } from './admin-requests.controller.js';
+import { AdminRequestsService } from './admin-requests.service.js';
+import { MyTasksService } from './my-tasks.service.js';
 import { RequestsService } from './requests.service.js';
 
-/** Demandes : création à réception d'un formulaire public (les opérations du back-office viendront ensuite). */
+/**
+ * Demandes : création à réception d'un formulaire public (`RequestsService`), opérations du back-office
+ * (`/v1/admin/requests*`) et « Mes tâches » du tableau de bord (`/v1/admin/me/tasks`).
+ */
 @Module({
-  providers: [RequestsService],
-  exports: [RequestsService],
+  controllers: [AdminRequestsController, MyTasksController],
+  providers: [RequestsService, AdminRequestsService, MyTasksService],
+  exports: [RequestsService, AdminRequestsService],
 })
 export class RequestsModule {}

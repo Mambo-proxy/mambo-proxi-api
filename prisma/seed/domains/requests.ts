@@ -2,6 +2,7 @@
 // Références `MP-AAAA-NNNN` : numéros des mocks (0085 à 0161) dans l'année du lancement ; le compteur annuel est
 // porté au dernier numéro utilisé pour que la première vraie demande prenne le suivant.
 import { AttachmentKind, Language, ScanStatus } from '../../../src/generated/prisma/client.js';
+import { requestSearchText } from '../../../src/modules/requests/request-search.js';
 import { logCount, mapId, readSeedData, type IdMap, type SeedClock, type Tx } from '../support.js';
 import type { AppointmentSeed, RequestSeed } from '../types.js';
 import type { CatalogueIds } from './catalogue.js';
@@ -53,11 +54,21 @@ export async function seedRequests(
       isDemo: true,
     };
     // La référence d'une demande existante n'est jamais modifiée (relance une autre année).
-    await tx.request.upsert({
+    const reference = clock.reference(request.referenceNumber);
+    const saved = await tx.request.upsert({
       where: { id: request.id },
       update: data,
-      create: { ...data, id: request.id, reference: clock.reference(request.referenceNumber) },
+      create: {
+        ...data,
+        id: request.id,
+        reference,
+        searchText: requestSearchText(reference, request.subject),
+      },
+      select: { reference: true, searchText: true },
     });
+    const searchText = requestSearchText(saved.reference, request.subject);
+    if (saved.searchText !== searchText)
+      await tx.request.update({ where: { id: request.id }, data: { searchText }, select: { id: true } });
 
     // Historique : remplacé à chaque lancement.
     await tx.requestEvent.deleteMany({ where: { requestId: request.id } });

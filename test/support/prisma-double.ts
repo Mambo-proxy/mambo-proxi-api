@@ -6,15 +6,21 @@
  * simples sont toutes renvoyées, les relations seulement si elles sont sélectionnées.
  *
  * Écritures (formulaires publics, authentification) : `create`, `createMany`, `update`, `updateMany`, `upsert` (avec
- * `{ increment }`), `delete`, `deleteMany`, `aggregate` (`_sum`), `count` ; `$transaction(fn)` exécute `fn` sur le
- * double lui-même (pas d'annulation). Les enregistrements créés reçoivent un identifiant `<table>_<n>` et des dates
- * `createdAt`/`updatedAt` si absentes. Une colonne absente vaut `null` pour les filtres (`revokedAt: null`,
- * `{ not: null }`), comme une colonne facultative jamais renseignée.
+ * `{ increment }`), `delete`, `deleteMany`, `aggregate` (`_sum`), `count`, `groupBy` (`_count._all`) ;
+ * `$transaction(fn)` exécute `fn` sur le double lui-même (pas d'annulation). Les enregistrements créés reçoivent un
+ * identifiant `<table>_<n>` et des dates `createdAt`/`updatedAt` si absentes. Une colonne absente vaut `null` pour
+ * les filtres (`revokedAt: null`, `{ not: null }`), comme une colonne facultative jamais renseignée.
+ *
+ * Back-office (demandes, contacts) : les enregistrements créés n'ont que leurs clés étrangères ; les relations
+ * déclarées dans `LINKS` sont alors retrouvées dans les autres tables (`request.contact` par `contactId`,
+ * `contact.requests` par `request.contactId`…), pour les sélections, les filtres (`some`, `none`, `every`, `is`,
+ * `isNot`, filtre direct) et `_count`. Opérateurs de texte : `contains`, `startsWith`, `endsWith` (avec
+ * `mode: 'insensitive'`) ; pagination : `skip`.
  */
 import { vi } from 'vitest';
 
 type Row = Record<string, unknown>;
-type Args = { where?: Row; orderBy?: unknown; take?: number; select?: Row; include?: Row };
+type Args = { where?: Row; orderBy?: unknown; take?: number; skip?: number; select?: Row; include?: Row };
 type WriteArgs = Args & {
   data?: Row | Row[];
   create?: Row;
@@ -22,6 +28,7 @@ type WriteArgs = Args & {
   skipDuplicates?: boolean;
   _sum?: Row;
 };
+type GroupByArgs = { by: string[]; where?: Row; _count?: Row };
 
 /** Champs des enregistrements du double qui sont des relations (les autres, JSON compris, sont des colonnes). */
 const RELATIONS = new Set([
@@ -43,7 +50,100 @@ const RELATIONS = new Set([
   'quarters',
 ]);
 
-const OPERATORS = new Set(['equals', 'in', 'notIn', 'not', 'lt', 'lte', 'gt', 'gte']);
+const OPERATORS = new Set([
+  'equals',
+  'in',
+  'notIn',
+  'not',
+  'lt',
+  'lte',
+  'gt',
+  'gte',
+  'contains',
+  'startsWith',
+  'endsWith',
+  'mode',
+]);
+
+export interface PrismaTables {
+  setting: Row[];
+  media: Row[];
+  category: Row[];
+  service: Row[];
+  review: Row[];
+  page: Row[];
+  zone: Row[];
+  redirect: Row[];
+  jobOffer: Row[];
+  // Tables des formulaires publics (facultatives : vides par défaut).
+  user?: Row[];
+  training?: Row[];
+  event?: Row[];
+  contact?: Row[];
+  contactInterest?: Row[];
+  subscriber?: Row[];
+  referenceCounter?: Row[];
+  request?: Row[];
+  requestEvent?: Row[];
+  notification?: Row[];
+  // Tables de l'authentification et des utilisateurs (facultatives : vides par défaut).
+  session?: Row[];
+  trustedDevice?: Row[];
+  otpChallenge?: Row[];
+  passwordReset?: Row[];
+  invitation?: Row[];
+  auditLog?: Row[];
+  appointment?: Row[];
+  requestNote?: Row[];
+  // Tables des demandes du back-office (facultatives : vides par défaut).
+  survey?: Row[];
+  attachment?: Row[];
+  jobApplication?: Row[];
+}
+
+type TableName = keyof PrismaTables;
+
+/** Relation retrouvée par clé : `from` (colonne de l'enregistrement) = `to` (colonne de la table liée). */
+interface Link {
+  table: TableName;
+  from: string;
+  to: string;
+  many?: boolean;
+}
+
+const toUser = (from: string): Link => ({ table: 'user', from, to: 'id' });
+
+/** Relations des tables du back-office, lues dans les autres tables quand l'enregistrement ne les porte pas. */
+const LINKS: Partial<Record<TableName, Record<string, Link>>> = {
+  request: {
+    contact: { table: 'contact', from: 'contactId', to: 'id' },
+    assignedTo: toUser('assignedToId'),
+    category: { table: 'category', from: 'categoryId', to: 'id' },
+    service: { table: 'service', from: 'serviceId', to: 'id' },
+    notes: { table: 'requestNote', from: 'id', to: 'requestId', many: true },
+    history: { table: 'requestEvent', from: 'id', to: 'requestId', many: true },
+    attachments: { table: 'attachment', from: 'id', to: 'requestId', many: true },
+    survey: { table: 'survey', from: 'id', to: 'requestId' },
+  },
+  requestNote: { author: toUser('authorId') },
+  requestEvent: { actor: toUser('actorId') },
+  contact: {
+    requests: { table: 'request', from: 'id', to: 'contactId', many: true },
+    appointments: { table: 'appointment', from: 'id', to: 'contactId', many: true },
+    interests: { table: 'contactInterest', from: 'id', to: 'contactId', many: true },
+    subscriber: { table: 'subscriber', from: 'id', to: 'contactId' },
+  },
+  contactInterest: { category: { table: 'category', from: 'categoryId', to: 'id' } },
+  appointment: {
+    contact: { table: 'contact', from: 'contactId', to: 'id' },
+    assignedTo: toUser('assignedToId'),
+  },
+};
+
+/** Accès aux tables du double (relations retrouvées par clé). */
+interface Graph {
+  tables: PrismaTables;
+}
 
 function isObject(value: unknown): value is Row {
   return typeof value === 'object' && value !== null && !Array.isArray(value) && !(value instanceof Date);
@@ -53,6 +153,27 @@ function comparable(value: unknown): unknown {
   return value instanceof Date ? value.getTime() : value;
 }
 
+function linkOf(table: TableName | undefined, key: string): Link | undefined {
+  return table === undefined ? undefined : LINKS[table]?.[key];
+}
+
+function isRelation(table: TableName | undefined, key: string): boolean {
+  return RELATIONS.has(key) || linkOf(table, key) !== undefined;
+}
+
+/** Valeur d'une relation : portée par l'enregistrement (graphe) ou retrouvée par clé (`LINKS`). */
+function related(graph: Graph | undefined, table: TableName | undefined, record: Row, key: string): unknown {
+  if (record[key] !== undefined) return record[key];
+  const link = linkOf(table, key);
+  if (!link || !graph) return undefined;
+  const rows = graph.tables[link.table] ?? [];
+  const value = record[link.from];
+  if (link.many)
+    return value === null || value === undefined ? [] : rows.filter((row) => row[link.to] === value);
+  if (value === null || value === undefined) return null;
+  return rows.find((row) => row[link.to] === value) ?? null;
+}
+
 function isOperatorObject(value: Row): boolean {
   const keys = Object.keys(value);
   return keys.length > 0 && keys.every((key) => OPERATORS.has(key));
@@ -60,9 +181,20 @@ function isOperatorObject(value: Row): boolean {
 
 function matchesOperators(actual: unknown, filter: Row): boolean {
   const value = comparable(actual);
+  const insensitive = filter['mode'] === 'insensitive';
+  const text = (input: unknown): string | null =>
+    typeof input === 'string' ? (insensitive ? input.toLowerCase() : input) : null;
   return Object.entries(filter).every(([operator, expected]) => {
     const target = comparable(expected);
     switch (operator) {
+      case 'mode':
+        return true;
+      case 'contains':
+        return text(actual)?.includes(text(expected) ?? '') ?? false;
+      case 'startsWith':
+        return text(actual)?.startsWith(text(expected) ?? '') ?? false;
+      case 'endsWith':
+        return text(actual)?.endsWith(text(expected) ?? '') ?? false;
       case 'equals':
         return value === target;
       case 'in':
@@ -86,16 +218,52 @@ function matchesOperators(actual: unknown, filter: Row): boolean {
   });
 }
 
-export function matchesWhere(record: Row, where: Row | undefined): boolean {
+/** Filtre d'une relation : `some` / `none` / `every` (liste), `is` / `isNot` ou filtre direct (un seul lié). */
+function matchesRelation(
+  graph: Graph | undefined,
+  table: TableName | undefined,
+  value: unknown,
+  filter: Row,
+): boolean {
+  if (Array.isArray(value)) {
+    const rows = value as Row[];
+    const test =
+      (part: unknown) =>
+      (row: Row): boolean =>
+        matchesWhere(row, part as Row, graph, table);
+    return Object.entries(filter).every(([operator, part]) => {
+      if (operator === 'some') return rows.some(test(part));
+      if (operator === 'none') return !rows.some(test(part));
+      if (operator === 'every') return rows.every(test(part));
+      throw new Error(`Filtre de liste non pris en charge par le double : ${operator}`);
+    });
+  }
+  if ('is' in filter || 'isNot' in filter) {
+    const check = (part: unknown): boolean =>
+      part === null
+        ? value === null || value === undefined
+        : isObject(value) && matchesWhere(value, part as Row, graph, table);
+    return (
+      ('is' in filter ? check(filter['is']) : true) && ('isNot' in filter ? !check(filter['isNot']) : true)
+    );
+  }
+  return isObject(value) && matchesWhere(value, filter, graph, table);
+}
+
+export function matchesWhere(record: Row, where: Row | undefined, graph?: Graph, table?: TableName): boolean {
   if (where === undefined) return true;
   return Object.entries(where).every(([key, filter]) => {
-    if (key === 'AND') return (filter as Row[]).every((part) => matchesWhere(record, part));
-    if (key === 'OR') return (filter as Row[]).some((part) => matchesWhere(record, part));
-    if (key === 'NOT') return !matchesWhere(record, filter as Row);
-    const actual = record[key];
+    if (key === 'AND') return (filter as Row[]).every((part) => matchesWhere(record, part, graph, table));
+    if (key === 'OR') return (filter as Row[]).some((part) => matchesWhere(record, part, graph, table));
+    if (key === 'NOT') {
+      const parts = Array.isArray(filter) ? (filter as Row[]) : [filter as Row];
+      return !parts.some((part) => matchesWhere(record, part, graph, table));
+    }
+    const relation = isRelation(table, key);
+    const actual = relation ? related(graph, table, record, key) : record[key];
     if (filter === null) return actual === null || actual === undefined;
     if (isObject(filter)) {
-      if (RELATIONS.has(key)) return isObject(actual) && matchesWhere(actual, filter);
+      if (relation) return matchesRelation(graph, linkOf(table, key)?.table, actual, filter);
       if (isOperatorObject(filter)) return matchesOperators(actual, filter);
       return false;
     }
@@ -134,34 +302,59 @@ function sortRows(rows: Row[], orderBy: unknown): Row[] {
   });
 }
 
-function project(record: Row, selection: Row | undefined): Row {
+/** `_count: { select: { requests: true | { where } } }` : nombre d'enregistrements liés. */
+function countRelations(
+  graph: Graph | undefined,
+  table: TableName | undefined,
+  record: Row,
+  args: unknown,
+): Row {
+  const counts: Row = {};
+  const selection = isObject(args) && isObject(args['select']) ? args['select'] : {};
+  for (const [key, spec] of Object.entries(selection)) {
+    if (spec === false) continue;
+    const value = related(graph, table, record, key);
+    const rows = Array.isArray(value) ? (value as Row[]) : [];
+    const where = isObject(spec) ? (spec['where'] as Row | undefined) : undefined;
+    counts[key] = rows.filter((row) => matchesWhere(row, where, graph, linkOf(table, key)?.table)).length;
+  }
+  return counts;
+}
+
+function project(record: Row, selection: Row | undefined, graph?: Graph, table?: TableName): Row {
   const result: Row = {};
   for (const [key, value] of Object.entries(record)) {
     // Relations seulement si elles sont sélectionnées.
-    if (!RELATIONS.has(key)) result[key] = value;
+    if (!isRelation(table, key)) result[key] = value;
   }
   for (const [key, args] of Object.entries(selection ?? {})) {
     if (args === false || args === undefined) continue;
+    if (key === '_count') {
+      result[key] = countRelations(graph, table, record, args);
+      continue;
+    }
     // Champ simple ou JSON sélectionné (`cities: true`, `translations: true`) : valeur telle quelle, déjà copiée.
-    if (!RELATIONS.has(key)) continue;
-    const related = record[key];
-    if (Array.isArray(related)) {
-      result[key] = findRows(related as Row[], args === true ? {} : (args as Args));
-    } else if (isObject(related)) {
+    if (!isRelation(table, key)) continue;
+    const value = related(graph, table, record, key);
+    const nestedTable = linkOf(table, key)?.table;
+    if (Array.isArray(value)) {
+      result[key] = findRows(value as Row[], args === true ? {} : (args as Args), graph, nestedTable);
+    } else if (isObject(value)) {
       const nested = args === true ? undefined : ((args as Args).select ?? (args as Args).include);
-      result[key] = project(related, nested);
-    } else if (related === null || related === undefined) {
-      if (key in record) result[key] = related ?? null;
+      result[key] = project(value, nested, graph, nestedTable);
+    } else if (value === null || value === undefined) {
+      if (key in record || linkOf(table, key)) result[key] = null;
     }
   }
   return result;
 }
 
-function findRows(rows: readonly Row[], args: Args = {}): Row[] {
-  const filtered = rows.filter((row) => matchesWhere(row, args.where));
+function findRows(rows: readonly Row[], args: Args = {}, graph?: Graph, table?: TableName): Row[] {
+  const filtered = rows.filter((row) => matchesWhere(row, args.where, graph, table));
   const sorted = sortRows(filtered, args.orderBy);
-  const limited = args.take === undefined ? sorted : sorted.slice(0, args.take);
-  return limited.map((row) => project(row, args.select ?? args.include));
+  const start = args.skip ?? 0;
+  const limited = sorted.slice(start, args.take === undefined ? undefined : start + args.take);
+  return limited.map((row) => project(row, args.select ?? args.include, graph, table));
 }
 
 let idSequence = 0;
@@ -180,7 +373,7 @@ function applyData(record: Row, data: Row): void {
   }
 }
 
-function delegate(name: string, rows: () => Row[]) {
+function delegate(name: TableName, rows: () => Row[], graph: Graph) {
   const insert = (data: Row): Row => {
     idSequence += 1;
     const now = new Date();
@@ -194,96 +387,76 @@ function delegate(name: string, rows: () => Row[]) {
     if (!('updatedAt' in data)) record['updatedAt'] = new Date();
     return record;
   };
+  const matching = (where: Row | undefined): Row[] =>
+    rows().filter((row) => matchesWhere(row, where, graph, name));
+  const output = (record: Row, args: Args): Row => project(record, args.select ?? args.include, graph, name);
   return {
-    findMany: vi.fn((args?: Args) => Promise.resolve(findRows(rows(), args))),
-    findFirst: vi.fn((args?: Args) => Promise.resolve(findRows(rows(), args)[0] ?? null)),
-    findUnique: vi.fn((args?: Args) => Promise.resolve(findRows(rows(), args)[0] ?? null)),
-    count: vi.fn((args?: Args) =>
-      Promise.resolve(rows().filter((row) => matchesWhere(row, args?.where)).length),
-    ),
-    create: vi.fn((args: WriteArgs) =>
-      Promise.resolve(project(insert(args.data as Row), args.select ?? args.include)),
-    ),
+    findMany: vi.fn((args?: Args) => Promise.resolve(findRows(rows(), args, graph, name))),
+    findFirst: vi.fn((args?: Args) => Promise.resolve(findRows(rows(), args, graph, name)[0] ?? null)),
+    findUnique: vi.fn((args?: Args) => Promise.resolve(findRows(rows(), args, graph, name)[0] ?? null)),
+    count: vi.fn((args?: Args) => Promise.resolve(matching(args?.where).length)),
+    create: vi.fn((args: WriteArgs) => Promise.resolve(output(insert(args.data as Row), args))),
     createMany: vi.fn((args: WriteArgs) => {
       const data = Array.isArray(args.data) ? args.data : [args.data as Row];
       data.forEach((item) => insert(item));
       return Promise.resolve({ count: data.length });
     }),
     update: vi.fn((args: WriteArgs) => {
-      const record = rows().find((row) => matchesWhere(row, args.where));
+      const record = matching(args.where)[0];
       if (!record)
         return Promise.reject(new Error(`Double Prisma : ${name} introuvable pour la mise à jour.`));
-      return Promise.resolve(project(update(record, args.data as Row), args.select ?? args.include));
+      return Promise.resolve(output(update(record, args.data as Row), args));
     }),
     updateMany: vi.fn((args: WriteArgs) => {
-      const matching = rows().filter((row) => matchesWhere(row, args.where));
-      matching.forEach((record) => update(record, args.data as Row));
-      return Promise.resolve({ count: matching.length });
+      const found = matching(args.where);
+      found.forEach((record) => update(record, args.data as Row));
+      return Promise.resolve({ count: found.length });
     }),
     delete: vi.fn((args: WriteArgs) => {
       const table = rows();
-      const index = table.findIndex((row) => matchesWhere(row, args.where));
+      const index = table.findIndex((row) => matchesWhere(row, args.where, graph, name));
       if (index < 0)
         return Promise.reject(new Error(`Double Prisma : ${name} introuvable pour la suppression.`));
       const [removed] = table.splice(index, 1);
-      return Promise.resolve(project(removed, args.select ?? args.include));
+      return Promise.resolve(output(removed ?? {}, args));
     }),
     upsert: vi.fn((args: WriteArgs) => {
-      const existing = rows().find((row) => matchesWhere(row, args.where));
+      const existing = matching(args.where)[0];
       const record = existing ? update(existing, args.update ?? {}) : insert(args.create ?? {});
-      return Promise.resolve(project(record, args.select ?? args.include));
+      return Promise.resolve(output(record, args));
     }),
     deleteMany: vi.fn((args?: Args) => {
       const table = rows();
-      const kept = table.filter((row) => !matchesWhere(row, args?.where));
+      const kept = table.filter((row) => !matchesWhere(row, args?.where, graph, name));
       const count = table.length - kept.length;
       table.splice(0, table.length, ...kept);
       return Promise.resolve({ count });
     }),
     aggregate: vi.fn((args: WriteArgs) => {
-      const matching = rows().filter((row) => matchesWhere(row, args.where));
       const sums: Row = {};
       for (const field of Object.keys(args._sum ?? {})) {
-        const values = matching
+        const values = matching(args.where)
           .map((row) => row[field])
           .filter((value): value is number => typeof value === 'number');
         sums[field] = values.length > 0 ? values.reduce((total, value) => total + value, 0) : null;
       }
       return Promise.resolve({ _sum: sums });
     }),
+    groupBy: vi.fn((args: GroupByArgs) => {
+      const groups = new Map<string, Row>();
+      for (const row of matching(args.where)) {
+        const values = args.by.map((field) => row[field] ?? null);
+        const key = JSON.stringify(values);
+        const group = groups.get(key) ?? {
+          ...Object.fromEntries(args.by.map((field, index) => [field, values[index]])),
+          _count: { _all: 0 },
+        };
+        (group['_count'] as { _all: number })._all += 1;
+        groups.set(key, group);
+      }
+      return Promise.resolve([...groups.values()]);
+    }),
   };
-}
-
-export interface PrismaTables {
-  setting: Row[];
-  media: Row[];
-  category: Row[];
-  service: Row[];
-  review: Row[];
-  page: Row[];
-  zone: Row[];
-  redirect: Row[];
-  jobOffer: Row[];
-  // Tables des formulaires publics (facultatives : vides par défaut).
-  user?: Row[];
-  training?: Row[];
-  event?: Row[];
-  contact?: Row[];
-  contactInterest?: Row[];
-  subscriber?: Row[];
-  referenceCounter?: Row[];
-  request?: Row[];
-  requestEvent?: Row[];
-  notification?: Row[];
-  // Tables de l'authentification et des utilisateurs (facultatives : vides par défaut).
-  session?: Row[];
-  trustedDevice?: Row[];
-  otpChallenge?: Row[];
-  passwordReset?: Row[];
-  invitation?: Row[];
-  auditLog?: Row[];
-  appointment?: Row[];
-  requestNote?: Row[];
 }
 
 const OPTIONAL_TABLES = [
@@ -305,40 +478,34 @@ const OPTIONAL_TABLES = [
   'auditLog',
   'appointment',
   'requestNote',
+  'survey',
+  'attachment',
+  'jobApplication',
 ] as const;
+
+const DELEGATED_TABLES = [
+  'setting',
+  'media',
+  'category',
+  'service',
+  'review',
+  'page',
+  'zone',
+  'redirect',
+  'jobOffer',
+  ...OPTIONAL_TABLES,
+] as const satisfies readonly TableName[];
 
 /** Double à passer à `overrideProvider(PrismaService).useValue(…)`. */
 export function createPrismaDouble(tables: PrismaTables) {
   for (const name of OPTIONAL_TABLES) tables[name] ??= [];
-  const table = (name: keyof PrismaTables) => (): Row[] => tables[name] ?? [];
+  const graph: Graph = { tables };
+  const table = (name: TableName) => (): Row[] => tables[name] ?? [];
+  const delegates = Object.fromEntries(
+    DELEGATED_TABLES.map((name) => [name, delegate(name, table(name), graph)]),
+  ) as Record<(typeof DELEGATED_TABLES)[number], ReturnType<typeof delegate>>;
   const double = {
-    setting: delegate('setting', table('setting')),
-    media: delegate('media', table('media')),
-    category: delegate('category', table('category')),
-    service: delegate('service', table('service')),
-    review: delegate('review', table('review')),
-    page: delegate('page', table('page')),
-    zone: delegate('zone', table('zone')),
-    redirect: delegate('redirect', table('redirect')),
-    jobOffer: delegate('jobOffer', table('jobOffer')),
-    user: delegate('user', table('user')),
-    training: delegate('training', table('training')),
-    event: delegate('event', table('event')),
-    contact: delegate('contact', table('contact')),
-    contactInterest: delegate('contactInterest', table('contactInterest')),
-    subscriber: delegate('subscriber', table('subscriber')),
-    referenceCounter: delegate('referenceCounter', table('referenceCounter')),
-    request: delegate('request', table('request')),
-    requestEvent: delegate('requestEvent', table('requestEvent')),
-    notification: delegate('notification', table('notification')),
-    session: delegate('session', table('session')),
-    trustedDevice: delegate('trustedDevice', table('trustedDevice')),
-    otpChallenge: delegate('otpChallenge', table('otpChallenge')),
-    passwordReset: delegate('passwordReset', table('passwordReset')),
-    invitation: delegate('invitation', table('invitation')),
-    auditLog: delegate('auditLog', table('auditLog')),
-    appointment: delegate('appointment', table('appointment')),
-    requestNote: delegate('requestNote', table('requestNote')),
+    ...delegates,
     $queryRaw: vi.fn().mockResolvedValue([{ '?column?': 1 }]),
     $disconnect: vi.fn().mockResolvedValue(undefined),
     $transaction: vi.fn((operation: unknown): Promise<unknown> => {

@@ -11,10 +11,12 @@ import { buildLoggerParams } from './logging/logger.config.js';
 import { AuthGuard } from './modules/auth/auth.guard.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { CatalogModule } from './modules/catalog/catalog.module.js';
+import { ContactsModule } from './modules/contacts/contacts.module.js';
 import { FormsModule } from './modules/forms/forms.module.js';
 import { MailModule } from './modules/mail/mail.module.js';
 import { NavigationModule } from './modules/navigation/navigation.module.js';
 import { PagesModule } from './modules/pages/pages.module.js';
+import { RequestsModule } from './modules/requests/requests.module.js';
 import { SettingsModule } from './modules/settings/settings.module.js';
 import { SitemapModule } from './modules/sitemap/sitemap.module.js';
 import { UsersModule } from './modules/users/users.module.js';
@@ -44,6 +46,8 @@ import { PrismaModule } from './prisma/prisma.module.js';
     FormsModule,
     AuthModule,
     UsersModule,
+    RequestsModule,
+    ContactsModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: ProblemFilter },

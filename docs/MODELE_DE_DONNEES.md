@@ -63,14 +63,29 @@ colonnes dédiées (`trainingId`, `participants`, `eventId`, `seats`, `partnersh
   formations, offres d'emploi, événements, éditions et articles, zones, contacts, demandes, rendez-vous, abonnés,
   campagnes et médias (`pnpm db:purge-demo`).
 
+- **Recherche sans accents ni casse (migration `20261027000000_search_keys`).** `contacts.search_text` (nom, e-mail,
+  structure), `contacts.city_key` (ville) et `requests.search_text` (référence, sujet) contiennent le texte sans
+  accents, en minuscules (`src/common/text/search-key.ts`), recalculé par l'API à chaque écriture (formulaires,
+  duplication, anonymisation, seed) ; les valeurs existantes ont été calculées par la migration. Recherche `q` des
+  demandes et contacts du back-office (`contains`), filtre `district` (`city_key` commence par le quartier) et
+  indicateur « Douala et environs » (`city_key` = « douala » ou se termine par « , douala ») : filtres Prisma
+  ordinaires, sans l'extension `unaccent`.
+- **Anonymisation (RGPD).** Une demande anonymisée garde type, service, statut, dates et horodatage du consentement
+  (statistiques) ; `anonymized_at` est posé, message, valeurs du formulaire, IP, agent utilisateur, notes internes et
+  noms des pièces jointes sont effacés, et la demande est rattachée à la fiche commune `anonyme@mamboproxi.invalid`
+  (« Contact anonymisé »). Contact effacé : fiche vidée sur place (`efface-<id>@mamboproxi.invalid`, « Contact
+  effacé », `anonymized_at`), demandes anonymisées, abonnement anonymisé et désinscrit (statistiques des campagnes
+  conservées). Ces lignes ne sont plus affichées par le back-office.
+
 ## Contraintes ajoutées à la main dans les migrations (non exprimables en Prisma)
 
 Faites dans `prisma/migrations/20261026000000_init` : CHECK des offres, index unique partiel des créneaux, bornes des notes, jours, point focal et coordonnées. Restent pour le module de recherche : `unaccent` et index plein texte.
 
 - CHECK `service_offers` : exactement un de `service_id` / `section_id` ;
 - index unique partiel sur `appointments (starts_at)` pour les statuts `A_CONFIRMER`, `CONFIRME` (créneau pris → 409) ;
-- extension `unaccent` + index de recherche plein texte (`tsvector` français / anglais) pour `/v1/search`,
-  `/admin/search` et le filtre `district` (insensible aux accents) ;
+- extension `unaccent` + index de recherche plein texte (`tsvector` français / anglais) pour `/v1/search` et
+  `/admin/search` (le filtre `district` et la recherche des listes du back-office passent par les clés
+  `search_text` / `city_key`) ;
 - CHECK de bornes (`rating` 1–5, `weekday` 1–7, `focal_x/y` 0–1, coordonnées dans l'emprise du Cameroun).
 
 ## Écarts et points du contrat à préciser

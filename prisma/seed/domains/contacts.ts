@@ -7,6 +7,7 @@ import {
   SubscriberSource,
   SubscriberStatus,
 } from '../../../src/generated/prisma/client.js';
+import { contactSearchKeys } from '../../../src/modules/contacts/contact.mapper.js';
 import { logCount, readSeedData, type SeedClock, type Tx } from '../support.js';
 import type { ContactSeed } from '../types.js';
 
@@ -169,6 +170,7 @@ function contactData(contact: ContactSeed, clock: SeedClock) {
     lastActivityAt: clock.date(contact.lastActivityAt),
     createdAt: clock.date(contact.createdAt),
     isDemo: true,
+    ...contactSearchKeys(contact),
   };
 }
 

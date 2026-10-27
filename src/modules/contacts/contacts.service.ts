@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import type { Language, Prisma, SubscriberSource, SubscriberStatus } from '../../generated/prisma/client.js';
-import { normalizeEmail, toContactData, type ContactSubmission } from './contact.mapper.js';
+import {
+  contactSearchKeys,
+  normalizeEmail,
+  toContactData,
+  type ContactSubmission,
+} from './contact.mapper.js';
 
 export interface SavedContact {
   id: string;
@@ -32,12 +37,26 @@ export class ContactsService {
     now: Date,
   ): Promise<SavedContact> {
     const { create, update } = toContactData(submission, now);
-    return tx.contact.upsert({
+    const saved = await tx.contact.upsert({
       where: { email: create.email },
       create,
       update,
-      select: { id: true, email: true, fullName: true, firstName: true },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        firstName: true,
+        organization: true,
+        city: true,
+        searchText: true,
+        cityKey: true,
+      },
     });
+    // Fiche existante : les clés de recherche dépendent aussi des valeurs non remplacées (structure, ville).
+    const keys = contactSearchKeys(saved);
+    if (keys.searchText !== saved.searchText || keys.cityKey !== saved.cityKey)
+      await tx.contact.update({ where: { id: saved.id }, data: keys, select: { id: true } });
+    return { id: saved.id, email: saved.email, fullName: saved.fullName, firstName: saved.firstName };
   }
 
   /** Remplace les rubriques qui intéressent le contact (inscription). */

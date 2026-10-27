@@ -67,6 +67,17 @@ après 60 s), sauf sur un appareil de confiance (cookie `mp_td`, 30 jours, param
   est refusée à tous. Matrice rôle → permissions : `src/modules/auth/permissions.ts` (schéma `Role` du contrat).
 - En local, les codes et les liens (invitation, réinitialisation) arrivent dans Mailpit.
 
+## Back-office : demandes et contacts
+
+- `/v1/admin/requests*` : liste filtrée (type, statut, rubrique, pays, quartier, personne assignée, échéance,
+  période, recherche), paginée et triée avec les compteurs des onglets ; export CSV ; détail ; statut, assignation et
+  échéance (`PATCH`) ; notes internes ; duplication ; anonymisation. Un chargé de clientèle (`requests:read-assigned`)
+  ne voit que ses demandes. `/v1/admin/me/tasks` : « Mes tâches » du tableau de bord.
+- `/v1/admin/contacts*` : liste et indicateurs, export CSV, fiche, export RGPD (JSON), droit à l'effacement.
+- Exports CSV : UTF-8 avec BOM, séparateur `;`, cellules entre guillemets, formules neutralisées (apostrophe devant
+  `=`, `+`, `-`, `@`, sauf nombres et téléphones), inscrits au journal d'activité.
+- Recherche et quartier sans accents ni casse (colonnes `search_text`, `city_key` : `docs/MODELE_DE_DONNEES.md`).
+
 ## E-mails
 
 Les e-mails partent en arrière-plan par la file BullMQ `mail` (Redis) : `MailQueueService.enqueue(...)` ajoute une

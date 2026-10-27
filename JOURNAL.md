@@ -276,3 +276,115 @@
 
 - Environ 70 mutations à cookie hors authentification et utilisateurs ne déclarent pas `403` (modules pas encore
   implémentés) : à compléter avec chaque module.
+
+## Phase 2 — Back-office : demandes et contacts (27 octobre 2026)
+
+### Fait
+
+- Demandes (`src/modules/requests`) : `GET /v1/admin/requests` (filtres `type`, `status`, `category`, `country`,
+  `district`, `assignee`, `due`, `from`, `to`, `q` ; pagination ; tri ; compteurs des onglets calculés sans le
+  statut), `GET /v1/admin/requests/export.csv`, `GET`, `PATCH` (statut, assignation, échéance) et `DELETE`
+  (anonymisation) de `/v1/admin/requests/{id}`, `POST …/notes`, `POST …/duplicate` ; `GET /v1/admin/me/tasks`.
+- Contacts (`src/modules/contacts`) : `GET /v1/admin/contacts` (filtres `profile`, `country`, `district`,
+  `interest`, `q` ; indicateurs), `GET /v1/admin/contacts/export.csv`, `GET` et `DELETE` (droit à l'effacement) de
+  `/v1/admin/contacts/{id}`, `GET …/export` (export RGPD en JSON).
+- Socle : `common/pagination` (`page`, `pageSize`, `sort` validés, `meta`), `common/csv` (BOM, `;`, CRLF,
+  guillemets, formules neutralisées), `common/text/search-key`, `common/time/agency-day` (journée de Douala),
+  `common/audit/audit-log` ; formats partagés `ContactSummary`, `UserRef`, `AdminAppointment`.
+- Migration `20261027000000_search_keys` (SQL produit hors ligne par
+  `prisma migrate diff --from-schema <schéma précédent> --to-schema prisma/schema.prisma --script`, complété du calcul
+  des lignes existantes) : `contacts.search_text`, `contacts.city_key`, `requests.search_text`, tenues à jour par les
+  formulaires, la duplication, l'anonymisation et le seed.
+- Contrat : réponse commune `InvalidQuery` (400) sur les listes et exports ; `403 Forbidden` (rôle insuffisant ou
+  `csrf-token-invalid`) sur les dix routes du lot qui ne le déclaraient pas ; en-têtes `Content-Disposition` des
+  exports ; règles de tri, de recherche, d'anonymisation, d'effacement et contenu de l'export RGPD décrits ; schéma
+  de la réponse de `GET /v1/admin/contacts/{id}/export`. Site synchronisé (`pnpm contract:sync`,
+  `pnpm contract:generate`).
+- Tests : unitaires (`csv.spec.ts`, `search-key.spec.ts`, `request.mapper.spec.ts`, clés de recherche des contacts) ;
+  e2e `test/admin-requests.e2e-spec.ts` et `test/admin-contacts.e2e-spec.ts` (données `test/fixtures/back-office.ts`,
+  une session par rôle ouverte une seule fois), avec un bloc sur la base réelle. Le double de Prisma retrouve les
+  relations par clé étrangère (`LINKS`), filtre les listes liées (`some`, `none`, `every`, `is`), compte (`_count`),
+  regroupe (`groupBy`), pagine (`skip`) et connaît `contains` / `startsWith` / `endsWith`.
+
+### Décisions
+
+- **Périmètre** : avec la seule permission `requests:read-assigned` (AGENT), liste, compteurs et export se limitent
+  aux demandes assignées ; `assignee` désignant quelqu'un d'autre → 403 ; une demande hors périmètre, comme une
+  demande anonymisée, est « introuvable » (404, texte du back-office simulé). Statut, échéance et notes : toute
+  demande avec `requests:write`, les siennes avec `requests:write-assigned` ; assignation : `requests:assign` ;
+  retour en arrière du statut : `requests:revert-status` (administrateurs). Matrice existante inchangée (l'EDITOR
+  assigne et anonymise ; le MANAGER aussi, comme le prévoit le schéma `Role`).
+- **Assignation** : membre actif, mot de passe défini, rôle qui traite les demandes (comme `assignable` de la
+  présence), sinon 422 sur `assignedToId`. Événement `ASSIGNED` (`assignedToId`, `assignedToName`), notification
+  `ASSIGNMENT` (« Demande assignée — {service} ({référence}) », lien `/admin/demandes?id=`) et e-mail
+  `team-assignment` à la personne assignée, sauf si elle s'assigne elle-même ; un échec de mise en file est
+  journalisé sans faire échouer la modification. `assignedAt` figure dans les données de l'e-mail : deux
+  assignations successives à la même personne ne sont pas fusionnées par l'identifiant stable de la tâche.
+- **Statuts** : `completedAt` à « Prestation réalisée », `closedAt` à « Clôturée », effacés par un retour en arrière.
+  Devis passé à « Prestation réalisée » : ligne `surveys` `SCHEDULED` à `surveyDelayHours` (paramètre `emails`, 24 h
+  par défaut) et événement `SURVEY_SCHEDULED` ; un retour en arrière supprime l'invitation pas encore envoyée. Le
+  jeton enregistré est provisoire : le module des questionnaires le remplacera à l'envoi (seul un condensat est
+  conservé). L'échéance (`dueAt`) n'a pas de type d'événement dans le contrat : journal d'activité seulement.
+- **Libellés de l'historique** calculés à la lecture à partir de `kind` et `data` (exemples du contrat et du
+  back-office simulé : « Demande reçue via le formulaire », « Statut : Nouvelle → En cours », « Assignée à … »).
+- **Anonymisation d'une demande** : message, valeurs du formulaire, structure, IP et agent utilisateur, sujet libre
+  des messages de contact, notes internes, noms des pièces jointes (`fichier-anonymise`), réponses libres du
+  questionnaire, message et notes du rendez-vous lié ; la demande (et le rendez-vous lié) passe sur la fiche commune
+  `anonyme@mamboproxi.invalid`, exclue des listes : la demande n'est plus rattachable à la personne. Type, service,
+  statut et dates restent pour les statistiques.
+- **Droit à l'effacement** : fiche vidée sur place (`efface-<id>@mamboproxi.invalid`, « Contact effacé »), centres
+  d'intérêt retirés, demandes anonymisées (elles restent sur la fiche effacée), message et notes des rendez-vous
+  effacés, abonnement anonymisé et désinscrit plutôt que supprimé (la suppression des envois de campagne, en
+  cascade, fausserait les statistiques). Fiches effacées et fiche commune exclues des listes, des indicateurs et des
+  fiches (404).
+- **Export RGPD** : fiche complète (prénom, nom, quartier, langue, dernière activité en plus), demandes avec contenu,
+  preuve du consentement (IP, agent utilisateur), historique, pièces jointes décrites et questionnaire, abonnement ;
+  sans les notes internes de l'équipe (demandes et rendez-vous).
+- **CSV** : colonnes et en-têtes du back-office simulé ; UTF-8 avec BOM, `;`, CRLF, cellules entre guillemets.
+  Injection de formules (pratique OWASP) : apostrophe devant une cellule commençant par `=`, `+`, `-`, `@`, tabulation
+  ou retour chariot, sauf un nombre ou un numéro de téléphone (`+237…` deviendrait sinon illisible, et ne peut rien
+  exécuter). `Cache-Control: no-store`, `Content-Disposition` `demandes-AAAA-MM-JJ.csv` / `contacts-AAAA-MM-JJ.csv`
+  (date de Douala). Chaque export (CSV, RGPD) est inscrit au journal, avec le nombre de lignes seulement.
+- **Journal d'activité** : `request.update`, `request.duplicate`, `request.anonymize`, `request.export`,
+  `contact.export`, `contact.export-data`, `contact.erase` ; libellés et états sans donnée personnelle des clients
+  (références, statuts, membres de l'équipe).
+- **Recherche sans accents** : colonnes de clés normalisées plutôt que l'extension `unaccent` (gardée pour la
+  recherche plein texte de `/v1/search` et `/admin/search`) : filtres Prisma ordinaires, testables avec le double.
+- **« Mes tâches »** : la partie rendez-vous lit directement la table `appointments` (aujourd'hui, à confirmer, 5
+  prochains sur 7 jours, créneau proposé pris en compte), au format `AdminAppointment` que reprendra le module des
+  rendez-vous ; aucune partie n'est renvoyée à zéro par défaut.
+- **Tris** : demandes `createdAt` (défaut `-createdAt`), `updatedAt`, `dueAt`, `reference`, `status`, `type` ;
+  contacts `createdAt` (défaut), `updatedAt`, `fullName`, `lastActivityAt` ; autre valeur → 400 ; départage par
+  identifiant. `totalPages` vaut 0 pour une liste vide (contrat : minimum 0).
+
+### Écarts avec le back-office simulé du site (le contrat prime)
+
+- Export des demandes : type en libellé (« Devis ») au lieu du code (`DEVIS`) ; formules neutralisées ; nom de
+  fichier daté (le site nomme de toute façon le fichier téléchargé). Export des contacts : « Créé le » en date de
+  Douala au lieu de la date UTC.
+- `whatsappUrl` renseigné avec le message de l'exemple du contrat (« c'est Mambo Proxi… ») ; le mock renvoie `null`
+  et le site construit alors son propre lien (« c’est MAMBO Proxi… »).
+- Effacement d'un contact : ses demandes anonymisées disparaissent des listes (le mock les garde, renommées
+  « Contact effacé ») ; `DELETE` d'une demande : anonymisation puis 404, comme la suppression du mock.
+- `Subscriber.source` : origine de l'abonnement (`footer`, `suivi-mambo`, `inscription`, `autre`) au lieu de la
+  source de la fiche contact. Export RGPD : clés `requests` et `newsletter` en plus de `exportedAt` et `contact`.
+- Le mock ignore `sort` ; l'API l'applique. 422 d'assignation : même détail, avec `errors[].code = not_assignable`.
+
+### Difficultés et solutions
+
+- **Double de Prisma** : les lignes créées par l'API n'ont que leurs clés étrangères (le graphe d'objets des
+  lectures publiques ne suffisait plus) ; relations retrouvées par clé (`LINKS`) sans changer le comportement des
+  enregistrements qui portent déjà leurs relations. Le double renvoie toutes les colonnes quelle que soit la
+  sélection : la duplication recopie désormais les champs un à un (un `...source` recopiait aussi `id`).
+- **Machine** : commandes lourdes lancées une à une ; tests sur la base réelle non lancés en local (pas de Docker),
+  exécutés par la CI.
+
+### Points ouverts
+
+- `GET /v1/admin/requests/{id}/attachments/{attachmentId}` (URL signée de 5 min) non implémenté : module de
+  stockage, qui devra aussi purger les fichiers des demandes anonymisées (nom `fichier-anonymise`).
+- Avis publiés liés aux demandes d'un contact effacé (nom affiché « Prénom N. », ville) : à traiter avec le module
+  des avis. Titres de notifications reprenant le sujet libre d'un message de contact : non effacés.
+- Tableau de bord et `sidebar-counts` (lot suivant) : exclure les demandes anonymisées, comme la présence
+  (`openTasks`, corrigée dans ce lot).
+- Envoi et relance du questionnaire programmé, avec le nouveau jeton : module des questionnaires.

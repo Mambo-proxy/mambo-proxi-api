@@ -47,7 +47,13 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
 - [~] contacts · requests (références `MP-AAAA-NNNN`, historique, notes, export CSV, anonymisation)
   - [x] Fiche contact créée ou mise à jour par e-mail normalisé (`src/modules/contacts`) : profil, structure, activité, ville et quartier, préférence de contact, langue, centres d'intérêt (inscription), abonnement newsletter préparé « en attente » (double opt-in)
   - [x] Création des demandes (`src/modules/requests`) : référence atomique (`ReferenceCounter`, année de Douala), statut `NOUVELLE`, échéance + 24 h, consentement horodaté (IP, agent utilisateur), historique `RECEIVED`, notifications de l'équipe (rôles `requests:read`)
-  - [ ] Opérations du back-office : liste, détail, statut, assignation, notes, export CSV, anonymisation ; `ACK_SENT` / `TEAM_ALERT_SENT` à l'envoi effectif des e-mails (module mail)
+  - [x] Opérations du back-office (`src/modules/requests`, `src/modules/contacts`) : `/v1/admin/requests*` (liste filtrée, paginée, triée et compteurs, export CSV, détail, statut, assignation avec notification et e-mail `team-assignment`, échéance, notes, duplication, anonymisation), `/v1/admin/contacts*` (liste et indicateurs, export CSV, fiche, export RGPD, droit à l'effacement), `/v1/admin/me/tasks` ; périmètre `requests:read-assigned` ; journal d'activité
+  - [x] Migration `20261027000000_search_keys` : clés de recherche sans accents (`contacts.search_text`, `contacts.city_key`, `requests.search_text`), tenues à jour par l'API et le seed
+  - [x] Questionnaire programmé au passage d'un devis à « Prestation réalisée » (`surveys`, `SURVEY_SCHEDULED`) ; envoi et relance avec le module des questionnaires
+  - [x] Tests : unitaires (CSV, clés de recherche, journée de Douala, libellés de l'historique, filtres) ; e2e `test/admin-requests.e2e-spec.ts`, `test/admin-contacts.e2e-spec.ts` (double de Prisma avec relations par clé ; bloc base réelle)
+  - [x] `ACK_SENT` / `TEAM_ALERT_SENT` à l'envoi effectif des e-mails (module mail, `MailRecorder`)
+  - [ ] `GET /v1/admin/requests/{id}/attachments/{attachmentId}` (URL signée) : avec le module de stockage ; purge des fichiers des demandes anonymisées
+  - [ ] Avis publiés d'un contact effacé (nom affiché, ville) : à traiter avec le module des avis
 - [x] mail (React Email, texte brut, gabarits Figma) + queue (BullMQ, réessais) — 21 gabarits, textes modifiables en base, 4 e-mails maquettés alignés, logo PNG, `pnpm mail:preview`
 - [x] auth (argon2id, OTP e-mail, appareils de confiance, rotation des jetons, CSRF, verrouillage) · users (invitation, rôles)
   - [x] `/v1/auth/*` (9 opérations) : mot de passe argon2id, code à 6 chiffres (10 min, 5 essais, renvoi après 60 s), appareil de confiance `mp_td` (paramètre `trustedDeviceDays`), cookies `mp_at`/`mp_rt`/`mp_csrf`, rotation avec détection de réutilisation, verrouillage progressif, mot de passe oublié (réponse identique), réinitialisation et invitation à usage unique
@@ -56,7 +62,7 @@ Légende : `[x]` fait · `[~]` en cours · `[ ]` à faire. Les tâches du site e
   - [x] Seed : mots de passe `SEED_ADMIN_PASSWORD` et `SEED_DEMO_PASSWORD` (développement) hachés en argon2id
   - [x] Tests : unitaires (permissions contre le contrat, JWT, politique des mots de passe) ; e2e `test/auth.e2e-spec.ts`, `test/admin-users.e2e-spec.ts` (doubles ; bloc base réelle)
   - [x] Contrat : 422 (login, verify-otp, resend-otp, forgot-password, PATCH users), 401 (resend-otp), 423 (verify-otp), 404 et 409 (DELETE et reset-password d'un utilisateur), 403 (logout), 429 (refresh), exemple `csrf-token-invalid` de `Forbidden` ; tests passés sur `expectContract`
-  - [ ] Contrat : 403 `Forbidden` absent de ~70 mutations à cookie hors auth/utilisateurs (services, pages, avis, médias…), à ajouter avec leurs modules
+  - [ ] Contrat : 403 `Forbidden` absent des mutations à cookie hors auth/utilisateurs/demandes/contacts (services, pages, avis, médias…), à ajouter avec leurs modules
   - [ ] Site : appeler `POST /v1/auth/refresh` sur un 401 (jeton d'accès de 15 min) avant de rediriger vers la connexion
 - [ ] appointments + availability (créneaux, 409, confirmation `.ics`, proposition, rappel J-1 9 h Douala)
 - [ ] surveys + reviews (invitation après « Prestation réalisée », relance J+3, jeton unique 30 j, consentement de publication)

@@ -88,7 +88,7 @@ export class UsersService {
         select: { userId: true },
       }),
       this.prisma.request.findMany({
-        where: { assignedToId: { in: ids }, status: { in: [...OPEN_REQUEST_STATUSES] } },
+        where: { assignedToId: { in: ids }, status: { in: [...OPEN_REQUEST_STATUSES] }, anonymizedAt: null },
         select: { assignedToId: true },
       }),
       this.prisma.appointment.findMany({

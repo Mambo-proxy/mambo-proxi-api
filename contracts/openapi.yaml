@@ -1499,6 +1499,11 @@ paths:
       description: |
         Avec la seule permission `requests:read-assigned`, la liste et les compteurs se limitent aux demandes assignées
         à l'utilisateur connecté (`assignee=me` appliqué d'office, autre valeur → `403`).
+
+        Les demandes anonymisées n'apparaissent plus. `district` et `q` ne tiennent compte ni de la casse ni des
+        accents ; `q` cherche dans la référence, le sujet, le nom, l'adresse e-mail et la structure du contact.
+        Tri (`sort`) : `createdAt` (défaut `-createdAt`), `updatedAt`, `dueAt`, `reference`, `status`, `type`.
+        `counts` : compteurs par statut calculés avec tous les filtres sauf `status` (onglets).
       security: [{ cookieAuth: [] }]
       parameters:
         - name: type
@@ -1536,7 +1541,9 @@ paths:
                   counts: { $ref: '#/components/schemas/RequestStatusCounts' }
               examples:
                 default: { $ref: '#/components/examples/AdminRequestsPage' }
+        '400': { $ref: '#/components/responses/InvalidQuery' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
 
   /v1/admin/requests/export.csv:
     get:
@@ -1544,6 +1551,13 @@ paths:
       operationId: adminExportRequests
       x-permissions: [requests:export]
       summary: Export CSV (mêmes filtres que la liste)
+      description: |
+        Toutes les demandes filtrées (périmètre de l'utilisateur, sans pagination), des plus récentes aux plus
+        anciennes. Colonnes : Référence ; Type ; Statut ; Client ; E-mail ; Téléphone ; Ville ; Pays ; Service ; Assignée
+        à ; Échéance ; Reçue le (libellés des types et statuts, dates ISO 8601 UTC). Chaque cellule est entre
+        guillemets ; une cellule qui commence par `=`, `+`, `-`, `@`, une tabulation ou un retour chariot est préfixée
+        d'une apostrophe (injection de formules), sauf un nombre ou un numéro de téléphone. Chaque export est inscrit
+        au journal d'activité.
       security: [{ cookieAuth: [] }]
       parameters:
         - name: type
@@ -1565,11 +1579,17 @@ paths:
         - $ref: '#/components/parameters/To'
       responses:
         '200':
-          description: Fichier CSV (UTF-8 avec BOM, séparateur `;`).
+          description: Fichier CSV (UTF-8 avec BOM, séparateur `;`, lignes CRLF), non mis en cache (`no-store`).
+          headers:
+            Content-Disposition:
+              description: '`attachment; filename="demandes-AAAA-MM-JJ.csv"` (date de Douala).'
+              schema: { type: string }
           content:
             text/csv:
               schema: { type: string }
+        '400': { $ref: '#/components/responses/InvalidQuery' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
 
   /v1/admin/requests/{id}:
     get:
@@ -1577,6 +1597,10 @@ paths:
       operationId: adminGetRequest
       x-permissions: [requests:read, requests:read-assigned]
       summary: Détail d'une demande
+      description: |
+        `404` pour une demande inconnue, anonymisée ou, avec la seule permission `requests:read-assigned`, qui n'est
+        pas assignée à l'utilisateur connecté. `payload` : valeurs propres au formulaire (sans `fields`, renvoyés à
+        part) ; libellés de l'historique calculés à la lecture.
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       responses:
@@ -1588,6 +1612,7 @@ paths:
               examples:
                 default: { $ref: '#/components/examples/AdminRequestDetail' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
     patch:
       tags: [Admin — Demandes]
@@ -1595,9 +1620,12 @@ paths:
       x-permissions: [requests:write, requests:write-assigned, requests:assign]
       summary: Changer le statut ou l'assignation
       description: |
-        Chaque changement crée un événement d'historique. Le passage à `PRESTATION_REALISEE` d'un devis planifie
-        l'invitation au questionnaire (délai paramétrable). Le retour arrière du statut demande la permission
-        `requests:revert-status` (administrateurs).
+        Chaque changement de statut ou d'assignation crée un événement d'historique et une ligne du journal
+        d'activité ; tous les contrôles précèdent la moindre écriture. Le passage à `PRESTATION_REALISEE` d'un devis
+        planifie l'invitation au questionnaire (`surveyDelayHours` du paramètre `emails`, 24 h par défaut ;
+        `survey.status = SCHEDULED`, événement `SURVEY_SCHEDULED`) et renseigne `completedAt` ; `CLOTUREE` renseigne
+        `closedAt`. Le retour arrière du statut demande la permission `requests:revert-status` (administrateurs) ; il
+        efface `completedAt` / `closedAt` et annule l'invitation pas encore envoyée.
 
         Assignation (`assignedToId`, permission `requests:assign`) : la personne doit être un membre actif pouvant traiter
         des demandes (`assignable` dans `GET /v1/admin/users/presence`), sinon `422` ; `null` retire l'assignation.
@@ -1607,6 +1635,9 @@ paths:
         (désactivable dans les modèles d'e-mails) ; s'assigner soi-même ne notifie pas.
 
         Échéance (`dueAt`) : fixée à la réception (24 h après la demande), modifiable ; `null` = sans échéance.
+
+        `403` : rôle insuffisant (détail en français selon le cas) ou jeton CSRF absent (`csrf-token-invalid`) ;
+        `404` : demande inconnue, anonymisée ou hors du périmètre de l'utilisateur.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       requestBody:
@@ -1635,6 +1666,12 @@ paths:
       operationId: adminAnonymizeRequest
       x-permissions: [requests:anonymize]
       summary: Anonymiser une demande (RGPD)
+      description: |
+        Efface le message, les valeurs du formulaire, la structure, l'adresse IP et l'agent utilisateur du
+        consentement, le sujet libre des messages de contact, les notes internes, les noms des pièces jointes, les
+        réponses libres du questionnaire et le message du rendez-vous lié ; la demande est détachée de la fiche du
+        contact (fiche commune anonyme) et un événement `ANONYMIZED` est ajouté. Type, service, statut et dates
+        restent pour les statistiques ; la demande n'apparaît plus dans le back-office (`404` ensuite).
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       responses:
@@ -1649,6 +1686,9 @@ paths:
       operationId: adminAddRequestNote
       x-permissions: [requests:write, requests:write-assigned]
       summary: Ajouter une note interne
+      description: |
+        Texte sans les espaces de début et de fin ; événement `NOTE_ADDED`. Avec `requests:write-assigned` seulement,
+        sur ses propres demandes (les autres : `404`).
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       requestBody:
@@ -1667,6 +1707,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/RequestNote' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
@@ -1676,6 +1717,9 @@ paths:
       operationId: adminDuplicateRequest
       x-permissions: [requests:write]
       summary: Dupliquer une demande (nouvelle référence, statut « Nouvelle »)
+      description: |
+        Copie du contenu, du contact et de l'assignation, échéance à 24 h, événement `DUPLICATED` ; ni notes, ni
+        historique, ni pièces jointes, ni questionnaire.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       responses:
@@ -1685,6 +1729,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/RequestDetail' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   /v1/admin/requests/{id}/attachments/{attachmentId}:
@@ -3384,6 +3429,12 @@ paths:
       operationId: adminListContacts
       x-permissions: [contacts:read]
       summary: Contacts et inscrits
+      description: |
+        Fiches effacées exclues. `district` et `q` (nom, adresse e-mail, structure) ne tiennent compte ni de la casse
+        ni des accents. Tri (`sort`) : `createdAt` (défaut `-createdAt`), `updatedAt`, `fullName`, `lastActivityAt`.
+        `requestsCount` ne compte pas les demandes anonymisées. `stats` porte sur tous les contacts (sans les
+        filtres) ; `newThisMonth` = créés dans les 30 derniers jours ; `locations.douala` = ville « Douala » ou
+        « Quartier, Douala ».
       security: [{ cookieAuth: [] }]
       parameters:
         - name: profile
@@ -3413,7 +3464,9 @@ paths:
                   data: { type: array, items: { $ref: '#/components/schemas/AdminContactListItem' } }
                   meta: { $ref: '#/components/schemas/PaginationMeta' }
                   stats: { $ref: '#/components/schemas/ContactStats' }
+        '400': { $ref: '#/components/responses/InvalidQuery' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
 
   /v1/admin/contacts/export.csv:
     get:
@@ -3421,6 +3474,11 @@ paths:
       operationId: adminExportContacts
       x-permissions: [contacts:export]
       summary: Export CSV des contacts
+      description: |
+        Contacts filtrés, du plus récent au plus ancien. Colonnes : Nom ; Structure ; E-mail ; Téléphone ; Profil ;
+        Ville ; Pays ; Intérêts ; Demandes ; Newsletter (Abonné, En attente, Désinscrit, Non) ; Créé le (date de
+        Douala `AAAA-MM-JJ`). Même format et même protection contre l'injection de formules que l'export des demandes ;
+        chaque export est inscrit au journal d'activité.
       security: [{ cookieAuth: [] }]
       parameters:
         - name: profile
@@ -3435,11 +3493,17 @@ paths:
           schema: { $ref: '#/components/schemas/Slug' }
       responses:
         '200':
-          description: Fichier CSV.
+          description: Fichier CSV (UTF-8 avec BOM, séparateur `;`, lignes CRLF), non mis en cache (`no-store`).
+          headers:
+            Content-Disposition:
+              description: '`attachment; filename="contacts-AAAA-MM-JJ.csv"` (date de Douala).'
+              schema: { type: string }
           content:
             text/csv:
               schema: { type: string }
+        '400': { $ref: '#/components/responses/InvalidQuery' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
 
   /v1/admin/contacts/{id}:
     get:
@@ -3456,17 +3520,24 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AdminContact' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
     delete:
       tags: [Admin — Contacts]
       operationId: adminEraseContact
       x-permissions: [contacts:write]
       summary: Droit à l'effacement (anonymise le contact et ses demandes)
+      description: |
+        La fiche est vidée (nom « Contact effacé », adresse factice, coordonnées, structure, centres d'intérêt), ses
+        demandes sont anonymisées (comme `DELETE /v1/admin/requests/{id}`), le message et les notes de ses
+        rendez-vous effacés, son abonnement anonymisé et désinscrit. La fiche n'apparaît plus (`404` ensuite) ;
+        l'effacement est inscrit au journal d'activité, sans donnée personnelle.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       responses:
         '204': { $ref: '#/components/responses/NoContent' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   /v1/admin/contacts/{id}/export:
@@ -3475,15 +3546,34 @@ paths:
       operationId: adminExportContactData
       x-permissions: [contacts:export]
       summary: Export RGPD de toutes les données d'un contact (JSON)
+      description: |
+        Droit d'accès et à la portabilité : `exportedAt`, `contact` (fiche `AdminContact` complétée du prénom, du nom,
+        du quartier, de la langue et de la dernière activité), `requests` (contenu des formulaires, preuve du
+        consentement avec adresse IP et agent utilisateur, historique, pièces jointes décrites, questionnaire) et
+        `newsletter` (consentement et confirmation). Les notes internes de l'équipe n'y figurent pas. Chaque export
+        est inscrit au journal d'activité.
       security: [{ cookieAuth: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       responses:
         '200':
-          description: Données du contact.
+          description: Données du contact, non mises en cache (`no-store`).
+          headers:
+            Content-Disposition:
+              description: '`attachment; filename="donnees-<id>.json"`.'
+              schema: { type: string }
           content:
             application/json:
-              schema: { type: object, additionalProperties: true }
+              schema:
+                type: object
+                required: [exportedAt, contact, requests]
+                additionalProperties: true
+                properties:
+                  exportedAt: { $ref: '#/components/schemas/DateTime' }
+                  contact: { $ref: '#/components/schemas/AdminContact' }
+                  requests: { type: array, items: { type: object, additionalProperties: true } }
+                  newsletter: { type: [object, 'null'], additionalProperties: true }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
 
   # ─────────────────────────── Admin — Newsletter ─────────────────
@@ -4363,6 +4453,20 @@ components:
               - path: consent
                 code: required
                 message: Merci d'accepter le traitement de vos données pour envoyer votre demande.
+    InvalidQuery:
+      description: |
+        Paramètres de requête invalides (`invalid-query`) : valeur inconnue (type, statut, profil), format (date,
+        pays, slug), bornes de la pagination (`page` ≥ 1, `pageSize` de 1 à 100) ou champ de tri non autorisé.
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/Problem' }
+          example:
+            type: https://api.mamboproxi.com/problems/invalid-query
+            title: Requête invalide
+            status: 400
+            detail: Vérifiez les paramètres de la requête.
+            errors:
+              - { path: pageSize, code: too_big, message: La valeur doit être inférieure ou égale à 100. }
     Unauthorized:
       description: Session absente ou expirée.
       content:

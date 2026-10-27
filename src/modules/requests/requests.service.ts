@@ -10,6 +10,7 @@ import type {
 } from '../../generated/prisma/client.js';
 import { ROLES, hasAnyPermission } from '../auth/permissions.js';
 import { nextReference } from './reference.js';
+import { requestSearchText } from './request-search.js';
 
 /** Échéance de traitement d'une nouvelle demande : réception + 24 h (comme les données simulées du site). */
 export const REQUEST_DUE_DELAY_MS = 24 * 60 * 60 * 1000;
@@ -89,6 +90,7 @@ export class RequestsService {
       data: {
         ...draft,
         reference,
+        searchText: requestSearchText(reference, draft.subject),
         status: 'NOUVELLE',
         dueAt,
         createdAt: now,

@@ -1007,6 +1007,8 @@ model Contact {
   preferredChannel ContactPreference? @map("preferred_channel")
   source           String? /// Formulaire d'origine (ex. `devis`, `inscription`).
   language         Language           @default(FR)
+  searchText       String             @default("") @map("search_text") /// Nom, e-mail et structure sans accents ni casse (recherche `q`).
+  cityKey          String?            @map("city_key") /// Ville sans accents ni casse (filtre `district`, indicateur « Douala »).
   lastActivityAt   DateTime           @default(now()) @map("last_activity_at") @db.Timestamptz(3) /// Base de la durée de conservation.
   anonymizedAt     DateTime?          @map("anonymized_at") @db.Timestamptz(3)
   isDemo           Boolean            @default(false) @map("is_demo")
@@ -1072,6 +1074,7 @@ model Request {
   contactPreference ContactPreference? @map("contact_preference")
   subject           String? /// Libellé court (service, formation, poste, événement, sujet du contact).
   payload           Json               @default("{}")
+  searchText        String             @default("") @map("search_text") /// Référence et sujet sans accents ni casse (recherche `q`).
   message           String?
   language          Language           @default(FR)
   consentAt         DateTime           @map("consent_at") @db.Timestamptz(3)

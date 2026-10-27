@@ -1,3 +1,4 @@
+import { optionalSearchKey, searchKey } from '../../common/text/search-key.js';
 import type { ContactPreference, ContactProfile, Language, Prisma } from '../../generated/prisma/client.js';
 
 /** Coordonnées saisies dans un formulaire public, déjà validées. */
@@ -52,6 +53,22 @@ export function shortName(fullName: string, parts?: { firstName: string; lastNam
   return initial ? `${firstName.trim()} ${initial}.` : firstName.trim();
 }
 
+/**
+ * Clés de recherche d'une fiche (colonnes `search_text` et `city_key`) : nom, e-mail et structure pour la
+ * recherche `q`, ville pour le filtre `district` et l'indicateur « Douala et environs ».
+ */
+export function contactSearchKeys(contact: {
+  fullName: string;
+  email: string;
+  organization?: string | null;
+  city?: string | null;
+}): { searchText: string; cityKey: string | null } {
+  return {
+    searchText: searchKey(contact.fullName, contact.email, contact.organization),
+    cityKey: optionalSearchKey(contact.city),
+  };
+}
+
 type ContactData = Prisma.ContactUncheckedCreateInput;
 
 /** Valeurs à enregistrer : seules les informations fournies remplacent celles de la fiche existante. */
@@ -86,9 +103,10 @@ export function toContactData(
   if (submission.activity) provided.activity = submission.activity;
   if (submission.preferredChannel) provided.preferredChannel = submission.preferredChannel;
 
+  const email = normalizeEmail(submission.email);
   return {
     create: {
-      email: normalizeEmail(submission.email),
+      email,
       fullName,
       firstName,
       lastName,
@@ -103,7 +121,14 @@ export function toContactData(
       source: submission.source,
       language: submission.language,
       lastActivityAt: now,
+      ...contactSearchKeys({
+        fullName,
+        email,
+        organization: submission.organization ?? null,
+        city: submission.city ?? null,
+      }),
     },
+    // Clés de recherche d'une fiche existante : recalculées après l'écriture (`ContactsService.upsert`).
     update: provided,
   };
 }

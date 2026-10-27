@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  contactSearchKeys,
   districtFromCity,
   normalizeEmail,
   shortName,
@@ -39,6 +40,25 @@ describe('shortName', () => {
   });
 });
 
+describe('contactSearchKeys', () => {
+  it('retire accents et casse du nom, de l’e-mail, de la structure et de la ville', () => {
+    expect(
+      contactSearchKeys({
+        fullName: 'Hervé  Tchoumi',
+        email: 'Herve.T@Example.com',
+        organization: 'Saveurs du Wouri',
+        city: 'Makèpè, Douala',
+      }),
+    ).toEqual({
+      searchText: 'herve tchoumi herve.t@example.com saveurs du wouri',
+      cityKey: 'makepe, douala',
+    });
+    expect(
+      contactSearchKeys({ fullName: 'Mireille', email: 'm@example.com', city: '  ' }).cityKey,
+    ).toBeNull();
+  });
+});
+
 describe('toContactData', () => {
   const submission: ContactSubmission = {
     email: 'Aurelie.K@example.com',
@@ -70,6 +90,8 @@ describe('toContactData', () => {
       source: 'devis',
       language: 'FR',
       lastActivityAt: NOW,
+      searchText: 'aurelie kamga aurelie.k@example.com',
+      cityKey: 'bonapriso, douala',
     });
   });
 
