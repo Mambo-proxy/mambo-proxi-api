@@ -277,11 +277,30 @@ export const pageSectionSchema = z.discriminatedUnion(
 );
 export type PageSectionInput = z.output<typeof pageSectionSchema>;
 
+/**
+ * Section anglaise (`PageTranslationInput.sections`) : seuls `id` et `type` sont lus ici ; les textes sont posés
+ * sur la section française de même `id` puis validés avec `pageSectionSchema` (voir `AdminPagesService`).
+ */
+const translationSectionSchema = z
+  .object({ id: z.string().trim().min(1).max(64), type: z.string().max(40).optional() })
+  .loose();
+
+/** Schéma `PageTranslationInput` du contrat. */
+export const pageTranslationSchema = z.object({
+  title: nullableText(160).optional(),
+  sections: z
+    .array(translationSectionSchema, { error: 'La version anglaise doit contenir la liste des sections.' })
+    .max(40, { error: 'Une page compte au plus 40 sections.' }),
+  seo: seoSchema.optional(),
+});
+export type PageTranslationInput = z.output<typeof pageTranslationSchema>;
+
 /** Schéma `PageDraftInput` du contrat. */
 export const pageDraftSchema = z.object({
   sections: z
     .array(pageSectionSchema, { error: 'Le brouillon doit contenir la liste des sections.' })
     .max(40, { error: 'Une page compte au plus 40 sections.' }),
   seo: seoSchema.optional(),
+  translations: z.object({ en: pageTranslationSchema.optional() }).optional(),
 });
 export type PageDraftInput = z.output<typeof pageDraftSchema>;

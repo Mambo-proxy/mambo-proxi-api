@@ -11,13 +11,31 @@ import {
 import { notFoundException, type ProblemFieldError } from '../../common/problem/problem.js';
 import { CACHE_TAGS, requestRevalidation } from '../../common/revalidation/revalidation.js';
 import { validationException } from '../../common/validation/validation-exception.js';
+import { frenchErrorMap, issuesToProblemErrors } from '../../common/validation/zod-issues.js';
 import { AppConfigService } from '../../config/app-config.service.js';
 import { Prisma, type PageGroup } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { unknownMediaErrors, type MediaReference } from '../media/media-refs.js';
 import { MediaService } from '../media/media.service.js';
 import { toUserRef, USER_REF_SELECT, type UserRef } from '../users/user-ref.js';
-import { SECTION_TYPES, type PageDraftInput, type SectionType } from './page-sections.schemas.js';
+import {
+  SECTION_TYPES,
+  pageSectionSchema,
+  type PageDraftInput,
+  type PageTranslationInput,
+  type SectionType,
+} from './page-sections.schemas.js';
+import {
+  applyEnglishTexts,
+  englishSectionErrors,
+  englishSections,
+  readEnglish,
+  sectionTextHash,
+  stampLegacyHashes,
+  translateSeo,
+  translationStatus,
+  type TranslationStatus,
+} from './page-translations.js';
 import { PAGE_KEYS, isPageKey, toSeo, type Page, type PageKey } from './pages.mapper.js';
 
 export const ADMIN_PAGE_NOT_FOUND = 'Cette page n’existe pas.';
@@ -37,6 +55,7 @@ const adminPageSelect = {
   seo: true,
   draftSections: true,
   draftSeo: true,
+  translations: true,
   draftTranslations: true,
   allowedSections: true,
   publishedAt: true,
@@ -58,11 +77,20 @@ export interface AdminPageSummary {
   updatedBy: UserRef | null;
 }
 
+/** Schéma `PageTranslation` du contrat. */
+export interface PageTranslation {
+  title: string | null;
+  sections: JsonObject[];
+  seo: Page['seo'];
+}
+
 /** Schéma `AdminPage` du contrat. */
 export interface AdminPage extends AdminPageSummary {
   sections: JsonObject[];
   allowedSectionTypes: SectionType[];
   seo: Page['seo'];
+  translations: { en: PageTranslation | null };
+  translationStatus: { en: TranslationStatus };
 }
 
 const SECTION_TYPE_SET: ReadonlySet<unknown> = new Set(SECTION_TYPES);
@@ -84,6 +112,13 @@ function toSummary(page: AdminPageRecord): AdminPageSummary {
     updatedAt: page.updatedAt.toISOString(),
     updatedBy: page.updatedBy === null ? null : toUserRef(page.updatedBy),
   };
+}
+
+/** Sections exploitables d'une colonne JSON (identifiant et type connus). */
+function validSections(value: unknown): JsonObject[] {
+  return asObjectArray(value).filter(
+    (section) => typeof section['id'] === 'string' && SECTION_TYPE_SET.has(section['type']),
+  );
 }
 
 /** Rang d'une page dans la liste (ordre de l'énumération `PageKey` du contrat). */
@@ -122,17 +157,34 @@ export class AdminPagesService {
     return page;
   }
 
-  /** Brouillon s'il existe, sinon version publiée ; toutes les sections, masquées comprises, visuels résolus. */
+  /**
+   * Brouillon s'il existe, sinon version publiée ; toutes les sections, masquées comprises, visuels résolus. Version
+   * anglaise (brouillon anglais s'il existe, sinon publiée) recomposée sur les sections françaises affichées, et état
+   * de la traduction.
+   */
   private async toAdminPage(page: AdminPageRecord): Promise<AdminPage> {
-    const sections = asObjectArray(page.draftSections ?? page.sections).filter(
-      (section) => typeof section['id'] === 'string' && SECTION_TYPE_SET.has(section['type']),
-    );
-    const [resolved] = await this.media.resolveVisuals(sections);
+    const sections = validSections(page.draftSections ?? page.sections);
+    const seo = page.draftSections === null ? page.seo : (page.draftSeo ?? page.seo);
+    const english = readEnglish(page.draftTranslations ?? page.translations);
+    const translated = english === null ? [] : englishSections(sections, english.sections);
+    const [[resolved], [resolvedEnglish]] = await Promise.all([
+      this.media.resolveVisuals(sections),
+      this.media.resolveVisuals(translated),
+    ]);
     return {
       ...toSummary(page),
       sections: resolved,
       allowedSectionTypes: allowedTypes(page),
-      seo: toSeo(page.draftSections === null ? page.seo : (page.draftSeo ?? page.seo)),
+      seo: toSeo(seo),
+      translations: {
+        en:
+          english === null
+            ? null
+            : { title: english.title, sections: resolvedEnglish, seo: toSeo(translateSeo(seo, english.seo)) },
+      },
+      translationStatus: {
+        en: translationStatus(sections, english, validSections(page.sections)),
+      },
     };
   }
 
@@ -194,16 +246,93 @@ export class AdminPagesService {
     if (errors.length > 0) throw validationException(errors);
   }
 
+  /**
+   * Version anglaise du brouillon (`translations.en`) : `id` alignés sur les sections françaises de l'envoi, textes
+   * anglais posés sur la section française puis validés comme elle (limites, HTML assaini). Empreinte des textes
+   * français mémorisée par section : recalculée si les textes anglais de la section changent (ou si elle est
+   * nouvelle), sinon gardée (une traduction inchangée reste périmée si le français a changé ; une traduction
+   * antérieure au suivi prend l'empreinte du français publié).
+   */
+  private englishDraft(
+    page: AdminPageRecord,
+    draft: PageDraftInput,
+    english: PageTranslationInput,
+  ): { value: JsonObject; errors: ProblemFieldError[] } {
+    const basePath = 'translations.en.sections';
+    const errors = englishSectionErrors(draft.sections, english.sections, basePath);
+    const french = new Map<string, JsonObject>(draft.sections.map((section) => [section.id, section]));
+    const current = page.draftTranslations ?? page.translations;
+    const previous = readEnglish(current);
+    const previousById = new Map(previous?.sections.map((section) => [section['id'], section]));
+    const published = new Map(validSections(page.sections).map((section) => [section['id'], section]));
+    const sections: JsonObject[] = [];
+    const sourceHashes: Record<string, string> = {};
+    english.sections.forEach((input, index) => {
+      const prefix = `${basePath}.${String(index)}.`;
+      const source = french.get(input.id);
+      if (source === undefined || errors.some((error) => error.path.startsWith(prefix))) return;
+      const parsed = pageSectionSchema.safeParse(applyEnglishTexts(source, input), {
+        error: frenchErrorMap,
+        reportInput: true,
+      });
+      if (!parsed.success) {
+        errors.push(
+          ...issuesToProblemErrors(
+            parsed.error.issues.map((issue) => ({
+              ...issue,
+              path: ['translations', 'en', 'sections', index, ...issue.path],
+            })),
+          ),
+        );
+        return;
+      }
+      const section = parsed.data as JsonObject;
+      sections.push(section);
+      const before = previousById.get(input.id);
+      const unchanged =
+        before !== undefined &&
+        sectionTextHash(applyEnglishTexts(source, before)) === sectionTextHash(section);
+      const publishedSource = published.get(input.id);
+      const hash = unchanged
+        ? (previous?.sourceHashes[input.id] ??
+          (publishedSource === undefined ? null : sectionTextHash(publishedSource)) ??
+          sectionTextHash(source))
+        : sectionTextHash(source);
+      if (hash !== null) sourceHashes[input.id] = hash;
+    });
+    const seo = english.seo ?? previous?.seo ?? {};
+    return {
+      value: {
+        ...(isPlainObject(current) ? current : {}),
+        en: {
+          title: english.title ?? null,
+          sections,
+          seo: { title: seo['title'] ?? null, description: seo['description'] ?? null },
+          sourceHashes,
+        },
+      },
+      errors,
+    };
+  }
+
   /** `PUT /v1/admin/pages/{key}` : enregistre le brouillon (sauvegarde automatique), sans toucher au site. */
   async saveDraft(key: string, draft: PageDraftInput, actor: AuditActor, now: Date): Promise<AdminPage> {
     const page = await this.find(this.prisma, key);
     await this.checkDraft(page, draft);
+    const english = draft.translations?.en;
+    let draftTranslations: Prisma.InputJsonValue | undefined;
+    if (english !== undefined) {
+      const { value, errors } = this.englishDraft(page, draft, english);
+      if (errors.length > 0) throw validationException(errors);
+      draftTranslations = value as Prisma.InputJsonValue;
+    }
     const seo = draft.seo ?? (page.draftSeo as Prisma.InputJsonValue | null) ?? page.seo;
     await this.prisma.page.update({
       where: { key },
       data: {
         draftSections: draft.sections,
         draftSeo: seo ?? {},
+        ...(draftTranslations === undefined ? {} : { draftTranslations }),
         draftUpdatedAt: now,
         updatedById: actor.userId,
       },
@@ -220,13 +349,16 @@ export class AdminPagesService {
   async publish(key: string, actor: AuditActor, now: Date): Promise<AdminPage> {
     const page = await this.find(this.prisma, key);
     if (page.draftSections === null && page.publishedAt !== null) return this.toAdminPage(page);
+    // Traductions antérieures au suivi : empreinte du français publié jusqu'ici, avant qu'il soit remplacé.
+    const translations = page.draftTranslations ?? page.translations;
+    const stamped = stampLegacyHashes(translations, validSections(page.sections)) ?? translations;
     await this.prisma.$transaction(async (tx) => {
       await tx.page.update({
         where: { key },
         data: {
           ...(page.draftSections === null ? {} : { sections: page.draftSections }),
           ...(page.draftSeo === null ? {} : { seo: page.draftSeo }),
-          ...(page.draftTranslations === null ? {} : { translations: page.draftTranslations }),
+          ...(stamped === null ? {} : { translations: stamped as Prisma.InputJsonValue }),
           draftSections: Prisma.DbNull,
           draftSeo: Prisma.DbNull,
           draftTranslations: Prisma.DbNull,

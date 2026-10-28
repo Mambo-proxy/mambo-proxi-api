@@ -149,6 +149,66 @@ describe('pages, zones, paramètres et e-mails du back-office (avec des doubles)
       expect(rows('auditLog').at(-1)).toMatchObject({ action: 'page.publish', entityId: 'mentions-legales' });
     });
 
+    it('enregistre et publie la version anglaise, puis signale les traductions périmées', async () => {
+      const hero = { id: 'hero', type: 'hero', enabled: true, variant: 'legal', title: 'Mentions légales' };
+      const texte = {
+        id: 'texte',
+        type: 'richText',
+        enabled: true,
+        articles: [{ title: 'Éditeur', html: '<p>Société éditrice.</p>' }],
+      };
+      const initial = (await sessions.editor.agent.get('/v1/admin/pages/mentions-legales')).body as Row;
+      expect(initial).toMatchObject({
+        translations: { en: null },
+        translationStatus: { en: { state: 'MISSING', missingSectionIds: ['hero'] } },
+      });
+
+      const rejected = await write('editor', 'put', '/v1/admin/pages/mentions-legales').send({
+        sections: [hero, texte],
+        translations: { en: { sections: [{ id: 'texte' }, { id: 'hero' }, { id: 'absente' }] } },
+      });
+      expectContract('put', '/v1/admin/pages/{key}', 422, rejected);
+      expect(((rejected.body as Row)['errors'] as Row[]).map((error) => error['path'])).toEqual([
+        'translations.en.sections.1.id',
+        'translations.en.sections.2.id',
+      ]);
+
+      const saved = await write('editor', 'put', '/v1/admin/pages/mentions-legales').send({
+        sections: [hero, texte],
+        translations: {
+          en: {
+            title: 'Legal notice',
+            sections: [{ ...hero, variant: 'centered', enabled: false, title: 'Legal notice' }],
+          },
+        },
+      });
+      expectContract('put', '/v1/admin/pages/{key}', 200, saved);
+      expect(saved.body).toMatchObject({
+        translations: {
+          en: { title: 'Legal notice', sections: [{ id: 'hero', variant: 'legal', enabled: true }] },
+        },
+        translationStatus: { en: { state: 'MISSING', missingSectionIds: ['texte'], outdatedSectionIds: [] } },
+      });
+
+      await write('editor', 'post', '/v1/admin/pages/mentions-legales/publish');
+      const english = (await request(server).get('/v1/pages/mentions-legales?lang=en')).body as Row;
+      expect(english).toMatchObject({
+        title: 'Legal notice',
+        sections: [{ title: 'Legal notice' }, { articles: [{ title: 'Éditeur' }] }],
+      });
+
+      // Seul un changement des textes français rend la traduction périmée.
+      const visual = await write('editor', 'put', '/v1/admin/pages/mentions-legales').send({
+        sections: [{ ...hero, enabled: false }, texte],
+      });
+      expect(visual.body).toMatchObject({ translationStatus: { en: { outdatedSectionIds: [] } } });
+      const outdated = await write('editor', 'put', '/v1/admin/pages/mentions-legales').send({
+        sections: [{ ...hero, title: 'Informations légales' }, texte],
+      });
+      expectContract('put', '/v1/admin/pages/{key}', 200, outdated);
+      expect(outdated.body).toMatchObject({ translationStatus: { en: { outdatedSectionIds: ['hero'] } } });
+    });
+
     it('applique les règles du brouillon (types autorisés, sections automatiques, identifiants, images)', async () => {
       const response = await write('editor', 'put', '/v1/admin/pages/accueil').send({
         sections: [

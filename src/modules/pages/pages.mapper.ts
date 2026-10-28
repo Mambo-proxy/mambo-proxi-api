@@ -1,5 +1,4 @@
 import type { Lang } from '../../common/i18n/lang.js';
-import { localizeFields } from '../../common/i18n/translations.js';
 import {
   asObject,
   asObjectArray,
@@ -8,6 +7,7 @@ import {
   type JsonObject,
 } from '../../common/json/json-read.js';
 import type { Prisma } from '../../generated/prisma/client.js';
+import { readEnglish, translateSections, translateSeo } from './page-translations.js';
 
 /** Clés de page du contrat (`PageKey`). */
 export const PAGE_KEYS = [
@@ -74,9 +74,6 @@ export const publishedPageSelect = {
 
 export type PublishedPageRecord = Prisma.PageGetPayload<{ select: typeof publishedPageSelect }>;
 
-/** Champs traduits d'une page (`translations.en` : `{ title, sections, seo }`). */
-const PAGE_FIELDS = ['title', 'sections', 'seo'] as const;
-
 /** Schéma `Page` du contrat. */
 export interface Page {
   key: PageKey;
@@ -87,9 +84,23 @@ export interface Page {
   updatedAt: string;
 }
 
-/** Page publiée dans la langue demandée (les références d'images des sections sont résolues ensuite). */
-export function localizePage(page: PublishedPageRecord, lang: Lang): PublishedPageRecord {
-  return localizeFields(page, page.translations, lang, PAGE_FIELDS);
+/**
+ * Page dans la langue demandée (les références d'images des sections sont résolues ensuite). En anglais, section par
+ * section : textes de la section anglaise de même `id` si elle existe, sinon la section française ; champs non
+ * textuels toujours ceux du français (`page-translations.ts`). Titre et SEO anglais avec repli sur le français.
+ */
+export function localizePage<
+  T extends Pick<PublishedPageRecord, 'title' | 'sections' | 'seo' | 'translations'>,
+>(page: T, lang: Lang): T {
+  if (lang === 'fr') return page;
+  const english = readEnglish(page.translations);
+  if (english === null) return page;
+  return {
+    ...page,
+    title: english.title ?? page.title,
+    sections: translateSections(asObjectArray(page.sections), english.sections) as Prisma.JsonValue,
+    seo: translateSeo(page.seo, english.seo) as Prisma.JsonValue,
+  };
 }
 
 /** Sections visibles : sections valides dont l'interrupteur `enabled` n'est pas désactivé, dans l'ordre enregistré. */
