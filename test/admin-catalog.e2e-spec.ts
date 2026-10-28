@@ -361,6 +361,98 @@ describe('services et rubriques du back-office (avec des doubles)', () => {
       expect((publicDetail.body as Row)['name']).toBe('Chef à domicile');
     });
 
+    it('enregistre la version anglaise (textes seuls), son statut par champ et « marquer comme revu »', async () => {
+      const saved = await write('editor', 'patch', '/v1/admin/services/svc_chef')
+        .set('If-Match', 'v4')
+        .send({
+          translations: {
+            en: {
+              name: 'Private chef',
+              tagline: 'A chef at home',
+              steps: [{ title: 'Your request', text: 'Describe your meal.' }, { title: 'En trop' }],
+              advantages: [{ icon: 'Star', title: 'Tailor-made', text: 'Adapted menu.' }],
+              cities: ['Ignoré'],
+            },
+          },
+        });
+      expectContract('patch', '/v1/admin/services/{id}', 200, saved);
+      expect(saved.body).toMatchObject({
+        version: 'v5',
+        name: 'Chef privé',
+        translations: {
+          en: {
+            name: 'Private chef',
+            tagline: 'A chef at home',
+            steps: [{ title: 'Your request', text: 'Describe your meal.' }],
+            advantages: [{ title: 'Tailor-made', text: 'Adapted menu.' }],
+          },
+        },
+        translationStatus: {
+          en: { state: 'MISSING', missingFields: ['summary', 'audiences', 'faq'], outdatedFields: [] },
+        },
+      });
+      const stored = find('service', 'svc_chef')?.['translations'] as { en: Row };
+      expect(stored.en).not.toHaveProperty('cities');
+      expect(Object.keys(stored.en['sourceHashes'] as Row).sort()).toEqual([
+        'advantages',
+        'name',
+        'steps',
+        'tagline',
+      ]);
+      // Service publié : l'anglais est en ligne aussitôt, structure et icône du français.
+      const english = await request(server).get('/v1/services/chef-prive?lang=en');
+      expect(english.body).toMatchObject({
+        name: 'Private chef',
+        steps: [{ title: 'Your request', text: 'Describe your meal.' }],
+        advantages: [{ icon: null, title: 'Tailor-made' }],
+      });
+
+      // Le nom français change sans retouche de l'anglais : « à revoir ».
+      const renamed = await write('editor', 'patch', '/v1/admin/services/svc_chef').send({
+        name: 'Chef privé à domicile',
+      });
+      expect(renamed.body).toMatchObject({
+        version: 'v6',
+        translations: { en: { name: 'Private chef' } },
+        translationStatus: { en: { outdatedFields: ['name'] } },
+      });
+
+      const unknown = await write('editor', 'patch', '/v1/admin/services/svc_chef').send({
+        translations: { en: { name: 'Private chef' }, reviewedFields: ['faq'] },
+      });
+      expectContract('patch', '/v1/admin/services/{id}', 422, unknown);
+      expect((unknown.body as { errors: Row[] }).errors).toEqual([
+        expect.objectContaining({ path: 'translations.reviewedFields.0', code: 'unknown_field' }),
+      ]);
+      const tooLong = await write('editor', 'patch', '/v1/admin/services/svc_chef').send({
+        translations: { en: { seoTitle: 'x'.repeat(61) } },
+      });
+      expect((tooLong.body as { errors: Row[] }).errors).toEqual([
+        expect.objectContaining({ path: 'translations.en.seoTitle' }),
+      ]);
+
+      const reviewed = await write('editor', 'patch', '/v1/admin/services/svc_chef').send({
+        translations: {
+          en: (renamed.body as { translations: { en: Row } }).translations.en,
+          reviewedFields: ['name'],
+        },
+      });
+      expectContract('patch', '/v1/admin/services/{id}', 200, reviewed);
+      expect(reviewed.body).toMatchObject({
+        version: 'v7',
+        translationStatus: { en: { outdatedFields: [] } },
+      });
+
+      const removed = await write('editor', 'patch', '/v1/admin/services/svc_chef').send({
+        translations: { en: null },
+      });
+      expect(removed.body).toMatchObject({
+        translations: { en: null },
+        translationStatus: { en: { state: 'MISSING' } },
+      });
+      expect(find('service', 'svc_chef')?.['translations']).toBeNull();
+    });
+
     it('crée une redirection 301 quand l’adresse d’un service publié change', async () => {
       const response = await write('editor', 'patch', '/v1/admin/services/svc_chef').send({
         slug: 'chef-a-domicile',
@@ -484,7 +576,10 @@ describe('services et rubriques du back-office (avec des doubles)', () => {
   });
 
   describe('duplication, ordre, suppression', () => {
-    it('duplique en brouillon hors menu, avec ses listes', async () => {
+    it('duplique en brouillon hors menu, avec ses listes et sa version anglaise', async () => {
+      await write('editor', 'patch', '/v1/admin/services/svc_chef').send({
+        translations: { en: { name: 'Private chef', tagline: 'A chef at home' } },
+      });
       const response = await write('editor', 'post', '/v1/admin/services/svc_chef/duplicate');
       expectContract('post', '/v1/admin/services/{id}/duplicate', 201, response);
       expect(response.body).toMatchObject({
@@ -500,6 +595,15 @@ describe('services et rubriques du back-office (avec des doubles)', () => {
         offers: [{ title: 'Dîner à deux' }],
       });
       expect(((response.body as Row)['offers'] as Row[])[0]?.['id']).not.toBe('off_chef_1');
+      // Version anglaise recopiée : le nom (« (copie) ») est à revoir, l'accroche reste à jour.
+      expect(response.body).toMatchObject({
+        translations: { en: { name: 'Private chef', tagline: 'A chef at home' } },
+        translationStatus: { en: { outdatedFields: ['name'] } },
+      });
+      const copyId = (response.body as Row)['id'];
+      expect(rows('serviceOffer').find((offer) => offer['serviceId'] === copyId)?.['translations']).toEqual({
+        en: { title: 'Dinner for two' },
+      });
       const again = await write('editor', 'post', '/v1/admin/services/svc_chef/duplicate');
       expect((again.body as Row)['slug']).toBe('chef-prive-copie-2');
     });
@@ -611,6 +715,56 @@ describe('services et rubriques du back-office (avec des doubles)', () => {
         icon: 'pas-une-icone',
       });
       expectContract('post', '/v1/admin/categories', 422, invalid);
+    });
+
+    it('enregistre la version anglaise d’une rubrique et garde celle des carrousels réécrits', async () => {
+      const section = {
+        eyebrow: 'Nos véhicules',
+        title: 'Choisissez ==votre véhicule.==',
+        offers: [{ title: 'Berline', text: 'Climatisée.', action: 'BOOKING', actionLabel: 'Réserver' }],
+      };
+      const first = await write('writer', 'patch', '/v1/admin/categories/cat_exp').send({
+        offerSections: [section],
+        translations: {
+          en: {
+            name: 'Experience',
+            homeCard: { chips: ['Private chef'] },
+            heroTitle: 'Tailor-made ==moments.==',
+          },
+        },
+      });
+      expectContract('patch', '/v1/admin/categories/{id}', 200, first);
+      const sectionId = ((first.body as { offerSections: Row[] }).offerSections[0] ?? {})['id'];
+      expect(typeof sectionId).toBe('string');
+      expect(first.body).toMatchObject({
+        translations: { en: { name: 'Experience', heroTitle: 'Tailor-made ==moments.==' } },
+        translationStatus: { en: { state: 'MISSING', outdatedFields: [] } },
+      });
+      // Pas de carte d'accueil en français : la puce anglaise n'est pas gardée.
+      expect((first.body as { translations: { en: Row } }).translations.en).not.toHaveProperty('homeCard');
+
+      // Traduction des textes du carrousel (import) : gardée par identifiant, puis par rang.
+      const stored = rows('categoryOfferSection').find((row) => row['id'] === sectionId);
+      if (stored) stored['translations'] = { en: { eyebrow: 'Our vehicles' } };
+      const byId = await write('writer', 'patch', '/v1/admin/categories/cat_exp').send({
+        offerSections: [{ ...section, id: sectionId, title: 'Choisissez ==votre voiture.==' }],
+      });
+      expectContract('patch', '/v1/admin/categories/{id}', 200, byId);
+      expect((byId.body as { offerSections: Row[] }).offerSections[0]).toMatchObject({ id: sectionId });
+      expect(rows('categoryOfferSection').find((row) => row['id'] === sectionId)?.['translations']).toEqual({
+        en: { eyebrow: 'Our vehicles' },
+      });
+      await write('writer', 'patch', '/v1/admin/categories/cat_exp').send({ offerSections: [section] });
+      const [rewritten] = rows('categoryOfferSection').filter((row) => row['categoryId'] === 'cat_exp');
+      expect(rewritten?.['translations']).toEqual({ en: { eyebrow: 'Our vehicles' } });
+      await write('writer', 'patch', '/v1/admin/categories/cat_exp').send({
+        offerSections: [{ ...section, id: null }],
+      });
+      const [fresh] = rows('categoryOfferSection').filter((row) => row['categoryId'] === 'cat_exp');
+      expect(fresh?.['translations'] ?? null).toBeNull();
+
+      const publicEnglish = await request(server).get('/v1/categories/experience?lang=en');
+      expect(publicEnglish.body).toMatchObject({ name: 'Experience', heroTitle: 'Tailor-made ==moments.==' });
     });
 
     it('change le slug d’une rubrique publiée : redirections de la rubrique et de ses fiches', async () => {

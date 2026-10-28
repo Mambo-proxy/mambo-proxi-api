@@ -11,7 +11,7 @@ import { CACHE_TAGS, requestRevalidation } from '../../common/revalidation/reval
 import { slugify, uniqueSlug } from '../../common/text/slug.js';
 import { validationException } from '../../common/validation/validation-exception.js';
 import { AppConfigService } from '../../config/app-config.service.js';
-import type { Prisma } from '../../generated/prisma/client.js';
+import { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { unknownMediaErrors, type MediaReference } from '../media/media-refs.js';
 import { MediaService } from '../media/media.service.js';
@@ -37,6 +37,11 @@ import type {
   ServicePatch,
 } from './admin-catalog.schemas.js';
 import { offerMediaReferences, replaceOffers, unknownTargetErrors } from './admin-offers.js';
+import {
+  nextCatalogTranslations,
+  reviewedCatalogFieldErrors,
+  SERVICE_TEXT_FIELDS,
+} from './catalog-translations.js';
 import { normalizeSearch } from './catalog.service.js';
 
 export const ADMIN_SERVICE_NOT_FOUND = 'Ce service n’existe pas ou a été supprimé.';
@@ -123,6 +128,7 @@ function scalarData(fields: ServicePatch): Prisma.ServiceUncheckedUpdateInput {
     relatedServiceIds: _related,
     featuredReviewIds: _featured,
     offers: _offers,
+    translations: _translations,
     ...scalars
   } = fields;
   const data: Prisma.ServiceUncheckedUpdateInput = {};
@@ -130,6 +136,45 @@ function scalarData(fields: ServicePatch): Prisma.ServiceUncheckedUpdateInput {
     if (value !== undefined) (data as Record<string, unknown>)[key] = value;
   }
   return data;
+}
+
+/** Valeur de la colonne JSON `translations` (`null` → SQL NULL). */
+function translationsColumn(value: Prisma.JsonObject | null): Prisma.InputJsonValue | typeof Prisma.DbNull {
+  return value === null ? Prisma.DbNull : value;
+}
+
+/**
+ * Colonne `translations` après un enregistrement (`CatalogTranslations`) : `undefined` si ni la version anglaise ni
+ * un texte français modifiable n'est envoyé (colonne inchangée). `422` pour un `reviewedFields` sans traduction.
+ */
+function serviceTranslations(
+  current: AdminServiceRecord | null,
+  fields: ServicePatch,
+  french: object,
+): Prisma.InputJsonValue | typeof Prisma.DbNull | undefined {
+  const input = fields.translations;
+  const touched = SERVICE_TEXT_FIELDS.some((field) => fields[field] !== undefined);
+  if (input === undefined && !touched) return undefined;
+  if (input !== undefined) {
+    const errors = reviewedCatalogFieldErrors(SERVICE_TEXT_FIELDS, french, input);
+    if (errors.length > 0) throw validationException(errors);
+  }
+  return translationsColumn(
+    nextCatalogTranslations({
+      fields: SERVICE_TEXT_FIELDS,
+      previousFrench: current,
+      french,
+      stored: current?.translations ?? null,
+      input,
+    }) as Prisma.JsonObject | null,
+  );
+}
+
+/** Textes français après l'enregistrement : valeurs envoyées, sinon celles du service. */
+function frenchAfter(current: object, fields: ServicePatch): object {
+  const next: Record<string, unknown> = { ...current };
+  for (const field of SERVICE_TEXT_FIELDS) if (fields[field] !== undefined) next[field] = fields[field];
+  return next;
 }
 
 /** Étiquettes de cache du site concernées par un service publié (ancienne et nouvelle adresse). */
@@ -400,6 +445,19 @@ export class AdminServicesService {
       slug = await this.freeSlug(slugify(input.name));
     }
     const { galleryImageIds, relatedServiceIds, featuredReviewIds, offers } = input;
+    const seoTitle = input.seoTitle === undefined ? defaultSeoTitle(input.name) : input.seoTitle;
+    const seoDescription =
+      input.seoDescription === undefined
+        ? defaultSeoDescription(input.summary, input.tagline)
+        : input.seoDescription;
+    const translations =
+      input.translations === undefined
+        ? undefined
+        : serviceTranslations(
+            null,
+            { translations: input.translations },
+            frenchAfter({ ...SERVICE_DEFAULTS, seoTitle, seoDescription }, input),
+          );
     const created = await this.prisma.$transaction(async (tx) => {
       const row = await tx.service.create({
         data: {
@@ -409,11 +467,9 @@ export class AdminServicesService {
           categoryId: input.categoryId,
           tagline: input.tagline,
           slug,
-          seoTitle: input.seoTitle === undefined ? defaultSeoTitle(input.name) : input.seoTitle,
-          seoDescription:
-            input.seoDescription === undefined
-              ? defaultSeoDescription(input.summary, input.tagline)
-              : input.seoDescription,
+          seoTitle,
+          seoDescription,
+          ...(translations === undefined ? {} : { translations }),
           status: 'DRAFT',
           sortOrder: await this.nextSortOrder(tx, input.categoryId),
         },
@@ -468,6 +524,7 @@ export class AdminServicesService {
     }
     const { categorySlug } = await this.checkReferences(id, patch);
     if (patch.slug !== undefined && patch.slug !== current.slug) await this.ensureSlugFree(patch.slug, id);
+    const translations = serviceTranslations(current, patch, frenchAfter(current, patch));
 
     const movesCategory = patch.categoryId !== undefined && patch.categoryId !== current.categoryId;
     const updated = await this.prisma.$transaction(async (tx) => {
@@ -475,6 +532,7 @@ export class AdminServicesService {
         where: { id },
         data: {
           ...scalarData(patch),
+          ...(translations === undefined ? {} : { translations }),
           ...(movesCategory && patch.categoryId !== undefined
             ? { sortOrder: await this.nextSortOrder(tx, patch.categoryId) }
             : {}),
@@ -654,6 +712,8 @@ export class AdminServicesService {
           seoTitle: source.seoTitle,
           seoDescription: source.seoDescription,
           toComplete: source.toComplete,
+          // Version anglaise recopiée avec son suivi : le nom (« (copie) ») devient « à revoir ».
+          ...(source.translations === null ? {} : { translations: source.translations }),
           status: 'DRAFT',
           sortOrder: await this.nextSortOrder(tx, source.categoryId),
         },
@@ -682,6 +742,7 @@ export class AdminServicesService {
           })),
         },
       );
+      await this.copyOfferTranslations(tx, row.id, source.offers);
       await recordAudit(tx, actor, {
         action: 'service.duplicate',
         entity: 'Service',
@@ -693,6 +754,29 @@ export class AdminServicesService {
     });
     await this.media.refreshUsages({ kind: 'service', entityId: created.id });
     return this.respond(created, now);
+  }
+
+  /** Traduction anglaise des offres recopiées (cartes recréées dans l'ordre de celles de la source). */
+  private async copyOfferTranslations(
+    tx: Tx,
+    serviceId: string,
+    sourceOffers: AdminServiceRecord['offers'],
+  ): Promise<void> {
+    if (sourceOffers.every((offer) => offer.translations === null)) return;
+    const copies = await tx.serviceOffer.findMany({
+      where: { serviceId },
+      orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
+      select: { id: true },
+    });
+    for (const [index, copy] of copies.entries()) {
+      const translations = sourceOffers[index]?.translations ?? null;
+      if (translations !== null)
+        await tx.serviceOffer.update({
+          where: { id: copy.id },
+          data: { translations: translations },
+          select: { id: true },
+        });
+    }
   }
 
   /**

@@ -1197,3 +1197,34 @@
   reçoivent l'empreinte du texte français d'avant, pour que le changement soit signalé.
 - Anglais des quartiers non exposé dans `AdminZone` : `detail` et `mapLabel` ne sont pas éditables dans le
   formulaire du back-office ; seul leur statut l'est.
+
+## Services et rubriques bilingues (28 octobre 2026)
+
+### Fait
+
+- Contrat : `CatalogTranslations` (règles), `CatalogTranslationStatus`, `ServiceTexts`, `CategoryTexts` ;
+  `translations` dans `ServiceFields` / `CategoryFields`, `translations` et `translationStatus` exigés dans
+  `AdminService` / `AdminCategory` ; `offerSections[].id` (facultatif, renvoyé par les lectures).
+- `src/modules/catalog/catalog-translations.ts` sur le socle commun : champs modifiables (service : nom, accroche,
+  description courte, publics, étapes, avantages sans l'icône, FAQ, SEO ; rubrique : textes à plat, carte d'accueil,
+  SEO), vue du back-office, `reviewedFields` (422 `translations.reviewedFields.N`), enregistrement (empreinte par
+  champ de premier niveau dans `translations.en.sourceHashes`), `localizeCatalog` pour la lecture publique.
+- `localizeTexts` ajouté au socle (`applyTexts` champ par champ).
+- Lecture publique des services et des rubriques (fiche, cartes, rubrique, recherche) : textes seuls sur la
+  structure française (nombre d'éléments, icônes, images, liens, nom technique et type des champs du devis, `kind`
+  des blocs du français). Offres et en-têtes de carrousels : comportement inchangé (`localizeFields`).
+- `PATCH` : la traduction modifie la `version` comme un champ français (`If-Match` inchangé), revalidation
+  inchangée ; colonne recalculée seulement si `translations` ou un texte français modifiable est envoyé.
+- Corrections : `duplicate` recopie `translations` (et celle des offres, par rang) ; `writeSections` recopiait les
+  carrousels sans leur `translations` (anglais des en-têtes perdu à chaque `PATCH` avec `offerSections`) : gardé
+  par `id`, à défaut par rang (`id: null` = nouveau carrousel).
+- Tests : `catalog-translations.spec.ts` (élément ajouté en français, champs techniques, statut, empreintes, revu,
+  suppression) ; e2e `admin-catalog` (enregistrement, statut, revu, 422, duplication, carrousels) et
+  `public-content` (puces ajoutées en français) adaptés.
+
+### Décisions
+
+- Suivi par champ de premier niveau (`steps`, `homeCard`…) : un élément ajouté rend le champ « à traduire ».
+- Les textes anglais des champs non modifiables dans le back-office (villes, puces du devis, CTA d'un service, blocs
+  de rubrique…) sont conservés tels quels à l'enregistrement, et `en: null` ne les supprime pas.
+- Pas de migration : tout tient dans la colonne `translations` existante.

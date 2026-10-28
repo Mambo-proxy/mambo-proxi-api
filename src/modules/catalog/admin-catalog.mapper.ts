@@ -4,11 +4,17 @@ import type { MediaImage, Visual } from '../media/visual.mapper.js';
 import { mediaImageSelect } from '../media/visual.mapper.js';
 import type { ContractTint } from './admin-catalog.schemas.js';
 import { serviceHref } from './catalog.mapper.js';
+import {
+  CATEGORY_TEXT_FIELDS,
+  catalogTranslationView,
+  SERVICE_TEXT_FIELDS,
+  type CatalogTranslationView,
+} from './catalog-translations.js';
 
 /**
  * Formats du back-office pour les services et les rubriques (`AdminServiceListItem`, `AdminService`,
- * `Completeness`, `AdminCategory` du contrat) : tous statuts, champs bruts en français (les traductions anglaises
- * de `translations` ne sont ni lues ni modifiées ici).
+ * `Completeness`, `AdminCategory` du contrat) : tous statuts, champs bruts en français, plus la version anglaise des
+ * textes modifiables et son statut (`catalogTranslationView`).
  */
 
 export const TINT_TO_CONTRACT: Record<CategoryTint, ContractTint> = {
@@ -40,6 +46,7 @@ export const adminOfferSelect = {
   actionLabelMobile: true,
   targetServiceId: true,
   sortOrder: true,
+  translations: true,
   image: { select: mediaImageSelect },
 } satisfies Prisma.ServiceOfferSelect;
 
@@ -82,6 +89,7 @@ export const adminServiceSelect = {
   sortOrder: true,
   version: true,
   publishedAt: true,
+  translations: true,
   isDemo: true,
   updatedAt: true,
   category: { select: { id: true, slug: true, name: true, status: true, sortOrder: true } },
@@ -229,7 +237,7 @@ export interface AdminServiceListItem {
 }
 
 /** Schéma `AdminService` du contrat (champs bruts, plus `categoryId` et les titres des blocs). */
-export interface AdminService extends AdminServiceListItem {
+export interface AdminService extends AdminServiceListItem, CatalogTranslationView {
   categoryId: string;
   shortName: string | null;
   tagline: string;
@@ -331,6 +339,7 @@ export function toAdminService(
     publishedAt: service.publishedAt?.toISOString() ?? null,
     completenessDetail: serviceCompleteness(service),
     version: serviceVersion(service.version),
+    ...catalogTranslationView(SERVICE_TEXT_FIELDS, service, service.translations),
   };
 }
 
@@ -366,6 +375,7 @@ export const adminCategorySelect = {
   seoTitle: true,
   seoDescription: true,
   sortOrder: true,
+  translations: true,
   isDemo: true,
   updatedAt: true,
   offerSections: {
@@ -386,7 +396,7 @@ export const adminCategorySelect = {
 export type AdminCategoryRecord = Prisma.CategoryGetPayload<{ select: typeof adminCategorySelect }>;
 
 /** Schéma `AdminCategory` du contrat. */
-export interface AdminCategory {
+export interface AdminCategory extends CatalogTranslationView {
   id: string;
   slug: string;
   name: string;
@@ -448,6 +458,7 @@ export function toAdminCategory(category: AdminCategoryRecord, media: MediaResol
     groups: asObjectArray(category.groups),
     highlight: Object.keys(highlight).length === 0 ? null : highlight,
     offerSections: category.offerSections.map((section) => ({
+      id: section.id,
       eyebrow: section.eyebrow,
       title: section.title,
       titleMobile: section.titleMobile,
@@ -463,5 +474,6 @@ export function toAdminCategory(category: AdminCategoryRecord, media: MediaResol
     sortOrder: category.sortOrder,
     serviceCount: category._count.services,
     updatedAt: category.updatedAt.toISOString(),
+    ...catalogTranslationView(CATEGORY_TEXT_FIELDS, category, category.translations),
   };
 }

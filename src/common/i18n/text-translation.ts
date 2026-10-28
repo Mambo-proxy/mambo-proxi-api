@@ -76,6 +76,24 @@ export function applyTexts(french: unknown, english: unknown, rules: TextRules, 
   return compose(french, english, rules, '', key);
 }
 
+/**
+ * Champs listés d'un enregistrement dont les textes viennent de `english` (`applyTexts` champ par champ) ; les autres
+ * champs sont rendus tels quels. Sert aux contenus dont la colonne `translations.en` a la forme des champs français.
+ */
+export function localizeTexts<T extends object, K extends keyof T>(
+  record: T,
+  english: unknown,
+  rules: TextRules,
+  fields: readonly K[],
+): T {
+  if (!isPlainObject(english)) return record;
+  const result = { ...record };
+  for (const field of fields) {
+    result[field] = applyTexts(record[field], english[String(field)], rules) as T[K];
+  }
+  return result;
+}
+
 /** Textes de `value` (`[chemin, texte]`, non vides, triés par chemin) : ce qui se traduit. */
 export function textEntries(value: unknown, rules: TextRules): [string, string][] {
   const texts: [string, string][] = [];

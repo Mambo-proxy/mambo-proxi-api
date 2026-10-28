@@ -50,6 +50,68 @@ export const offerInputSchema = z.object({
 });
 export type OfferInput = z.output<typeof offerInputSchema>;
 
+// ─────────────────────────── Version anglaise (`CatalogTranslations`) ───────────────────────────
+
+/** Texte anglais : vide ou `null` = texte français (limites du français). */
+const englishString = (max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max, { error: `${String(max)} caractères au maximum.` })
+    .nullable();
+const englishText = (max: number) => englishString(max).optional();
+
+/** Champ `translations` : textes anglais (`en`, `null` = supprimer) et champs marqués revus. */
+const catalogTranslationsInput = <T extends z.ZodType>(texts: T) =>
+  z
+    .object({
+      en: texts.nullable(),
+      reviewedFields: z.array(z.string().min(1).max(60)).max(40).optional(),
+    })
+    .optional();
+
+const englishItems = <T extends z.ZodType>(item: T, max: number) =>
+  z.array(item.nullable()).max(max).optional();
+
+/** Schéma `ServiceTexts` (les autres clés envoyées sont ignorées). */
+const serviceTextsSchema = z.object({
+  name: englishText(120),
+  tagline: englishText(120),
+  summary: englishText(240),
+  audiences: z.array(englishString(200)).max(12).optional(),
+  steps: englishItems(z.object({ title: englishText(120), text: englishText(600) }), 10),
+  advantages: englishItems(z.object({ title: englishText(120), text: englishText(600) }), 8),
+  faq: englishItems(z.object({ question: englishText(200), answer: englishText(2000) }), 20),
+  seoTitle: englishText(60),
+  seoDescription: englishText(160),
+});
+
+/** Schéma `CategoryTexts`. */
+const categoryTextsSchema = z.object({
+  name: englishText(80),
+  tagline: englishText(120),
+  description: englishText(600),
+  eyebrow: englishText(60),
+  heroTitle: englishText(400),
+  heroLead: englishText(400),
+  audiencesTitle: englishText(160),
+  servicesTitle: englishText(160),
+  servicesLead: englishText(300),
+  processTitle: englishText(160),
+  ctaTitle: englishText(120),
+  ctaText: englishText(300),
+  homeCard: z
+    .object({
+      title: englishText(80),
+      text: englishText(200),
+      textMobile: englishText(120),
+      chips: z.array(englishString(40)).max(6).optional(),
+    })
+    .optional(),
+  seoTitle: englishText(60),
+  seoDescription: englishText(160),
+});
+
 /** Champs `ServiceFields` du contrat. */
 const serviceFieldsSchema = z.object({
   name: z
@@ -92,6 +154,7 @@ const serviceFieldsSchema = z.object({
   seoTitle: nullableText(60),
   seoDescription: nullableText(160),
   toComplete: z.boolean(),
+  translations: catalogTranslationsInput(serviceTextsSchema),
 });
 
 /** `ServicePatch` : mise à jour partielle (au moins un champ). */
@@ -156,6 +219,7 @@ const highlightSchema = z.object({
 });
 
 const offerSectionSchema = z.object({
+  id: idSchema.nullable().optional(),
   eyebrow: z.string().trim().min(1).max(40),
   title: z.string().trim().min(1).max(120),
   titleMobile: nullableText(80).optional(),
@@ -214,6 +278,7 @@ const categoryFieldsSchema = z.object({
   ctaText: nullableText(300),
   seoTitle: nullableText(60),
   seoDescription: nullableText(160),
+  translations: catalogTranslationsInput(categoryTextsSchema),
 });
 
 export const categoryPatchSchema = categoryFieldsSchema

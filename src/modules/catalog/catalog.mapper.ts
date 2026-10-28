@@ -32,6 +32,7 @@ import type {
   ServiceOffers,
   ServiceSummary,
 } from './catalog.types.js';
+import { localizeCatalog } from './catalog-translations.js';
 
 /** Construction des images et visuels (implémentée par `MediaService`). */
 export interface MediaResolver {
@@ -43,7 +44,11 @@ export interface MediaResolver {
   ): Visual;
 }
 
-/** Champs traduisibles (colonne `translations`, `docs/MODELE_DE_DONNEES.md`). */
+/**
+ * Champs traduisibles (colonne `translations`, `docs/MODELE_DE_DONNEES.md`). Services et rubriques : textes seuls sur
+ * la structure française (`localizeCatalog`) ; offres et en-têtes de carrousels (non modifiables en anglais dans le
+ * back-office) : recouvrement champ par champ (`localizeFields`).
+ */
 const CATEGORY_REF_FIELDS = ['name'] as const;
 const SERVICE_SUMMARY_FIELDS = ['name', 'shortName', 'summary'] as const;
 const SERVICE_DETAIL_FIELDS = [
@@ -147,7 +152,7 @@ export function initialsOf(authorName: string): string {
 }
 
 function localizedName(record: { name: string; translations: unknown }, lang: Lang): string {
-  return localizeFields(record, record.translations, lang, CATEGORY_REF_FIELDS).name;
+  return localizeCatalog(record, record.translations, lang, CATEGORY_REF_FIELDS).name;
 }
 
 export function toCategoryRef(
@@ -176,7 +181,7 @@ export function toServiceSummary(
   lang: Lang,
   media: MediaResolver,
 ): ServiceSummary {
-  const localized = localizeFields(service, service.translations, lang, SERVICE_SUMMARY_FIELDS);
+  const localized = localizeCatalog(service, service.translations, lang, SERVICE_SUMMARY_FIELDS);
   return {
     id: service.id,
     slug: service.slug,
@@ -323,7 +328,7 @@ export function toServiceDetail(
   media: MediaResolver,
   context: ServiceDetailContext,
 ): ServiceDetail {
-  const localized = localizeFields(service, service.translations, lang, SERVICE_DETAIL_FIELDS);
+  const localized = localizeCatalog(service, service.translations, lang, SERVICE_DETAIL_FIELDS);
   const featured = service.featuredReviews
     .map((item) => item.review)
     .filter((review) => review.status === 'PUBLIE');
@@ -411,7 +416,7 @@ export interface CategorySummaryContext {
 
 /** Valeurs traduites des champs du résumé (à résoudre avant `toCategorySummary` pour les visuels). */
 export function localizeCategorySummary(category: CategorySummaryRecord, lang: Lang): CategorySummaryRecord {
-  return localizeFields(category, category.translations, lang, CATEGORY_SUMMARY_FIELDS);
+  return localizeCatalog(category, category.translations, lang, CATEGORY_SUMMARY_FIELDS);
 }
 
 /** `CategorySummary` d'une rubrique déjà traduite (`localizeCategorySummary`). */
@@ -480,7 +485,7 @@ export function toCategoryDetail(
   media: MediaResolver,
   context: CategoryDetailContext,
 ): CategoryDetail {
-  const localized = localizeFields(category, category.translations, lang, CATEGORY_DETAIL_FIELDS);
+  const localized = localizeCatalog(category, category.translations, lang, CATEGORY_DETAIL_FIELDS);
   const visibleSlugs = new Set(context.services.map((service) => service.slug));
   const testimonial = category.testimonial?.status === 'PUBLIE' ? toReview(category.testimonial, lang) : null;
 

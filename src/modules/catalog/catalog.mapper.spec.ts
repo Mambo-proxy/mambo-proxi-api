@@ -161,7 +161,12 @@ describe('mappers du catalogue', () => {
       number: '02',
       href: '/services/experience',
       thumbnail: { illustration: 'chef', image: null, alt: '' },
-      homeCard: { title: 'Tailor-made moments', chips: ['Car rental', 'Private chef'], visual: null },
+      // Textes seuls sur la structure française : 4 puces, les 2 dernières non traduites restent en français.
+      homeCard: {
+        title: 'Tailor-made moments',
+        chips: ['Car rental', 'Private chef', 'Massage bien-être', 'Photographe'],
+        visual: null,
+      },
     });
     expect(summary).not.toHaveProperty('services');
     expectToMatchSchema('CategorySummary', summary);

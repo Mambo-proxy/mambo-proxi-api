@@ -24,6 +24,11 @@ import type {
 } from './admin-catalog.schemas.js';
 import { offerMediaReferences, replaceOffers, unknownTargetErrors } from './admin-offers.js';
 import { categoryHref, serviceHref } from './catalog.mapper.js';
+import {
+  CATEGORY_TEXT_FIELDS,
+  nextCatalogTranslations,
+  reviewedCatalogFieldErrors,
+} from './catalog-translations.js';
 
 export const ADMIN_CATEGORY_NOT_FOUND = 'Cette rubrique n’existe pas ou a été supprimée.';
 
@@ -41,13 +46,53 @@ function conflict(detail: string, errors: ProblemFieldError[] = []): ProblemExce
 
 /** Colonnes simples d'une rubrique (la teinte passe du format du contrat à celui de la base). */
 function scalarData(fields: CategoryPatch): Prisma.CategoryUncheckedUpdateInput {
-  const { offerSections: _sections, tint, homeCard, highlight, ...rest } = fields;
+  const {
+    offerSections: _sections,
+    translations: _translations,
+    tint,
+    homeCard,
+    highlight,
+    ...rest
+  } = fields;
   const data: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(rest)) if (value !== undefined) data[key] = value;
   if (tint !== undefined) data['tint'] = TINT_FROM_CONTRACT[tint];
   if (homeCard !== undefined) data['homeCard'] = homeCard;
   if (highlight !== undefined) data['highlight'] = highlight ?? Prisma.DbNull;
   return data;
+}
+
+/**
+ * Colonne `translations` après un enregistrement (`CatalogTranslations`) : `undefined` si ni la version anglaise ni
+ * un texte français modifiable n'est envoyé (colonne inchangée). `422` pour un `reviewedFields` sans traduction.
+ */
+function categoryTranslations(
+  current: AdminCategoryRecord | null,
+  fields: CategoryPatch,
+  french: object,
+): Prisma.InputJsonValue | typeof Prisma.DbNull | undefined {
+  const input = fields.translations;
+  const touched = CATEGORY_TEXT_FIELDS.some((field) => fields[field] !== undefined);
+  if (input === undefined && !touched) return undefined;
+  if (input !== undefined) {
+    const errors = reviewedCatalogFieldErrors(CATEGORY_TEXT_FIELDS, french, input);
+    if (errors.length > 0) throw validationException(errors);
+  }
+  const next = nextCatalogTranslations({
+    fields: CATEGORY_TEXT_FIELDS,
+    previousFrench: current,
+    french,
+    stored: current?.translations ?? null,
+    input,
+  });
+  return next === null ? Prisma.DbNull : (next as Prisma.InputJsonValue);
+}
+
+/** Textes français après l'enregistrement : valeurs envoyées, sinon celles de la rubrique. */
+function frenchAfter(current: object, fields: CategoryPatch): object {
+  const next: Record<string, unknown> = { ...current };
+  for (const field of CATEGORY_TEXT_FIELDS) if (fields[field] !== undefined) next[field] = fields[field];
+  return next;
 }
 
 /** Valeurs d'une nouvelle rubrique (celles du schéma Prisma, écrites explicitement). */
@@ -177,7 +222,11 @@ export class AdminCategoriesService {
       ]);
   }
 
-  /** Remplace les carrousels d'offres (sections et cartes), en gardant les identifiants connus. */
+  /**
+   * Remplace les carrousels d'offres (sections et cartes), en gardant les identifiants connus et leur traduction
+   * anglaise : un carrousel renvoyé avec son `id` le garde ; sans `id`, il reprend la traduction du carrousel de
+   * même rang (`null` : nouveau carrousel) ; une carte renvoyée avec son `id` garde la sienne.
+   */
   private async writeSections(
     tx: Tx,
     categoryId: string,
@@ -185,8 +234,10 @@ export class AdminCategoriesService {
   ): Promise<void> {
     const existing = await tx.categoryOfferSection.findMany({
       where: { categoryId },
-      select: { id: true, offers: { select: { id: true, translations: true } } },
+      orderBy: [{ sortOrder: 'asc' }, { id: 'asc' }],
+      select: { id: true, translations: true, offers: { select: { id: true, translations: true } } },
     });
+    const byId = new Map(existing.map((section) => [section.id, section]));
     const offers = new Map(
       existing.flatMap((section) => section.offers.map((offer) => [offer.id, offer.translations])),
     );
@@ -195,9 +246,16 @@ export class AdminCategoriesService {
       await tx.serviceOffer.deleteMany({ where: { sectionId: { in: sectionIds } } });
       await tx.categoryOfferSection.deleteMany({ where: { categoryId } });
     }
+    const used = new Set<string>();
     for (const [index, section] of sections.entries()) {
+      const kept = typeof section.id === 'string' && !used.has(section.id) ? byId.get(section.id) : undefined;
+      if (kept !== undefined) used.add(kept.id);
+      const translations =
+        section.id === undefined ? (existing[index]?.translations ?? null) : (kept?.translations ?? null);
       const row = await tx.categoryOfferSection.create({
         data: {
+          ...(kept === undefined ? {} : { id: kept.id }),
+          ...(translations === null ? {} : { translations: translations }),
           categoryId,
           eyebrow: section.eyebrow,
           title: section.title,
@@ -231,6 +289,16 @@ export class AdminCategoriesService {
       orderBy: [{ sortOrder: 'desc' }],
       select: { sortOrder: true },
     });
+    const heroTitle = input.heroTitle ?? input.name;
+    const heroLead = input.heroLead ?? input.description;
+    const translations =
+      input.translations === undefined
+        ? undefined
+        : categoryTranslations(
+            null,
+            { translations: input.translations },
+            frenchAfter({ ...CATEGORY_DEFAULTS, homeCard: null, heroTitle, heroLead }, input),
+          );
     const created = await this.prisma.$transaction(async (tx) => {
       const row = await tx.category.create({
         data: {
@@ -242,8 +310,9 @@ export class AdminCategoriesService {
           icon: input.icon,
           tint: TINT_FROM_CONTRACT[input.tint],
           slug,
-          heroTitle: input.heroTitle ?? input.name,
-          heroLead: input.heroLead ?? input.description,
+          heroTitle,
+          heroLead,
+          ...(translations === undefined ? {} : { translations }),
           status: input.status ?? 'DRAFT',
           sortOrder: (last?.sortOrder ?? 0) + 1,
         },
@@ -272,9 +341,14 @@ export class AdminCategoriesService {
     const current = await this.find(this.prisma, id);
     await this.checkReferences(patch);
     if (patch.slug !== undefined && patch.slug !== current.slug) await this.ensureSlugFree(patch.slug, id);
+    const translations = categoryTranslations(current, patch, frenchAfter(current, patch));
     const wasVisible = current.status === 'PUBLISHED';
     const updated = await this.prisma.$transaction(async (tx) => {
-      await tx.category.update({ where: { id }, data: scalarData(patch), select: { id: true } });
+      await tx.category.update({
+        where: { id },
+        data: { ...scalarData(patch), ...(translations === undefined ? {} : { translations }) },
+        select: { id: true },
+      });
       if (patch.offerSections !== undefined) await this.writeSections(tx, id, patch.offerSections);
       const next = await this.find(tx, id);
       let redirected = false;

@@ -2026,7 +2026,9 @@ paths:
         (`galleryImageIds`, `relatedServiceIds`, `featuredReviewIds`, `offers`) remplacent les listes enregistrées ;
         une offre renvoyée avec son `id` le garde. Changement de rubrique : le service passe à la fin de la nouvelle
         rubrique. Slug déjà utilisé → `409`. Service publié dont l'adresse change (slug ou rubrique) : redirection
-        301 de l'ancienne adresse (`GET /v1/site/redirects`).
+        301 de l'ancienne adresse (`GET /v1/site/redirects`). `translations` (facultatif) enregistre la version
+        anglaise avec le reste (règles : `CatalogTranslations`) ; elle change la `version` comme un champ français et,
+        pour un service publié, est en ligne aussitôt.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters:
         - $ref: '#/components/parameters/IdPath'
@@ -2119,7 +2121,8 @@ paths:
       summary: Dupliquer (copie en brouillon)
       description: |
         Copie en brouillon : « (copie) » ajouté au nom, slug `<slug>-copie` (`-2`… si besoin), hors menu et hors
-        accueil, à la fin de la rubrique ; galerie, services liés, avis mis en avant et offres recopiés.
+        accueil, à la fin de la rubrique ; galerie, services liés, avis mis en avant, offres et version anglaise
+        (textes et suivi, offres comprises) recopiés. Le nom ayant changé, sa traduction est signalée « à revoir ».
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       responses:
@@ -2259,8 +2262,10 @@ paths:
       summary: Modifier une rubrique
       description: |
         Mise à jour partielle (statut compris : publier, dépublier, archiver). `offerSections` remplace les carrousels
-        d'offres. Slug déjà utilisé → `409`. Rubrique publiée dont le slug change : redirections 301 de la page
-        rubrique et de ses fiches publiées.
+        d'offres : un carrousel renvoyé avec son `id` le garde, ainsi que la traduction anglaise de ses textes (sans
+        `id`, celle du carrousel de même rang) ; une carte renvoyée avec son `id` garde la sienne. `translations`
+        (facultatif) enregistre la version anglaise (règles : `CatalogTranslations`). Slug déjà utilisé → `409`.
+        Rubrique publiée dont le slug change : redirections 301 de la page rubrique et de ses fiches publiées.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       requestBody:
@@ -7082,6 +7087,16 @@ components:
         seoTitle: { type: [string, 'null'], maxLength: 60 }
         seoDescription: { type: [string, 'null'], maxLength: 160 }
         toComplete: { type: boolean }
+        translations:
+          description: |
+            Version anglaise saisie à la main (règles : `CatalogTranslations`). Renvoyée par les lectures ; facultative
+            à l'enregistrement (absente : version anglaise inchangée).
+          allOf:
+            - $ref: '#/components/schemas/CatalogTranslations'
+            - type: object
+              properties:
+                en:
+                  oneOf: [{ $ref: '#/components/schemas/ServiceTexts' }, { type: 'null' }]
 
     ServiceInput:
       allOf:
@@ -7099,7 +7114,7 @@ components:
       allOf:
         - $ref: '#/components/schemas/AdminServiceListItem'
         - type: object
-          required: [tagline, summary, icon, illustration, cities, audiences, steps, advantages, faq, quoteBullets, relatedServiceIds, featuredReviewIds, galleryImageIds, showWhatsapp, completenessDetail, version]
+          required: [tagline, summary, icon, illustration, cities, audiences, steps, advantages, faq, quoteBullets, relatedServiceIds, featuredReviewIds, galleryImageIds, showWhatsapp, completenessDetail, version, translations, translationStatus]
           properties:
             shortName: { type: [string, 'null'] }
             tagline: { type: string }
@@ -7141,6 +7156,13 @@ components:
             relatedTitle: { type: [string, 'null'] }
             ctaTitle: { type: [string, 'null'] }
             ctaText: { type: [string, 'null'] }
+            translations:
+              type: object
+              required: [en]
+              description: "Version anglaise (règles : `CatalogTranslations`), réduite aux textes traduits."
+              properties:
+                en: { oneOf: [{ $ref: '#/components/schemas/ServiceTexts' }, { type: 'null' }] }
+            translationStatus: { $ref: '#/components/schemas/CatalogTranslationStatus' }
 
     Completeness:
       type: object
@@ -7156,6 +7178,105 @@ components:
               key: { type: string, enum: [general, audiences, steps, advantages, faq, related, coverImage] }
               label: { type: string, examples: [Informations générales] }
               done: { type: boolean }
+
+    CatalogTranslations:
+      type: object
+      required: [en]
+      description: |
+        Version anglaise d'un service ou d'une rubrique, saisie à la main dans le back-office. **Seuls les textes
+        modifiables dans le back-office se traduisent ici** (`ServiceTexts`, `CategoryTexts`) ; toute autre valeur
+        envoyée est ignorée. Icônes, images, liens, nombres, réglages et structure (nombre et ordre des éléments de
+        listes) sont toujours ceux du français, sur le site comme dans les e-mails. Listes alignées par rang :
+        l'élément N anglais traduit l'élément N français (éléments en trop ignorés, élément `null` = non traduit).
+        Un texte anglais absent, `null` ou vide laisse le texte français.
+
+        À l'enregistrement, `en` remplace la version anglaise de ces textes (`null` la supprime) ; les textes anglais
+        des autres champs (repris à l'import, non modifiables dans le back-office) sont conservés. Le suivi se fait
+        par champ de premier niveau (`name`, `steps`, `homeCard`…) : l'empreinte des textes français d'un champ est
+        recalculée si sa traduction est nouvelle ou modifiée, sinon gardée (le champ reste « à revoir » si le
+        français a changé). Les lectures renvoient `en` réduit aux textes traduits (`null` sans traduction).
+      properties:
+        en: { type: [object, 'null'], additionalProperties: true, description: Textes anglais (forme `ServiceTexts` ou `CategoryTexts`). }
+        reviewedFields:
+          type: array
+          maxItems: 40
+          items: { type: string, minLength: 1, maxLength: 60 }
+          description: |
+            Envoi seulement. Champs de premier niveau (`steps`, `seoTitle`…) dont la traduction a été relue et reste
+            juste malgré un changement du français : leur empreinte devient celle des textes français enregistrés
+            (ils quittent `outdatedFields`). Chaque champ doit être traduit, sinon `422` sur
+            `translations.reviewedFields.N`. Non mémorisé.
+
+    CatalogTranslationStatus:
+      type: object
+      required: [en]
+      description: |
+        État de la version anglaise (lecture seule, ignoré à l'enregistrement), par champ de premier niveau des textes
+        modifiables (`TextTranslationStatus` : `steps` est « à traduire » si l'un de ses textes n'a pas de traduction).
+      properties:
+        en: { $ref: '#/components/schemas/TextTranslationStatus' }
+
+    ServiceTexts:
+      type: object
+      description: Textes anglais d'un service (champs modifiables dans le back-office), de la forme du français.
+      properties:
+        name: { type: [string, 'null'], maxLength: 120 }
+        tagline: { type: [string, 'null'], maxLength: 120 }
+        summary: { type: [string, 'null'], maxLength: 240 }
+        audiences: { type: array, maxItems: 12, items: { type: [string, 'null'], maxLength: 200 } }
+        steps:
+          type: array
+          maxItems: 10
+          items:
+            type: [object, 'null']
+            properties:
+              title: { type: [string, 'null'], maxLength: 120 }
+              text: { type: [string, 'null'], maxLength: 600 }
+        advantages:
+          type: array
+          maxItems: 8
+          items:
+            type: [object, 'null']
+            description: Titre et texte seulement (l'icône est celle du français).
+            properties:
+              title: { type: [string, 'null'], maxLength: 120 }
+              text: { type: [string, 'null'], maxLength: 600 }
+        faq:
+          type: array
+          maxItems: 20
+          items:
+            type: [object, 'null']
+            properties:
+              question: { type: [string, 'null'], maxLength: 200 }
+              answer: { type: [string, 'null'], maxLength: 2000 }
+        seoTitle: { type: [string, 'null'], maxLength: 60 }
+        seoDescription: { type: [string, 'null'], maxLength: 160 }
+
+    CategoryTexts:
+      type: object
+      description: Textes anglais d'une rubrique (champs modifiables dans le back-office), de la forme du français.
+      properties:
+        name: { type: [string, 'null'], maxLength: 80 }
+        tagline: { type: [string, 'null'], maxLength: 120 }
+        description: { type: [string, 'null'], maxLength: 600 }
+        eyebrow: { type: [string, 'null'], maxLength: 60 }
+        heroTitle: { type: [string, 'null'], maxLength: 400, description: Texte à accent `==…==`. }
+        heroLead: { type: [string, 'null'], maxLength: 400 }
+        audiencesTitle: { type: [string, 'null'], maxLength: 160 }
+        servicesTitle: { type: [string, 'null'], maxLength: 160 }
+        servicesLead: { type: [string, 'null'], maxLength: 300 }
+        processTitle: { type: [string, 'null'], maxLength: 160 }
+        ctaTitle: { type: [string, 'null'], maxLength: 120 }
+        ctaText: { type: [string, 'null'], maxLength: 300 }
+        homeCard:
+          type: object
+          properties:
+            title: { type: [string, 'null'], maxLength: 80 }
+            text: { type: [string, 'null'], maxLength: 200 }
+            textMobile: { type: [string, 'null'], maxLength: 120 }
+            chips: { type: array, maxItems: 6, items: { type: [string, 'null'], maxLength: 40 } }
+        seoTitle: { type: [string, 'null'], maxLength: 60 }
+        seoDescription: { type: [string, 'null'], maxLength: 160 }
 
     CategoryFields:
       type: object
@@ -7202,6 +7323,12 @@ components:
             type: object
             required: [eyebrow, title, offers]
             properties:
+              id:
+                oneOf: [{ $ref: '#/components/schemas/Id' }, { type: 'null' }]
+                description: |
+                  Identifiant d'un carrousel enregistré (renvoyé par les lectures) : renvoyé tel quel, le carrousel le
+                  garde avec la traduction anglaise de ses textes ; absent, il reprend celle du carrousel de même rang ;
+                  `null`, c'est un nouveau carrousel.
               eyebrow: { type: string, maxLength: 40 }
               title: { type: string, maxLength: 120 }
               titleMobile: { type: [string, 'null'], maxLength: 80 }
@@ -7213,6 +7340,16 @@ components:
         ctaText: { type: [string, 'null'] }
         seoTitle: { type: [string, 'null'], maxLength: 60 }
         seoDescription: { type: [string, 'null'], maxLength: 160 }
+        translations:
+          description: |
+            Version anglaise saisie à la main (règles : `CatalogTranslations`). Renvoyée par les lectures (réduite aux
+            textes traduits) ; facultative à l'enregistrement (absente : version anglaise inchangée).
+          allOf:
+            - $ref: '#/components/schemas/CatalogTranslations'
+            - type: object
+              properties:
+                en:
+                  oneOf: [{ $ref: '#/components/schemas/CategoryTexts' }, { type: 'null' }]
 
     CategoryInput:
       allOf:
@@ -7230,12 +7367,13 @@ components:
       allOf:
         - $ref: '#/components/schemas/CategoryFields'
         - type: object
-          required: [id, name, slug, status, sortOrder, serviceCount, updatedAt]
+          required: [id, name, slug, status, sortOrder, serviceCount, updatedAt, translations, translationStatus]
           properties:
             id: { $ref: '#/components/schemas/Id' }
             sortOrder: { type: integer }
             serviceCount: { type: integer }
             updatedAt: { $ref: '#/components/schemas/DateTime' }
+            translationStatus: { $ref: '#/components/schemas/CatalogTranslationStatus' }
 
     # ─────────────────────────── Admin — Pages ──────────────────────
     AdminPageSummary:

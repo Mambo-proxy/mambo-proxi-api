@@ -314,6 +314,11 @@ describe('lectures publiques (avec des doubles)', () => {
       const body = response.body as (Body & { services: Body[] })[];
 
       expect(body[1]).toMatchObject({ name: 'Experience', tagline: 'Tailor-made moments' });
+      // Textes seuls sur la structure française : les puces ajoutées en français (non traduites) restent affichées.
+      expect(body[1]?.['homeCard']).toMatchObject({
+        title: 'Tailor-made moments',
+        chips: ['Car rental', 'Private chef', 'Massage bien-être', 'Photographe'],
+      });
       expect(slugs(body[1]?.services)).toEqual([
         'location-voiture',
         'photographe',

@@ -5,6 +5,7 @@ import { AppConfigService } from '../../config/app-config.service.js';
 import type { IllustrationScene } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { serviceHref } from '../catalog/catalog.mapper.js';
+import { localizeCatalog } from '../catalog/catalog-translations.js';
 import { visibleServiceWhere } from '../catalog/catalog.selects.js';
 import { visibleJobWhere } from '../jobs/job.mapper.js';
 import { LATEST_EDITION_ORDER, visibleEditionWhere } from '../magazine/magazine.mapper.js';
@@ -240,13 +241,13 @@ export class SiteSearchService {
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
     });
     return rows.map((row) => {
-      const service = localizeFields(row, row.translations, lang, [
+      const service = localizeCatalog(row, row.translations, lang, [
         'name',
         'tagline',
         'summary',
         'seoDescription',
       ]);
-      const category = localizeFields(row.category, row.category.translations, lang, ['name']);
+      const category = localizeCatalog(row.category, row.category.translations, lang, ['name']);
       return {
         type: 'service',
         id: row.id,
@@ -279,7 +280,7 @@ export class SiteSearchService {
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
     });
     return rows.map((row) => {
-      const category = localizeFields(row, row.translations, lang, ['name', 'tagline', 'description']);
+      const category = localizeCatalog(row, row.translations, lang, ['name', 'tagline', 'description']);
       const count = row._count.services;
       const services = `${String(count)} service${count > 1 ? 's' : ''}`;
       return {
