@@ -1,11 +1,14 @@
 import { readFileSync } from 'node:fs';
+import { isDeepStrictEqual } from 'node:util';
 import { describe, expect, it } from 'vitest';
 import type { z } from 'zod';
+import { pickTexts } from './common/i18n/text-translation.js';
 import { availabilityConfigSchema } from './modules/appointments/availability.schemas.js';
 import { categoryPatchSchema, servicePatchSchema } from './modules/catalog/admin-catalog.schemas.js';
 import { emailTemplateInputSchema } from './modules/mail/admin-email-templates.service.js';
 import { pageDraftSchema } from './modules/pages/page-sections.schemas.js';
 import { isSettingsGroup, settingsGroupSchema } from './modules/settings/admin-settings.schemas.js';
+import { localizeSetting, settingTextRules } from './modules/settings/setting-translations.js';
 import { zonePatchSchema } from './modules/zones/admin-zones.schemas.js';
 
 /**
@@ -121,18 +124,35 @@ describe('données de départ et limites du contrat', () => {
     const settings = seed('settings') as Row[];
     const errors = settings
       .filter((row) => isSettingsGroup(String(row['key'])))
-      .flatMap((row) =>
-        problems(
-          String(row['key']),
+      .flatMap((row) => {
+        const key = String(row['key']);
+        // Version anglaise telle que le site la lit : textes de la liste blanche posés sur la valeur française.
+        const english = row['translations']
+          ? { en: localizeSetting(key, row['value'], row['translations'], 'en') }
+          : undefined;
+        return problems(
+          key,
           settingsGroupSchema,
-          { ...(row['value'] as Row), translations: row['translations'] },
+          { ...(row['value'] as Row), translations: english },
           (value) => {
             const { translations: _translations, ...fields } = value;
             return { group: row['key'], ...fields };
           },
-        ),
-      );
+        );
+      });
     expect(errors).toEqual([]);
+  });
+
+  it('paramètres : la version anglaise ne contient que des textes traduisibles', () => {
+    const settings = seed('settings') as Row[];
+    const extra = settings.flatMap((row) => {
+      const key = String(row['key']);
+      const rules = settingTextRules(key);
+      const english = (row['translations'] as Row | null)?.['en'];
+      if (rules === null || english === undefined) return [];
+      return isDeepStrictEqual(pickTexts(row['value'], english, rules), english) ? [] : [key];
+    });
+    expect(extra).toEqual([]);
   });
 
   it('disponibilités des rendez-vous (plages, fermetures, paramètre `availability`)', () => {

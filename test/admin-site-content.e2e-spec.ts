@@ -594,7 +594,11 @@ describe('pages, zones, paramètres et e-mails du back-office (avec des doubles)
 
       const saved = await write('editor', 'put', '/v1/admin/settings/whatsapp').send(body);
       expectContract('put', '/v1/admin/settings/{group}', 200, saved);
-      expect(saved.body).toEqual(body);
+      expect(saved.body).toMatchObject(body);
+      // Message français changé, anglais du seed gardé (sans empreinte) : signalé « à revoir ».
+      expect((saved.body as Row)['translationStatus']).toEqual({
+        en: { state: 'OUTDATED', missingFields: [], outdatedFields: ['message'] },
+      });
       const site = await request(server).get('/v1/site/settings');
       expectContract('get', '/v1/site/settings', 200, site);
       expect((site.body as Row)['whatsapp']).toMatchObject({

@@ -1,8 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { localize, localizeFields, translationFor } from '../../common/i18n/translations.js';
+import { localizeFields, translationFor } from '../../common/i18n/translations.js';
 import { asObject, readNullableString, type JsonObject } from '../../common/json/json-read.js';
 import { AppConfigService } from '../../config/app-config.service.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
+import { localizeSetting } from '../settings/setting-translations.js';
 import { DEFAULT_CONTENTS, type MailContent } from './default-contents.js';
 import { formatPhone } from './mail-format.js';
 import type { MailContext } from './mail-view.js';
@@ -79,7 +80,8 @@ export class MailContentService {
       select: { key: true, value: true, translations: true },
     });
     const groups: Record<string, JsonObject> = {};
-    for (const row of rows) groups[row.key] = asObject(localize(row.value, row.translations, lang));
+    for (const row of rows)
+      groups[row.key] = asObject(localizeSetting(row.key, row.value, row.translations, lang));
     const site = groups['site'] ?? {};
     const contacts = groups['coordonnees'] ?? {};
     const agency = asObject(contacts['agency']);

@@ -1161,3 +1161,39 @@
 
 - Marquage non mémorisé : il n'agit que sur l'envoi qui le porte (pas d'état « revu » à stocker, l'empreinte suffit).
 - Pas de nouvelle route : le marquage passe par le `PUT` du brouillon, avec la version anglaise envoyée.
+
+## Paramètres et zones bilingues, socle commun des traductions (28 octobre 2026)
+
+### Fait
+
+- Socle `src/common/i18n/text-translation.ts`, extrait de `page-translations.ts` : `applyTexts` (textes anglais sur
+  la structure française selon `TextRules` : `nonTextKeys` et/ou liste blanche `paths` avec `*`), `textEntries`,
+  `textHash` / `fieldHash` (sha256 stable), `pickTexts` / `translatedEntries` (version anglaise réduite aux textes
+  traduits), `unitsStatus` / `textTranslationStatus` (`MISSING` / `OUTDATED` / `UP_TO_DATE`), `nextReferenceHash`
+  (empreinte gardée, recalculée ou revue). Les pages s'en servent ; leurs tests passent sans modification.
+- Paramètres (`setting-translations.ts`) : liste blanche par groupe (`coordonnees` : horaires, nom, lignes d'adresse,
+  horaires d'ouverture, note colis ; `whatsapp` : message ; `seo` : titre et description ; `chiffres` : libellés,
+  suffixe, valeur texte). `GET`/`PUT /v1/admin/settings/{group}` renvoient `translations.en` et
+  `translationStatus.en` ; `PUT` accepte `translations: { en, reviewedFields? }` (absent : anglais inchangé, mais
+  empreintes posées). Empreintes par chemin dans `translations.en.sourceHashes`. Lecture publique et e-mails :
+  `localizeSetting` (liste blanche pour ces groupes, `localize` pour les autres).
+- Bogue corrigé : l'anglais du seed `coordonnees` recopiait toute l'agence (téléphones, GPS, `mapsUrl`) et les
+  chiffres clés leurs valeurs, si bien qu'une modification faite dans le back-office n'apparaissait pas en anglais.
+  Seed nettoyé (textes seulement) et contrôlé par `seed-content.spec.ts` ; les données déjà en base sont corrigées
+  à la lecture (liste blanche), sans migration de données, puis nettoyées au prochain enregistrement du groupe.
+- Zones (`zone-translations.ts`) : colonne `translation_hashes` (JSONB, migration légère
+  `20261029120000_zone_translation_hashes`, SQL vérifié avec `prisma migrate diff`), empreintes de `name`,
+  `description`, `result` et des textes des quartiers (`quarter:<clé>:detail|mapLabel`) ; `AdminZone.translationStatus`
+  (chemins `quarters.N.…` pour les quartiers) et `ZoneFields.reviewedFields`. `writeQuarters` garde désormais
+  `detailEn` / `mapLabelEn` quand le français change (signalés à revoir) et ne les efface que si le français est vidé.
+- Contrat : `TextTranslationStatus`, `SettingsTranslations`, `SettingsTranslationStatus`, `Settings*Texts`.
+- Tests : `text-translation.spec.ts`, `setting-translations.spec.ts` (lecture publique corrigée, statut, revu),
+  `zone-translations.spec.ts` ; e2e paramètres adapté (réponse avec la version anglaise et son statut).
+
+### Décisions
+
+- Unité d'empreinte « chemin » (paramètres) et « champ » (zones) : le back-office marque chaque champ revu.
+- Traductions sans empreinte (seed, données existantes) : considérées à jour ; à l'enregistrement suivant, elles
+  reçoivent l'empreinte du texte français d'avant, pour que le changement soit signalé.
+- Anglais des quartiers non exposé dans `AdminZone` : `detail` et `mapLabel` ne sont pas éditables dans le
+  formulaire du back-office ; seul leur statut l'est.

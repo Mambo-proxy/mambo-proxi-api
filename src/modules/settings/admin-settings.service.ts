@@ -1,3 +1,4 @@
+import { isDeepStrictEqual } from 'node:util';
 import { Inject, Injectable } from '@nestjs/common';
 import { APP_VERSION } from '../../common/app-version.js';
 import { recordAudit, type AuditActor } from '../../common/audit/audit-log.js';
@@ -6,7 +7,7 @@ import { notFoundException } from '../../common/problem/problem.js';
 import { CACHE_TAGS, requestRevalidation } from '../../common/revalidation/revalidation.js';
 import { validationException } from '../../common/validation/validation-exception.js';
 import { AppConfigService } from '../../config/app-config.service.js';
-import type { Prisma } from '../../generated/prisma/client.js';
+import { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { forbiddenException } from '../auth/auth.errors.js';
 import type { AuthContext } from '../auth/auth.types.js';
@@ -19,6 +20,12 @@ import {
   type SettingsGroup,
   type SettingsGroupValue,
 } from './admin-settings.schemas.js';
+import {
+  nextSettingTranslations,
+  reviewedFieldErrors,
+  settingTranslationView,
+  type SettingTranslationsInput,
+} from './setting-translations.js';
 
 export const SETTINGS_GROUP_NOT_FOUND = 'Ce groupe de paramètres n’existe pas.';
 
@@ -125,8 +132,9 @@ function pick(value: JsonObject, fields: readonly string[]): JsonObject {
 
 /**
  * Paramètres du back-office (`/v1/admin/settings/{group}`, `/v1/admin/system-status`) : une ligne `settings` par
- * groupe. L'enregistrement remplace les champs du contrat et garde les clés internes (libellés d'affichage, textes
- * anglais de `translations`) ; il s'applique partout sur le site dès la lecture suivante.
+ * groupe. L'enregistrement remplace les champs du contrat et garde les clés internes (libellés d'affichage) ; la
+ * version anglaise (`translations`, groupes qui ont des textes) est remplacée si elle est envoyée, sinon gardée, et
+ * ses empreintes sont mises à jour. Il s'applique partout sur le site dès la lecture suivante.
  */
 @Injectable()
 export class AdminSettingsService {
@@ -136,16 +144,30 @@ export class AdminSettingsService {
     @Inject(AppConfigService) private readonly config: AppConfigService,
   ) {}
 
-  private async stored(group: SettingsGroup): Promise<JsonObject | null> {
-    const row = await this.prisma.setting.findUnique({ where: { key: group }, select: { value: true } });
-    return row === null ? null : asObject(row.value);
+  private async stored(group: SettingsGroup): Promise<{ value: JsonObject; translations: unknown } | null> {
+    const row = await this.prisma.setting.findUnique({
+      where: { key: group },
+      select: { value: true, translations: true },
+    });
+    return row === null ? null : { value: asObject(row.value), translations: row.translations };
   }
 
-  private async toValue(group: SettingsGroup, stored: JsonObject | null): Promise<JsonObject> {
-    const value: JsonObject = {
-      group,
-      ...pick({ ...GROUP_DEFAULTS[group], ...(stored ?? {}) }, GROUP_FIELDS[group]),
-    };
+  /** Champs du contrat (valeurs par défaut d'un groupe jamais enregistré). */
+  private fields(group: SettingsGroup, stored: JsonObject | null): JsonObject {
+    return pick({ ...GROUP_DEFAULTS[group], ...(stored ?? {}) }, GROUP_FIELDS[group]);
+  }
+
+  /**
+   * Réponse du back-office : champs du contrat, puis, pour un groupe qui a des textes, sa version anglaise
+   * (`translations.en`) et son statut (`translationStatus.en`).
+   */
+  private async toValue(
+    group: SettingsGroup,
+    stored: JsonObject | null,
+    translations: unknown,
+  ): Promise<JsonObject> {
+    const fields = this.fields(group, stored);
+    const value: JsonObject = { group, ...fields, ...settingTranslationView(group, fields, translations) };
     if (group === 'seo') {
       const ogImageId = readNullableString(value, 'ogImageId');
       value['ogImage'] =
@@ -159,7 +181,8 @@ export class AdminSettingsService {
   /** `GET /v1/admin/settings/{group}` */
   async get(group: string): Promise<JsonObject> {
     if (!isSettingsGroup(group)) throw notFoundException(SETTINGS_GROUP_NOT_FOUND);
-    return this.toValue(group, await this.stored(group));
+    const stored = await this.stored(group);
+    return this.toValue(group, stored?.value ?? null, stored?.translations ?? null);
   }
 
   /**
@@ -191,8 +214,17 @@ export class AdminSettingsService {
       if (errors.length > 0) throw validationException(errors);
     }
 
-    const current = (await this.stored(group)) ?? {};
-    const { group: _group, ...fields } = input;
+    const stored = await this.stored(group);
+    const current = stored?.value ?? {};
+    const {
+      group: _group,
+      translations: translationsInput,
+      translationStatus: _status,
+      ...fields
+    } = input as SettingsGroupValue & {
+      translations?: SettingTranslationsInput;
+      translationStatus?: unknown;
+    };
     if ('ogImage' in fields) delete (fields as JsonObject)['ogImage'];
     const next: JsonObject = { ...current, ...fields };
     for (const [field, display] of DISPLAY_FIELDS[group] ?? []) {
@@ -210,12 +242,38 @@ export class AdminSettingsService {
     const changed = GROUP_FIELDS[group].filter(
       (field) => JSON.stringify(current[field] ?? null) !== JSON.stringify(next[field] ?? null),
     );
+    // Version anglaise : textes de la liste blanche seulement, empreintes par chemin (`setting-translations`).
+    const nextFields = this.fields(group, next);
+    if (translationsInput !== undefined) {
+      const errors = reviewedFieldErrors(group, nextFields, translationsInput);
+      if (errors.length > 0) throw validationException(errors);
+    }
+    const translations = nextSettingTranslations({
+      key: group,
+      previousFrench: this.fields(group, stored?.value ?? null),
+      french: nextFields,
+      stored: stored?.translations ?? null,
+      input: translationsInput,
+    });
+    // Colonne écrite seulement si elle change (`null` : plus aucune traduction).
+    const translationData =
+      translations === undefined || (translations === null && (stored?.translations ?? null) === null)
+        ? {}
+        : { translations: translations === null ? Prisma.DbNull : (translations as Prisma.InputJsonObject) };
+    if (translations !== undefined && !isDeepStrictEqual(translations, stored?.translations ?? null)) {
+      changed.push('translations');
+    }
 
     await this.prisma.$transaction(async (tx) => {
       await tx.setting.upsert({
         where: { key: group },
-        create: { key: group, value: next as Prisma.InputJsonObject, updatedById: actor.userId },
-        update: { value: next as Prisma.InputJsonObject, updatedById: actor.userId },
+        create: {
+          key: group,
+          value: next as Prisma.InputJsonObject,
+          ...translationData,
+          updatedById: actor.userId,
+        },
+        update: { value: next as Prisma.InputJsonObject, ...translationData, updatedById: actor.userId },
         select: { key: true },
       });
       if (PUBLIC_GROUPS.has(group)) await requestRevalidation(tx, [CACHE_TAGS.settings]);
@@ -230,7 +288,11 @@ export class AdminSettingsService {
     });
     // Seul groupe modifiable qui référence une image (`ogImageId`).
     if (group === 'seo') await this.media.refreshUsages({ kind: 'setting', entityId: group });
-    return this.toValue(group, next);
+    return this.toValue(
+      group,
+      next,
+      translations === undefined ? (stored?.translations ?? null) : translations,
+    );
   }
 
   /** `GET /v1/admin/system-status` : HTTPS du site, dernière sauvegarde réussie, version, fournisseur d'e-mails. */

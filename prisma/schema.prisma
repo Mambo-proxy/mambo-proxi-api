@@ -932,25 +932,28 @@ model MediaUsage {
 /// Tarif indicatif de déplacement (`fee…`) : donnée interne exposée par le contrat (`ZoneFee`), masquée sur le site
 /// tant que l'option « Afficher les tarifs » est désactivée ; ce n'est pas un prix de prestation (devis uniquement).
 model Zone {
-  id            String    @id @default(cuid(2))
-  key           String    @unique
-  name          String
-  nameEn        String?   @map("name_en")
-  tone          ZoneTone
-  description   String    @default("")
-  descriptionEn String?   @map("description_en")
-  result        String    @default("") /// Réponse affichée quand un quartier de la zone est recherché.
-  resultEn      String?   @map("result_en")
-  delay         String? /// Délai moyen (« 30–45 min ») ; null = « Sur devis ».
-  feeAmount     Int?      @map("fee_amount")
-  feeCurrency   Currency? @default(XAF) @map("fee_currency")
-  feeFrom       Boolean   @default(false) @map("fee_from") /// « Dès … » : montant minimal.
-  area          Json?
-  active        Boolean   @default(false) /// Une zone créée reste inactive tant qu'elle n'est pas activée.
-  sortOrder     Int       @default(0) @map("sort_order")
-  isDemo        Boolean   @default(false) @map("is_demo")
-  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  id                String    @id @default(cuid(2))
+  key               String    @unique
+  name              String
+  nameEn            String?   @map("name_en")
+  tone              ZoneTone
+  description       String    @default("")
+  descriptionEn     String?   @map("description_en")
+  result            String    @default("") /// Réponse affichée quand un quartier de la zone est recherché.
+  resultEn          String?   @map("result_en")
+  /// Empreintes des textes français traduits en anglais (`{ name, description, result, "quarter:<clé>:detail"… }`,
+  /// sha256) : signalent une traduction périmée (`AdminZone.translationStatus`). null = traductions antérieures au suivi.
+  translationHashes Json?     @map("translation_hashes")
+  delay             String? /// Délai moyen (« 30–45 min ») ; null = « Sur devis ».
+  feeAmount         Int?      @map("fee_amount")
+  feeCurrency       Currency? @default(XAF) @map("fee_currency")
+  feeFrom           Boolean   @default(false) @map("fee_from") /// « Dès … » : montant minimal.
+  area              Json?
+  active            Boolean   @default(false) /// Une zone créée reste inactive tant qu'elle n'est pas activée.
+  sortOrder         Int       @default(0) @map("sort_order")
+  isDemo            Boolean   @default(false) @map("is_demo")
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   quarters ZoneQuarter[]
 

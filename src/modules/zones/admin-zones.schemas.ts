@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { searchKey } from '../../common/text/search-key.js';
 import { nullableText } from '../../common/validation/content.schemas.js';
+import { REVIEWED_FIELD_PATTERN } from './zone-translations.js';
 
 /**
  * Corps des opérations « Admin — Zones » du contrat (`ZoneFields`, `ZoneQuarter`, `ZoneArea`, `ZoneFee`).
@@ -146,6 +147,8 @@ const zoneFieldsSchema = z.object({
       });
     }),
   area: areaSchema.nullable(),
+  /** Traductions relues, justes malgré un changement du français (`zone-translations`). */
+  reviewedFields: z.array(z.string().regex(REVIEWED_FIELD_PATTERN, { error: 'Champ inconnu.' })).max(200),
 });
 
 export const zoneInputSchema = zoneFieldsSchema.partial().extend({

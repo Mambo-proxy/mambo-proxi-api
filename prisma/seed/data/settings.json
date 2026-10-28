@@ -49,13 +49,6 @@
         "agency": {
           "name": "MAMBO Proxi agency",
           "addressLines": ["Agency address"],
-          "city": "Douala",
-          "country": "CM",
-          "phone": "+237600000000",
-          "phoneDisplay": "+237 6 00 00 00 00",
-          "latitude": 4.0511,
-          "longitude": 9.7679,
-          "mapsUrl": "https://www.google.com/maps/search/?api=1&query=4.0511,9.7679",
           "openingHours": [
             {
               "label": "Monday – Friday",
@@ -188,25 +181,18 @@
       "en": {
         "keyFigures": [
           {
-            "key": "projects",
-            "value": 150,
             "suffix": "+",
             "label": "projects supported"
           },
           {
-            "key": "partners",
-            "value": 40,
             "suffix": "+",
             "label": "committed partners"
           },
           {
-            "key": "services",
-            "value": 30,
             "label": "services across 6 areas",
             "labelMobile": "services, 6 areas"
           },
           {
-            "key": "area",
             "valueText": "Douala",
             "label": "and surroundings, starting from Cité SIC",
             "labelMobile": "and surroundings"

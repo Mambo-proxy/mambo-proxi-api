@@ -50,6 +50,60 @@ const agencySchema = z.object({
   parcelReceptionNote: nullableText(300).optional(),
 });
 
+/**
+ * Textes anglais d'un groupe (`translations.en`, schémas `Settings*Texts` du contrat) : seuls les chemins de la liste
+ * blanche sont gardés (`SETTING_TEXT_PATHS`), un texte vide ou `null` laisse le français.
+ */
+const englishText = (max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max, { error: `${String(max)} caractères au maximum.` })
+    .nullable()
+    .optional();
+
+const translationsInput = <T extends z.ZodType>(texts: T) =>
+  z
+    .object({
+      en: texts.nullable(),
+      reviewedFields: z.array(z.string().min(1).max(120)).max(80).optional(),
+    })
+    .optional();
+
+/** Statut de la traduction : lecture seule, renvoyé par `GET`, ignoré à l'enregistrement. */
+const translationStatusInput = z.unknown().optional();
+
+const coordonneesTexts = z.object({
+  hoursLabel: englishText(120),
+  agency: z
+    .object({
+      name: englishText(120),
+      addressLines: z.array(englishText(160)).max(6).optional(),
+      openingHours: z
+        .array(z.object({ label: englishText(60), hours: englishText(60) }).nullable())
+        .max(10)
+        .optional(),
+      parcelReceptionNote: englishText(300),
+    })
+    .optional(),
+});
+
+const chiffresTexts = z.object({
+  keyFigures: z
+    .array(
+      z
+        .object({
+          label: englishText(80),
+          labelMobile: englishText(80),
+          suffix: englishText(16),
+          valueText: englishText(24),
+        })
+        .nullable(),
+    )
+    .max(8)
+    .optional(),
+});
+
 const integer = (min: number, max: number, message: string) =>
   z
     .number({ error: message })
@@ -71,12 +125,16 @@ export const settingsGroupSchema = z.discriminatedUnion(
         .min(1, { error: 'Indiquez les horaires.' })
         .max(120),
       agency: agencySchema,
+      translations: translationsInput(coordonneesTexts),
+      translationStatus: translationStatusInput,
     }),
     z.object({
       group: z.literal('whatsapp'),
       enabled: z.boolean(),
       number: phone,
       message: z.string().trim().max(500, { error: '500 caractères au maximum.' }),
+      translations: translationsInput(z.object({ message: englishText(500) })),
+      translationStatus: translationStatusInput,
     }),
     z.object({
       group: z.literal('reseaux'),
@@ -123,6 +181,10 @@ export const settingsGroupSchema = z.discriminatedUnion(
       // Lecture seule : renvoyée par `GET`, ignorée à l'enregistrement.
       ogImage: z.unknown().optional(),
       searchConsoleVerification: nullableText(200).optional(),
+      translations: translationsInput(
+        z.object({ defaultTitle: englishText(60), defaultDescription: englishText(160) }),
+      ),
+      translationStatus: translationStatusInput,
     }),
     z.object({
       group: z.literal('analytics'),
@@ -134,7 +196,12 @@ export const settingsGroupSchema = z.discriminatedUnion(
       ga4PropertyId: nullableText(40).optional(),
       newsletterTracking: z.boolean().optional(),
     }),
-    z.object({ group: z.literal('chiffres'), keyFigures: z.array(keyFigureSchema).max(8) }),
+    z.object({
+      group: z.literal('chiffres'),
+      keyFigures: z.array(keyFigureSchema).max(8),
+      translations: translationsInput(chiffresTexts),
+      translationStatus: translationStatusInput,
+    }),
     z.object({
       group: z.literal('rgpd'),
       inactiveContactsRetentionMonths: integer(6, 120, 'Entre 6 et 120 mois.'),

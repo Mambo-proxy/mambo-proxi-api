@@ -1,4 +1,13 @@
-import { createHash } from 'node:crypto';
+import {
+  applyTexts,
+  nextReferenceHash,
+  readHashes,
+  textEntries,
+  textHash,
+  unitsStatus,
+  type TextRules,
+  type TranslationState,
+} from '../../common/i18n/text-translation.js';
 import { isPlainObject } from '../../common/i18n/translations.js';
 import { asObject, asObjectArray, readNullableString, type JsonObject } from '../../common/json/json-read.js';
 import type { ProblemFieldError } from '../../common/problem/problem.js';
@@ -11,7 +20,7 @@ import type { ProblemFieldError } from '../../common/problem/problem.js';
  * reste (structure, images, liens, réglages d'affichage, `enabled`, ordre) est celui de la section française de même
  * `id`, à l'enregistrement comme à chaque lecture. `sourceHashes` garde, pour chaque section traduite, l'empreinte des
  * textes français au moment où la version anglaise a été enregistrée : une différence avec l'empreinte actuelle
- * signale une traduction périmée.
+ * signale une traduction périmée. Mécanique commune (textes, empreintes, statut) : `common/i18n/text-translation.ts`.
  */
 
 /** Champs chaîne qui ne sont pas des textes à traduire : toujours ceux du français (sous-arbre compris). */
@@ -35,45 +44,21 @@ export const NON_TEXT_KEYS: ReadonlySet<string> = new Set([
   'adminLabel',
 ]);
 
+/** Règles des textes des pages (socle `text-translation`) : toutes les chaînes hors champs techniques. */
+const PAGE_TEXT_RULES: TextRules = { nonTextKeys: NON_TEXT_KEYS };
+
 /**
  * Textes anglais posés sur la structure française : une chaîne française non vide est remplacée par la chaîne
  * anglaise de même chemin si elle est renseignée ; listes élément par élément (nombre et ordre du français) ;
  * champs techniques, booléens et nombres du français ; ce qui n'existe pas en français est ignoré.
  */
 export function applyEnglishTexts(french: unknown, english: unknown, key?: string): unknown {
-  if (key !== undefined && NON_TEXT_KEYS.has(key)) return french;
-  if (typeof french === 'string') {
-    return french !== '' && typeof english === 'string' && english.trim() !== '' ? english : french;
-  }
-  if (Array.isArray(french)) {
-    const list: unknown[] = Array.isArray(english) ? english : [];
-    return french.map((item, index) => applyEnglishTexts(item, list[index]));
-  }
-  if (isPlainObject(french)) {
-    const source = isPlainObject(english) ? english : {};
-    return Object.fromEntries(
-      Object.entries(french).map(([field, value]) => [field, applyEnglishTexts(value, source[field], field)]),
-    );
-  }
-  return french;
+  return applyTexts(french, english, PAGE_TEXT_RULES, key);
 }
 
 /** Textes d'une section (`[chemin, texte]`, triés par chemin) : ce qui se traduit. */
 export function sectionTexts(section: unknown): [string, string][] {
-  const texts: [string, string][] = [];
-  const walk = (value: unknown, path: string, key?: string): void => {
-    if (key !== undefined && NON_TEXT_KEYS.has(key)) return;
-    if (typeof value === 'string') {
-      if (value.trim() !== '') texts.push([path, value]);
-    } else if (Array.isArray(value)) {
-      value.forEach((item, index) => walk(item, `${path}.${String(index)}`));
-    } else if (isPlainObject(value)) {
-      for (const [field, item] of Object.entries(value))
-        walk(item, path === '' ? field : `${path}.${field}`, field);
-    }
-  };
-  walk(section, '');
-  return texts.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+  return textEntries(section, PAGE_TEXT_RULES);
 }
 
 /**
@@ -81,9 +66,7 @@ export function sectionTexts(section: unknown): [string, string][] {
  * clés JSON) ; `null` si la section n'a aucun texte (rien à traduire).
  */
 export function sectionTextHash(section: unknown): string | null {
-  const texts = sectionTexts(section);
-  if (texts.length === 0) return null;
-  return createHash('sha256').update(JSON.stringify(texts)).digest('hex');
+  return textHash(section, PAGE_TEXT_RULES);
 }
 
 /** Version anglaise enregistrée (`translations.en`), lue prudemment. */
@@ -97,14 +80,11 @@ export interface EnglishVersion {
 export function readEnglish(translations: unknown): EnglishVersion | null {
   const english = asObject(translations)['en'];
   if (!isPlainObject(english)) return null;
-  const hashes = asObject(english['sourceHashes']);
   return {
     title: readNullableString(english, 'title'),
     sections: asObjectArray(english['sections']).filter((section) => typeof section['id'] === 'string'),
     seo: asObject(english['seo']),
-    sourceHashes: Object.fromEntries(
-      Object.entries(hashes).filter((entry): entry is [string, string] => typeof entry[1] === 'string'),
-    ),
+    sourceHashes: readHashes(english['sourceHashes']),
   };
 }
 
@@ -149,7 +129,7 @@ export function translateSeo(french: unknown, english: JsonObject): JsonObject {
 
 /** Schéma `PageTranslationStatus` du contrat. */
 export interface TranslationStatus {
-  state: 'MISSING' | 'OUTDATED' | 'UP_TO_DATE';
+  state: TranslationState;
   missingSectionIds: string[];
   outdatedSectionIds: string[];
 }
@@ -177,26 +157,21 @@ export function translationStatus(
 ): TranslationStatus {
   const translated = byId(english?.sections ?? []);
   const published = byId(publishedFrench);
-  const missingSectionIds: string[] = [];
-  const outdatedSectionIds: string[] = [];
-  for (const section of french) {
+  const units = french.flatMap((section) => {
     const id = section['id'];
-    const hash = sectionTextHash(section);
-    if (typeof id !== 'string' || hash === null) continue;
-    if (english === null || englishFor(section, translated) === undefined) {
-      missingSectionIds.push(id);
-      continue;
-    }
-    const reference = referenceHash(id, english, published);
-    if (reference !== null && reference !== hash) outdatedSectionIds.push(id);
-  }
-  const state =
-    english === null || missingSectionIds.length > 0
-      ? 'MISSING'
-      : outdatedSectionIds.length > 0
-        ? 'OUTDATED'
-        : 'UP_TO_DATE';
-  return { state, missingSectionIds, outdatedSectionIds };
+    if (typeof id !== 'string') return [];
+    const isTranslated = english !== null && englishFor(section, translated) !== undefined;
+    return [
+      {
+        id,
+        hash: sectionTextHash(section),
+        translated: isTranslated,
+        reference: english !== null && isTranslated ? referenceHash(id, english, published) : null,
+      },
+    ];
+  });
+  const { state, missing, outdated } = unitsStatus(units, english !== null);
+  return { state, missingSectionIds: missing, outdatedSectionIds: outdated };
 }
 
 /**
@@ -286,10 +261,14 @@ export function nextSourceHash(options: {
   reviewed: boolean;
 }): string | null {
   const { source, section, before, stored, published, reviewed } = options;
-  const unchanged =
-    before !== undefined && sectionTextHash(applyEnglishTexts(source, before)) === sectionTextHash(section);
-  if (reviewed || !unchanged) return sectionTextHash(source);
-  return stored ?? (published === undefined ? null : sectionTextHash(published)) ?? sectionTextHash(source);
+  return nextReferenceHash({
+    current: sectionTextHash(source),
+    unchanged:
+      before !== undefined && sectionTextHash(applyEnglishTexts(source, before)) === sectionTextHash(section),
+    reviewed,
+    stored,
+    fallback: published === undefined ? null : sectionTextHash(published),
+  });
 }
 
 /**

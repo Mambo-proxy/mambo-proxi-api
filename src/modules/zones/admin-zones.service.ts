@@ -9,7 +9,15 @@ import { Prisma, type ZoneTone } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import type { ReorderInput } from '../catalog/admin-catalog.schemas.js';
 import { SETTING_KEYS } from '../settings/settings.constants.js';
+import type { TextTranslationStatus } from '../../common/i18n/text-translation.js';
+import { validationException } from '../../common/validation/validation-exception.js';
 import type { QuarterInput, ZoneInput, ZonePatch } from './admin-zones.schemas.js';
+import {
+  nextZoneHashes,
+  reviewedZoneFieldErrors,
+  zoneTranslationStatus,
+  type QuarterTexts,
+} from './zone-translations.js';
 import { toZoneArea, type ZoneArea, type ZoneQuarter } from './zones.mapper.js';
 
 export const ADMIN_ZONE_NOT_FOUND = 'Cette zone n’existe plus.';
@@ -25,6 +33,7 @@ const adminZoneSelect = {
   descriptionEn: true,
   result: true,
   resultEn: true,
+  translationHashes: true,
   delay: true,
   feeAmount: true,
   feeCurrency: true,
@@ -74,6 +83,7 @@ export interface AdminZone {
   requestsCount: number;
   sortOrder: number;
   updatedAt: string;
+  translationStatus: { en: TextTranslationStatus };
 }
 
 /** Schéma `AdminZones` du contrat. */
@@ -110,12 +120,13 @@ function toAdminZone(zone: AdminZoneRecord, requestsCount: number): AdminZone {
     requestsCount,
     sortOrder: zone.sortOrder,
     updatedAt: zone.updatedAt.toISOString(),
+    translationStatus: { en: zoneTranslationStatus(zone) },
   };
 }
 
 /** Colonnes simples d'une zone (tarif indicatif à plat, contour GeoJSON). */
 function scalarData(fields: ZonePatch): Prisma.ZoneUncheckedUpdateInput {
-  const { quarters: _quarters, fee, area, ...rest } = fields;
+  const { quarters: _quarters, fee, area, reviewedFields: _reviewed, ...rest } = fields;
   const data: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(rest)) if (value !== undefined) data[key] = value;
   if (fee !== undefined) {
@@ -174,14 +185,15 @@ export class AdminZonesService {
 
   /**
    * Remplace les quartiers d'une zone (ordre de la liste). Un quartier déjà présent dans une autre zone y est
-   * retiré : un quartier n'appartient qu'à une zone. La traduction anglaise d'un quartier conservé est gardée tant
-   * que le texte français correspondant ne change pas.
+   * retiré : un quartier n'appartient qu'à une zone. La traduction anglaise d'un quartier conservé est gardée, même
+   * si son texte français change (elle est alors signalée « à revoir » par les empreintes), sauf si le texte
+   * français est vidé. Renvoie les quartiers remplacés, par clé.
    */
   private async writeQuarters(
     tx: Prisma.TransactionClient,
     zoneId: string,
     quarters: readonly QuarterInput[],
-  ) {
+  ): Promise<Map<string, QuarterTexts>> {
     const keys = quarters.map((quarter) => searchKey(quarter.name));
     const previous = await tx.zoneQuarter.findMany({
       where: { OR: [{ zoneId }, { normalizedName: { in: keys } }] },
@@ -189,7 +201,7 @@ export class AdminZonesService {
     });
     const byKey = new Map(previous.map((quarter) => [quarter.normalizedName, quarter]));
     await tx.zoneQuarter.deleteMany({ where: { OR: [{ zoneId }, { normalizedName: { in: keys } }] } });
-    if (quarters.length === 0) return;
+    if (quarters.length === 0) return byKey;
     await tx.zoneQuarter.createMany({
       data: quarters.map((quarter, index) => {
         const normalizedName = keys[index] ?? searchKey(quarter.name);
@@ -201,9 +213,9 @@ export class AdminZonesService {
           name: quarter.name,
           normalizedName,
           detail,
-          detailEn: before !== undefined && before.detail === detail ? before.detailEn : null,
+          detailEn: detail === null ? null : (before?.detailEn ?? null),
           mapLabel,
-          mapLabelEn: before !== undefined && before.mapLabel === mapLabel ? before.mapLabelEn : null,
+          mapLabelEn: mapLabel === null ? null : (before?.mapLabelEn ?? null),
           isBase: quarter.isBase ?? false,
           labelOnSmallMap: quarter.labelOnSmallMap ?? false,
           lat: quarter.coordinates?.lat ?? null,
@@ -214,6 +226,30 @@ export class AdminZonesService {
         };
       }),
     });
+    return byKey;
+  }
+
+  /**
+   * Empreintes des traductions après une création ou une modification (`translationHashes`) ; `reviewedFields` doit
+   * désigner des textes traduits (422 sinon, transaction annulée).
+   */
+  private async stampTranslations(
+    tx: Prisma.TransactionClient,
+    id: string,
+    before: AdminZoneRecord | null,
+    previousQuarters: ReadonlyMap<string, QuarterTexts>,
+    reviewed: readonly string[],
+  ): Promise<AdminZoneRecord> {
+    const after = await this.find(tx, id);
+    const errors = reviewedZoneFieldErrors(after, reviewed);
+    if (errors.length > 0) throw validationException(errors);
+    const translationHashes = nextZoneHashes({ before, after, previousQuarters, reviewed });
+    await tx.zone.update({
+      where: { id },
+      data: { translationHashes },
+      select: { id: true },
+    });
+    return { ...after, translationHashes };
   }
 
   /** `POST /v1/admin/zones` : à la fin de la liste, inactive sauf mention contraire. */
@@ -247,7 +283,15 @@ export class AdminZonesService {
         },
         select: { id: true },
       });
-      if (input.quarters !== undefined) await this.writeQuarters(tx, row.id, input.quarters);
+      const previousQuarters =
+        input.quarters === undefined ? new Map() : await this.writeQuarters(tx, row.id, input.quarters);
+      const next = await this.stampTranslations(
+        tx,
+        row.id,
+        null,
+        previousQuarters,
+        input.reviewedFields ?? [],
+      );
       await requestRevalidation(tx, [CACHE_TAGS.zones]);
       await recordAudit(tx, actor, {
         action: 'zone.create',
@@ -256,7 +300,7 @@ export class AdminZonesService {
         label: `A créé la zone « ${input.name} »`,
         after: { key, active: input.active ?? false },
       });
-      return this.find(tx, row.id);
+      return next;
     });
     return this.respond(created, now);
   }
@@ -266,9 +310,19 @@ export class AdminZonesService {
     const current = await this.find(this.prisma, id);
     const updated = await this.prisma.$transaction(async (tx) => {
       await tx.zone.update({ where: { id }, data: scalarData(patch), select: { id: true } });
-      if (patch.quarters !== undefined) await this.writeQuarters(tx, id, patch.quarters);
+      // Quartiers inchangés : leurs textes anglais restent ceux d'avant (même clé).
+      const previousQuarters =
+        patch.quarters === undefined
+          ? new Map(current.quarters.map((quarter) => [quarter.normalizedName, quarter]))
+          : await this.writeQuarters(tx, id, patch.quarters);
+      const next = await this.stampTranslations(
+        tx,
+        id,
+        current,
+        previousQuarters,
+        patch.reviewedFields ?? [],
+      );
       await requestRevalidation(tx, [CACHE_TAGS.zones]);
-      const next = await this.find(tx, id);
       await recordAudit(tx, actor, {
         action: 'zone.update',
         entity: 'Zone',

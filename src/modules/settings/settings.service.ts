@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Lang } from '../../common/i18n/lang.js';
-import { localize } from '../../common/i18n/translations.js';
 import { asObject, readNullableString } from '../../common/json/json-read.js';
 import { AppConfigService } from '../../config/app-config.service.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { MediaService } from '../media/media.service.js';
+import { localizeSetting } from './setting-translations.js';
 import { SETTING_KEYS, SITE_SETTINGS_KEYS, type SettingKey } from './settings.constants.js';
 import {
   TURNSTILE_TEST_SITE_KEY,
@@ -19,7 +19,10 @@ export interface SettingGroups {
   updatedAt: Date | null;
 }
 
-/** Lecture des paramètres (table `settings`), dans la langue demandée. */
+/**
+ * Lecture des paramètres (table `settings`), dans la langue demandée : textes anglais de la liste blanche posés sur
+ * la valeur française (`localizeSetting`).
+ */
 @Injectable()
 export class SettingsService {
   constructor(
@@ -37,7 +40,7 @@ export class SettingsService {
     const values: SettingValues = {};
     let updatedAt: Date | null = null;
     for (const row of rows) {
-      values[row.key as SettingKey] = asObject(localize(row.value, row.translations, lang));
+      values[row.key as SettingKey] = asObject(localizeSetting(row.key, row.value, row.translations, lang));
       if (updatedAt === null || row.updatedAt > updatedAt) updatedAt = row.updatedAt;
     }
     return { values, updatedAt };

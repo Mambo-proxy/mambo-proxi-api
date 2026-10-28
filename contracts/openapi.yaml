@@ -7941,6 +7941,15 @@ components:
           oneOf:
             - $ref: '#/components/schemas/ZoneArea'
             - type: 'null'
+        reviewedFields:
+          type: array
+          maxItems: 200
+          items: { type: string, pattern: '^(name|description|result|quarters\.\d+\.(detail|mapLabel))$' }
+          description: |
+            Traductions anglaises relues, justes malgré un changement du texte français : leur empreinte devient
+            celle du texte français enregistré (elles quittent `translationStatus.en.outdatedFields`). Chemins de
+            `TextTranslationStatus` (`quarters.N.…` : rang du quartier dans la zone enregistrée). Un chemin sans
+            texte anglais → `422` sur `reviewedFields.N`. Non mémorisé : n'agit que sur cet envoi.
 
     ZoneInput:
       allOf:
@@ -7956,7 +7965,7 @@ components:
 
     AdminZone:
       type: object
-      required: [id, key, name, nameEn, tone, description, descriptionEn, result, resultEn, delay, fee, active, quarters, requestsCount, sortOrder, updatedAt]
+      required: [id, key, name, nameEn, tone, description, descriptionEn, result, resultEn, delay, fee, active, quarters, requestsCount, sortOrder, updatedAt, translationStatus]
       properties:
         id: { $ref: '#/components/schemas/Id' }
         key: { $ref: '#/components/schemas/Slug' }
@@ -7978,6 +7987,17 @@ components:
         requestsCount: { type: integer, description: 'Demandes des 12 derniers mois dont la ville commence par un quartier de la zone.' }
         sortOrder: { type: integer }
         updatedAt: { $ref: '#/components/schemas/DateTime' }
+        translationStatus:
+          type: object
+          required: [en]
+          description: |
+            État de la version anglaise (`nameEn`, `descriptionEn`, `resultEn` et textes anglais des quartiers), par
+            champ : `name`, `description`, `result`, `quarters.N.detail`, `quarters.N.mapLabel` (N = rang du
+            quartier). Une traduction est « à revoir » quand son texte français a changé depuis son enregistrement ;
+            la traduction anglaise d'un quartier est gardée quand son texte français change (sauf s'il est vidé) et
+            signalée à revoir. Les traductions antérieures à ce suivi sont considérées à jour.
+          properties:
+            en: { $ref: '#/components/schemas/TextTranslationStatus' }
 
     AdminZones:
       type: object
@@ -8199,6 +8219,17 @@ components:
         email: { $ref: '#/components/schemas/Email' }
         hoursLabel: { type: string }
         agency: { $ref: '#/components/schemas/SiteSettings/properties/agency' }
+        translations:
+          description: |
+            Version anglaise saisie à la main (règles : `SettingsTranslations`). Renvoyée par `GET` et `PUT` ;
+            facultative à l'enregistrement (absente : version anglaise inchangée).
+          allOf:
+            - $ref: '#/components/schemas/SettingsTranslations'
+            - type: object
+              properties:
+                en:
+                  oneOf: [{ $ref: '#/components/schemas/SettingsCoordonneesTexts' }, { type: 'null' }]
+        translationStatus: { $ref: '#/components/schemas/SettingsTranslationStatus' }
 
     SettingsWhatsapp:
       type: object
@@ -8209,6 +8240,17 @@ components:
         enabled: { type: boolean }
         number: { $ref: '#/components/schemas/PhoneE164' }
         message: { type: string, maxLength: 500 }
+        translations:
+          description: |
+            Version anglaise saisie à la main (règles : `SettingsTranslations`). Renvoyée par `GET` et `PUT` ;
+            facultative à l'enregistrement (absente : version anglaise inchangée).
+          allOf:
+            - $ref: '#/components/schemas/SettingsTranslations'
+            - type: object
+              properties:
+                en:
+                  oneOf: [{ $ref: '#/components/schemas/SettingsWhatsappTexts' }, { type: 'null' }]
+        translationStatus: { $ref: '#/components/schemas/SettingsTranslationStatus' }
 
     SettingsReseaux:
       type: object
@@ -8245,6 +8287,17 @@ components:
           description: Image de partage correspondant à `ogImageId` (lecture seule, ignorée à l'enregistrement).
           oneOf: [{ $ref: '#/components/schemas/MediaImage' }, { type: 'null' }]
         searchConsoleVerification: { type: [string, 'null'] }
+        translations:
+          description: |
+            Version anglaise saisie à la main (règles : `SettingsTranslations`). Renvoyée par `GET` et `PUT` ;
+            facultative à l'enregistrement (absente : version anglaise inchangée).
+          allOf:
+            - $ref: '#/components/schemas/SettingsTranslations'
+            - type: object
+              properties:
+                en:
+                  oneOf: [{ $ref: '#/components/schemas/SettingsSeoTexts' }, { type: 'null' }]
+        translationStatus: { $ref: '#/components/schemas/SettingsTranslationStatus' }
 
     SettingsAnalytics:
       type: object
@@ -8263,6 +8316,17 @@ components:
       properties:
         group: { type: string, const: chiffres }
         keyFigures: { type: array, maxItems: 8, items: { $ref: '#/components/schemas/KeyFigure' } }
+        translations:
+          description: |
+            Version anglaise saisie à la main (règles : `SettingsTranslations`). Renvoyée par `GET` et `PUT` ;
+            facultative à l'enregistrement (absente : version anglaise inchangée).
+          allOf:
+            - $ref: '#/components/schemas/SettingsTranslations'
+            - type: object
+              properties:
+                en:
+                  oneOf: [{ $ref: '#/components/schemas/SettingsChiffresTexts' }, { type: 'null' }]
+        translationStatus: { $ref: '#/components/schemas/SettingsTranslationStatus' }
 
     SettingsRgpd:
       type: object
@@ -8281,6 +8345,118 @@ components:
         group: { type: string, const: securite }
         maintenanceMode: { type: boolean }
         trustedDeviceDays: { type: integer, minimum: 0, maximum: 90, default: 30 }
+
+    TextTranslationStatus:
+      type: object
+      required: [state, missingFields, outdatedFields]
+      description: |
+        État d'une version anglaise suivie champ par champ (paramètres, zones…), calculé à la lecture par rapport
+        aux textes français actuels. Seuls les champs dont le texte français est renseigné comptent.
+        - `missingFields` : champs sans texte anglais (le site affiche le français).
+        - `outdatedFields` : champs dont le texte français a changé depuis l'enregistrement de leur traduction
+          (empreinte du texte français mémorisée à chaque enregistrement). Une traduction antérieure à ce suivi
+          (sans empreinte) est considérée à jour, puis suivie dès l'enregistrement suivant.
+        - `state` : `MISSING` s'il manque au moins un champ, sinon `OUTDATED` si au moins un champ est périmé,
+          sinon `UP_TO_DATE`.
+
+        Chemins pointés (`hoursLabel`, `agency.addressLines.0`, `keyFigures.2.label`, `quarters.3.detail`).
+      properties:
+        state: { type: string, enum: [MISSING, OUTDATED, UP_TO_DATE] }
+        missingFields: { type: array, items: { type: string } }
+        outdatedFields: { type: array, items: { type: string } }
+
+    SettingsTranslations:
+      type: object
+      required: [en]
+      description: |
+        Version anglaise d'un groupe de paramètres qui a des textes (`coordonnees`, `whatsapp`, `seo`, `chiffres`).
+        **Seuls les textes se traduisent**, et seulement ceux de cette liste (toute autre valeur envoyée est
+        ignorée) :
+        - `coordonnees` : `hoursLabel`, `agency.name`, `agency.addressLines.N`, `agency.openingHours.N.label`,
+          `agency.openingHours.N.hours`, `agency.parcelReceptionNote` ;
+        - `whatsapp` : `message` ;
+        - `seo` : `defaultTitle`, `defaultDescription` ;
+        - `chiffres` : `keyFigures.N.label`, `keyFigures.N.labelMobile`, `keyFigures.N.suffix`,
+          `keyFigures.N.valueText`.
+
+        Numéros, adresses e-mail, coordonnées GPS, liens, nombres et réglages sont toujours ceux du français, sur le
+        site comme dans les e-mails. Listes alignées par rang : l'élément N anglais traduit l'élément N français
+        (éléments en trop ignorés). Un texte anglais absent, `null` ou vide laisse le texte français.
+
+        À l'enregistrement, `en` remplace la version anglaise (`null` la supprime) ; l'empreinte de chaque texte
+        français traduit est recalculée si son texte anglais est nouveau ou modifié, sinon gardée (le champ reste
+        « à revoir » si le français a changé). `GET` renvoie `en` réduit aux textes traduits (`null` sans
+        traduction).
+      properties:
+        en: { type: [object, 'null'], additionalProperties: true, description: Textes anglais (forme `Settings*Texts` du groupe). }
+        reviewedFields:
+          type: array
+          maxItems: 80
+          items: { type: string, minLength: 1, maxLength: 120 }
+          description: |
+            Envoi seulement. Champs dont la traduction a été relue et reste juste malgré un changement du texte
+            français : leur empreinte devient celle du texte français enregistré (ils quittent `outdatedFields`).
+            Chaque chemin doit désigner un texte traduit, sinon `422` sur `translations.reviewedFields.N`. Non
+            mémorisé.
+
+    SettingsTranslationStatus:
+      type: object
+      required: [en]
+      description: État de la version anglaise du groupe (lecture seule, ignoré à l'enregistrement).
+      properties:
+        en: { $ref: '#/components/schemas/TextTranslationStatus' }
+
+    SettingsCoordonneesTexts:
+      type: object
+      description: Textes anglais du groupe `coordonnees`.
+      properties:
+        hoursLabel: { type: [string, 'null'], maxLength: 120 }
+        agency:
+          type: object
+          properties:
+            name: { type: [string, 'null'], maxLength: 120 }
+            addressLines: { type: array, maxItems: 6, items: { type: [string, 'null'], maxLength: 160 } }
+            openingHours:
+              type: array
+              maxItems: 10
+              items:
+                oneOf:
+                  - type: object
+                    properties:
+                      label: { type: [string, 'null'], maxLength: 60 }
+                      hours: { type: [string, 'null'], maxLength: 60 }
+                  - type: 'null'
+            parcelReceptionNote: { type: [string, 'null'], maxLength: 300 }
+
+    SettingsWhatsappTexts:
+      type: object
+      description: Textes anglais du groupe `whatsapp`.
+      properties:
+        message: { type: [string, 'null'], maxLength: 500 }
+
+    SettingsSeoTexts:
+      type: object
+      description: Textes anglais du groupe `seo`.
+      properties:
+        defaultTitle: { type: [string, 'null'], maxLength: 60 }
+        defaultDescription: { type: [string, 'null'], maxLength: 160 }
+
+    SettingsChiffresTexts:
+      type: object
+      description: Textes anglais du groupe `chiffres`.
+      properties:
+        keyFigures:
+          type: array
+          maxItems: 8
+          items:
+            oneOf:
+              - type: object
+                properties:
+                  label: { type: [string, 'null'], maxLength: 80 }
+                  labelMobile: { type: [string, 'null'], maxLength: 80 }
+                  suffix: { type: [string, 'null'], maxLength: 16 }
+                  valueText: { type: [string, 'null'], maxLength: 24 }
+              - type: 'null'
 
     SystemStatus:
       type: object
@@ -10268,6 +10444,7 @@ components:
             requestsCount: 41
             sortOrder: 0
             updatedAt: '2026-10-18T08:00:00.000Z'
+            translationStatus: { en: { state: UP_TO_DATE, missingFields: [], outdatedFields: [] } }
           - id: zon_speciale
             key: zone-speciale
             name: Zone spéciale
@@ -10287,6 +10464,7 @@ components:
             requestsCount: 3
             sortOrder: 3
             updatedAt: '2026-10-18T08:00:00.000Z'
+            translationStatus: { en: { state: UP_TO_DATE, missingFields: [], outdatedFields: [] } }
 
     AdminServices:
       summary: Liste des services
