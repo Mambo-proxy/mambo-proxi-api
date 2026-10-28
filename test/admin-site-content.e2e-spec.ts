@@ -207,6 +207,30 @@ describe('pages, zones, paramètres et e-mails du back-office (avec des doubles)
       });
       expectContract('put', '/v1/admin/pages/{key}', 200, outdated);
       expect(outdated.body).toMatchObject({ translationStatus: { en: { outdatedSectionIds: ['hero'] } } });
+
+      // Traduction toujours juste : marquée revue sans changer ses textes, elle redevient à jour.
+      const englishHero = { id: 'hero', title: 'Legal notice' };
+      const unknownReviewed = await write('editor', 'put', '/v1/admin/pages/mentions-legales').send({
+        sections: [{ ...hero, title: 'Informations légales' }, texte],
+        translations: {
+          en: { title: 'Legal notice', sections: [englishHero], reviewedSectionIds: ['texte'] },
+        },
+      });
+      expectContract('put', '/v1/admin/pages/{key}', 422, unknownReviewed);
+      expect(((unknownReviewed.body as Row)['errors'] as Row[]).map((error) => error['path'])).toEqual([
+        'translations.en.reviewedSectionIds.0',
+      ]);
+      const reviewed = await write('editor', 'put', '/v1/admin/pages/mentions-legales').send({
+        sections: [{ ...hero, title: 'Informations légales' }, texte],
+        translations: {
+          en: { title: 'Legal notice', sections: [englishHero], reviewedSectionIds: ['hero'] },
+        },
+      });
+      expectContract('put', '/v1/admin/pages/{key}', 200, reviewed);
+      expect(reviewed.body).toMatchObject({
+        translations: { en: { sections: [{ id: 'hero', title: 'Legal notice' }] } },
+        translationStatus: { en: { outdatedSectionIds: [] } },
+      });
     });
 
     it('applique les règles du brouillon (types autorisés, sections automatiques, identifiants, images)', async () => {

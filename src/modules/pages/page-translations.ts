@@ -249,6 +249,50 @@ export function englishSectionErrors(
 }
 
 /**
+ * Sections marquées « revues » (`PageTranslationInput.reviewedSectionIds`) : chaque `id` doit être celui d'une
+ * section anglaise du même envoi (`422` sur `translations.en.reviewedSectionIds.N` sinon).
+ */
+export function reviewedSectionErrors(
+  english: readonly { id: string }[],
+  reviewed: readonly string[],
+  basePath: string,
+): ProblemFieldError[] {
+  const sent = new Set(english.map((section) => section.id));
+  return reviewed.flatMap((id, index): ProblemFieldError[] =>
+    sent.has(id)
+      ? []
+      : [
+          {
+            path: `${basePath}.${String(index)}`,
+            code: 'unknown_section',
+            message: 'Cette section ne fait pas partie de la version anglaise envoyée.',
+          },
+        ],
+  );
+}
+
+/**
+ * Empreinte à mémoriser pour une section anglaise enregistrée : celle des textes français actuels (`source`) si la
+ * section est nouvelle, si ses textes anglais ont changé ou si elle est marquée revue ; sinon l'empreinte gardée
+ * (une traduction inchangée reste périmée si le français a changé ; une traduction antérieure au suivi prend
+ * l'empreinte du français publié).
+ */
+export function nextSourceHash(options: {
+  source: JsonObject;
+  section: JsonObject;
+  before: JsonObject | undefined;
+  stored: string | undefined;
+  published: JsonObject | undefined;
+  reviewed: boolean;
+}): string | null {
+  const { source, section, before, stored, published, reviewed } = options;
+  const unchanged =
+    before !== undefined && sectionTextHash(applyEnglishTexts(source, before)) === sectionTextHash(section);
+  if (reviewed || !unchanged) return sectionTextHash(source);
+  return stored ?? (published === undefined ? null : sectionTextHash(published)) ?? sectionTextHash(source);
+}
+
+/**
  * Empreintes des traductions antérieures au suivi, posées à la publication : chaque section anglaise sans empreinte
  * reçoit celle des textes français publiés jusque-là (ceux qu'elle traduit), pour que les changements du français
  * publié ensuite la signalent périmée. `undefined` si rien ne change.

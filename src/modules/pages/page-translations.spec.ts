@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   applyEnglishTexts,
   englishSectionErrors,
+  nextSourceHash,
   readEnglish,
+  reviewedSectionErrors,
   sectionTextHash,
   stampLegacyHashes,
   translateSections,
@@ -145,6 +147,43 @@ describe('version anglaise des pages', () => {
     ]);
     expect(englishSectionErrors(french, [{ id: 'univers', type: 'hero' }], path)).toEqual([
       expect.objectContaining({ path: 'translations.en.sections.0.type', code: 'type_mismatch' }),
+    ]);
+  });
+
+  it('remet à jour une section périmée marquée revue sans changer ses textes anglais', () => {
+    const translated = { ...hero, title: 'Welcome' };
+    const stored = sectionTextHash(hero) ?? undefined;
+    const french = { ...hero, visual: { ...hero.visual, alt: 'Une famille réunie.' } };
+    const options = { source: french, section: translated, before: translated, stored, published: undefined };
+
+    // Textes anglais inchangés : l'empreinte gardée laisse la section périmée…
+    const kept = nextSourceHash({ ...options, reviewed: false });
+    expect(kept).toBe(stored);
+    expect(
+      translationStatus(
+        [french],
+        readEnglish({ en: { sections: [translated], sourceHashes: { hero: kept } } }),
+        [],
+      ).outdatedSectionIds,
+    ).toEqual(['hero']);
+    // … marquée revue, elle prend l'empreinte du français actuel et redevient à jour.
+    const reviewed = nextSourceHash({ ...options, reviewed: true });
+    expect(reviewed).toBe(sectionTextHash(french));
+    expect(
+      translationStatus(
+        [french],
+        readEnglish({ en: { sections: [translated], sourceHashes: { hero: reviewed } } }),
+        [],
+      ),
+    ).toEqual({ state: 'UP_TO_DATE', missingSectionIds: [], outdatedSectionIds: [] });
+  });
+
+  it('refuse une section revue absente de la version anglaise envoyée', () => {
+    const path = 'translations.en.reviewedSectionIds';
+
+    expect(reviewedSectionErrors([{ id: 'hero' }], ['hero'], path)).toEqual([]);
+    expect(reviewedSectionErrors([{ id: 'hero' }], ['hero', 'bandeau'], path)).toEqual([
+      expect.objectContaining({ path: 'translations.en.reviewedSectionIds.1', code: 'unknown_section' }),
     ]);
   });
 });

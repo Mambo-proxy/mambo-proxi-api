@@ -292,6 +292,10 @@ export const pageTranslationSchema = z.object({
     .array(translationSectionSchema, { error: 'La version anglaise doit contenir la liste des sections.' })
     .max(40, { error: 'Une page compte au plus 40 sections.' }),
   seo: seoSchema.optional(),
+  reviewedSectionIds: z
+    .array(z.string().trim().min(1).max(64), { error: 'Liste des sections revues invalide.' })
+    .max(40, { error: 'Au plus 40 sections peuvent être marquées revues.' })
+    .optional(),
 });
 export type PageTranslationInput = z.output<typeof pageTranslationSchema>;
 

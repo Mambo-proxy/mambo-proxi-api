@@ -29,8 +29,9 @@ import {
   applyEnglishTexts,
   englishSectionErrors,
   englishSections,
+  nextSourceHash,
   readEnglish,
-  sectionTextHash,
+  reviewedSectionErrors,
   stampLegacyHashes,
   translateSeo,
   translationStatus,
@@ -249,9 +250,8 @@ export class AdminPagesService {
   /**
    * Version anglaise du brouillon (`translations.en`) : `id` alignés sur les sections françaises de l'envoi, textes
    * anglais posés sur la section française puis validés comme elle (limites, HTML assaini). Empreinte des textes
-   * français mémorisée par section : recalculée si les textes anglais de la section changent (ou si elle est
-   * nouvelle), sinon gardée (une traduction inchangée reste périmée si le français a changé ; une traduction
-   * antérieure au suivi prend l'empreinte du français publié).
+   * français mémorisée par section : recalculée si les textes anglais de la section changent, si elle est nouvelle
+   * ou marquée revue (`reviewedSectionIds`), sinon gardée (voir `nextSourceHash`).
    */
   private englishDraft(
     page: AdminPageRecord,
@@ -260,6 +260,11 @@ export class AdminPagesService {
   ): { value: JsonObject; errors: ProblemFieldError[] } {
     const basePath = 'translations.en.sections';
     const errors = englishSectionErrors(draft.sections, english.sections, basePath);
+    const reviewedIds = english.reviewedSectionIds ?? [];
+    errors.push(
+      ...reviewedSectionErrors(english.sections, reviewedIds, 'translations.en.reviewedSectionIds'),
+    );
+    const reviewed = new Set(reviewedIds);
     const french = new Map<string, JsonObject>(draft.sections.map((section) => [section.id, section]));
     const current = page.draftTranslations ?? page.translations;
     const previous = readEnglish(current);
@@ -288,16 +293,14 @@ export class AdminPagesService {
       }
       const section = parsed.data as JsonObject;
       sections.push(section);
-      const before = previousById.get(input.id);
-      const unchanged =
-        before !== undefined &&
-        sectionTextHash(applyEnglishTexts(source, before)) === sectionTextHash(section);
-      const publishedSource = published.get(input.id);
-      const hash = unchanged
-        ? (previous?.sourceHashes[input.id] ??
-          (publishedSource === undefined ? null : sectionTextHash(publishedSource)) ??
-          sectionTextHash(source))
-        : sectionTextHash(source);
+      const hash = nextSourceHash({
+        source,
+        section,
+        before: previousById.get(input.id),
+        stored: previous?.sourceHashes[input.id],
+        published: published.get(input.id),
+        reviewed: reviewed.has(input.id),
+      });
       if (hash !== null) sourceHashes[input.id] = hash;
     });
     const seo = english.seo ?? previous?.seo ?? {};

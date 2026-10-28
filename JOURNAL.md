@@ -1142,3 +1142,22 @@
 
 - Image jamais construite localement (pas de Docker) : à valider au premier lancement du workflow.
 - Cookies `SameSite=Lax` : le back-office exige un domaine commun site/API (ou un relais `/v1` côté site).
+
+## Traduction anglaise d'une page « marquée comme revue » (28 octobre 2026)
+
+### Fait
+
+- Contrat : `PageTranslationInput.reviewedSectionIds` (facultatif, au plus 40 `id`) et règle des empreintes
+  documentée. Chaque `id` doit être celui d'une section présente dans `sections` de l'envoi anglais, sinon `422` sur
+  `translations.en.reviewedSectionIds.N` (`unknown_section`).
+- `saveDraft` : pour ces sections, l'empreinte mémorisée (`sourceHashes`) devient celle des textes français actuels
+  du brouillon même si les textes anglais n'ont pas changé ; la réponse renvoie `translationStatus` recalculé.
+  Calcul de l'empreinte extrait dans `nextSourceHash` et contrôle dans `reviewedSectionErrors`
+  (`page-translations.ts`).
+- Tests : `page-translations.spec.ts` (section périmée marquée revue → à jour ; `id` hors envoi → erreur), cas ajouté
+  dans `test/admin-site-content.e2e-spec.ts` (422 puis section de nouveau à jour). Journal d'audit inchangé.
+
+### Décisions
+
+- Marquage non mémorisé : il n'agit que sur l'envoi qui le porte (pas d'état « revu » à stocker, l'empreinte suffit).
+- Pas de nouvelle route : le marquage passe par le `PUT` du brouillon, avec la version anglaise envoyée.
