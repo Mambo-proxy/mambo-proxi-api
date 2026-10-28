@@ -32,6 +32,14 @@ export const SETTINGS_GROUP_NOT_FOUND = 'Ce groupe de paramètres n’existe pas
 // Durée de conservation des sauvegardes quotidiennes (`pg_dump`, docs/07) : celle de la tâche de sauvegarde.
 export { BACKUP_RETENTION_DAYS };
 
+/** Traductions sans les empreintes (`en.sourceHashes`) : comparaison pour le journal d'activité. */
+function withoutHashes(translations: unknown): unknown {
+  const en = asObject(asObject(translations)['en']);
+  if (!('sourceHashes' in en)) return translations;
+  const { sourceHashes: _hashes, ...texts } = en;
+  return { ...asObject(translations), en: texts };
+}
+
 /** Libellés des groupes (journal d'activité). */
 const GROUP_LABELS: Record<SettingsGroup, string> = {
   coordonnees: 'Coordonnées',
@@ -260,7 +268,11 @@ export class AdminSettingsService {
       translations === undefined || (translations === null && (stored?.translations ?? null) === null)
         ? {}
         : { translations: translations === null ? Prisma.DbNull : (translations as Prisma.InputJsonObject) };
-    if (translations !== undefined && !isDeepStrictEqual(translations, stored?.translations ?? null)) {
+    // Journal : seuls les textes anglais comptent, pas les empreintes posées à chaque enregistrement.
+    if (
+      translations !== undefined &&
+      !isDeepStrictEqual(withoutHashes(translations), withoutHashes(stored?.translations ?? null))
+    ) {
       changed.push('translations');
     }
 
