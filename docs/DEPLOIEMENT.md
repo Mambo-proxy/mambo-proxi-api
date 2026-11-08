@@ -103,7 +103,9 @@ En cas de reprise des données d'un autre serveur, reprendre **les mêmes** `POS
 - API : GitHub → Actions → « Déploiement » → _Run workflow_. `deploy.sh` : images de l'API, PostgreSQL et Redis,
   `prisma migrate deploy`, `docker compose up -d --wait`, contrôle de `/v1/health`, nettoyage des images. Le site
   en place (`.web-tag`) n'est pas modifié.
-- Site : même workflow dans `mambo-proxi-web` (`deploy-web.sh` : image du site, redémarrage du service `web`).
+- Site : même workflow dans `mambo-proxi-web` (`deploy-web.sh` : image du site, redémarrage du service `web`). Le
+  build pré-génère des pages à partir de l'API en ligne (`NEXT_PUBLIC_API_URL`) : l'API doit répondre pendant toute la
+  construction (sinon échec « Error occurred prerendering page »).
 - Retour arrière : `bash /opt/mambo/deploy.sh <sha>` ou `bash /opt/mambo/deploy-web.sh <sha>` (les migrations ne sont
   pas annulées). À la main, se connecter d'abord au registre avec un jeton GitHub « read:packages » :
   `docker login ghcr.io -u <compte>`.
