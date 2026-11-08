@@ -1,7 +1,24 @@
-# Mandataire inverse de l'API : HTTPS automatique (Let's Encrypt), compression, en-têtes de sécurité.
-# API_DOMAIN : 13-38-208-248.sslip.io tant qu'il n'y a pas de nom de domaine, puis ex. api.mamboproxi.com.
+# Mandataire inverse du VPS : HTTPS automatique (Let's Encrypt) pour le site et l'API, compression, en-têtes.
+# WEB_DOMAIN : mamboproxi.com (www redirigé) ; API_DOMAIN : api.mamboproxi.com.
 {
 	email {$ACME_EMAIL}
+}
+
+# Adresse canonique du site : sans www (= NEXT_PUBLIC_SITE_URL du site, WEB_URL de l'API, seule origine CORS).
+www.{$WEB_DOMAIN} {
+	redir https://{$WEB_DOMAIN}{uri} permanent
+}
+
+{$WEB_DOMAIN} {
+	encode zstd gzip
+
+	# Le site pose ses propres en-têtes de sécurité (CSP comprise, next.config.ts).
+	header {
+		-Server
+		-X-Powered-By
+	}
+
+	reverse_proxy web:3000
 }
 
 {$API_DOMAIN} {

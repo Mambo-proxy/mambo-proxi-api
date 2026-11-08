@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-# Déploiement de l'API sur le serveur (lancé par le workflow « Déploiement » via SSM, ou à la main en root) :
-#   sudo /opt/mambo/deploy.sh <étiquette>     # SHA du commit (défaut : latest)
-# Connexion ECR, téléchargement des images, migrations Prisma, redémarrage, attente du healthcheck, nettoyage.
+# Déploiement de l'API sur le VPS (lancé par le workflow « Déploiement » via SSH, ou à la main par l'utilisateur
+# deploy) :
+#   bash /opt/mambo/deploy.sh <étiquette>     # SHA du commit (défaut : latest)
+# Téléchargement des images de l'API, migrations Prisma, redémarrage, attente du healthcheck, nettoyage.
+# Connexion au registre ghcr.io : faite par le workflow avant l'appel (jeton éphémère), ou une fois pour toutes à la
+# main avec un jeton personnel « read:packages » (docs/DEPLOIEMENT.md).
 set -euo pipefail
 
 TAG="${1:-latest}"
 DIR=/opt/mambo
-REGION="${AWS_REGION:-eu-west-3}"
-REGISTRY="${ECR_REGISTRY:-168692730521.dkr.ecr.eu-west-3.amazonaws.com}"
 
 log() { printf '\n[%s] %s\n' "$(date -u +%H:%M:%S)" "$*"; }
 fail() {
@@ -17,18 +18,22 @@ fail() {
 
 cd "$DIR"
 [ -f .env ] || fail "$DIR/.env est introuvable. Créez-le à partir de $DIR/.env.production.example (docs/DEPLOIEMENT.md)."
-for variable in API_DOMAIN ACME_EMAIL POSTGRES_PASSWORD; do
+for variable in API_DOMAIN WEB_DOMAIN ACME_EMAIL POSTGRES_PASSWORD REVALIDATE_SECRET; do
   grep -Eq "^${variable}=.+" .env || fail "$variable est vide ou absent de $DIR/.env."
 done
 
 export IMAGE_TAG="$TAG"
+# Version du site en place (déployée par mambo-proxi-web) : jamais changée par un déploiement de l'API.
+WEB_IMAGE_TAG="$(cat "$DIR/.web-tag" 2>/dev/null || echo latest)"
+export WEB_IMAGE_TAG
 compose() { docker compose -f "$DIR/docker-compose.prod.yml" --env-file "$DIR/.env" "$@"; }
 
-log "Connexion au registre ECR ($REGISTRY)"
-aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin "$REGISTRY"
+# Services démarrés : le site seulement s'il a déjà été déployé (image présente sur le serveur).
+services=(caddy postgres redis api)
+[ -f "$DIR/.web-tag" ] && services+=(web)
 
-log "Téléchargement des images (étiquette $TAG)"
-compose --profile tools pull --quiet
+log "Téléchargement des images de l'API (étiquette $TAG)"
+compose --profile tools pull --quiet api migrate
 
 log "Démarrage de PostgreSQL et Redis"
 compose up -d --wait --wait-timeout 120 postgres redis
@@ -36,8 +41,8 @@ compose up -d --wait --wait-timeout 120 postgres redis
 log "Migrations Prisma (prisma migrate deploy)"
 compose --profile tools run --rm migrate
 
-log "Démarrage des services"
-if ! compose up -d --remove-orphans --wait --wait-timeout 180; then
+log "Démarrage des services : ${services[*]}"
+if ! compose up -d --remove-orphans --wait --wait-timeout 180 "${services[@]}"; then
   compose ps
   compose logs --tail 100 api
   fail "les services ne sont pas en bonne santé après 3 minutes."

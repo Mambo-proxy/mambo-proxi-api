@@ -1228,3 +1228,28 @@
 - Les textes anglais des champs non modifiables dans le back-office (villes, puces du devis, CTA d'un service, blocs
   de rubrique…) sont conservés tels quels à l'enregistrement, et `en: null` ne les supprime pas.
 - Pas de migration : tout tient dans la colonne `translations` existante.
+
+## Hébergement sur VPS Contabo et domaine mamboproxi.com (8 novembre 2026)
+
+### Fait
+
+- Pile de production déplacée d'EC2 vers un VPS Contabo (Ubuntu 24.04, 91.90.82.90) : `deploy/docker-compose.prod.yml`
+  accueille le site (service `web`, image de mambo-proxi-web), Caddy sert `mamboproxi.com` (www redirigé) et
+  `api.mamboproxi.com`, Mailpit retiré (e-mails par SMTP réel). Limites de mémoire relevées.
+- Images dans `ghcr.io/mambo-proxy/mambo-proxi-api` au lieu d'Amazon ECR ; workflow « Déploiement » par SSH
+  (utilisateur `deploy`) au lieu de SSM ; jeton éphémère du workflow transmis sur l'entrée standard.
+- `deploy-web.sh` (déploiement du site, version mémorisée dans `.web-tag`), `deploy.sh` ne touche plus au site.
+- `bootstrap.sh` réécrit pour Ubuntu : Docker officiel, ufw, fail2ban, mises à jour automatiques, utilisateur
+  `deploy`, SSH par clés seulement.
+- `docs/DEPLOIEMENT.md` réécrit (DNS, Resend, secrets GitHub, reprise des données d'un autre serveur).
+- Serveur installé ; `.env` repris de l'EC2 (mêmes secrets, nouveaux domaines) ; dump de la base transféré.
+
+### Difficultés
+
+- `PasswordAuthentication yes` de `50-cloud-init.conf` (image Contabo) l'emportait sur notre fichier `90-` (sshd
+  garde la première valeur lue) : fichier renommé `00-mambo.conf`.
+
+### Décisions
+
+- Site et API sur le même domaine enregistrable : `COOKIE_DOMAIN=.mamboproxi.com`, plus de relais `/v1` côté site.
+- E-mails par Resend (domaine vérifié) ; Gmail SMTP conservé jusqu'à la vérification du domaine.
