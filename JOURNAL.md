@@ -1253,3 +1253,9 @@
 
 - Site et API sur le même domaine enregistrable : `COOKIE_DOMAIN=.mamboproxi.com`, plus de relais `/v1` côté site.
 - E-mails par Resend (domaine vérifié) ; Gmail SMTP conservé jusqu'à la vérification du domaine.
+
+### Mise en production (8 novembre 2026)
+
+- Base de l'EC2 restaurée sur le VPS (`pg_restore`), migrations à jour.
+- E-mails par Resend (`smtp.resend.com:465`, expéditeur `contact@mamboproxi.com`, domaine vérifié) au lieu de Gmail.
+- Clé secrète Turnstile du domaine, `SITE_ENV=production`.
