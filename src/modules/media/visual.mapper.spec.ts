@@ -66,9 +66,10 @@ describe('toMediaImage / toVisual', () => {
     });
   });
 
-  it("garde l'illustration sans image, ou si le traitement de l'image a échoué", () => {
+  it("garde l'illustration sans image, et l'original sans variantes si leur génération a échoué", () => {
     expect(toVisual('chef', null, BASE)).toEqual({ illustration: 'chef', image: null, alt: '' });
-    expect(toVisual('chef', { ...chef, status: 'FAILED' }, BASE).image).toBeNull();
+    const failed = toVisual('chef', { ...chef, status: 'FAILED', variants: null }, BASE).image;
+    expect(failed).toMatchObject({ id: chef.id, variants: [] });
   });
 
   it("prend le texte alternatif de l'emplacement, sinon celui du média", () => {

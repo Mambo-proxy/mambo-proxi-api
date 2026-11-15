@@ -51,14 +51,14 @@ export class MediaService {
   }
 
   /**
-   * Identifiants qui ne désignent aucun média utilisable de la médiathèque (absent, ou traitement échoué) : les
-   * contenus du back-office ne font que référencer des médias déjà envoyés (une seule requête).
+   * Identifiants qui ne désignent aucun média de la médiathèque : les contenus du back-office ne font que référencer
+   * des médias déjà envoyés (une seule requête). Un média `FAILED` reste utilisable (original sans variantes).
    */
   async unknownIds(ids: Iterable<string>): Promise<Set<string>> {
     const unique = [...new Set(ids)];
     if (unique.length === 0) return new Set();
     const found = await this.prisma.media.findMany({
-      where: { id: { in: unique }, status: { not: 'FAILED' } },
+      where: { id: { in: unique } },
       select: { id: true },
     });
     const known = new Set(found.map((item) => item.id));

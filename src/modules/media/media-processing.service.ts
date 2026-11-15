@@ -27,6 +27,12 @@ export type MediaJobOutcome = 'ready' | 'cleaned' | 'skipped';
 /** Partie de `Queue` utilisée (remplaçable dans les tests). */
 export interface MediaQueueClient {
   add(name: string, data: MediaJob, opts: JobsOptions): Promise<unknown>;
+  /** Tâche conservée par la file (reprise des médias restés `PROCESSING`). */
+  getJob?(
+    jobId: string,
+  ): Promise<
+    { isCompleted(): Promise<boolean>; isFailed(): Promise<boolean>; remove(): Promise<void> } | undefined
+  >;
   close(): Promise<void>;
 }
 
@@ -65,6 +71,10 @@ function messageOf(error: unknown): string {
  * dernier essai ; le site est alors revalidé pour les contenus qui l'utilisent. Redis indisponible : l'envoi rend la
  * main après 3 s et le worker reprend au démarrage les médias restés `PROCESSING` (`catchUp`).
  */
+/** Identifiant stable de la tâche des variantes d'un fichier (rien n'est généré deux fois). */
+const variantsJobId = (mediaId: string, storageKey: string): string =>
+  `media-${mediaId}-${folderOf(storageKey) ?? 'site'}`;
+
 @Injectable()
 export class MediaProcessingService implements OnModuleDestroy {
   private readonly logger = new Logger(MediaProcessingService.name);
@@ -80,8 +90,25 @@ export class MediaProcessingService implements OnModuleDestroy {
     await this.add(
       'media-variants',
       { type: 'variants', mediaId, storageKey },
-      { jobId: `media-${mediaId}-${folderOf(storageKey) ?? 'site'}` },
+      { jobId: variantsJobId(mediaId, storageKey) },
     );
+  }
+
+  /**
+   * Reprise d'un média resté `PROCESSING` : une tâche terminée ou échouée de même identifiant, encore conservée par la
+   * file (7 et 30 jours), ferait ignorer le nouvel ajout ; elle est retirée d'abord.
+   */
+  private async requeueVariants(mediaId: string, storageKey: string): Promise<void> {
+    try {
+      this.queue ??= this.createQueue();
+      const job = await this.queue.getJob?.(variantsJobId(mediaId, storageKey));
+      if (job && ((await job.isCompleted()) || (await job.isFailed()))) await job.remove();
+    } catch (error) {
+      this.logger.error(
+        `Médiathèque : ancienne tâche du média ${mediaId} non retirée (${messageOf(error)}).`,
+      );
+    }
+    await this.enqueueVariants(mediaId, storageKey);
   }
 
   /** Suppression des fichiers remplacés dans 24 h (pages en cache du site, CDN). */
@@ -104,7 +131,7 @@ export class MediaProcessingService implements OnModuleDestroy {
     return this.renderVariants(job.mediaId, job.storageKey);
   }
 
-  /** Dernier essai échoué : le média passe `FAILED` (l'illustration reste affichée sur le site). */
+  /** Dernier essai échoué : le média passe `FAILED` (le site affiche son original, sans variantes). */
   async markFailed(mediaId: string, storageKey: string): Promise<void> {
     await this.prisma.$transaction(async (tx) => {
       const { count } = await tx.media.updateMany({
@@ -134,7 +161,7 @@ export class MediaProcessingService implements OnModuleDestroy {
         take: CATCH_UP_LIMIT,
         select: { id: true, storageKey: true },
       });
-      for (const media of pending) await this.enqueueVariants(media.id, media.storageKey);
+      for (const media of pending) await this.requeueVariants(media.id, media.storageKey);
       if (pending.length > 0) this.logger.log(`Médias repris : ${String(pending.length)} à traiter.`);
     } catch (error) {
       this.logger.error(`Reprise des médias impossible : ${messageOf(error)}`);
