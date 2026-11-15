@@ -3,6 +3,7 @@ import { asObject, readNullableNumber } from '../../common/json/json-read.js';
 import { AppConfigService } from '../../config/app-config.service.js';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { AdminContactsService } from '../contacts/admin-contacts.service.js';
+import { REPLACED_FILES_TTL_MS } from '../media/media-processing.service.js';
 import { folderOf } from '../media/media-storage.js';
 import { AdminRequestsService, ANONYMOUS_CONTACT_EMAIL } from '../requests/admin-requests.service.js';
 import { OPEN_REQUEST_STATUSES } from '../requests/request.mapper.js';
@@ -260,6 +261,14 @@ export class GdprCleanupService {
       await privateDriver.delete(file.key);
       deleted += 1;
     }
+
+    // Média remplacé récemment : ses anciens fichiers (de date de modification ancienne) restent servis aux pages en
+    // cache jusqu'à leur suppression par la file `media` (`REPLACED_FILES_TTL_MS`). Les dossiers inconnus attendent
+    // alors le passage suivant plutôt que d'être supprimés avant ce délai.
+    const recentlyChanged = await this.prisma.media.count({
+      where: { updatedAt: { gte: new Date(now.getTime() - REPLACED_FILES_TTL_MS) } },
+    });
+    if (recentlyChanged > 0) return deleted;
 
     const mediaDriver = new LocalDiskStorageDriver(this.config.get('MEDIA_STORAGE_DIR'));
     const media = await this.prisma.media.findMany({ select: { storageKey: true, variants: true } });

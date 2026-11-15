@@ -1300,3 +1300,11 @@
   reçoit seulement un nouveau lien ; fiche, consentement et désinscription ne changent qu'à la confirmation (nouveau
   consentement horodaté pour un désinscrit). La création des envois d'une campagne est relancée à chaque reprise (liste
   complétée après un arrêt).
+
+## Correctifs de l'audit, priorité faible (15 novembre 2026)
+
+### Fait
+
+- **Nettoyage des fichiers orphelins** : les dossiers inconnus de la médiathèque ne sont plus supprimés si un média a
+  changé dans les dernières 24 h. L'ancien dossier d'un média remplacé (date de modification ancienne) était supprimé
+  aussitôt, avant le délai `REPLACED_FILES_TTL_MS`, et les pages en cache affichaient une image cassée.
