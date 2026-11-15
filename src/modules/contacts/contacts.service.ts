@@ -117,7 +117,7 @@ export class ContactsService {
 
   /**
    * Double opt-in : prépare l'abonnement « en attente » avec le consentement horodaté. Un abonné confirmé le reste ;
-   * un abonné désinscrit qui coche de nouveau la case redevient « en attente ». L'e-mail de confirmation (jeton
+   * un abonné désinscrit le reste jusqu'à la confirmation du nouveau lien (`NewsletterSubscriptionsService.confirm`). L'e-mail de confirmation (jeton
    * `confirmTokenHash`) sera envoyé par le module newsletter.
    */
   async prepareNewsletter(
@@ -147,18 +147,8 @@ export class ContactsService {
       });
       return 'EN_ATTENTE';
     }
-    if (existing.status === 'DESINSCRIT') {
-      await tx.subscriber.update({
-        where: { id: existing.id },
-        data: {
-          status: 'EN_ATTENTE',
-          consentAt: now,
-          unsubscribedAt: null,
-          contactId: existing.contactId ?? contactId,
-        },
-      });
-      return 'EN_ATTENTE';
-    }
+    // Désinscrit : reste désinscrit (preuve de la désinscription gardée) jusqu'à ce que le titulaire de l'adresse
+    // confirme le nouveau lien ; n'importe qui peut saisir l'adresse d'un tiers dans un formulaire.
     if (existing.contactId === null) {
       await tx.subscriber.update({ where: { id: existing.id }, data: { contactId } });
     }

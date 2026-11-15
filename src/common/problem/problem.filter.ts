@@ -7,6 +7,7 @@ import {
   type ExceptionFilter,
 } from '@nestjs/common';
 import type { Response } from 'express';
+import { Prisma } from '../../generated/prisma/client.js';
 import {
   PROBLEM_CONTENT_TYPE,
   ProblemException,
@@ -62,6 +63,20 @@ export class ProblemFilter implements ExceptionFilter {
     if (exception instanceof ProblemException) return { ...exception.problem };
 
     if (exception instanceof HttpException) return problemForStatus(exception.getStatus());
+
+    // Conflits d'écriture que les vérifications « lire puis écrire » des services laissent passer (deux envois
+    // simultanés, élément supprimé entre la lecture et l'écriture) : 409 et 404 plutôt qu'une erreur interne.
+    if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+      if (exception.code === 'P2002') {
+        return createProblem({
+          status: HttpStatus.CONFLICT,
+          type: 'conflict',
+          title: 'Conflit',
+          detail: "Un élément identique vient d'être enregistré. Actualisez la page puis réessayez.",
+        });
+      }
+      if (exception.code === 'P2025') return problemForStatus(HttpStatus.NOT_FOUND);
+    }
 
     if (isBodyParserError(exception)) {
       if (exception.type === 'entity.parse.failed') {

@@ -100,12 +100,15 @@ export function toVariants(value: Prisma.JsonValue, publicBaseUrl: string): Medi
   });
 }
 
-/** `MediaImage` d'un média ; `null` sans média ou si son traitement a échoué (l'illustration reste affichée). */
+/**
+ * `MediaImage` d'un média ; `null` sans média. Un média `FAILED` (variantes impossibles à générer) reste affiché :
+ * son original, contrôlé et réenregistré à l'envoi, est servi sans variantes.
+ */
 export function toMediaImage(
   media: MediaRecord | null | undefined,
   publicBaseUrl: string,
 ): MediaImage | null {
-  if (!media || media.status === 'FAILED') return null;
+  if (!media) return null;
   return {
     id: media.id,
     url: mediaUrl(media.storageKey, publicBaseUrl),

@@ -328,6 +328,10 @@ export class AdminMediaService {
   async remove(id: string, actor: AuditActor): Promise<void> {
     const row = await this.prisma.media.findUnique({ where: { id }, select: ADMIN_MEDIA_SELECT });
     if (row === null) throw notFoundException(MEDIA_NOT_FOUND);
+    // Lignes d'usage relevées avant le calcul : seules celles-ci, reconnues obsolètes, sont supprimées. Un usage
+    // enregistré entre le calcul et la transaction (page ou paramètre enregistré entre-temps) garde sa ligne, dont la
+    // clé étrangère `Restrict` bloque alors la suppression (409) au lieu de laisser une référence orpheline.
+    const recorded = await this.prisma.mediaUsage.findMany({ where: { mediaId: id }, select: { id: true } });
     const usages = [
       ...(await collectAllUsages(this.prisma)).filter((entry) => entry.mediaId === id),
       ...liveForeignUsages(id, row),
@@ -335,7 +339,8 @@ export class AdminMediaService {
     if (usages.length > 0) throw mediaInUseException([...new Set(usages.map((usage) => usage.label))]);
     try {
       await this.prisma.$transaction(async (tx) => {
-        await tx.mediaUsage.deleteMany({ where: { mediaId: id } });
+        if (recorded.length > 0)
+          await tx.mediaUsage.deleteMany({ where: { id: { in: recorded.map((usage) => usage.id) } } });
         await tx.media.delete({ where: { id }, select: { id: true } });
         await recordAudit(tx, actor, {
           action: 'media.delete',

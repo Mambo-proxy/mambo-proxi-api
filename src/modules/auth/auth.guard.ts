@@ -14,8 +14,10 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 /** Préfixe des routes du back-office : permissions obligatoires. */
 const ADMIN_PATH_PREFIX = `/${GLOBAL_PREFIX}/admin`;
 
+/** Comparaison sans casse, comme le routage d'Express (`/v1/ADMIN/…` atteint les mêmes routes). */
 function isAdminPath(path: string): boolean {
-  return path === ADMIN_PATH_PREFIX || path.startsWith(`${ADMIN_PATH_PREFIX}/`);
+  const lower = path.toLowerCase();
+  return lower === ADMIN_PATH_PREFIX || lower.startsWith(`${ADMIN_PATH_PREFIX}/`);
 }
 
 /**

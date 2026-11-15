@@ -162,9 +162,9 @@ export class CampaignDispatchService implements OnModuleDestroy {
       if (claimed.count === 0) return 'skipped';
     } else if (campaign.status !== 'EN_COURS_ENVOI') return 'skipped';
 
-    const existing = await this.prisma.campaignDelivery.count({ where: { campaignId: campaign.id } });
-    if (existing === 0)
-      await this.materialize(campaign.id, campaign.segmentKind, campaign.segmentTags, campaign.language);
+    // Toujours relancée (sans doublon : `skipDuplicates`) : une reprise après un arrêt pendant la création des envois
+    // (tranches de 1 000, hors transaction) complète la liste au lieu de n'envoyer qu'à une partie des abonnés.
+    await this.materialize(campaign.id, campaign.segmentKind, campaign.segmentTags, campaign.language);
     const recipients = await this.prisma.campaignDelivery.count({ where: { campaignId: campaign.id } });
     await this.prisma.campaign.update({
       where: { id: campaign.id },

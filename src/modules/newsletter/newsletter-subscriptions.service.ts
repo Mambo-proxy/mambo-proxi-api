@@ -124,17 +124,34 @@ export class NewsletterSubscriptionsService {
       return { ...accepted, alreadySubscribed: true };
     }
 
+    // Adresse déjà connue, en attente ou désinscrite : seul un nouveau lien de confirmation est émis. N'importe qui
+    // peut saisir l'adresse d'un tiers : sa fiche (nom, téléphone, source), son consentement et la preuve de sa
+    // désinscription ne changent qu'à la confirmation, par le titulaire de l'adresse.
+    if (existing) {
+      const token = newConfirmToken();
+      const saved = await this.prisma.subscriber.update({
+        where: { id: existing.id },
+        data: {
+          tags,
+          confirmTokenHash: confirmTokenHash(this.secret(), token),
+          confirmTokenExpires: new Date(now.getTime() + CONFIRM_VALIDITY_DAYS * DAY_MS),
+        },
+        select: { name: true },
+      });
+      await this.sendConfirmMail(input.email, meta.lang, token, saved.name);
+      return accepted;
+    }
+
     const contact = await this.prisma.contact.findUnique({
       where: { email: input.email },
       select: { id: true, anonymizedAt: true, subscriber: { select: { id: true } } },
     });
     const contactId =
-      existing?.contactId ??
-      (contact && contact.anonymizedAt === null && contact.subscriber === null ? contact.id : null);
+      contact && contact.anonymizedAt === null && contact.subscriber === null ? contact.id : null;
     const token = newConfirmToken();
     const pending = {
       status: 'EN_ATTENTE' as const,
-      name: input.name ?? existing?.name ?? null,
+      name: input.name ?? null,
       phone: input.phone,
       language: meta.lang === 'en' ? ('EN' as const) : ('FR' as const),
       source: SOURCES[input.source],
@@ -145,24 +162,18 @@ export class NewsletterSubscriptionsService {
       unsubscribedAt: null,
       contactId,
     };
-    const saved = existing
-      ? await this.prisma.subscriber.update({
-          where: { id: existing.id },
-          data: pending,
-          select: { name: true },
-        })
-      : await this.prisma.subscriber.create({
-          data: { ...pending, email: input.email },
-          select: { name: true },
-        });
+    const saved = await this.prisma.subscriber.create({
+      data: { ...pending, email: input.email },
+      select: { name: true },
+    });
     await this.sendConfirmMail(input.email, meta.lang, token, saved.name);
     return accepted;
   }
 
   /**
    * Confirmation demandée par un autre formulaire (inscription avec la case « newsletter ») : l'abonnement est déjà
-   * « en attente » (`ContactsService.prepareNewsletter`) ; un nouveau lien est émis et envoyé. Sans effet pour une
-   * adresse qui n'est pas en attente. N'échoue jamais (l'envoi du formulaire est déjà enregistré).
+   * « en attente » (`ContactsService.prepareNewsletter`), ou désinscrit et en cours de réinscription ; un nouveau lien
+   * est émis et envoyé. Sans effet pour une adresse confirmée. N'échoue jamais (l'envoi du formulaire est déjà enregistré).
    */
   async sendPendingConfirmation(email: string, now: Date): Promise<void> {
     try {
@@ -170,7 +181,7 @@ export class NewsletterSubscriptionsService {
         where: { email: email.trim().toLowerCase() },
         select: { id: true, status: true, language: true, name: true, email: true },
       });
-      if (subscriber?.status !== 'EN_ATTENTE') return;
+      if (subscriber?.status !== 'EN_ATTENTE' && subscriber?.status !== 'DESINSCRIT') return;
       const token = newConfirmToken();
       await this.prisma.subscriber.update({
         where: { id: subscriber.id },
@@ -193,17 +204,20 @@ export class NewsletterSubscriptionsService {
       where: { confirmTokenHash: confirmTokenHash(this.secret(), token) },
       select: { id: true, status: true, confirmTokenExpires: true, language: true },
     });
+    // Désinscrit qui s'est réinscrit (`subscribe`) : le lien vaut nouveau consentement.
+    const resubscribing = subscriber?.status === 'DESINSCRIT';
     if (
-      subscriber?.status !== 'EN_ATTENTE' ||
+      (subscriber?.status !== 'EN_ATTENTE' && !resubscribing) ||
       subscriber.confirmTokenExpires === null ||
       subscriber.confirmTokenExpires.getTime() <= now.getTime()
     )
       throw confirmExpiredException();
     const claimed = await this.prisma.subscriber.updateMany({
-      where: { id: subscriber.id, status: 'EN_ATTENTE' },
+      where: { id: subscriber.id, status: subscriber.status },
       data: {
         status: 'CONFIRME',
         confirmedAt: now,
+        ...(resubscribing ? { consentAt: now } : {}),
         unsubscribedAt: null,
         confirmTokenHash: null,
         confirmTokenExpires: null,
