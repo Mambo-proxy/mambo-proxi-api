@@ -241,13 +241,21 @@ export class AuthService {
       throw otpExpiredException();
     if (challenge.attempts >= OTP_MAX_ATTEMPTS) throw otpAttemptsExhaustedException();
 
+    // Essai réservé avant la comparaison, de façon atomique : des vérifications simultanées ne peuvent pas tester plus
+    // de `OTP_MAX_ATTEMPTS` codes (lire le compteur, comparer puis l'incrémenter laissait passer chaque requête
+    // concurrente).
+    const reserved = await this.prisma.otpChallenge.updateMany({
+      where: { id: challenge.id, consumedAt: null, attempts: { lt: OTP_MAX_ATTEMPTS } },
+      data: { attempts: { increment: 1 } },
+    });
+    if (reserved.count === 0) throw otpAttemptsExhaustedException();
+
     if (!safeEqual(this.otpHash(challenge.userId, input.code), challenge.codeHash)) {
-      const { attempts } = await this.prisma.otpChallenge.update({
+      const current = await this.prisma.otpChallenge.findUnique({
         where: { id: challenge.id },
-        data: { attempts: { increment: 1 } },
         select: { attempts: true },
       });
-      const left = OTP_MAX_ATTEMPTS - attempts;
+      const left = OTP_MAX_ATTEMPTS - (current?.attempts ?? OTP_MAX_ATTEMPTS);
       if (left > 0) throw wrongOtpException(left);
       await this.prisma.otpChallenge.update({ where: { id: challenge.id }, data: { consumedAt: now } });
       throw otpAttemptsExhaustedException();
@@ -411,7 +419,7 @@ export class AuthService {
     await this.revokeCredentials(user.id, now);
   }
 
-  /** Sessions, appareils de confiance et codes en cours d'un utilisateur révoqués. */
+  /** Sessions, appareils de confiance, codes et liens de réinitialisation en cours d'un utilisateur révoqués. */
   async revokeCredentials(userId: string, now: Date): Promise<void> {
     await this.sessions.revokeAllForUser(userId, now);
     await this.prisma.trustedDevice.updateMany({
@@ -421,6 +429,11 @@ export class AuthService {
     await this.prisma.otpChallenge.updateMany({
       where: { userId, consumedAt: null },
       data: { consumedAt: now },
+    });
+    // Autres liens de réinitialisation encore valides : inutilisables après un changement de mot de passe.
+    await this.prisma.passwordReset.updateMany({
+      where: { userId, usedAt: null },
+      data: { usedAt: now },
     });
   }
 
