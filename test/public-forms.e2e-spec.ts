@@ -432,7 +432,7 @@ describe('formulaires publics (avec des doubles)', () => {
       });
     });
 
-    it('incrémente la référence et met à jour la fiche contact existante (même e-mail)', async () => {
+    it('incrémente la référence et complète la fiche contact existante sans la remplacer (même e-mail)', async () => {
       const response = await post(
         app,
         '/v1/quote-requests',
@@ -456,10 +456,11 @@ describe('formulaires publics (avec des doubles)', () => {
       });
       const contacts = rows(tables, 'contact').filter((row) => row['email'] === 'aurelie.k@example.com');
       expect(contacts).toHaveLength(1);
+      // Téléphone et canal déjà renseignés : gardés (seule la demande porte les nouvelles valeurs) ; langue du dernier envoi.
       expect(contacts[0]).toMatchObject({
-        phone: '+237600000001',
+        phone: '+237612345678',
         city: 'Bonapriso, Douala',
-        preferredChannel: 'EMAIL',
+        preferredChannel: 'WHATSAPP',
         language: 'EN',
       });
       expect(mail.jobs[0]).toMatchObject({ template: 'quote-ack', lang: 'en' });

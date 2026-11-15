@@ -24,9 +24,46 @@ export interface NewsletterSubscriptionRequest {
   language: Language;
 }
 
+/** Champs d'une fiche existante complétés par un formulaire seulement s'ils sont vides. */
+const FILLABLE_FIELDS = {
+  fullName: true,
+  firstName: true,
+  lastName: true,
+  phone: true,
+  country: true,
+  city: true,
+  district: true,
+  organization: true,
+  activity: true,
+  preferredChannel: true,
+} as const satisfies Prisma.ContactSelect;
+
+type FillableField = keyof typeof FILLABLE_FIELDS;
+
 /**
- * Fiches contact des formulaires publics : une fiche par adresse e-mail (normalisée), créée ou mise à jour à chaque
- * envoi. Le consentement horodaté est porté par chaque demande (`Request.consentAt`, IP, agent utilisateur).
+ * Valeurs d'un envoi appliquées à une fiche existante : les champs de `FILLABLE_FIELDS` seulement là où la fiche est
+ * vide (le quartier suit la ville) ; la langue et la date de dernière activité suivent le dernier envoi ; le profil
+ * n'est jamais remplacé.
+ */
+function fillMissing(
+  existing: Record<FillableField, string | null>,
+  provided: Prisma.ContactUncheckedUpdateInput,
+): Prisma.ContactUncheckedUpdateInput {
+  const update: Prisma.ContactUncheckedUpdateInput = {};
+  if (provided.language !== undefined) update.language = provided.language;
+  if (provided.lastActivityAt !== undefined) update.lastActivityAt = provided.lastActivityAt;
+  const empty = (field: FillableField) => !existing[field]?.trim();
+  for (const field of Object.keys(FILLABLE_FIELDS) as FillableField[]) {
+    if (field === 'district' || provided[field] === undefined || !empty(field)) continue;
+    Object.assign(update, { [field]: provided[field] });
+    if (field === 'city' && provided.district !== undefined) update.district = provided.district;
+  }
+  return update;
+}
+
+/**
+ * Fiches contact des formulaires publics : une fiche par adresse e-mail (normalisée), créée au premier envoi puis
+ * complétée par les suivants. Le consentement horodaté est porté par chaque demande (`Request.consentAt`, IP, agent utilisateur).
  */
 @Injectable()
 export class ContactsService {
@@ -36,7 +73,12 @@ export class ContactsService {
     submission: ContactSubmission,
     now: Date,
   ): Promise<SavedContact> {
-    const { create, update } = toContactData(submission, now);
+    const { create, update: provided } = toContactData(submission, now);
+    // Fiche existante : seuls ses champs vides sont complétés. Un formulaire public n'est pas authentifié, n'importe
+    // qui peut y saisir l'adresse d'un client : il ne doit pas pouvoir remplacer son nom ni son téléphone. Les valeurs
+    // saisies restent dans la demande (`Request.payload`).
+    const existing = await tx.contact.findUnique({ where: { email: create.email }, select: FILLABLE_FIELDS });
+    const update = existing ? fillMissing(existing, provided) : provided;
     const saved = await tx.contact.upsert({
       where: { email: create.email },
       create,

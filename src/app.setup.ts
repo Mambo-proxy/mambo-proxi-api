@@ -31,8 +31,9 @@ export function configureApp(app: NestExpressApplication): void {
       crossOriginResourcePolicy: { policy: 'same-site' },
     }),
   );
-  // Analyseur JSON déclaré ici (NestJS ne le réenregistre pas) pour traduire aussitôt ses erreurs.
-  app.useBodyParser('json', { limit: '100kb' });
+  // Analyseur JSON déclaré ici (NestJS ne le réenregistre pas) pour traduire aussitôt ses erreurs. 1 Mo : le contrat
+  // autorise un article de 2 × 60 000 caractères et un HTML de 200 000 caractères (jusqu'à 4 octets chacun en UTF-8).
+  app.useBodyParser('json', { limit: '1mb' });
   // Lots de la mesure d'audience envoyés par `navigator.sendBeacon` (JSON en `text/plain`, 16 Kio au plus) : la
   // seule route qui lit un corps texte (`POST /v1/analytics/events`) ; ailleurs, un corps texte échoue à la validation.
   app.useBodyParser('text', { type: 'text/plain', limit: '16kb' });
