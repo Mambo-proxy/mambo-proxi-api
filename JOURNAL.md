@@ -1259,3 +1259,19 @@
 - Base de l'EC2 restaurée sur le VPS (`pg_restore`), migrations à jour.
 - E-mails par Resend (`smtp.resend.com:465`, expéditeur `contact@mamboproxi.com`, domaine vérifié) au lieu de Gmail.
 - Clé secrète Turnstile du domaine, `SITE_ENV=production`.
+
+## Correctifs de l'audit (15 novembre 2026)
+
+### Fait
+
+- **Limitation de débit des appels serveur du site** : les rendus Next.js appellent l'API par le réseau interne
+  (`http://api:4000`) et arrivaient tous de l'adresse du conteneur `web`, soit un seul quota de 120 requêtes par minute
+  pour tout le site (un robot sur des pages non mises en cache suffisait à faire échouer les rendus). Ces appels portent
+  désormais l'en-tête `x-internal-token` (HMAC de `REVALIDATE_SECRET`, déjà partagé avec le site) et ne sont plus
+  limités (`ThrottlerModule.skipIf`, `common/throttling/internal-request.ts`).
+- **Corps JSON jusqu'à 1 Mo** (100 Kio auparavant) : le contrat autorise un article de 2 × 60 000 caractères et un HTML
+  de 200 000 caractères, refusés jusqu'ici par un 413.
+
+### Décisions
+
+- Jeton dérivé de `REVALIDATE_SECRET` plutôt qu'un nouveau secret : aucune variable à ajouter sur le serveur.

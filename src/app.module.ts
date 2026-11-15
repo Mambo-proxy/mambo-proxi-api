@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
+import type { Request } from 'express';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 import { ProblemFilter } from './common/problem/problem.filter.js';
 import { AppThrottlerGuard, DEFAULT_THROTTLE } from './common/throttling/app-throttler.guard.js';
+import { isInternalRequest } from './common/throttling/internal-request.js';
 import { AppConfigModule } from './config/app-config.module.js';
 import { AppConfigService } from './config/app-config.service.js';
 import { HealthModule } from './health/health.module.js';
@@ -45,9 +47,18 @@ import { PrismaModule } from './prisma/prisma.module.js';
       inject: [AppConfigService],
       useFactory: (config: AppConfigService) => buildLoggerParams(config),
     }),
-    ThrottlerModule.forRoot({
-      throttlers: [{ name: 'default', ...DEFAULT_THROTTLE }],
-      setHeaders: true,
+    ThrottlerModule.forRootAsync({
+      inject: [AppConfigService],
+      useFactory: (config: AppConfigService) => {
+        const secret = config.get('REVALIDATE_SECRET');
+        return {
+          throttlers: [{ name: 'default', ...DEFAULT_THROTTLE }],
+          setHeaders: true,
+          // Appels serveur du site (réseau interne) : non limités, voir `internal-request.ts`.
+          skipIf: (context) =>
+            isInternalRequest(context.switchToHttp().getRequest<Request>().headers, secret),
+        };
+      },
     }),
     PrismaModule,
     HealthModule,
