@@ -232,6 +232,14 @@ export class AdminMagazineService {
       }
     }
 
+    if (
+      patch.publishAt !== undefined &&
+      data.status === undefined &&
+      current.status === 'SCHEDULED' &&
+      data.publishAt
+    )
+      await this.newsletter.assertScheduledBeforeSend(id, data.publishAt as Date);
+
     try {
       await this.prisma.$transaction(async (tx) => {
         const updated = await tx.magazineEdition.update({
@@ -298,6 +306,7 @@ export class AdminMagazineService {
     const current = await this.find(id);
     const date = publishAt === null ? now : new Date(publishAt);
     const status: MagazineEditionStatus = date.getTime() > now.getTime() ? 'SCHEDULED' : 'PUBLISHED';
+    if (status === 'SCHEDULED') await this.newsletter.assertScheduledBeforeSend(id, date);
     await this.prisma.$transaction(async (tx) => {
       await tx.magazineEdition.update({
         where: { id },

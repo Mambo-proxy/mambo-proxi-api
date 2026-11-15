@@ -3337,7 +3337,7 @@ paths:
       operationId: adminUpdateMagazineEdition
       x-permissions: [content:write]
       summary: Enregistrer une édition
-      description: Une édition publiée est mise à jour en ligne immédiatement (tag de revalidation `page:magazine`). Un numéro déjà pris renvoie 409.
+      description: Une édition publiée est mise à jour en ligne immédiatement (tag de revalidation `page:magazine`). Un numéro déjà pris renvoie 409, de même qu'une édition programmée reportée après la date d'envoi programmée de sa newsletter.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       requestBody:
@@ -3377,7 +3377,7 @@ paths:
       operationId: adminPublishMagazineEdition
       x-permissions: [content:write]
       summary: Publier ou programmer la publication
-      description: Sans date (ou avec une date passée), l'édition est publiée tout de suite ; avec une date future, elle est programmée (`SCHEDULED`).
+      description: Sans date (ou avec une date passée), l'édition est publiée tout de suite ; avec une date future, elle est programmée (`SCHEDULED`). Une date postérieure à l'envoi programmé de sa newsletter renvoie 409.
       security: [{ cookieAuth: [], csrfToken: [] }]
       parameters: [{ $ref: '#/components/parameters/IdPath' }]
       requestBody:
@@ -3396,6 +3396,7 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
         '422': { $ref: '#/components/responses/ValidationError' }
 
   /v1/admin/magazine/editions/{id}/unpublish:

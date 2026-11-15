@@ -389,6 +389,21 @@ export class MagazineNewsletterService {
     for (const campaignId of ids) await this.dispatch.scheduleStart(campaignId, scheduledAt, now);
   }
 
+  /**
+   * Édition reprogrammée (`SCHEDULED` à `publishAt`) : refusée (409) si un envoi par la newsletter est programmé avant
+   * cette date, sinon les abonnés recevraient des liens vers une édition pas encore en ligne.
+   */
+  async assertScheduledBeforeSend(editionId: string, publishAt: Date): Promise<void> {
+    const early = await this.prisma.campaign.findFirst({
+      where: { magazineEditionId: editionId, status: 'PROGRAMMEE', scheduledAt: { lt: publishAt } },
+      select: { id: true },
+    });
+    if (early)
+      throw conflict(
+        'L’envoi par la newsletter est programmé avant cette date de publication : choisissez une date antérieure ou reprogrammez d’abord l’envoi.',
+      );
+  }
+
   /** Dépublication : les campagnes programmées de l'édition repassent en brouillon (tâches ignorées au départ). */
   async cancelScheduled(tx: Prisma.TransactionClient, editionId: string): Promise<number> {
     const cancelled = await tx.campaign.updateMany({
