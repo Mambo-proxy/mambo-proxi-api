@@ -1280,3 +1280,23 @@
 - Fiches contact : un formulaire public n'est pas authentifié, n'importe qui pouvait remplacer le nom ou le téléphone
   d'un client en saisissant son adresse (décision du 15/11/2026 : compléter seulement).
 - Jeton dérivé de `REVALIDATE_SECRET` plutôt qu'un nouveau secret : aucune variable à ajouter sur le serveur.
+
+## Correctifs de l'audit, priorité moyenne (15 novembre 2026)
+
+### Fait
+
+- **Erreurs Prisma** : `P2002` (doublon, deux envois simultanés) → 409, `P2025` (élément supprimé entre la lecture et
+  l'écriture) → 404, au lieu d'erreurs 500 (`ProblemFilter`).
+- **Code OTP** : l'essai est réservé de façon atomique avant la comparaison ; des vérifications simultanées ne testent
+  plus que 5 codes au plus.
+- **Authentification** : les autres liens de réinitialisation sont invalidés avec les sessions (`revokeCredentials`) ;
+  préfixe `/v1/admin` comparé sans casse, comme le routage.
+- **Magazine** : une édition programmée ne peut plus être reportée (PATCH `publishAt`, `publish`) après l'envoi
+  programmé de sa newsletter (409, contrat mis à jour).
+- **Médias** : un média `FAILED` (variantes impossibles) reste affiché et sélectionnable (original sans variantes) ;
+  la suppression ne retire que les lignes d'usage reconnues obsolètes (un usage enregistré entre-temps bloque par sa
+  clé étrangère) ; reprise des médias restés `PROCESSING` malgré une ancienne tâche conservée par la file.
+- **Newsletter** : une adresse en attente ou désinscrite saisie de nouveau (inscription ou case des formulaires)
+  reçoit seulement un nouveau lien ; fiche, consentement et désinscription ne changent qu'à la confirmation (nouveau
+  consentement horodaté pour un désinscrit). La création des envois d'une campagne est relancée à chaque reprise (liste
+  complétée après un arrêt).

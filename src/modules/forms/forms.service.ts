@@ -391,7 +391,8 @@ export class FormsService {
           },
           now,
         );
-        return { newsletterPending: status === 'EN_ATTENTE' };
+        // En attente, ou désinscrit qui se réinscrit : lien de confirmation à envoyer.
+        return { newsletterPending: status === 'EN_ATTENTE' || status === 'DESINSCRIT' };
       },
       // Double opt-in : lien de confirmation envoyé par le module de la newsletter.
       afterCommit: async (contact, extra) => {
