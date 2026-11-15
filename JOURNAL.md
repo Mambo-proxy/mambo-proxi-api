@@ -1271,7 +1271,12 @@
   limités (`ThrottlerModule.skipIf`, `common/throttling/internal-request.ts`).
 - **Corps JSON jusqu'à 1 Mo** (100 Kio auparavant) : le contrat autorise un article de 2 × 60 000 caractères et un HTML
   de 200 000 caractères, refusés jusqu'ici par un 413.
+- **Fiches contact des formulaires publics** : une fiche existante n'est plus que complétée (champs vides) par un nouvel
+  envoi ; nom, téléphone, ville, structure et canal préféré ne sont plus remplacés. Les valeurs saisies restent dans la
+  demande. La langue suit toujours le dernier envoi.
 
 ### Décisions
 
+- Fiches contact : un formulaire public n'est pas authentifié, n'importe qui pouvait remplacer le nom ou le téléphone
+  d'un client en saisissant son adresse (décision du 15/11/2026 : compléter seulement).
 - Jeton dérivé de `REVALIDATE_SECRET` plutôt qu'un nouveau secret : aucune variable à ajouter sur le serveur.
